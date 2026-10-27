@@ -1,0 +1,25 @@
+{
+  "mode": "bundled",
+  "pages": [
+    2,
+    3,
+    4
+  ],
+  "actual_reflow": true,
+  "provider_api_calls": 0,
+  "resource_download_attempts": 0,
+  "paragraph_cache_hits": 0,
+  "chinese_characters": [
+    1398,
+    1659,
+    1163
+  ],
+  "songti_embedded": true,
+  "mean_pixel_error_against_0_2_1": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "excluded_toolkits_absent": true,
+  "python": "./.cache/package/macos-arm64/python/bin/python3.12"
+}

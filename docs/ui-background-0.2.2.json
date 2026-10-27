@@ -1,0 +1,17 @@
+{
+  "version": "0.2.2",
+  "model": "deepseek-flash",
+  "settingsOpened": true,
+  "settingsRootBackground": "rgb(236, 236, 236)",
+  "settingsBodyBackground": "rgb(236, 236, 236)",
+  "keyPersistedAfterRestart": true,
+  "storedKeyReadBack": true,
+  "forwardSync": true,
+  "reverseSync": true,
+  "independent": true,
+  "cleanup": true,
+  "reopenZeroAPI": true,
+  "ok": true,
+  "test": "Installed standalone XPI in isolated Zotero profile; native settings screenshot visually checked; cached three-page translation reused without new API calls.",
+  "api_requests": 0
+}

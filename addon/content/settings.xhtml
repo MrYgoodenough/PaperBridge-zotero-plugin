@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge 设置" width="650" height="760">
+  <html:style>
+    :root { color-scheme: light dark; background-color: Canvas; color: CanvasText; }
+    body { font: 15px "Songti SC", "SimSun", serif; margin: 28px; background-color: Canvas; color: CanvasText; }
+    [hidden] { display:none !important; }
+    h1 { font-size: 23px; margin: 0 0 6px; } p { color: light-dark(#62666e,#bbb); line-height:1.6; }
+    label { display: block; margin: 16px 0 6px; font-weight: 550; }
+    input, select { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #8886; border-radius:6px; background: light-dark(#fff,#333); color:inherit; font:inherit; }
+    .row { display: flex; gap: 14px; } .row > div { flex:1; }
+    button { padding: 9px 14px; border:1px solid #8886; border-radius:6px; font:inherit; cursor:pointer; }
+    .actions { display:flex; gap:8px; margin-top:22px; } #save { background:#2963d8;color:white;border-color:#2963d8; }
+    #status { white-space:pre-wrap; font-size:13px; } small { display:block; color:light-dark(#666,#aaa);margin-top:6px; }
+  </html:style>
+  <html:body>
+    <html:h1>PaperBridge</html:h1>
+    <html:p>论文全文翻译，原文与译文并排阅读。保留 PDF 的公式、图像与表格结构。</html:p>
+    <html:small>中文译文使用嵌入式宋体，标题与正文随原文层级排版。</html:small>
+    <html:label for="key">DeepSeek API Key</html:label>
+    <html:input id="key" type="password" autocomplete="off" placeholder="sk-…"/>
+    <html:small>密钥保存在 Zotero 登录管理器中，重启后仍可使用。论文文本会发送至所配置的 API。</html:small>
+    <html:label for="baseURL">API 地址</html:label>
+    <html:input id="baseURL"/>
+    <html:div class="row">
+      <html:div><html:label for="model">模型</html:label><html:select id="model"><html:option value="deepseek-flash">deepseek-flash</html:option></html:select></html:div>
+      <html:div><html:label for="language">目标语言</html:label><html:select id="language"><html:option value="zh-CN">简体中文</html:option><html:option value="zh-TW">繁體中文</html:option><html:option value="ja">日本語</html:option></html:select></html:div>
+    </html:div>
+    <html:div class="row">
+      <html:div><html:label for="pages">页码范围（空白表示全文）</html:label><html:input id="pages" placeholder="例如 1-3,5"/></html:div>
+    </html:div>
+    <html:div id="python-settings"><html:label for="pythonPath">本机 Python 路径（本机版使用）</html:label>
+    <html:input id="pythonPath" placeholder="例如 /opt/homebrew/bin/python3.12"/>
+    <html:small>本机版需要 arm64 Python 3.12，留空检测常见位置；第三方依赖随 XPI 提供。</html:small></html:div>
+    <html:small>排版依赖随安装包提供，插件不自动下载资源。</html:small>
+    <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">保存并检查引擎</html:button><html:button id="data">数据目录</html:button><html:button id="close">关闭</html:button></html:div>
+    <html:p id="status" role="status"/>
+    <html:p id="usage"/>
+    <html:small id="locations" style="overflow-wrap:anywhere"/>
+    <html:small>删除规则：论文条目进入回收站或永久删除时，删除生成的译文并清理其缓存；只删除原 PDF、论文条目仍在时保留译文。恢复条目不会恢复已删除的译文。</html:small>
+  </html:body>
+  <script src="chrome://paperbridge/content/settings.js"/>
+</window>

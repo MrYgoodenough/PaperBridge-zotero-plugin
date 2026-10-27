@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "model": "deepseek-flash",
+  "settingsOpened": true,
+  "keyPersistedAfterRestart": true,
+  "translatedAttachment": "./.runtime/packaged-data/storage/YBELR543/translated.pdf",
+  "sourceAttachment": "./.runtime/packaged-data/storage/7NV86EY2/pi0-v3.pdf",
+  "engineRoot": "./.runtime/packaged-data/paperbridge/0.2.0",
+  "storedKeyReadBack": true,
+  "selectedPages": "2-4",
+  "forwardSync": true,
+  "reverseSync": true,
+  "independent": true,
+  "cleanup": true,
+  "ok": true,
+  "phase": "complete"
+}

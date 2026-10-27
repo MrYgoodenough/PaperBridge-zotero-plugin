@@ -1,0 +1,18 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const context = vm.createContext({ Zotero: {}, Services: {}, Components:{utils:{cloneInto:value=>value}} });
+vm.runInContext(fs.readFileSync('addon/content/paperbridge.js', 'utf8'), context);
+const bridge = context.PaperBridge;
+const left = { currentScaleValue: 'page-width', _location: { pageNumber: 4, left: 0, top: 600 } };
+let destination;
+const right = { pagesCount: 3, scrollPageIntoView(value) { destination = value; } };
+bridge.syncPosition({ frames:[{},{}], apps: [{pdfViewer:left}, {pdfViewer:right}] }, 0);
+assert.equal(right.currentScaleValue, 'page-width');
+assert.equal(destination.pageNumber, 3);
+assert.equal(destination.destArray[3], 600);
+left._location = null;
+destination = null;
+bridge.syncPosition({ apps: [{pdfViewer:left}, {pdfViewer:right}] }, 0);
+assert.equal(destination, null);
+console.log('PDF coordinate mapping and page clamping passed');

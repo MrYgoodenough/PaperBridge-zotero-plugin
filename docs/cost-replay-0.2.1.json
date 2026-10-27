@@ -1,0 +1,8 @@
+{
+  "provider_api_calls": 0,
+  "baseline_actual_requests": 12,
+  "new_offline_batches": 8,
+  "new_estimated_input_tokens": 4972,
+  "unmapped_paragraphs": 0,
+  "stable_system_prefixes": 1
+}

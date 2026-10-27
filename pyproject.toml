@@ -1,0 +1,22 @@
+[project]
+name = "paperbridge"
+version = "0.3.1"
+description = "Layout-preserving DeepSeek translation bridge for Zotero"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "babeldoc==0.6.4", "fonttools>=4.60,<5",
+  "bitstring>=4.3,<5", "pymupdf==1.26.7", "pymupdf4llm<1",
+  "openai>=1.99,<3", "peewee>=3.17,<4",
+]
+
+[tool.uv]
+package = false
+cache-dir = ".cache/uv"
+
+[[tool.uv.index]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "reportlab>=4,<5", "cmake==4.4.4", "ninja==1.13.2"]

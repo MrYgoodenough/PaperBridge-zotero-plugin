@@ -1,0 +1,22 @@
+{
+  "provider": "DeepSeek",
+  "model": "deepseek-chat",
+  "translated_pages": [
+    1
+  ],
+  "total_pages": 17,
+  "source_pages": 17,
+  "page_dimensions_match": true,
+  "songti_fonts": [
+    "Songti SC Regular",
+    "Songti SC Bold",
+    "Songti SC Regular"
+  ],
+  "source_images": 159,
+  "translated_images": 71,
+  "chinese_characters": 541,
+  "visible_source_images": 79,
+  "original_visible_images_preserved": true,
+  "protected_regions": 1,
+  "chinese_font": "Songti SC Regular / Bold"
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "mode": "local",
+    "bytes": 169387226,
+    "size_MiB": 161.54,
+    "reduction_percent": 39.41,
+    "compressed_parts_MiB": {
+      "model_and_tokenizer": 63.44,
+      "third_party": 96.47,
+      "plugin_backend_and_licenses": 0.04
+    },
+    "archive_crc": "passed",
+    "entries": 5889
+  },
+  {
+    "mode": "bundled",
+    "bytes": 181437160,
+    "size_MiB": 173.03,
+    "reduction_percent": 35.1,
+    "compressed_parts_MiB": {
+      "model_and_tokenizer": 63.44,
+      "python_runtime": 11.37,
+      "third_party": 96.47,
+      "plugin_backend_and_licenses": 0.04
+    },
+    "archive_crc": "passed",
+    "entries": 6499
+  }
+]

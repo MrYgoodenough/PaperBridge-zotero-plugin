@@ -1,0 +1,144 @@
+{
+  "version": "0.2.0",
+  "platform": "macos-arm64",
+  "packaged_xpi_verified": true,
+  "key_persistence_verified": true,
+  "model": "deepseek-flash",
+  "translated_pages": [
+    2,
+    3,
+    4
+  ],
+  "pages": [
+    {
+      "page": 2,
+      "chinese_characters": 1401,
+      "songti_fonts": [
+        "Songti SC Bold",
+        "Songti SC Regular"
+      ],
+      "page_geometry_preserved": true,
+      "original_visible_images_preserved": true,
+      "protected_regions": 1,
+      "protected_region_mean_pixel_errors": [
+        0.0
+      ]
+    },
+    {
+      "page": 3,
+      "chinese_characters": 1680,
+      "songti_fonts": [
+        "Songti SC Regular"
+      ],
+      "page_geometry_preserved": true,
+      "original_visible_images_preserved": true,
+      "protected_regions": 0,
+      "protected_region_mean_pixel_errors": []
+    },
+    {
+      "page": 4,
+      "chinese_characters": 1175,
+      "songti_fonts": [
+        "Songti SC Bold",
+        "Songti SC Regular"
+      ],
+      "page_geometry_preserved": true,
+      "original_visible_images_preserved": true,
+      "protected_regions": 1,
+      "protected_region_mean_pixel_errors": [
+        0.0
+      ]
+    }
+  ],
+  "usage": {
+    "model": "deepseek-flash",
+    "api_requests": 12,
+    "input_tokens": 10942,
+    "cached_input_tokens": 2048,
+    "uncached_input_tokens": 8894,
+    "output_tokens": 3958,
+    "local_cache_hits": 0,
+    "requests": [
+      {
+        "prompt_tokens": 713,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 713,
+        "completion_tokens": 176
+      },
+      {
+        "prompt_tokens": 925,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 925,
+        "completion_tokens": 326
+      },
+      {
+        "prompt_tokens": 855,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 855,
+        "completion_tokens": 299
+      },
+      {
+        "prompt_tokens": 996,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 996,
+        "completion_tokens": 413
+      },
+      {
+        "prompt_tokens": 1169,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 913,
+        "completion_tokens": 439
+      },
+      {
+        "prompt_tokens": 1230,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 974,
+        "completion_tokens": 537
+      },
+      {
+        "prompt_tokens": 1105,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 849,
+        "completion_tokens": 545
+      },
+      {
+        "prompt_tokens": 1222,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 966,
+        "completion_tokens": 577
+      },
+      {
+        "prompt_tokens": 732,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 476,
+        "completion_tokens": 207
+      },
+      {
+        "prompt_tokens": 581,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 325,
+        "completion_tokens": 67
+      },
+      {
+        "prompt_tokens": 667,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 411,
+        "completion_tokens": 136
+      },
+      {
+        "prompt_tokens": 747,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 491,
+        "completion_tokens": 236
+      }
+    ],
+    "excluded_graphic_characters": 303
+  },
+  "reader_checks": {
+    "forwardSync": true,
+    "reverseSync": true,
+    "independent": true,
+    "cleanup": true,
+    "ok": true
+  }
+}

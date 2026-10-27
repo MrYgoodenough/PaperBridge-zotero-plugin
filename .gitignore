@@ -1,0 +1,50 @@
+# Local environments, dependencies, profiles, caches and test data
+.venv/
+venv/
+.tools/
+.cache/
+.runtime/
+tmp/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+node_modules/
+
+# Credentials and local configuration (only the placeholder example is public)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# OS, editor and agent state
+.DS_Store
+._*
+Thumbs.db
+.idea/
+.vscode/
+.codex/
+.agents/
+*.swp
+*.swo
+
+# Publish installers as GitHub Release assets; retain only this version's checksum
+*.xpi
+*.zip
+/dist/*
+!/dist/paperbridge-0.3.1-macos-arm64.xpi.sha256
+
+# The current README is local; it will be published separately by the owner
+/README*

@@ -1,0 +1,36 @@
+{
+  "same_paper_pages": [
+    2,
+    3,
+    4
+  ],
+  "provider": "DeepSeek",
+  "model": "deepseek-flash",
+  "before": {
+    "api_requests": 12,
+    "input_tokens": 10942,
+    "cached_input_tokens": 2048,
+    "uncached_input_tokens": 8894,
+    "output_tokens": 3958
+  },
+  "after": {
+    "api_requests": 10,
+    "input_tokens": 5610,
+    "cached_input_tokens": 896,
+    "uncached_input_tokens": 4714,
+    "output_tokens": 3843
+  },
+  "uncached_input_reduction_percent": 47.0,
+  "total_input_reduction_percent": 48.73,
+  "same_system_prefix_all_requests": true,
+  "pdf_reopen_api_calls": 0,
+  "paragraph_replay": {
+    "provider_api_calls": 0,
+    "recorded_unique_inputs": 26,
+    "cached_inputs_found": 26,
+    "reordered_cache_hits": 26,
+    "cache_survives_new_translator": true
+  },
+  "layout_verified": true,
+  "additional_paid_warmup_requests": 0
+}

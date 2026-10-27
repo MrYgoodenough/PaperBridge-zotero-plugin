@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "PaperBridge · 论文对照翻译",
+  "version": "0.3.1",
+  "description": "DeepSeek 全文翻译、保留论文排版与公式图表、原译文分屏阅读。",
+  "author": "PaperBridge contributors",
+  "applications": {
+    "zotero": {
+      "id": "paperbridge@local.dev",
+      "update_url": "https://example.invalid/paperbridge/updates.json",
+      "strict_min_version": "9.0",
+      "strict_max_version": "9.*"
+    }
+  }
+}

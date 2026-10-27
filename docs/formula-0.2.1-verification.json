@@ -1,0 +1,11 @@
+{
+  "page": 5,
+  "provider_api_calls": 0,
+  "protected_regions": 3,
+  "formula_texts_match": true,
+  "mean_pixel_errors_0_to_255": [
+    0.0,
+    0.22472287537789723,
+    0.21048850574712644
+  ]
+}

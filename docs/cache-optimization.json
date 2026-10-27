@@ -1,0 +1,13 @@
+{
+  "provider_api_calls_in_audit": 0,
+  "token_counts_are_estimates": true,
+  "before_unique_prompts": 37,
+  "before_estimated_input_tokens": 13274,
+  "after_prompts": 2,
+  "after_estimated_input_tokens": 1594,
+  "estimated_input_reduction_percent": 88.0,
+  "excluded_graphic_characters": 560,
+  "after_single_paragraph_fallbacks": 0,
+  "layout_validation_passed": true,
+  "chinese_characters_after": 541
+}

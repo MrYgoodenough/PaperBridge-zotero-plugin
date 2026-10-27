@@ -1,0 +1,11 @@
+{
+  "version": "0.3.0",
+  "python": "<PYTHON_EXECUTABLE>",
+  "job_state": "done",
+  "provider_api_calls": 0,
+  "source_and_temporary_files_removed": true,
+  "remaining_files": [
+    "translated.pdf",
+    "usage.json"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "mode": "bundled",
+  "version": "0.3.0",
+  "python": "./.runtime/packaged-data/paperbridge/engine/python/bin/python3.12",
+  "job_state": "done",
+  "provider_api_calls": 0,
+  "source_and_temporary_files_removed": true,
+  "remaining_files": [
+    "translated.pdf",
+    "usage.json"
+  ]
+}

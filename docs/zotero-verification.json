@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "version": "9.0.6",
+  "menu": true,
+  "leftPages": 2,
+  "rightPages": 2,
+  "positions": [
+    {
+      "page": 2,
+      "location": {
+        "pageNumber": 2,
+        "scale": "page-width",
+        "top": 792,
+        "left": -28,
+        "rotation": 0,
+        "pdfOpenParams": "#page=2&zoom=page-width,-28,792"
+      }
+    },
+    {
+      "page": 2,
+      "location": {
+        "pageNumber": 2,
+        "scale": "page-width",
+        "top": 792,
+        "left": -28,
+        "rotation": 0,
+        "pdfOpenParams": "#page=2&zoom=page-width,-28,792"
+      }
+    }
+  ],
+  "manualSynced": true,
+  "leftWidth": 497,
+  "rightWidth": 497,
+  "synced": true,
+  "reverseSynced": true,
+  "independent": true,
+  "toolbar": true,
+  "controls": true,
+  "cleanup": true,
+  "settings": true,
+  "realDeepSeekOpened": true,
+  "endToEndSavedAttachment": true
+}

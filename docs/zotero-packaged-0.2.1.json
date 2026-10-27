@@ -1,0 +1,41 @@
+{
+  "version": "0.2.1",
+  "model": "deepseek-flash",
+  "settingsOpened": true,
+  "keyPersistedAfterRestart": true,
+  "coldUsage": {
+    "api_requests": 10,
+    "input_tokens": 5610,
+    "cached_input_tokens": 896,
+    "uncached_input_tokens": 4714,
+    "output_tokens": 3843,
+    "local_cache_hits": 0,
+    "paragraph_cache_hits": 0,
+    "model": "deepseek-flash",
+    "date": "2026-10-27T07:50:10.866Z"
+  },
+  "translatedAttachment": "./.runtime/packaged-data/storage/5ZZSKL33/translated.pdf",
+  "sourceAttachment": "./.runtime/packaged-data/storage/Q63SCKPG/pi0-v3.pdf",
+  "engineRoot": "./.runtime/packaged-data/paperbridge/0.2.1",
+  "cacheRoot": "./.runtime/packaged-data/paperbridge/cache",
+  "stateRoot": "./.runtime/packaged-data/paperbridge/.runtime",
+  "storedKeyReadBack": true,
+  "selectedPages": "2-4",
+  "forwardSync": true,
+  "reverseSync": true,
+  "independent": true,
+  "cleanup": true,
+  "reopenUsage": {
+    "api_requests": 0,
+    "input_tokens": 0,
+    "cached_input_tokens": 0,
+    "uncached_input_tokens": 0,
+    "output_tokens": 0,
+    "full_pdf_cache": true,
+    "model": "deepseek-flash",
+    "date": "2026-10-27T07:50:18.489Z"
+  },
+  "reopenZeroAPI": true,
+  "ok": true,
+  "phase": "complete"
+}

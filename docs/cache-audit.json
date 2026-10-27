@@ -1,0 +1,34 @@
+{
+  "token_counts_are_estimates": true,
+  "jobs": [
+    {
+      "job": "8ef355947f34",
+      "paragraphs": 41,
+      "unique_prompts": 37,
+      "unchanged_fallbacks": 31,
+      "batch_prompts": 8,
+      "single_prompts": 29,
+      "estimated_input_tokens": 13274,
+      "prompt_token_range": [
+        224,
+        833
+      ],
+      "common_prefix_estimated_tokens": 28
+    },
+    {
+      "job": "b8f0fe353e93",
+      "paragraphs": 41,
+      "unique_prompts": 37,
+      "unchanged_fallbacks": 31,
+      "batch_prompts": 8,
+      "single_prompts": 29,
+      "estimated_input_tokens": 13274,
+      "prompt_token_range": [
+        224,
+        833
+      ],
+      "common_prefix_estimated_tokens": 28
+    }
+  ],
+  "shared_prompts_between_runs": 37
+}
