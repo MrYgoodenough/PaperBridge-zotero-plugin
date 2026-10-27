@@ -1,0 +1,17 @@
+# Text files are stored and checked out with LF on every platform, so a
+# Windows checkout and a macOS checkout always produce the same commit.
+* text=auto eol=lf
+
+# PowerShell scripts follow the Windows convention; they run with either.
+*.ps1 text eol=crlf
+
+# Binaries: never convert line endings or diff them as text.
+*.png binary
+*.jpg binary
+*.pdf binary
+*.xpi binary
+*.zip binary
+*.onnx binary
+*.ttf binary
+*.ttc binary
+*.sqlite binary

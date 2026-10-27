@@ -44,6 +44,3 @@ Thumbs.db
 *.xpi
 *.zip
 /dist/
-
-# The current README is local; it will be published separately by the owner
-/README*

@@ -6,12 +6,19 @@ Zotero 9 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻译�
 
 ## 安装
 
-目前的安装包是 **macOS Apple Silicon（arm64）版**。自带 Python 版。安装方法如下：
+0.3.1 为两个平台各提供一个自带 Python 的安装包，按系统下载对应文件：
+
+| 平台 | 安装包 |
+|---|---|
+| macOS Apple Silicon（arm64） | `paperbridge-0.3.1-macos-arm64.xpi` |
+| Windows x64 | `paperbridge-0.3.1-windows-x64.xpi` |
+
+安装方法如下：
 1. Zotero → **工具 → 插件 → 齿轮 → 从文件安装插件**，选择上述 XPI。
 2. **工具 → PaperBridge → 设置**，填写 DeepSeek API Key，点击“保存设置”。
 3. 打开 PDF，点击 **译 / 分屏**，或右键论文选择 **DeepSeek 翻译并分屏**。
 
-安装包包含独立 Python、BabelDOC、版面模型和 tokenizer。**无需安装 uv/Python，无需工程目录、`.env` 或终端命令。** 首次使用自动解包内置引擎，之后随 Zotero 自动启动和退出。
+安装包包含独立 Python、BabelDOC、版面模型和 tokenizer。**无需安装 uv/Python，无需工程目录、`.env` 或终端命令。** 首次使用自动解包内置引擎，之后随 Zotero 自动启动和退出。每个安装包只支持文件名对应的平台；Intel Mac 与 Windows ARM64 暂未提供预编译包，需按下方“开发与构建”自行打包。
 
 密钥通过插件界面保存到 Zotero 登录管理器，重启后仍可使用。模型默认并固定为 `deepseek-flash`，采用非思考模式处理翻译。`.env` 仅作为隔离测试的密钥输入，生产时插件并不会不读取它。
 
@@ -28,7 +35,12 @@ Zotero 9 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻译�
 
 正文、标题及图注按原布局重排。图片、表格和独立公式区域不发送 API 翻译，输出时从原 PDF 复制矢量、字形和位置。图内及表内英文保留原样。
 
-中文从 macOS 系统“宋体-简”提取常规、粗体字形，按实际使用嵌入译文 PDF。系统字体不随插件分发。扫描件未作为本版验证范围。
+中文按实际使用从系统衬线字体提取字形并嵌入译文 PDF，系统字体不随插件分发：
+
+- macOS：系统“宋体-简”（`Songti.ttc`）的常规、粗体字面。
+- Windows：系统“宋体”（`SimSun`）；粗体优先取 `Noto Serif SC`，缺失时回退到微软雅黑 Bold。
+
+扫描件未作为本版验证范围。
 
 ## 数据与用量
 
@@ -45,6 +57,7 @@ Zotero 9 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻译�
 - 三页均嵌入宋体，页面尺寸及可见图片位置保持一致；两个保护区域的平均像素误差均为 0。
 - 双向同步、独立滚动、关闭分屏清理、译文附件保存：通过。
 - 0.2.1版本对于deepseek在翻译中的未命中缓存较高问题进行了修复：实际用量：10 次请求，输入 5,610 token（缓存命中 896、未命中 4,714），输出 3,843 token。相比 0.2.0，未命中输入减少 47%，总输入减少 48.73%。
+- Windows x64（Zotero 9.0.6）：完整 XPI 解包、独立 Python 启动、选页翻译、分屏与联动滚动、关闭清理均通过；构建与逐项记录见 [docs/windows.md](docs/windows.md)。
 
 ## 开发与构建
 
@@ -59,6 +72,8 @@ sh scripts/build_opencv.sh
 .venv/bin/python scripts/build.py
 .venv/bin/python scripts/build.py --python local
 ```
+
+Windows 下的等价流程见 [docs/windows.md](docs/windows.md)（`scripts/setup.ps1`、`scripts/serve.ps1`）；自带 Python 版直接使用官方 `opencv-python-headless`，无需 `build_opencv.sh`。
 
 `stage_runtime.py` 从 `uv.lock` 收集本平台运行依赖及公开模型资源，`build.py` 将运行时与插件合并到单个 XPI。引擎运行时加载所需的 `.pyi` 类型资源一并保留；开发测试库不打入运行时。
 
