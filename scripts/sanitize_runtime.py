@@ -1,5 +1,6 @@
 """Remove this machine's home path from bundled build metadata before publishing."""
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -17,8 +18,9 @@ def sanitize_runtime(runtime):
         if home not in original:
             continue
         path.write_bytes(original.replace(home, replacement))
-        if original[:4] in macho:
+        if original[:4] in macho and sys.platform == "darwin":
             # Changing Mach-O bytes invalidates its existing signature on Apple Silicon.
+            # Windows and Linux loaders do not verify such embedded paths.
             subprocess.run(["codesign", "--force", "--sign", "-", str(path)], check=True)
         changed.append(path.relative_to(runtime).as_posix())
     return changed

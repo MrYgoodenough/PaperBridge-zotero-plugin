@@ -30,8 +30,8 @@
       <html:div><html:label for="pages">页码范围（空白表示全文）</html:label><html:input id="pages" placeholder="例如 1-3,5"/></html:div>
     </html:div>
     <html:div id="python-settings"><html:label for="pythonPath">本机 Python 路径（本机版使用）</html:label>
-    <html:input id="pythonPath" placeholder="例如 /opt/homebrew/bin/python3.12"/>
-    <html:small>本机版需要 arm64 Python 3.12，留空检测常见位置；第三方依赖随 XPI 提供。</html:small></html:div>
+    <html:input id="pythonPath" placeholder="例如 /opt/homebrew/bin/python3.12 或 C:\Python312\python.exe"/>
+    <html:small>本机版需要与系统架构一致的 Python 3.12，留空检测常见位置；第三方依赖随 XPI 提供。</html:small></html:div>
     <html:small>排版依赖随安装包提供，插件不自动下载资源。</html:small>
     <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">保存并检查引擎</html:button><html:button id="data">数据目录</html:button><html:button id="close">关闭</html:button></html:div>
     <html:p id="status" role="status"/>

@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import os
 import threading
 import sys
 import urllib.error
@@ -68,7 +69,9 @@ def test_token_is_private_and_stable(tmp_path, monkeypatch):
     first = bridge.read_token()
     assert len(first) >= 32
     assert bridge.read_token() == first
-    assert (tmp_path / "token").stat().st_mode & 0o777 == 0o600
+    if os.name != "nt":
+        # Windows has no POSIX permission bits; the data directory ACL applies instead.
+        assert (tmp_path / "token").stat().st_mode & 0o777 == 0o600
 
 
 def test_duplicate_requests_share_running_job(store, tmp_path):

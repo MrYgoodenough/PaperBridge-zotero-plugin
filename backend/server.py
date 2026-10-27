@@ -35,6 +35,35 @@ def clean_completed_job(folder):
             path.unlink()
 
 
+def parent_running(pid):
+    """Report whether the host process is still alive.
+
+    os.kill(pid, 0) checks liveness on POSIX, but on Windows any signal other than the
+    console events terminates the target process, so the host must be queried instead.
+    """
+    if os.name == "nt":
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+        if not handle:
+            return False
+        try:
+            code = ctypes.c_ulong()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+                return False
+            return code.value == 259  # STILL_ACTIVE
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        pass
+    return True
+
+
 def read_token():
     RUNTIME.mkdir(mode=0o700, exist_ok=True)
     path = RUNTIME / "token"
@@ -128,9 +157,11 @@ class JobStore:
                        HF_HOME=str(cache / "huggingface"),TORCH_HOME=str(cache / "torch"),
                        MPLCONFIGDIR=str(cache / "matplotlib"))
             (folder / "tmp").mkdir(exist_ok=True)
-            process = subprocess.Popen([sys.executable, "-I", "-S", "-B", "-u", str(ROOT / "backend/launcher.py"), "engine.py"],
+            process = subprocess.Popen([sys.executable, "-X", "utf8", "-I", "-S", "-B", "-u",
+                                        str(ROOT / "backend/launcher.py"), "engine.py"],
                                        cwd=ROOT, env=env, stdin=subprocess.PIPE,
-                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                                       encoding="utf-8", errors="replace")
             job.update(process=process, state="running", stage="准备内置排版引擎与宋体")
         try:
             payload = {**settings, "api_key": key, "folder": str(folder), "document_key":job["document_key"]}
@@ -255,9 +286,7 @@ def serve(port=0, parent_pid=None):
         def watch_parent():
             while True:
                 threading.Event().wait(3)
-                try:
-                    os.kill(parent_pid, 0)
-                except ProcessLookupError:
+                if not parent_running(parent_pid):
                     server.shutdown()
                     return
         threading.Thread(target=watch_parent,daemon=True).start()

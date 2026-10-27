@@ -17,7 +17,7 @@ def localize_cache():
     # BabelDOC 0.6.4 hardcodes Path.home(), ignoring XDG_CACHE_HOME.
     # Load its constants with only that assignment redirected before other modules import it.
     spec = importlib.util.find_spec("babeldoc.const")
-    source = Path(spec.origin).read_text()
+    source = Path(spec.origin).read_text(encoding="utf-8")
     original = 'CACHE_FOLDER = Path.home() / ".cache" / "babeldoc"'
     if original not in source:
         raise RuntimeError("BabelDOC cache interface changed; install the pinned version")

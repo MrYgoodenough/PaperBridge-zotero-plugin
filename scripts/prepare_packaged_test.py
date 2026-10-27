@@ -1,6 +1,8 @@
 """Install the actual XPI plus a separate test harness into a disposable profile."""
 import json
+import platform
 import shutil
+import sys
 import zipfile
 import argparse
 from pathlib import Path
@@ -10,12 +12,23 @@ PROFILE = ROOT / ".runtime/packaged-profile"
 PROFILE.mkdir(exist_ok=True)
 extensions = PROFILE / "extensions"
 extensions.mkdir(exist_ok=True)
-version=json.loads((ROOT / "addon/manifest.json").read_text())["version"]
+
+
+def build_platform():
+    machine = platform.machine().lower()
+    if sys.platform == "darwin" and machine == "arm64":
+        return "macos-arm64"
+    if sys.platform == "win32" and machine in {"amd64", "x86_64"}:
+        return "windows-x64"
+    raise SystemExit(f"Unsupported test platform: {sys.platform} {platform.machine()}")
+
+
+version=json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))["version"]
 parser = argparse.ArgumentParser()
-parser.add_argument("--local-python", default="", help="Existing arm64 Python 3.12 interpreter to test")
+parser.add_argument("--local-python", default="", help="Existing Python 3.12 interpreter to test")
 options = parser.parse_args()
 suffix = "-local-python" if options.local_python else ""
-shutil.copyfile(ROOT / f"dist/paperbridge-{version}-macos-arm64{suffix}.xpi", extensions / "paperbridge@local.dev.xpi")
+shutil.copyfile(ROOT / f"dist/paperbridge-{version}-{build_platform()}{suffix}.xpi", extensions / "paperbridge@local.dev.xpi")
 (ROOT / ".runtime/packaged-options.json").write_text(json.dumps({"pythonPath":options.local_python}))
 manifest = {"manifest_version":2,"name":"PaperBridge isolated integration tests","version":version,
     "applications":{"zotero":{"id":"paperbridge-tests@local.dev","strict_min_version":"9.0",

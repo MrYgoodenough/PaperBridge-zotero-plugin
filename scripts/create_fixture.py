@@ -1,4 +1,5 @@
 """Generate two vector research-PDF fixtures for reader integration tests."""
+import sys
 from pathlib import Path
 
 from reportlab.lib.colors import HexColor, black
@@ -11,7 +12,11 @@ from reportlab.platypus import Paragraph
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / ".runtime/fixtures"
 OUT.mkdir(exist_ok=True)
-pdfmetrics.registerFont(TTFont("FixtureChinese", "/System/Library/Fonts/Supplemental/Songti.ttc", subfontIndex=6))
+sys.path[:0] = [str(ROOT / "backend")]
+from fonts import FONT_DIR, NAMES, prepare_songti  # noqa: E402
+
+prepare_songti()
+pdfmetrics.registerFont(TTFont("FixtureChinese", str(FONT_DIR / NAMES["regular"])))
 
 
 def text(c, value, box, chinese=False, size=10):
