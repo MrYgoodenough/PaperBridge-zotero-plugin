@@ -1,0 +1,20 @@
+{
+  "version": "0.3.1",
+  "api_calls": 0,
+  "checks": {
+    "original_attachment_removed_translation_retained": true,
+    "citation_trashed_translation_and_cache_deleted": true,
+    "restore_does_not_resurrect_translation": true,
+    "original_file_removed_translation_retained": true,
+    "citation_permanently_erased_cache_deleted": true,
+    "direct_permanent_delete_cleans_translation_and_cache": true,
+    "shared_cache_preserved_for_other_citation": true,
+    "last_shared_owner_deletes_cache": true,
+    "collection_removal_preserves_translation": true,
+    "missed_deletion_reconciled_after_restart": true
+  },
+  "translationsRoot": "./.runtime/packaged-data/storage",
+  "cacheRoot": "./.runtime/packaged-data/paperbridge/cache",
+  "indexPath": "./.runtime/packaged-data/paperbridge/translations.json",
+  "ok": true
+}

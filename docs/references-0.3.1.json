@@ -1,0 +1,21 @@
+{
+  "pages": [
+    12,
+    14,
+    15
+  ],
+  "provider_api_calls": 0,
+  "network_attempts": 0,
+  "reference_entries_checked": 35,
+  "reference_entries_sent_to_llm": 0,
+  "reference_texts_match": true,
+  "reference_pixel_errors": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "body_and_appendix_still_reach_translator": true,
+  "excluded_reference_characters": 8633
+}

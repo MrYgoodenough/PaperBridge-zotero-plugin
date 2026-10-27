@@ -1,0 +1,31 @@
+{
+  "version": "0.3.1",
+  "platform": "macos-arm64",
+  "python_mode": "bundled",
+  "size_MiB": 173.04,
+  "bytes": 181444227,
+  "unit_tests_passed": 36,
+  "zotero_integration_passed": true,
+  "settings_saved_through_ui": true,
+  "lifecycle_checks_passed": 10,
+  "final_pages": "2-4",
+  "final_api_calls": 0,
+  "references_offline_pages": [
+    12,
+    14,
+    15
+  ],
+  "references_excluded_from_llm": true,
+  "references_pixel_error": 0,
+  "development_api_calls": 2,
+  "development_input_tokens": 849,
+  "development_cached_input_tokens": 256,
+  "development_uncached_input_tokens": 593,
+  "formal_zotero_data_directory": "<ZOTERO_DATA_DIR>",
+  "archive_crc": "passed",
+  "source_match": true,
+  "sha256": "1201dcded9e50413d3dd769584fbedffa2cef4686a4578b7207e8b0d39658279",
+  "formal_storage_directory_exists": true,
+  "archive_stage": "before_publication_sanitization",
+  "published_archive_report": "publication-0.3.1.json"
+}

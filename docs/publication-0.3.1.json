@@ -1,0 +1,41 @@
+{
+  "version": "0.3.1",
+  "platform": "macos-arm64",
+  "python_mode": "bundled",
+  "bytes": 181419208,
+  "size_MiB": 173.01,
+  "sha256": "1040320b7e21d904fb8cb950717b5bc0a512001285e79ea2b1ba33ef47051359",
+  "archive_crc": "passed",
+  "archive_source_match": true,
+  "local_home_path_matches": 0,
+  "local_env_secret_matches": 0,
+  "macho_signature": "verified after path sanitization",
+  "javascript_syntax": "passed",
+  "coordinate_mapping_test": "passed",
+  "offline_reflow": {
+    "mode": "publication",
+    "pages": [
+      2,
+      3,
+      4
+    ],
+    "actual_reflow": true,
+    "provider_api_calls": 0,
+    "resource_download_attempts": 0,
+    "paragraph_cache_hits": 26,
+    "chinese_characters": [
+      1398,
+      1659,
+      1163
+    ],
+    "songti_embedded": true,
+    "mean_pixel_error_against_0_2_1": [
+      0.0,
+      0.0,
+      0.00030534099161550144
+    ],
+    "excluded_toolkits_absent": true,
+    "python": ".cache/package/macos-arm64/python/bin/python3.12"
+  },
+  "python_unit_tests_passed": 36
+}

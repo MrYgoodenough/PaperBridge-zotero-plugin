@@ -40,11 +40,10 @@ Thumbs.db
 *.swp
 *.swo
 
-# Publish installers as GitHub Release assets; retain only this version's checksum
+# Publish installers as GitHub Release assets; keep build outputs local
 *.xpi
 *.zip
-/dist/*
-!/dist/paperbridge-0.3.1-macos-arm64.xpi.sha256
+/dist/
 
 # The current README is local; it will be published separately by the owner
 /README*
