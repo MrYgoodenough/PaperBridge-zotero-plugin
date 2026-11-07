@@ -1,3 +1,4 @@
+/** Unpack and launch the platform-specific engine inside the Zotero data directory. */
 /* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils */
 var BundledRuntime = class {
   constructor(rootURI, version) {
@@ -12,7 +13,7 @@ var BundledRuntime = class {
     this.connection = null;
   }
 
-  // Each XPI carries the runtime for one platform under runtime/<platform id>/.
+  /** Describe the runtime layout and interpreter architecture for this platform. */
   platform() {
     const os = Services.appinfo.OS;
     const abi = Services.appinfo.XPCOMABI;
@@ -23,6 +24,10 @@ var BundledRuntime = class {
     if (os === "WINNT" && abi.startsWith("x86_64")) {
       return { id: "windows-x64", label: "Windows x64", python: "python/python.exe",
         machine: "AMD64" };
+    }
+    if (os === "Linux" && abi.startsWith("x86_64")) {
+      return { id: "linux-x64", label: "Linux amd64", python: "python/bin/python3.12",
+        machine: "x86_64" };
     }
     throw new Error(`此安装包不支持 ${os}（${abi}）。请安装与你的系统对应的版本。`);
   }
@@ -107,6 +112,7 @@ var BundledRuntime = class {
     }
   }
 
+  /** Start the isolated engine and wait for its loopback service to become ready. */
   async launch() {
     await this.unpack();
     await this.seedCache();
@@ -116,13 +122,19 @@ var BundledRuntime = class {
     await IOUtils.remove(infoPath, { ignoreAbsent: true });
     const { Subprocess } = ChromeUtils.importESModule("resource://gre/modules/Subprocess.sys.mjs");
     this.python = await this.selectPython(Subprocess);
+    const environment = { PYTHONNOUSERSITE:"1",PYTHONDONTWRITEBYTECODE:"1",PYTHONPATH:null,PYTHONHOME:null,
+      PAPERBRIDGE_CACHE_DIR:this.cache,PAPERBRIDGE_STATE_DIR:this.state };
+    if (Services.appinfo.OS === "Linux") {
+      // ROS shells can prepend incompatible native libraries; change only the child process.
+      environment.LD_LIBRARY_PATH = null;
+      environment.LD_PRELOAD = null;
+    }
     this.process = await Subprocess.call({
       command: this.python,
       arguments: ["-X", "utf8", "-I", "-S", "-B", PathUtils.join(this.home, "backend", "launcher.py"), "server.py", "0", "--parent-pid", String(Services.appinfo.processID)],
       workdir: this.home,
       environmentAppend: true,
-      environment: { PYTHONNOUSERSITE:"1",PYTHONDONTWRITEBYTECODE:"1",PYTHONPATH:null,PYTHONHOME:null,
-        PAPERBRIDGE_CACHE_DIR:this.cache,PAPERBRIDGE_STATE_DIR:this.state },
+      environment,
       stderr: "stdout"
     });
     const process = this.process;
@@ -152,6 +164,7 @@ var BundledRuntime = class {
     throw new Error("内置引擎启动超时：" + this.output);
   }
 
+  /** Return common absolute interpreter paths without searching a ROS-modified PATH. */
   pythonCandidates(platform) {
     if (Services.appinfo.OS === "WINNT") {
       const candidates = [];
@@ -167,10 +180,15 @@ var BundledRuntime = class {
       candidates.push("C:\\Python312\\python.exe", "C:\\Python312-64\\python.exe");
       return candidates;
     }
+    if (Services.appinfo.OS === "Linux") {
+      return ["/usr/bin/python3.12", "/usr/local/bin/python3.12", "/usr/bin/python3",
+        "/usr/local/bin/python3"];
+    }
     return ["/opt/homebrew/bin/python3.12", "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
       "/usr/local/bin/python3.12", "/usr/bin/python3"];
   }
 
+  /** Select the bundled interpreter or verify the configured local Python 3.12. */
   async selectPython(Subprocess) {
     const platform = this.platform();
     // PathUtils.join rejects a component that contains a separator, so split the
@@ -178,10 +196,13 @@ var BundledRuntime = class {
     if (this.build.pythonMode === "bundled") return PathUtils.join(this.home, ...platform.python.split("/"));
     const configured = Zotero.Prefs.get("extensions.paperbridge.pythonPath", true) || "";
     const candidates = configured ? [configured] : this.pythonCandidates(platform);
+    // Interpreter probes must use the same clean native-library environment as the engine.
+    const environment = Services.appinfo.OS === "Linux" ? { LD_LIBRARY_PATH:null,LD_PRELOAD:null } : {};
     for (const command of candidates) {
       if (!await IOUtils.exists(command)) continue;
       const probe = await Subprocess.call({command, arguments:["-I", "-S", "-c",
-        `import sys,platform,ssl,sqlite3; print('paperbridge-python-ok' if sys.version_info[:2]==(3,12) and platform.machine()=='${platform.machine}' else 'incompatible')`],stderr:"stdout"});
+        `import sys,platform,ssl,sqlite3; print('paperbridge-python-ok' if sys.version_info[:2]==(3,12) and platform.machine()=='${platform.machine}' else 'incompatible')`],
+        environmentAppend:true,environment,stderr:"stdout"});
       const result = await probe.stdout.readString();
       const {exitCode} = await probe.wait();
       if (exitCode === 0 && result.trim() === "paperbridge-python-ok") return command;

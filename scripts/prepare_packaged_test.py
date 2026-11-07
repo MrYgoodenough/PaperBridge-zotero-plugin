@@ -7,7 +7,9 @@ import zipfile
 import argparse
 from pathlib import Path
 
+# Keep generated integration-test files inside this checkout.
 ROOT = Path(__file__).resolve().parents[1]
+# Disposable profile whose data directory is separate from the user's library.
 PROFILE = ROOT / ".runtime/packaged-profile"
 PROFILE.mkdir(exist_ok=True)
 extensions = PROFILE / "extensions"
@@ -15,15 +17,20 @@ extensions.mkdir(exist_ok=True)
 
 
 def build_platform():
+    """Use the same platform IDs as the released XPI runtime."""
     machine = platform.machine().lower()
     if sys.platform == "darwin" and machine == "arm64":
         return "macos-arm64"
     if sys.platform == "win32" and machine in {"amd64", "x86_64"}:
         return "windows-x64"
+    if sys.platform == "linux" and machine in {"amd64", "x86_64"}:
+        return "linux-x64"
     raise SystemExit(f"Unsupported test platform: {sys.platform} {platform.machine()}")
 
 
-version=json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))["version"]
+# The helper add-on must support exactly the same Zotero versions as the real add-on.
+addon_manifest=json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))
+version=addon_manifest["version"]
 parser = argparse.ArgumentParser()
 parser.add_argument("--local-python", default="", help="Existing Python 3.12 interpreter to test")
 options = parser.parse_args()
@@ -31,8 +38,10 @@ suffix = "-local-python" if options.local_python else ""
 shutil.copyfile(ROOT / f"dist/paperbridge-{version}-{build_platform()}{suffix}.xpi", extensions / "paperbridge@local.dev.xpi")
 (ROOT / ".runtime/packaged-options.json").write_text(json.dumps({"pythonPath":options.local_python}))
 manifest = {"manifest_version":2,"name":"PaperBridge isolated integration tests","version":version,
-    "applications":{"zotero":{"id":"paperbridge-tests@local.dev","strict_min_version":"9.0",
-    "strict_max_version":"9.*","update_url":"https://example.invalid/tests.json"}}}
+    "applications":{"zotero":{"id":"paperbridge-tests@local.dev",
+    "strict_min_version":addon_manifest["applications"]["zotero"]["strict_min_version"],
+    "strict_max_version":addon_manifest["applications"]["zotero"]["strict_max_version"],
+    "update_url":"https://example.invalid/tests.json"}}}
 bootstrap = '''function install(){} function uninstall(){} function shutdown(){}
 async function startup(){
   await Zotero.initializationPromise;

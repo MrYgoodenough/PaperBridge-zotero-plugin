@@ -37,6 +37,10 @@ Thumbs.db
 .vscode/
 .codex/
 .agents/
+# Local agent tools and scratch files; keep requested task reports versioned.
+/agent/codex/
+/agent/grok/
+/agent/dsh/
 *.swp
 *.swo
 

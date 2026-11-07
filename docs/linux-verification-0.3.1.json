@@ -1,0 +1,145 @@
+{
+  "version": "0.3.1",
+  "platform": "linux-x64",
+  "zoteroVersion": "10.0.8",
+  "model": "deepseek-flash",
+  "settingsOpened": true,
+  "settingsRootBackground": "rgb(250, 250, 250)",
+  "settingsBodyBackground": "rgb(250, 250, 250)",
+  "keyPersistedAfterRestart": true,
+  "settingsSavedThroughUI": true,
+  "locationsShown": true,
+  "coldUsage": {
+    "api_requests": 10,
+    "input_tokens": 5610,
+    "cached_input_tokens": 768,
+    "uncached_input_tokens": 4842,
+    "output_tokens": 3883,
+    "local_cache_hits": 0,
+    "paragraph_cache_hits": 0,
+    "model": "deepseek-flash",
+    "date": "2026-11-07T13:36:19.846Z"
+  },
+  "translatedAttachment": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/storage/UC54IXM9/translated.pdf",
+  "sourceAttachment": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/storage/NR2GRHFR/pi0-v3.pdf",
+  "engineRoot": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/paperbridge/engine",
+  "python": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/paperbridge/engine/python/bin/python3.12",
+  "pythonMode": "bundled",
+  "remainingVersionedEngines": [],
+  "cacheRoot": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/paperbridge/cache",
+  "stateRoot": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/paperbridge/.runtime",
+  "storedKeyReadBack": true,
+  "selectedPages": "2-4",
+  "forwardSync": true,
+  "reverseSync": true,
+  "independent": true,
+  "cleanup": true,
+  "reopenUsage": {
+    "api_requests": 0,
+    "input_tokens": 0,
+    "cached_input_tokens": 0,
+    "uncached_input_tokens": 0,
+    "output_tokens": 0,
+    "full_pdf_cache": true,
+    "model": "deepseek-flash",
+    "date": "2026-11-07T13:36:37.474Z"
+  },
+  "reopenZeroAPI": true,
+  "ok": true,
+  "phase": "complete",
+  "lifecycle": {
+    "version": "0.3.1",
+    "api_calls": 0,
+    "checks": {
+      "original_attachment_removed_translation_retained": true,
+      "citation_trashed_translation_and_cache_deleted": true,
+      "restore_does_not_resurrect_translation": true,
+      "original_file_removed_translation_retained": true,
+      "citation_permanently_erased_cache_deleted": true,
+      "direct_permanent_delete_cleans_translation_and_cache": true,
+      "shared_cache_preserved_for_other_citation": true,
+      "last_shared_owner_deletes_cache": true,
+      "collection_removal_preserves_translation": true,
+      "missed_deletion_reconciled_after_restart": true
+    },
+    "translationsRoot": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/storage",
+    "cacheRoot": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/paperbridge/cache",
+    "indexPath": "/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin/.runtime/packaged-data/paperbridge/translations.json",
+    "ok": true
+  },
+  "pdf": {
+    "translated_pages": [
+      2,
+      3,
+      4
+    ],
+    "chinese_characters": [
+      1360,
+      1572,
+      1109
+    ],
+    "serif_fonts": [
+      [
+        "Noto Serif CJK SC Bold",
+        "Noto Serif CJK SC Regular"
+      ],
+      [
+        "Noto Serif CJK SC Regular"
+      ],
+      [
+        "Noto Serif CJK SC Bold",
+        "Noto Serif CJK SC Regular"
+      ]
+    ],
+    "unselected_text_unchanged": true,
+    "page_count": 17,
+    "all_page_dimensions_unchanged": true
+  },
+  "runtime_glibc_minimum": "2.34",
+  "python_tests": {
+    "passed": 36,
+    "skipped": 0
+  },
+  "synchronization_tests_passed": true,
+  "native_imports_passed": true,
+  "zotero_database_integrity": "ok",
+  "engine_stopped_after_zotero_exit": true,
+  "ros_and_shell_configs_unchanged": true,
+  "formula": {
+    "page": 5,
+    "provider_api_calls": 0,
+    "protected_regions": 3,
+    "formula_texts_match": true,
+    "mean_pixel_errors_0_to_255": [
+      0.0,
+      0.22472287537789723,
+      0.21048850574712644
+    ]
+  },
+  "references": {
+    "pages": [
+      12,
+      14,
+      15
+    ],
+    "provider_api_calls": 0,
+    "network_attempts": 0,
+    "reference_entries_checked": 35,
+    "reference_entries_sent_to_llm": 0,
+    "reference_texts_match": true,
+    "reference_pixel_errors": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "body_and_appendix_still_reach_translator": true,
+    "excluded_reference_characters": 8633
+  },
+  "cancellation": {
+    "running_job_cancelled": true,
+    "actual_engine_child_stopped": true,
+    "completed_api_requests": 0
+  }
+}

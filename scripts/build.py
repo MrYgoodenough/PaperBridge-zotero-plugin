@@ -9,18 +9,23 @@ import zipfile
 from pathlib import Path
 from sanitize_runtime import sanitize_runtime
 
+# Source tree containing addon code and native runtime stages.
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def build_platform():
+    """Return the native bundle name and its site-packages path."""
     machine = platform.machine().lower()
     if sys.platform == "darwin" and machine == "arm64":
         return "macos-arm64", "python/lib/python3.12/site-packages"
     if sys.platform == "win32" and machine in {"amd64", "x86_64"}:
         return "windows-x64", "python/Lib/site-packages"
+    if sys.platform == "linux" and machine in {"amd64", "x86_64"}:
+        return "linux-x64", "python/lib/python3.12/site-packages"
     raise SystemExit(f"Unsupported build platform: {sys.platform} {platform.machine()}")
 
 
+# Runtime paths match stage_runtime.py and the addon launcher.
 PLATFORM, SITE_PACKAGES = build_platform()
 parser = argparse.ArgumentParser()
 parser.add_argument("--python", choices=["bundled", "local"], default="bundled")

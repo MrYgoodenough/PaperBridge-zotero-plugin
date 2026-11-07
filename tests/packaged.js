@@ -1,3 +1,4 @@
+/* Verify the installed XPI in a disposable Zotero profile using a test-only key. */
 (async () => {
   const root = PAPERBRIDGE_TEST_ROOT;
   const reportPath = root + "/.runtime/packaged-test.json";
@@ -16,7 +17,8 @@
     const options = JSON.parse(await IOUtils.readUTF8(root + "/.runtime/packaged-options.json"));
     doc.getElementById("pythonPath").value = options.pythonPath;
     const fixture = "paperbridge-ui-persistence-test";
-    const report = { version:bridge.runtime.version, model:bridge.pref("model"), settingsOpened:!!doc.getElementById("key") };
+    const report = { version:bridge.runtime.version, platform:bridge.runtime.platform().id,
+      zoteroVersion:Zotero.version, model:bridge.pref("model"), settingsOpened:!!doc.getElementById("key") };
     report.settingsRootBackground=settings.getComputedStyle(doc.documentElement).backgroundColor;
     report.settingsBodyBackground=settings.getComputedStyle(doc.body || doc.querySelector("body")).backgroundColor;
     if (!await IOUtils.exists(marker)) {
@@ -33,6 +35,7 @@
       await IOUtils.writeUTF8(marker,JSON.stringify({keySaved:true}));
       report.phase = "restart-required";
       await IOUtils.writeUTF8(reportPath,JSON.stringify(report,null,2));
+      if (options.autoQuit) Services.startup.quit(Ci.nsIAppStartup.eAttemptQuit);
       return;
     }
     // The .env is a test input only; production code does not read it.
@@ -100,7 +103,8 @@
     report.reopenUsage=JSON.parse(bridge.pref("lastUsage"));
     report.reopenZeroAPI=report.reopenUsage.api_requests===0 && report.reopenUsage.full_pdf_cache;
     bridge.setPref("pages", "");
-    report.ok=report.forwardSync&&report.reverseSync&&report.independent&&report.cleanup&&report.storedKeyReadBack;
+    report.ok=report.forwardSync&&report.reverseSync&&report.independent&&report.cleanup
+      &&report.storedKeyReadBack&&report.keyPersistedAfterRestart&&report.reopenZeroAPI;
     report.phase="complete";
     await IOUtils.writeUTF8(reportPath,JSON.stringify(report,null,2));
     await stage("完整 XPI 三页实测完成");
@@ -109,10 +113,12 @@
       const scope={Zotero,Services,IOUtils,PathUtils,Cc,Ci,Components,ChromeUtils,PAPERBRIDGE_TEST_ROOT:root};
       Services.scriptloader.loadSubScript(PathUtils.toFileURI(root+"/tests/lifecycle.js"),scope);
       report.lifecycle=await scope.runLifecycleTests(bridge);
+      report.ok=report.ok&&report.lifecycle.ok;
       await IOUtils.writeUTF8(reportPath,JSON.stringify(report,null,2));
       await stage("三页阅读与文献生命周期验证完成");
     }
     if (await IOUtils.exists(root+"/.runtime/show-settings")) bridge.settings();
+    if (options.autoQuit) Services.startup.quit(Ci.nsIAppStartup.eAttemptQuit);
   } catch(error) {
     await IOUtils.writeUTF8(reportPath,JSON.stringify({ok:false,error:String(error),stack:error.stack},null,2));
   }

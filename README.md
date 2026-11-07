@@ -2,16 +2,17 @@
 
 <img width="1907" height="1024" alt="image" src="https://github.com/user-attachments/assets/e0ea2cbd-b021-4434-994b-a96a472f7b4f" />
 
-Zotero 9 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻译正文，中文嵌入宋体；保留原始图表、公式和页面结构，在同一标签页左右对照阅读。平均一篇论文的完整对照翻译花费不到0.1元🤩
+Zotero 9 / 10 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻译正文，中文嵌入宋体；保留原始图表、公式和页面结构，在同一标签页左右对照阅读。平均一篇论文的完整对照翻译花费不到0.1元🤩
 
 ## 安装
 
-0.3.1 为两个平台各提供一个自带 Python 的安装包，按系统下载对应文件：
+0.3.1 为三个平台各提供一个自带 Python 的安装包，按系统下载对应文件：
 
 | 平台 | 安装包 |
 |---|---|
 | macOS Apple Silicon（arm64） | `paperbridge-0.3.1-macos-arm64.xpi` |
 | Windows x64 | `paperbridge-0.3.1-windows-x64.xpi` |
+| Linux amd64（glibc ≥ 2.34；Ubuntu 24.04 已验证） | `paperbridge-0.3.1-linux-x64.xpi` |
 
 安装方法如下：
 1. Zotero → **工具 → 插件 → 齿轮 → 从文件安装插件**，选择上述 XPI。
@@ -39,6 +40,7 @@ Zotero 9 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻译�
 
 - macOS：系统“宋体-简”（`Songti.ttc`）的常规、粗体字面。
 - Windows：系统“宋体”（`SimSun`）；粗体优先取 `Noto Serif SC`，缺失时回退到微软雅黑 Bold。
+- Linux：通过 fontconfig 查找思源宋体（`Noto Serif CJK SC` / `Source Han Serif SC` 等），提取简体中文常规、粗体字面；字体未随插件分发。
 
 扫描件未作为本版验证范围。
 
@@ -66,14 +68,15 @@ Zotero 9 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻译�
 ```sh
 ./scripts/setup.sh
 .venv/bin/python scripts/warmup.py
-curl -L --fail --output .cache/opencv-4.12.0.tar.gz https://github.com/opencv/opencv/archive/refs/tags/4.12.0.tar.gz
-sh scripts/build_opencv.sh
+# macOS 构建需先按下文准备精简 OpenCV。
 .venv/bin/python scripts/stage_runtime.py
 .venv/bin/python scripts/build.py
 .venv/bin/python scripts/build.py --python local
 ```
 
-Windows 下的等价流程见 [docs/windows.md](docs/windows.md)（`scripts/setup.ps1`、`scripts/serve.ps1`）；自带 Python 版直接使用官方 `opencv-python-headless`，无需 `build_opencv.sh`。
+Linux 开发与安装见 [docs/linux.md](docs/linux.md)；`setup.sh` 使用项目内的独立 Python，不改动系统 Python 或 ROS2 环境。Linux 与 Windows 使用官方 `opencv-python-headless`，无需编译 OpenCV。
+
+macOS 在打包前运行 `curl -L --fail --output .cache/opencv-4.12.0.tar.gz https://github.com/opencv/opencv/archive/refs/tags/4.12.0.tar.gz` 和 `sh scripts/build_opencv.sh`。Windows 等价流程见 [docs/windows.md](docs/windows.md)（`scripts/setup.ps1`、`scripts/serve.ps1`）。
 
 `stage_runtime.py` 从 `uv.lock` 收集本平台运行依赖及公开模型资源，`build.py` 将运行时与插件合并到单个 XPI。引擎运行时加载所需的 `.pyi` 类型资源一并保留；开发测试库不打入运行时。
 

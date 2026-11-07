@@ -11,40 +11,49 @@ from pathlib import Path
 from packaging.requirements import Requirement
 from sanitize_runtime import sanitize_runtime
 
+# Source tree and project-local staging locations.
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def build_platform():
+    """Return the native bundle name and Python paths."""
     machine = platform.machine().lower()
     if sys.platform == "darwin" and machine == "arm64":
         return "macos-arm64", "python/bin/python3.12", "python/lib/python3.12/site-packages"
     if sys.platform == "win32" and machine in {"amd64", "x86_64"}:
         return "windows-x64", "python/python.exe", "python/Lib/site-packages"
+    if sys.platform == "linux" and machine in {"amd64", "x86_64"}:
+        return "linux-x64", "python/bin/python3.12", "python/lib/python3.12/site-packages"
     raise SystemExit(f"Unsupported build platform: {sys.platform} {platform.machine()}")
 
 
+# Runtime paths match the platform key used by the addon launcher.
 PLATFORM, PYTHON_EXECUTABLE, SITE_PACKAGES = build_platform()
+# Each native build has its own relocatable staging tree.
 STAGE = ROOT / f".cache/package/{PLATFORM}"
 # The pinned engine uses only line clustering and grayscale SSIM from these
 # toolkits. compact_math supplies those operations; model-hub clients are unused.
-# Windows keeps the stock image module: the minimal OpenCV build script is macOS-only.
+# Linux and Windows keep the official wheel; the minimal OpenCV build is macOS-only.
 OMIT = {"ruff", "scipy", "scikit-learn", "scikit-image", "huggingface-hub", "hf-xet",
         "networkx", "narwhals", "joblib", "threadpoolctl", "imageio", "tifffile", "lazy-loader"}
-if sys.platform != "win32":
+if sys.platform == "darwin":
     OMIT.add("opencv-python-headless")
 
 
 def copy(source, target):
+    """Copy a file while preserving executable permissions."""
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source, target, follow_symlinks=True)
 
 
 def uv():
+    """Find the project-local uv executable or an existing installation."""
     local = ROOT / ".tools/bin" / ("uv.exe" if os.name == "nt" else "uv")
     return str(local) if local.exists() else shutil.which("uv") or "uv"
 
 
 def stage_interpreter():
+    """Copy the base interpreter and its standard library into the bundle."""
     base = Path(sys.base_prefix)
     if os.name == "nt":
         python = STAGE / "python"
@@ -60,12 +69,18 @@ def stage_interpreter():
                                                       "ensurepip", "pydoc_data", "*.pyc", "*.pdb"))
         return
     copy(base / "bin/python3.12", STAGE / "python/bin/python3.12")
+    # Drop development and GUI assets while keeping Linux ELF runtime libraries.
+    ignored = ["site-packages", "__pycache__", "test", "tests", "pkgconfig", "*.pyc",
+               "libtcl*", "tcl*", "tk*", "itcl*", "thread3*", "idlelib", "turtle*", "config-3.12*"]
+    if sys.platform == "darwin":
+        # The existing macOS executable does not need a bundled libpython dylib.
+        ignored.append("libpython*")
     shutil.copytree(base / "lib", STAGE / "python/lib", dirs_exist_ok=True,
-                    ignore=shutil.ignore_patterns("site-packages", "__pycache__", "test", "tests", "pkgconfig", "*.pyc",
-                                                 "libpython*", "libtcl*", "tcl*", "tk*", "itcl*", "thread3*", "idlelib", "turtle*", "config-3.12*"))
+                    ignore=shutil.ignore_patterns(*ignored))
 
 
 def stage_packages(destination):
+    """Copy locked runtime distributions, including wheel-owned native libraries."""
     exported = subprocess.check_output([uv(), "export", "--frozen", "--no-dev", "--no-hashes", "--no-emit-project"],
                                        cwd=ROOT, text=True, stderr=subprocess.DEVNULL)
     requirements = [Requirement(line) for line in exported.splitlines() if re.match(r"^[\w.-]+==", line)]
@@ -85,6 +100,7 @@ def stage_packages(destination):
             # translation never decodes video, and the macOS build has no videoio at all.
             if entry.name.startswith("opencv_videoio_ffmpeg") and entry.suffix in {".dll", ".dylib"}:
                 continue
+            # Keep wheel .libs directories beside their corresponding extension modules.
             source = Path(dist.locate_file(entry))
             if source.is_file():
                 copy(source, destination / entry)
@@ -92,13 +108,14 @@ def stage_packages(destination):
 
 
 def stage():
+    """Assemble the interpreter, backend, model and tokenizer runtime."""
     if STAGE.exists():
         shutil.rmtree(STAGE)
     STAGE.mkdir(parents=True, exist_ok=True)
     stage_interpreter()
     destination = STAGE / SITE_PACKAGES
     packages = stage_packages(destination)
-    if sys.platform != "win32":
+    if sys.platform == "darwin":
         compact_cv = ROOT / ".cache/opencv-install"
         if not (compact_cv / "cv2").exists():
             raise SystemExit("Run scripts/build_opencv.sh to build the image-only OpenCV module first")

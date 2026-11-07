@@ -9,7 +9,7 @@
       "id": "paperbridge@local.dev",
       "update_url": "https://example.invalid/paperbridge/updates.json",
       "strict_min_version": "9.0",
-      "strict_max_version": "9.*"
+      "strict_max_version": "10.*"
     }
   }
 }
