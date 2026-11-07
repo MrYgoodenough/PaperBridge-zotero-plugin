@@ -74,7 +74,8 @@
     const health = await bridge.request("/health");
     report.python = health.python;
     report.pythonMode = bridge.runtime.build.pythonMode;
-    report.remainingVersionedEngines = (await IOUtils.getChildren(bridge.runtime.base)).filter(path => /\/\d+\.\d+\.\d+$/.test(path));
+    report.remainingVersionedEngines = (await IOUtils.getChildren(bridge.runtime.base))
+      .filter(path => /^\d+\.\d+\.\d+$/.test(PathUtils.filename(path)));
     report.cacheRoot = bridge.runtime.cache;
     report.stateRoot = bridge.runtime.state;
     report.storedKeyReadBack = bridge.getKey()===key;

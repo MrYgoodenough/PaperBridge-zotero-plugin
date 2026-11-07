@@ -1,0 +1,68 @@
+{
+  "version": "0.3.1",
+  "date": "2026-11-07",
+  "platform": "windows-x64",
+  "cause": "The installed Windows XPI still declared strict_max_version 9.*.",
+  "fix": "Rebuilt the Windows XPI from the existing Zotero 9 / 10 source manifest and reinstalled it.",
+  "compatibility": {
+    "strict_min_version": "9.0",
+    "strict_max_version": "10.*"
+  },
+  "packages": {
+    "bundled": {
+      "name": "paperbridge-0.3.1-windows-x64.xpi",
+      "bytes": 198838084,
+      "sha256": "40c42ca37466b381d086e9d4ee8bf983060b9714dc69ed7a2d4528ce0fecf037",
+      "archive_crc": "passed",
+      "addon_and_backend_source_match": true
+    },
+    "local_python": {
+      "name": "paperbridge-0.3.1-windows-x64-local-python.xpi",
+      "bytes": 186904616,
+      "sha256": "d8ab08f69aac5921402660380aa8a906602ba824f43bef9644b48119e79e79bf",
+      "archive_crc": "passed",
+      "integration_tested": false
+    }
+  },
+  "isolated_zotero_10_0_6": {
+    "real_bundled_xpi": true,
+    "python": "3.12.13",
+    "menus_and_reader_button": true,
+    "settings_and_key_save": true,
+    "engine_unpacked_and_started": true,
+    "unpack_seconds": 13.7,
+    "model_seeded": true,
+    "translated_attachment_saved": true,
+    "selected_pages": "1",
+    "translation_seconds": 36,
+    "api_requests": 0,
+    "paragraph_cache_hits": 17,
+    "fresh_api_translation_tested": false,
+    "pdf_pages": 15,
+    "first_page_chinese_characters": 798,
+    "simsun_embedded": true,
+    "all_page_sizes_match": true,
+    "unselected_page_text_preserved": true,
+    "forward_sync": true,
+    "reverse_sync": true,
+    "independent_reading": true,
+    "split_cleanup": true,
+    "sqlite_integrity": "ok"
+  },
+  "normal_profile_zotero_10_0_8": {
+    "zotero_applied_previously_downloaded_update_on_startup": true,
+    "plugin_active": true,
+    "app_disabled": false,
+    "plugin_manager_shows_enabled": true,
+    "tools_menu_and_reader_button": true,
+    "full_integration_tested": false
+  },
+  "checks": {
+    "python_tests_passed": 35,
+    "python_tests_skipped": 1,
+    "skip_reason": "Optional reference-paper fixture absent.",
+    "pdf_coordinate_mapping": "passed",
+    "packaged_js_syntax": "passed"
+  },
+  "github_release_assets_updated": false
+}

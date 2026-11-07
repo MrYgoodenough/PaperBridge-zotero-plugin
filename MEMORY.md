@@ -1,6 +1,8 @@
 # 当前开发基线
 
 - 项目为 PaperBridge 0.3.1：Zotero 9 / 10 插件，后端固定 BabelDOC 0.6.4，默认 DeepSeek `deepseek-flash`。源码主分支为 `master`。
+- Windows 自带 Python 的 0.3.1 包已按 Zotero 9 / 10 兼容声明重建：Windows Zotero 10.0.6 的解包、选页缓存翻译、宋体嵌入及双向分屏实测通过；本机正常 profile 在 Zotero 10.0.8 下已启用。摘要见 `docs/windows-compatibility-0.3.1.json`。
+- 兼容声明更新后必须重建各平台 XPI；同名旧包不会跟随源码更新。当前 `update_url` 仍为占位地址，本机需重新安装 XPI。此次 Windows 重建包已替换本机安装，GitHub Release 附件尚未替换。
 - 运行时按 `macos-arm64`、`windows-x64`、`linux-x64` 独立构建。Linux amd64 自带 CPython 3.12，解释器路径 `python/bin/python3.12`；当前 Linux 包的原生库要求 glibc ≥ 2.34。Ubuntu 24.04 + Zotero 10.0.8 已实测，其他发行版尚未实机验证。
 - Linux 使用官方 OpenCV headless wheel，需保留各 wheel 的 `.libs`；仅 macOS 需要自编译精简 OpenCV。打包用 uv 管理的独立解释器，不用系统 Python 作为可重定位运行时。
 - Linux 中文字体通过 fontconfig 查询已安装的思源宋体等中文衬线字体，选择简体中文字面并导出到插件缓存；CFF 字面以 `.ttf` 缓存名保存，但 PDF 中实际为嵌入的 OTF。系统字体不随 XPI 分发。

@@ -58,6 +58,19 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 
 ## 验证环境与结果
 
+Zotero 10 兼容范围由 `addon/manifest.json` 的 `strict_max_version: 10.*` 声明。
+已有 Windows XPI 若仍声明 `9.*`，需要从当前源码重新运行 `scripts/build.py` 并安装新包；
+仅更新源码不会改变已安装的 XPI。当前更新地址为占位地址，需从文件安装。
+
+2026-11-07 使用独立 Zotero 10.0.6 程序副本、profile 和文献库验证重建的自带 Python 包：
+插件菜单、设置保存、内置引擎解包与启动、选页翻译、译文附件、双向同步、独立阅读及关闭清理均通过。
+翻译复用 17 条段落缓存，API 请求为 0；第 1 页含 798 个中文字符并嵌入宋体，
+其余 14 页文字及所有页尺寸与原文一致。此轮未验证新的 DeepSeek API 请求。
+本机正常 Zotero 启动时自动应用已有的 10.0.8 更新，插件管理器已显示 Enabled，阅读器按钮正常。
+10.0.8 本轮仅验证加载；完整功能验证针对 10.0.6。摘要见 `windows-compatibility-0.3.1.json`。
+
+此前 Zotero 9 的验证结果：
+
 - Zotero 9.0.6（Windows 安装版），Windows x64，Python 3.12.13
 - 独立 profile 与独立数据目录，安装最终 `dist\paperbridge-0.3.1-windows-x64.xpi`（190 MiB）后实测
 - 另有离线引擎测试：注入固定译文的模拟 LLM，用真实论文 PDF（15 页，双栏、公式、图表、参考文献）
