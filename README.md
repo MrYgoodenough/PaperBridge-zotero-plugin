@@ -6,13 +6,15 @@ Zotero 9 / 10 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻
 
 ## 安装
 
-0.3.1 为三个平台各提供一个自带 Python 的安装包，按系统下载对应文件：
+最新 **0.4.2** 已发布 **macOS Apple Silicon（arm64）自带 Python 版**，兼容 Zotero **9.0–10.***，已在 **10.0.9** 的全新隔离配置中验证。可覆盖安装旧版，无需另装 Python。
 
-| 平台 | 安装包 |
+| 平台 | 版本与下载 |
 |---|---|
-| macOS Apple Silicon（arm64） | `paperbridge-0.3.1-macos-arm64.xpi` |
-| Windows x64 | `paperbridge-0.3.1-windows-x64.xpi` |
-| Linux amd64（glibc ≥ 2.34；Ubuntu 24.04 已验证） | `paperbridge-0.3.1-linux-x64.xpi` |
+| macOS Apple Silicon（arm64） | **[下载 0.4.2 XPI](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.4.2/paperbridge-0.4.2-macos-arm64.xpi)** · 173.03 MiB |
+| Windows x64 | [0.3.1 XPI](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.1/paperbridge-0.3.1-windows-x64.xpi) · [Windows 说明](docs/windows.md) |
+| Linux amd64 | 0.3.1 的构建与安装说明见 [Linux 文档](docs/linux.md) |
+
+本次 0.4.2 仅更新 macOS arm64 包；其他平台的既有版本和说明继续保留。[0.4.2 发布说明](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)。
 
 安装方法如下：
 1. Zotero → **工具 → 插件 → 齿轮 → 从文件安装插件**，选择上述 XPI。
@@ -21,7 +23,7 @@ Zotero 9 / 10 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻
 
 安装包包含独立 Python、BabelDOC、版面模型和 tokenizer。**无需安装 uv/Python，无需工程目录、`.env` 或终端命令。** 首次使用自动解包内置引擎，之后随 Zotero 自动启动和退出。每个安装包只支持文件名对应的平台；Intel Mac 与 Windows ARM64 暂未提供预编译包，需按下方“开发与构建”自行打包。
 
-密钥通过插件界面保存到 Zotero 登录管理器，重启后仍可使用。模型默认并固定为 `deepseek-flash`，采用非思考模式处理翻译。`.env` 仅作为隔离测试的密钥输入，生产时插件并不会不读取它。
+密钥通过插件界面保存到 Zotero 登录管理器，重启后仍可使用。模型默认并固定为 `deepseek-flash`，采用非思考模式处理翻译。`.env` 仅作为隔离测试的密钥输入，生产插件不读取它。
 
 ## 阅读与翻译
 
@@ -29,7 +31,10 @@ Zotero 9 / 10 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻
 - 翻译完成后保存为 Zotero PDF 附件，并自动打开左右分屏。
 - 默认双向同步翻页、滚动位置和缩放；右下角可切换为独立阅读。
 - 拖动中间分隔线调整宽度，“关闭分屏”恢复原生阅读器。
-- 右侧为只读阅读；需要批注时，直接打开保存的译文附件。
+- **0.4.2 macOS 版右侧支持原生高亮、下划线、笔记注释、文字、区域和绘图工具**，标注保存到译文附件，关闭后重开仍可编辑。
+- 原文与译文的标注各自独立；自动对应后置，翻页、滚动和缩放同步保留。
+- **长公式悬停显示复制图标**，点击复制为 `$$…$$`；短公式保留选中后复制为 `$…$`。
+- 优先复用公式缓存或已有 LaTeX；未命中才使用已配置的 DeepSeek 转写。悬停及本地公式区域识别不调用 DeepSeek。
 - **工具 → PaperBridge → 取消当前论文翻译** 可终止任务。
 
 ## 排版与宋体
@@ -50,7 +55,28 @@ Zotero 9 / 10 的一体化论文翻译插件。目前使用 `deepseek-flash` 翻
 
 已保存的译文 PDF 优先复用，段落译文另有本地缓存。API 实际请求数、输入、输出、缓存命中和未命中 token 保存在任务目录的 `usage.json`，不记录密钥。
 
+### 公式持久缓存（0.4.2）
+
+每篇原 PDF 与关联译文共用一个 JSON，位于 **Zotero 数据目录 / paperbridge / formula-cache / `<原 PDF SHA-256>.json`**。保存 LaTeX、已识别页面的长公式区域及论文/附件引用；缓存命中不需要 API Key，也不重复请求。相同 PDF 内容可由多个论文条目共用。
+
+从 **工具 → PaperBridge → 公式缓存…** 或设置窗口的 **公式缓存** 入口，可查看公式、LaTeX、页数和引用数，并清除所选 PDF 或全部公式缓存。
+
+| 操作 | 缓存行为 |
+|---|---|
+| 关闭阅读器、重启、升级插件 | 保留缓存 |
+| 只删除原 PDF，论文条目仍在 | 保留，关联译文继续使用 |
+| 删除一个译文附件 | 仍有论文或其他关联附件引用时保留 |
+| 删除论文条目或移入回收站 | 移除该论文引用，无其他引用时清理 JSON |
+| 插件停用期间删除论文 | 下次启动时清理无引用缓存 |
+| 手动清除缓存 | 只删公式结果及区域，不动 PDF、标注、笔记或全文翻译缓存 |
+
+普通 PDF 通常不含原始 TeX，未命中公式由模型转写，复杂结果需核对；无可选文本的扫描公式暂不提供图像 OCR。首次转写需要有效 DeepSeek Key，并产生相应用量。
+
 ## 测试结果
+
+**0.4.2（macOS arm64 / Zotero 10.0.9）：** 61 项后端测试、47 项实际 XPI 集成检查及 6 项实际重启/引擎升级检查通过。覆盖标注保存、长公式悬停复制、缓存查看与清除、附件/论文删除和停用期间删除后的启动清理。本地长公式识别使用实际内置模型；转写响应用可计数模拟结果验证缓存和请求次数，本轮不新增真实模型识别准确率结论。
+
+以下为此前版本的翻译与跨平台测试记录：
 
 使用实际 XPI 在工程内的全新 Zotero 9.0.6 配置中测试，不依赖项目 `.venv`，不操作日常文献库。
 
@@ -96,6 +122,15 @@ node tests/test_sync.cjs
 - [DeepSeek 模型文档](https://api-docs.deepseek.com/quick_start/pricing/)
 
 项目采用 AGPL-3.0，见 LICENSE。内置依赖保留其原有许可文件。
+
+## 0.4.2 主要更新
+
+- Zotero 10 主版本兼容声明，10.0.9 实测。
+- 右侧译文接入原生附件阅读器，支持标注保存、重开、删除和单独打开译文后继续编辑。
+- 长公式悬停复制、短公式选中复制，支持 `$$…$$` / `$…$`。
+- 每篇 PDF 一个持久 JSON，新增缓存查看、手动清除和按论文引用自动清理。
+
+[下载与发布说明](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)。
 
 ## 0.3.1主要更新：文献归属、删除与参考文献
 
