@@ -137,12 +137,13 @@ test('configuration snapshots and status updates persist only public metadata', 
   const record = await f.library.put(f.source, null, input, {...job, api_key:'job-secret'}, stat);
   input.capabilities.json = false;
   assert.equal(record.config.capabilities.json, true);
-  await f.library.update(record, {id:'retry', state:'done', output_path:'/outputs/result.pdf',
+  await f.library.update(record, {id:'retry', state:'done', output_path:'/outputs/result.pdf', alignment_path:'/outputs/alignment.json',
     quality:{status:'partial', api_key:'quality-secret'}, api_key:'patch-secret',
     error:'api_key=error-secret Bearer token-secret sk-example-key', config:{model:'unwanted'}});
   assert.equal(record.jobID, 'retry');
   assert.equal(record.saveState, 'produced');
   assert.equal(record.config.model, config.model);
+  assert.equal((await f.reload()).records[0].alignmentPath, '/outputs/alignment.json');
   const saved = f.files.get(f.library.path);
   for (const secret of ['top-secret', 'raw-secret', 'nested-secret', 'job-secret', 'url-secret',
     'quality-secret', 'patch-secret', 'error-secret', 'token-secret', 'sk-example-key', 'user:password']) {
@@ -154,7 +155,7 @@ test('configuration snapshots and status updates persist only public metadata', 
 test('retry forks leave previous imported outcomes intact and persist detached owner state', async () => {
   const f = fixture();
   const pdf = f.item('PREVIOUS', f.owner);
-  const prior = await f.library.put(f.source, pdf, config, {...job, state:'done'}, stat);
+  const prior = await f.library.put(f.source, pdf, config, {...job, state:'done', alignment_path:'/outputs/previous-alignment.json'}, stat);
   const previous = plain(prior);
   const attempt = await f.library.forkAttempt(prior, {...job, id:'retry'});
   assert.deepEqual(plain(prior), previous);
@@ -163,6 +164,7 @@ test('retry forks leave previous imported outcomes intact and persist detached o
   assert.equal(attempt.attachmentKey, null);
   assert.equal(attempt.saveState, null);
   assert.equal(attempt.outputPath, null);
+  assert.equal(attempt.alignmentPath, null, 'a new attempt cannot inherit the old output mapping');
   assert.equal(await f.library.findAttachment(attempt), null);
   assert.strictEqual(await f.library.forkAttempt(prior, {...job, id:'retry'}), attempt);
   await assert.rejects(f.library.forkAttempt(prior, job), /new backend job ID/);

@@ -18,6 +18,7 @@ async function startup({ id, version, rootURI }) {
   Services.scriptloader.loadSubScript(rootURI + "content/runtime.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/library.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/tasks.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/alignment.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/paperbridge.js", scope);
   scope.PaperBridge.runtime = new scope.BundledRuntime(rootURI, version);
   scope.PaperBridge.library = new scope.TranslationLibrary(scope.PaperBridge);

@@ -114,7 +114,7 @@ var TranslationLibrary = class {
     const record = {version:TRANSLATION_VERSION, recordID:old.recordID || this.newID(), config, ...config};
     for (const key of ["libraryID", "sourceKey", "sourceID", "ownerKey", "ownerID", "parentKey",
       "attachmentKey", "attachmentID", "sourceURI", "title", "modified", "size", "rulesVersion",
-      "fingerprint", "documentKey", "importingAttachmentKey", "outputPath", "retryOf", "retryPendingSince"]) {
+      "fingerprint", "documentKey", "importingAttachmentKey", "outputPath", "alignmentPath", "retryOf", "retryPendingSince"]) {
       record[key] = this.publicValue(old[key] ?? null);
     }
     record.jobID = old.jobID || null;
@@ -222,7 +222,7 @@ var TranslationLibrary = class {
         modified:stat.lastModified, size:stat.size, rulesVersion:TRANSLATION_RULES_VERSION,
         jobID, state:job.state || (attachment ? "done" : "queued"), quality:job.quality,
         saveState:job.state === "done" || job.output_path ? "produced" : null,
-        lastError:job.error, outputPath:job.output_path,
+        lastError:job.error, outputPath:job.output_path, alignmentPath:job.alignment_path,
         fingerprint:job.fingerprint, documentKey:job.document_key
       });
       this.records.push(record);
@@ -243,7 +243,8 @@ var TranslationLibrary = class {
         jobID, state:status.state || "queued", detached:false, retryPendingSince:null, quality:status.quality ?? "unknown",
         saveState:status.state === "done" || status.output_path ? "produced" : null,
         lastError:status.error || "", attachmentID:null, attachmentKey:null, importingAttachmentKey:null,
-        outputPath:status.output_path || null, fingerprint:status.fingerprint ?? record.fingerprint,
+        outputPath:status.output_path || null, alignmentPath:status.alignment_path || null,
+        fingerprint:status.fingerprint ?? record.fingerprint,
         documentKey:status.document_key ?? record.documentKey});
       this.records.push(attempt);
     }
@@ -256,10 +257,11 @@ var TranslationLibrary = class {
     record = this.records.find(candidate => candidate.recordID === record.recordID);
     if (!record) throw new Error("Translation record is no longer in the library.");
     const changes = {...patch};
-    for (const [from, to] of [["id", "jobID"], ["error", "lastError"], ["output_path", "outputPath"], ["document_key", "documentKey"]]) {
+    for (const [from, to] of [["id", "jobID"], ["error", "lastError"], ["output_path", "outputPath"],
+      ["alignment_path", "alignmentPath"], ["document_key", "documentKey"]]) {
       if (from in changes && !(to in changes)) changes[to] = changes[from];
     }
-    for (const key of ["jobID", "state", "quality", "saveState", "lastError", "outputPath",
+    for (const key of ["jobID", "state", "quality", "saveState", "lastError", "outputPath", "alignmentPath",
       "fingerprint", "documentKey", "importingAttachmentKey", "detached", "retryPendingSince"]) {
       if (key in changes && changes[key] !== undefined) record[key] = this.publicValue(changes[key]);
     }

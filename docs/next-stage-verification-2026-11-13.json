@@ -1,0 +1,428 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "timezone": "Asia/Shanghai",
+  "source_version": "0.3.2",
+  "base_commit": "a1db1e9530370c402d7e14cc3e52141f46b4bf52",
+  "scope": {
+    "requested_stages": [
+      1,
+      2,
+      3
+    ],
+    "stage_4_not_started": true,
+    "production_dependency_changed": false,
+    "production_alignment_generation_enabled": false,
+    "release_published": false,
+    "daily_zotero_profiles_changed": false
+  },
+  "engine_probe": {
+    "status": "research_complete_migration_not_complete",
+    "pinned": {
+      "babeldoc": "0.6.4",
+      "paid_provider_calls": 0,
+      "responses": "simulated",
+      "production_dependency_changed": false,
+      "font_mode": "system",
+      "cases": [
+        {
+          "mode": "pinned_capture",
+          "completion_calls": 1,
+          "ok": true,
+          "captured_same_unit_candidates": 2,
+          "mapping": {
+            "candidate_count": 2,
+            "verified_count": 2,
+            "excluded_count": 0,
+            "exclusion_reasons": {}
+          },
+          "pdf": {
+            "path": "/home/scq/PaperBridge-zotero-plugin/.runtime/engine-interface-probe/0.6.4-19a5e584/pinned_capture/translated.pdf",
+            "pages": 1,
+            "cjk_present": true,
+            "marker_present": true,
+            "source_title_present": true,
+            "fonts": [
+              {
+                "xref": 4,
+                "name": "Noto Serif CJK SC Regular",
+                "type": "Type0",
+                "extension": "otf",
+                "embedded": true,
+                "embedded_bytes": 24425908
+              }
+            ]
+          },
+          "output_path": "/home/scq/PaperBridge-zotero-plugin/.runtime/engine-interface-probe/0.6.4-19a5e584/pinned_capture/translated.pdf"
+        }
+      ],
+      "network_attempts": [],
+      "formal_wheel_stage_capture": null
+    },
+    "official_0_7_1_supported_fonts": {
+      "babeldoc": "0.7.1",
+      "paid_provider_calls": 0,
+      "responses": "simulated",
+      "production_dependency_changed": false,
+      "font_mode": "official",
+      "cases": [
+        {
+          "mode": "public",
+          "completion_calls": 1,
+          "ok": true,
+          "pdf": {
+            "path": "/home/scq/PaperBridge-zotero-plugin/.runtime/engine-interface-probe/0.7.1-31c5b3cd/public/output/source.no_watermark.zh-CN.mono.pdf",
+            "pages": 1,
+            "cjk_present": true,
+            "marker_present": true,
+            "source_title_present": false,
+            "fonts": [
+              {
+                "xref": 9,
+                "name": "Source Han Serif CN Regular",
+                "type": "Type0",
+                "extension": "ttf",
+                "embedded": true,
+                "embedded_bytes": 256879
+              }
+            ]
+          },
+          "output_path": "/home/scq/PaperBridge-zotero-plugin/.runtime/engine-interface-probe/0.7.1-31c5b3cd/public/output/source.no_watermark.zh-CN.mono.pdf"
+        },
+        {
+          "mode": "existing_protection_adapter",
+          "completion_calls": 0,
+          "ok": false,
+          "error": "RuntimeError: 'PageProjection' object has no attribute 'pdf_character'"
+        }
+      ],
+      "network_attempts": [],
+      "official_fonts_prepared": [
+        "SourceHanSerifCN-Regular.ttf",
+        "SourceHanSerifCN-Bold.ttf"
+      ],
+      "formal_wheel_stage_capture": false
+    },
+    "official_0_7_1_system_fonts": {
+      "babeldoc": "0.7.1",
+      "paid_provider_calls": 0,
+      "responses": "simulated",
+      "production_dependency_changed": false,
+      "cases": [
+        {
+          "mode": "public",
+          "completion_calls": 0,
+          "ok": false,
+          "error": "RuntimeError: unprofiled PDF font flags for SHA3-256 1e48d57b4f6167ca2b320e53bf30883377db0dc96bbc1c28837ccd2f213f0c41"
+        },
+        {
+          "mode": "existing_protection_adapter",
+          "completion_calls": 0,
+          "ok": false,
+          "error": "RuntimeError: unprofiled PDF font flags for SHA3-256 1e48d57b4f6167ca2b320e53bf30883377db0dc96bbc1c28837ccd2f213f0c41"
+        }
+      ],
+      "network_attempts": [],
+      "formal_wheel_stage_capture": false
+    }
+  },
+  "provider": {
+    "schema_version": 1,
+    "mode": "run",
+    "created_at": "2026-11-13T13:21:13.603511+00:00",
+    "scope": "direct_provider_only",
+    "limits": {
+      "requests_per_profile": 1,
+      "max_output_tokens": 256,
+      "sdk_retries": 0,
+      "timeout_seconds": 30,
+      "fallback": false
+    },
+    "billing_note": "No invoice or price lookup; monetary billing remains unknown after any dispatch.",
+    "warnings": [],
+    "profiles": [
+      {
+        "profile": "deepseek",
+        "settings": {
+          "profile": "deepseek",
+          "base_url": "https://api.deepseek.com",
+          "model": "deepseek-flash",
+          "lang_out": "zh-CN",
+          "pages": "",
+          "capabilities": {
+            "json_mode": true,
+            "thinking_disabled": true,
+            "max_tokens": 256
+          }
+        },
+        "credential_status": "provided",
+        "input_sources": {
+          "api_key": ".runtime/deepseek.key",
+          "base_url": "existing_profile_default",
+          "model": "existing_profile_default",
+          "json_mode": "existing_profile_default",
+          "thinking_disabled": "existing_profile_default"
+        },
+        "missing_inputs": [],
+        "config_errors": [],
+        "available": true,
+        "outcome": "validated_translation",
+        "request_invocations": 1,
+        "usage_status": "reported",
+        "billing": "unknown",
+        "response": {
+          "id": "a7777e61-6e6f-41dc-9231-fa6779f60759",
+          "model": "deepseek-flash",
+          "finish_reason": "stop",
+          "content": "{\"translations\":[{\"id\":0,\"text\":\"该样本包含3个粒子。\"}]}",
+          "usage": {
+            "completion_tokens": 20,
+            "prompt_tokens": 135,
+            "total_tokens": 155,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cache_write_tokens": null,
+              "cached_tokens": 0
+            },
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 135
+          }
+        },
+        "compatibility": {
+          "chat_completion_responded": true,
+          "translation_json_valid": true,
+          "translation_changed": true,
+          "validation_error": null,
+          "semantic_quality": "not_verified"
+        }
+      },
+      {
+        "profile": "compatible",
+        "settings": null,
+        "credential_status": "missing",
+        "input_sources": {
+          "api_key": "absent",
+          "base_url": "absent",
+          "model": "absent",
+          "json_mode": "existing_profile_default",
+          "thinking_disabled": "existing_profile_default"
+        },
+        "missing_inputs": [
+          "COMPATIBLE_API_KEY (missing)",
+          "COMPATIBLE_BASE_URL",
+          "COMPATIBLE_MODEL"
+        ],
+        "config_errors": [],
+        "available": false,
+        "outcome": "not_called",
+        "request_invocations": 0,
+        "usage_status": "not_called",
+        "billing": "not_called"
+      }
+    ],
+    "request_invocations": 1
+  },
+  "paid_provider_request_invocations": 1,
+  "reported_tokens": 155,
+  "invoice_billing": "unknown",
+  "alignment": {
+    "status": "independent_prototype_not_automatic_production_mvp",
+    "schema_version": 1,
+    "fixture_pages": 1,
+    "fixture_verified_units": 2,
+    "source_sha256": "b591134a8411e9128a895480bacbd98b190956a3397492b6c5220551d7440222",
+    "output_sha256": "a665f7cadefdd302b16b0bf4d8cb774c42ab44e3135e523cdf9394949eb1c268",
+    "normalized_literal_text_and_geometry_only": true,
+    "semantic_pair_inference": false,
+    "native_cases": [
+      "100/150/200%",
+      "different source/target scale",
+      "trusted explicit localization",
+      "real divider resize",
+      "independent 270/90 degree display rotation",
+      "close/reopen cleanup",
+      "old/no-map fallback",
+      "source/output hash changes",
+      "zero alignment job submissions"
+    ]
+  },
+  "offline_regression": {
+    "linux": {
+      "python_passed": 158,
+      "python_skipped": 1
+    },
+    "windows": {
+      "python_passed": 158,
+      "python_skipped": 1
+    },
+    "skip_reason": "Optional .cache/references/pi0-v3.pdf absent",
+    "alignment_python_tests": 36,
+    "alignment_node_tests": 16,
+    "provider_cli_python_tests": 14,
+    "other_node_suites": [
+      "tasks",
+      "library",
+      "sync",
+      "task_window",
+      "packaged_startup"
+    ]
+  },
+  "native_validation": [
+    {
+      "platform": "linux-x64",
+      "python_mode": "bundled",
+      "suite": "alignment",
+      "checks_passed": 54,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "physical_navigation_observed": true,
+      "jobs_post_attempts": 0,
+      "validation_calls": 9,
+      "fixture_provider_responses": "simulated"
+    },
+    {
+      "platform": "linux-x64",
+      "python_mode": "bundled",
+      "suite": "queue",
+      "checks_passed": 17,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "engine_outcomes": "simulated"
+    },
+    {
+      "platform": "linux-x64",
+      "python_mode": "local",
+      "suite": "alignment",
+      "checks_passed": 54,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "physical_navigation_observed": true,
+      "jobs_post_attempts": 0,
+      "validation_calls": 9,
+      "fixture_provider_responses": "simulated"
+    },
+    {
+      "platform": "linux-x64",
+      "python_mode": "local",
+      "suite": "queue",
+      "checks_passed": 17,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "engine_outcomes": "simulated"
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "bundled",
+      "suite": "alignment",
+      "checks_passed": 54,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "physical_navigation_observed": true,
+      "jobs_post_attempts": 0,
+      "validation_calls": 9,
+      "fixture_provider_responses": "simulated"
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "bundled",
+      "suite": "queue",
+      "checks_passed": 17,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "engine_outcomes": "simulated"
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "local",
+      "suite": "alignment",
+      "checks_passed": 54,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "physical_navigation_observed": true,
+      "jobs_post_attempts": 0,
+      "validation_calls": 9,
+      "fixture_provider_responses": "simulated"
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "local",
+      "suite": "queue",
+      "checks_passed": 17,
+      "provider_calls": 0,
+      "zotero_version": "10.0.8",
+      "normal_exit": true,
+      "database_integrity": "ok",
+      "engine_outcomes": "simulated"
+    }
+  ],
+  "packages": [
+    {
+      "file": "dist/paperbridge-0.3.2-linux-x64.xpi",
+      "platform": "linux-x64",
+      "python_mode": "bundled",
+      "bytes": 286106028,
+      "sha256": "9f4b5d314f08ef173e3c2a9d0ea58072b2889b42d34f5e49dce19a61592420da",
+      "source_files_checked": 25,
+      "draft_feed_verified": true
+    },
+    {
+      "file": "dist/paperbridge-0.3.2-linux-x64-local-python.xpi",
+      "platform": "linux-x64",
+      "python_mode": "local",
+      "bytes": 248187787,
+      "sha256": "5322abd1c499803997c5034c56fb5b944dce8644f74a091f1f7ccb57c654df38",
+      "source_files_checked": 25,
+      "draft_feed_verified": true
+    },
+    {
+      "file": "dist/paperbridge-0.3.2-windows-x64.xpi",
+      "platform": "windows-x64",
+      "python_mode": "bundled",
+      "bytes": 198885319,
+      "sha256": "8c0e68c9ca109d11a27b2dbd8b81971aee330cd86a5817ecd5b38e13b11c3535",
+      "source_files_checked": 25,
+      "draft_feed_verified": true
+    },
+    {
+      "file": "dist/paperbridge-0.3.2-windows-x64-local-python.xpi",
+      "platform": "windows-x64",
+      "python_mode": "local",
+      "bytes": 186951857,
+      "sha256": "11655b4912412105100a8ca5fa19ca0607c46665aa5d611d687de7467390cf85",
+      "source_files_checked": 25,
+      "draft_feed_verified": true
+    }
+  ],
+  "known_limitations": [
+    "No compatible endpoint/model/key; no compatible real calls",
+    "0.6.4 parser security issues remain; 0.7.1 capture/protection/font migration unresolved",
+    "No automatic mapping generation in production translations; only research-script fixture generation",
+    "One synthetic page/two captured units are not 15-25 papers/300 manually checked fragments or 98%/80% acceptance",
+    "No cross-column/cross-page/cache-hit mapping acceptance, whole-PDF real-provider quality, native cropped-PDF or macOS acceptance"
+  ],
+  "nonblocking_incidents": [
+    {
+      "platform": "linux-x64",
+      "incident": "One intermediate resize-failure run exited with native SIGSEGV after its report was written",
+      "exit_code": 139,
+      "resolved_root_cause": false,
+      "post_exit_database_integrity": "ok",
+      "final_alignment_and_queue_runs": "all normal exits; no remaining owned backend processes"
+    }
+  ]
+}

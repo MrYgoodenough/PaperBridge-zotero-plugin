@@ -1,5 +1,5 @@
 /** Zotero commands and paired PDF reading; task execution lives in tasks.js. */
-/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, TranslationTasks */
+/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, TranslationTasks, FragmentAlignment */
 // One bridge is shared by all Zotero windows in the addon scope.
 var PaperBridge = {
   jobs: new Map(),
@@ -302,6 +302,25 @@ var PaperBridge = {
     return view;
   },
 
+  /** Validate the recorded local sidecar against both current PDF attachments. */
+  async loadAlignment(state) {
+    const record = [...this.library.records].reverse().find(candidate =>
+      candidate.libraryID === state.translated.libraryID && candidate.attachmentKey === state.translated.key &&
+      candidate.sourceKey === state.source.key);
+    if (!record?.alignmentPath) return { mapping: null, reason: "没有片段映射，继续使用页级同步。" };
+    const result = await this.request("/alignment/validate", "POST", {
+      mapping_path: record.alignmentPath, source_path: await state.source.getFilePathAsync(),
+      output_path: await state.translated.getFilePathAsync()
+    });
+    if (!result.available) {
+      // Mapping failure must explain the downgrade without suggesting a paid retransmission.
+      const reasons = { source_hash_changed: "原文已变化，旧片段映射已停用。", output_hash_changed: "译文已变化，旧片段映射已停用。",
+        missing_mapping: "没有片段映射，继续使用页级同步。", no_verified_units: "没有可信片段，继续使用页级同步。" };
+      result.reason = reasons[result.reason] || "片段映射不可用，仍可正常阅读。";
+    }
+    return result;
+  },
+
   /** Open paired readers without coupling layout failure to translation saving. */
   async split(source, translated) {
     Zotero.debug("PaperBridge: opening source reader");
@@ -315,6 +334,7 @@ var PaperBridge = {
     const container = reader._iframe.parentElement;
     const originalStyle = container.getAttribute("style") || "";
     const leftStyle = reader._iframe.getAttribute("style") || "";
+    const leftFlex = reader._iframe.getAttribute("flex");
     container.style.cssText += ";display:flex;flex-direction:row;min-width:0;overflow:hidden";
     reader._iframe.style.cssText += ";flex:1 1 0;min-width:160px;width:0";
     const divider = win.document.createXULElement("box");
@@ -326,7 +346,7 @@ var PaperBridge = {
     browser.setAttribute("class", "reader paperbridge-reader");
     browser.setAttribute("flex", "1");
     browser.style.cssText = "flex:1 1 0;min-width:160px;width:0";
-    const state = { reader, browser, divider, container, originalStyle, leftStyle, cleanups: [], sync: true, active: 0 };
+    const state = { reader, source, translated, browser, divider, container, originalStyle, leftStyle, leftFlex, cleanups: [], sync: true, active: 0 };
     this.splits.set(reader.tabID, state);
     const loaded = new Promise(resolve => browser.addEventListener("load", event => {
       if (event.target === browser.contentDocument) resolve();
@@ -403,6 +423,9 @@ var PaperBridge = {
     close.addEventListener("click", () => this.closeSplit(state.reader.tabID));
     for (const button of [sync, close]) button.style.cssText = "font:13px 'Songti SC','SimSun',serif;padding:5px 8px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer";
     controls.append(sync, close);
+    // Missing maps disable only explicit localization; ordinary reading remains unchanged.
+    state.alignment = new FragmentAlignment({ loadMapping: split => this.loadAlignment(split) });
+    controls.append(state.alignment.attach(state));
     doc.body.append(controls);
     const listen = (target, type, handler, options) => {
       target.addEventListener(type, handler, options);
@@ -418,8 +441,12 @@ var PaperBridge = {
       if (!dragging) return;
       const box = state.container.getBoundingClientRect();
       const ratio = Math.max(0.2, Math.min(0.8, (event.clientX - box.left) / box.width));
-      state.reader._iframe.style.flex = `${ratio} 1 0`;
-      state.browser.style.flex = `${1 - ratio} 1 0`;
+      // XUL browser flex attributes set integer relative weights, overriding CSS-only sizing.
+      const weightScale = 100;
+      state.reader._iframe.setAttribute("flex", String(Math.round(ratio * weightScale)));
+      state.browser.setAttribute("flex", String(Math.round((1 - ratio) * weightScale)));
+      state.reader._iframe.style.setProperty("flex", `${ratio} 1 0px`);
+      state.browser.style.setProperty("flex", `${1 - ratio} 1 0px`);
     });
     listen(state.divider, "pointerup", () => { dragging = false; });
     listen(state.divider, "lostpointercapture", () => { dragging = false; });
@@ -440,6 +467,7 @@ var PaperBridge = {
         }
       }
       const handler = event => {
+        if (Date.now() < (state.alignmentNavigationUntil || 0)) return;
         if (state.sync && state.active === index) this.syncPosition(state, index, event.location);
       };
       const bus = state.apps[index].eventBus;
@@ -470,7 +498,9 @@ var PaperBridge = {
     const cleanups = [...state.cleanups, () => state.right?._primaryView?.destroy(),
       () => state.browser.remove(), () => state.divider.remove(),
       () => state.container.setAttribute("style", state.originalStyle),
-      () => state.reader._iframe.setAttribute("style", state.leftStyle)];
+      () => state.reader._iframe.setAttribute("style", state.leftStyle),
+      () => state.leftFlex === null ? state.reader._iframe.removeAttribute("flex")
+        : state.reader._iframe.setAttribute("flex", state.leftFlex)];
     for (const cleanup of cleanups) {
       try { cleanup(); } catch (error) { Zotero.logError(error); }
     }

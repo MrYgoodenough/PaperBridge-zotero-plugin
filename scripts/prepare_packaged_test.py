@@ -28,8 +28,8 @@ addon_manifest=json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf
 version=addon_manifest["version"]
 parser = argparse.ArgumentParser()
 parser.add_argument("--local-python", default="", help="Existing Python 3.12 interpreter to test")
-parser.add_argument("--suite", choices=["packaged", "queue"], default="packaged",
-                    help="Queue smoke uses a separate profile and no provider calls")
+parser.add_argument("--suite", choices=["packaged", "queue", "alignment"], default="packaged",
+                    help="Queue/alignment smoke uses separate profiles and no provider calls")
 options = parser.parse_args()
 # Each suite owns its profile and data, never the user's normal Zotero library.
 PROFILE = ROOT / f".runtime/{options.suite}-profile"
@@ -59,9 +59,10 @@ async function runTests(){
   for(let i=0;i<100&&!Zotero.PaperBridge;i++) await Zotero.Promise.delay(100);
   if(!Zotero.PaperBridge) throw new Error("PaperBridge did not start within 10 seconds");
   Services.scriptloader.loadSubScript(TEST_URI, {Zotero,Services,IOUtils,PathUtils,Cc,Ci,Components,ChromeUtils,PAPERBRIDGE_TEST_ROOT:PROJECT_ROOT_LITERAL});
-}'''.replace("TEST_URI",json.dumps((ROOT / ("tests/queue_packaged.js" if options.suite == "queue" else "tests/packaged.js")).as_uri())).replace("PROJECT_ROOT_LITERAL",json.dumps(str(ROOT)))
-if options.suite == "queue":
-    bootstrap = bootstrap.replace("packaged-test.json", "queue-test.json")
+}'''.replace("TEST_URI",json.dumps((ROOT / ("tests/" + {"packaged": "packaged.js", "queue": "queue_packaged.js",
+    "alignment": "alignment_packaged.js"}[options.suite])).as_uri())).replace("PROJECT_ROOT_LITERAL",json.dumps(str(ROOT)))
+if options.suite != "packaged":
+    bootstrap = bootstrap.replace("packaged-test.json", options.suite + "-test.json")
 with zipfile.ZipFile(extensions / "paperbridge-tests@local.dev.xpi","w") as z:
     z.writestr("manifest.json",json.dumps(manifest))
     z.writestr("bootstrap.js",bootstrap)

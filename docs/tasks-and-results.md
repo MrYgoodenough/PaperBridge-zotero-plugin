@@ -1,6 +1,9 @@
+<!-- Developer guide to durable tasks, result ownership, and recovery boundaries. -->
 # 任务与成果架构
 
 PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译独立的引擎进程，不引入外部队列服务。
+
+生产依赖仍为 BabelDOC 0.6.4 / PyMuPDF 1.26.7。引擎接口研究、直接 provider 验证 CLI 与可信定位原型的入口及限制见 [engine-and-alignment.md](engine-and-alignment.md)。
 
 ## 修改入口
 
@@ -9,15 +12,18 @@ PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译�
 - `backend/library_cache.py`：唯一的非秘密配置规范化、整篇指纹与段落命名空间。新增模型能力时，前后端配置、缓存键和测试应一起调整；不要把密钥加入身份。
 - `backend/deepseek.py`、`usage.py`、`batching.py`：请求能力、实际用量及固定引擎的翻译单元证据。`quality.json` 的完整/部分/不可用/未知与 PDF 是否生成分开判断；完整不等于语义质量认证。
 - `addon/content/tasks.js`：多选入队、恢复状态、逐项取消和保存；批量不调用分屏。单篇和批量入口都把当前配置、未变原文的未完成或未确认成果转到任务列表，不自动重发；批量跳过这些条目后继续其余论文。不同论文可共享后端 job，但各自拥有独立记录、保存状态及附件。重试必须使用返回的新 job ID 和 `forkAttempt()` 的新归属记录。
-- `addon/content/library.js`：版本 2 的 `translations.json`、附件归属与恢复标记。`put()` 固定配置，`update()` 更新状态，`findAttachment()` 恢复导入，`attach()` 完成保存。损坏索引先备份、禁用清理，不推断其余数据可删除。
+- `addon/content/library.js`：版本 2 的 `translations.json`、附件归属与恢复标记。`put()` 固定配置，`update()` 更新状态，`findAttachment()` 恢复导入，`attach()` 完成保存；`alignment_path` 保存为对应归属的 `alignmentPath`。损坏索引先备份、禁用清理，不推断其余数据可删除。
 - `addon/content/settings.*`、`prefs.js`：默认 DeepSeek 加一个可选兼容 profile；凭据分别保存在 Zotero 登录管理器。切换设置只影响后续入队任务。
-- `addon/content/paperbridge.js`：单篇入口及原有页级分屏同步。私有 Zotero/PDF.js 接口仍局限于阅读路径，保存失败和阅读失败不会混为同一执行状态。
+- `backend/alignment.py`、`addon/content/alignment.js`：Schema 1 sidecar 的本地证据验证与显式片段定位。后端 `POST /alignment/validate` 核对当前两份 PDF 的 SHA-256 与几何，不提交或重试任务；前端只消费父级验证结果。
+- `addon/content/paperbridge.js`：单篇入口、原有页级分屏同步与 `loadAlignment()` 父级加载入口。私有 Zotero/PDF.js 接口仍局限于阅读路径，保存失败和阅读失败不会混为同一执行状态。
 
 进度通过引擎 `PB:` 事件传递 `progress`、`phase`、`counts`，计数沿用 `quality.json` 的字段；服务端仅接受这些非生命周期字段。任务窗口共用后台任务状态，不维护第二套临时任务系统；用尝试时间戳计算用时，已结束任务停止计时。阶段缺少百分比时不重置进度，BabelDOC 的小数百分比按 0–100 解释。
 
 ## 数据与恢复边界
 
-任务记录、尝试目录及清单位于插件 `.runtime/jobs/`；译文附件在 Zotero `storage/`。失败尝试不能覆盖先前可用 PDF。根结果与尝试的清单、质量、用量均保留；对齐 sidecar 若存在也不应被当作临时文件删掉。这里没有实现段落映射生产或跨设备 sidecar 同步。
+任务记录、尝试目录及清单位于插件 `.runtime/jobs/`；译文附件在 Zotero `storage/`。失败尝试不能覆盖先前可用 PDF。根结果与尝试的清单、质量、用量均保留；`alignment.json` 若存在也不应被当作临时文件删掉，服务端暴露其 `alignment_path`。正式翻译流水线目前不自动生成 mapping，原型由 `scripts/probe_engine.py` 捕获同单元并验证实际文本/几何后产出，不做语义猜配；没有跨设备 sidecar 同步。
+
+旧成果无 mapping 或验证失败时，定位控件显示降级原因，普通阅读与页级同步仍可用；不删除旧附件，不为补 mapping 自动重发。sidecar 使用零基页码、未旋转的 PDF user space，并绑定原文/译文 PDF 字节 SHA-256，不是屏幕坐标缓存。
 
 新尝试使用 `jobs/attempts/<job-id>-<number>/`，避免指纹与 UUID 重复嵌套触发 Windows 路径长度限制。记录中的 `layout: "flat"` 区分新布局；缺少该字段的旧尝试仍按 `jobs/<fingerprint>/attempts/...` 读取，不迁移或覆盖旧文件。新目录的 `identity.json` 独立保存指纹与文档身份，供译文反查和归属清理使用；缺失或损坏身份的目录保留，不猜测删除。源快照与当前结果别名仍在 `jobs/<fingerprint>/`。
 
@@ -29,8 +35,12 @@ PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译�
 
 使用项目自己的 Python 环境运行 `python -m pytest tests -q -rs`，另运行 `node tests/test_tasks.cjs`、`node tests/test_library.cjs`、`node tests/test_sync.cjs`、`node tests/test_packaged_startup.cjs`。
 
+可信定位和 provider CLI 的离线入口为 `python -m pytest tests/test_alignment.py tests/test_verify_providers.py -q` 与 `node tests/test_alignment.cjs`；provider 测试使用临时模拟输入。直接运行 `scripts/verify_providers.py` 即使不加 `--run` 也会读取具名输入及已知明文 key，禁密钥任务不要运行；实际请求必须显式 `--run`，每个 ready profile 最多一次，输出 token 上限 512，无重试或回退。
+
 完整 XPI 构建后，`scripts/prepare_packaged_test.py --suite queue` 创建独立 `queue-profile` / `queue-data`。`tests/queue_packaged.js` 检查真实 Zotero 设置、登录管理器、后端启动、批量入口和附件导入；模型结果显式模拟，不调用服务商、不验证翻译质量。测试需要在 `.runtime/queue-fixture.pdf` 放一份非敏感 PDF。默认 `packaged` 套件保持原有真实翻译测试，可能调用付费 API。
+
+`--suite alignment` 使用独立 `.runtime/alignment-profile` / `.runtime/alignment-data`，只允许隔离 profile，由 `tests/alignment_packaged.js` 测试真实阅读器及本地 mapping 验证，不调用 providers、不提交或重试任务。fixture 需预先置于 `.runtime/alignment-fixture/`：`source.pdf`、`translated.pdf`、同次原型产出的 `alignment.json`；准备脚本不生成 mapping。启动方式与静态测试边界见 [engine-and-alignment.md](engine-and-alignment.md)。
 
 `tests/offline_quality_pipeline.py` 使用项目 Python 和已准备的 `.cache` 资源，禁网运行真实 BabelDOC 解析、排版与 PDF 输出；仅替换服务商响应，检查成功与响应丢失两条路径的质量、用量和字体嵌入。运行 `python -I -B tests/offline_quality_pipeline.py`，结果写入 `.runtime/offline-quality-report.json`；可在 Windows/Linux/macOS 原生环境运行，不代表真实模型语义质量验收。
 
-引擎升级到 0.7.x 涉及 Python 私有阶段移除，需要独立评估，不可只改依赖版本号。段落对齐须先验证目标发布 wheel 的稳定快照接口与最终 PDF 坐标，不能将当前页级同步宣称为段落对齐。
+正式 0.7.1 wheel 的 `stage_capture_enabled=False`，旧 `ILTranslatorLLMOnly` 移除、保护适配与 `PageProjection` 不兼容，以及系统字体 hash/profile 均阻碍迁移，不能只改依赖版本号。`--official-fonts` 的 public pipeline 成功只使用模拟 response，不表示升级完成；当前可信定位是原型，不能将页级同步宣称为段落对齐。

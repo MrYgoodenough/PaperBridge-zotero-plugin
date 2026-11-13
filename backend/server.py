@@ -677,6 +677,11 @@ class Handler(BaseHTTPRequestHandler):
                 return self.respond(200, {"version": VERSION, "root": str(ROOT), "engine": "BabelDOC 0.6.4", "python":sys.executable})
             if self.command == "GET" and path == "/jobs":
                 return self.respond(200, {"jobs": self.server.store.list_jobs()})
+            if self.command == "POST" and path == "/alignment/validate":
+                from alignment import load_mapping
+                data = self.body()
+                # This validates local evidence only; it never submits or retries a model job.
+                return self.respond(200, load_mapping(data.get("mapping_path"), data.get("source_path"), data.get("output_path")))
             if self.command == "POST" and path in {"/cache/describe","/cache/prune"}:
                 size = int(self.headers.get("Content-Length", "0"))
                 if not 0 < size <= 8 * 1024 * 1024:
