@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-13",
+  "source_version": "0.3.2",
+  "source_commit": "44b47efe691ff71ce8d049d0dec1a1beda1d6c28",
+  "release_created": false,
+  "macos_release_assets_changed": false,
+  "batch_review_gate": {
+    "incomplete_or_unconfirmed_matching_outcomes": "Explicit task review; no fresh POST /jobs",
+    "unrelated_new_papers": "Continue enqueueing",
+    "latest_complete_saved_outcome": "Still reusable",
+    "legacy_partial_saved_outcome": "Still requires explicit review"
+  },
+  "python_tests": {
+    "linux": { "passed": 108, "skipped": 1 },
+    "windows": { "passed": 108, "skipped": 1 },
+    "skip_reason": "Missing optional .cache/references/pi0-v3.pdf"
+  },
+  "javascript_both_platforms": [
+    "tasks including seven reviewable outcomes and mixed batch",
+    "task_window",
+    "library (15 tests)",
+    "sync",
+    "packaged_startup"
+  ],
+  "isolated_zotero_xpi": [
+    { "platform": "linux-x64", "python_mode": "bundled", "zotero": "10.0.8", "ok": true, "checks": 17, "provider_calls": 0, "database_integrity": "ok", "test_processes_remaining": 0 },
+    { "platform": "linux-x64", "python_mode": "local", "zotero": "10.0.8", "ok": true, "checks": 17, "provider_calls": 0, "database_integrity": "ok", "test_processes_remaining": 0 },
+    { "platform": "windows-x64", "python_mode": "bundled", "zotero": "10.0.8", "ok": true, "checks": 17, "provider_calls": 0, "database_integrity": "ok", "test_processes_remaining": 0 },
+    { "platform": "windows-x64", "python_mode": "local", "zotero": "10.0.8", "ok": true, "checks": 17, "provider_calls": 0, "database_integrity": "ok", "test_processes_remaining": 0 }
+  ],
+  "packages": [
+    { "file": "dist/paperbridge-0.3.2-linux-x64.xpi", "platform": "linux-x64", "python_mode": "bundled", "bytes": 286094965, "sha256": "eab0a8a882aa2a512269ff9b5edb59e0eae9fab63b6a8f425792b0e2bc943645", "source_files_checked": 23, "draft_feed_verified": true },
+    { "file": "dist/paperbridge-0.3.2-linux-x64-local-python.xpi", "platform": "linux-x64", "python_mode": "local", "bytes": 248176724, "sha256": "02ca70c0f0df6d35fb6215d0396bf38d0b6e7e9194df337543461f5396c5ef00", "source_files_checked": 23, "draft_feed_verified": true },
+    { "file": "dist/paperbridge-0.3.2-windows-x64.xpi", "platform": "windows-x64", "python_mode": "bundled", "bytes": 198874253, "sha256": "1f878c4fd8311c84a68a4904853f9be19734a6ad0e3b9b0b8fa02da78e542016", "source_files_checked": 23, "draft_feed_verified": true },
+    { "file": "dist/paperbridge-0.3.2-windows-x64-local-python.xpi", "platform": "windows-x64", "python_mode": "local", "bytes": 186940789, "sha256": "32ef4d36f204dd2f7d673751daa89b29e0bf6ac338e19f601c5312e5a6a78864", "source_files_checked": 23, "draft_feed_verified": true }
+  ],
+  "source_sync": {
+    "branch": "master",
+    "linux_windows_github_source_commit": "44b47efe691ff71ce8d049d0dec1a1beda1d6c28",
+    "windows_original_draft_zip_sha256": "473e40bab232e2ae673d718e8c80b10fd106a8e11bffce8dcf8dfca75ca47c4d",
+    "windows_original_files_verified": 112,
+    "windows_original_draft_stash": "1585dab3ddd69ff0d22c8a2a787914b1fc717d85",
+    "windows_artifacts_copied_and_hash_verified": true,
+    "windows_original_artifacts_backup": "E:\\ZoteroPlugin\\PaperBridge-zotero-plugin\\.runtime\\dist-before-takeover-sync-20261113-195420"
+  },
+  "limits": [
+    "XPI job outcomes are simulated; real provider translation and semantic quality are not accepted",
+    "The native offline BabelDOC pipeline was not rerun in this finishing pass; prior evidence remains in recovery-verification-2026-11-13.json",
+    "macOS was not rebuilt or GUI-tested; published 0.4.2-specific source remains outside this branch",
+    "No Release or update feed was published; dist/updates remains draft-only",
+    "Normal Zotero profiles, libraries and original Windows Python environment were not modified",
+    "Paragraph-level alignment and BabelDOC 0.7.x migration remain separate work"
+  ]
+}
