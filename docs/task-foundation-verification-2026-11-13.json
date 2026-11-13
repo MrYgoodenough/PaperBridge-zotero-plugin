@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-13",
+  "timezone": "Asia/Shanghai",
+  "scope": "Unreleased task foundation, serial batch and controlled compatible profile",
+  "python": {"passed": 88, "skipped": 1, "skip_reason": "Reference sample .cache/references/pi0-v3.pdf is absent"},
+  "javascript": {
+    "library_tests": 14,
+    "task_contracts": "passed: shared cancellation, import retry, persistence failure and lost-response recovery",
+    "pdf_coordinate_mapping": "passed",
+    "packaged_helper_startup": "passed",
+    "syntax_and_xhtml": "passed"
+  },
+  "installed_xpi": {
+    "platform": "linux-x64",
+    "zotero": "10.0.8",
+    "python_mode": "bundled",
+    "profile": "isolated queue-profile / queue-data",
+    "checks_passed": 13,
+    "actual_zotero_operations": ["settings", "separate credentials", "backend startup and listing", "multi-selection", "task dialog", "attachment imports", "repeat polling", "trash preservation", "shutdown"],
+    "engine_results": "explicitly simulated; not a provider translation-quality test",
+    "database_integrity": "ok",
+    "service_stopped": true
+  },
+  "real_babeldoc_pipeline": {
+    "engine": "0.6.4",
+    "pdf": "synthetic one-page digital PDF with two translation units",
+    "network": "blocked; zero connection attempts",
+    "actual_provider_calls": 0,
+    "simulated_success": {"quality": "complete", "applied_units": 2, "intercepted_requests": 1},
+    "simulated_response_loss": {"quality": "unusable", "failed_units": 2, "intercepted_requests": 1, "automatic_resends": 0, "pdf_still_produced": true}
+  },
+  "packages": [
+    {"name": "paperbridge-0.3.1-linux-x64.xpi", "bytes": 286089377, "sha256": "90375b48331cdfc81693cb297a8974776d2ab2cd8bea1ad80b5c7b987e7d855f", "source_files_verified": 23},
+    {"name": "paperbridge-0.3.1-linux-x64-local-python.xpi", "bytes": 248171129, "sha256": "0858b3c1d1d953acfec7758d23fcec6d25a2e250375ce8517030d2749113c084", "source_files_verified": 23}
+  ],
+  "limitations": [
+    "Windows desktop-hz SSH connection timed out; no new Windows runtime or XPI validation",
+    "No macOS test environment; no new macOS runtime or XPI validation",
+    "No real provider calls, broad paper corpus or linguistic quality evaluation",
+    "Linux local-Python variant built and source-checked but not run in Zotero",
+    "Fixed BabelDOC 0.6.4 retains upstream disclosed parser security risks",
+    "No paragraph alignment or cross-device sidecar synchronization"
+  ]
+}

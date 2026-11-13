@@ -1,0 +1,332 @@
+{
+  "date": "2026-11-13",
+  "source_version": "0.3.2",
+  "release_created": false,
+  "recovered_intent_evidence": "Windows uncommitted docs/update-0.3.2.md and associated source/test diffs",
+  "backups": [
+    {
+      "file": "windows-wip-before-takeover-20261113.zip",
+      "sha256": "473e40bab232e2ae673d718e8c80b10fd106a8e11bffce8dcf8dfca75ca47c4d"
+    },
+    {
+      "file": "linux-wip-before-takeover-20261113.zip",
+      "sha256": "e5b437a161712a855d17f0f6b4d442c67e7ccd2296f198fa5a3aca2a7eb10cd4"
+    }
+  ],
+  "integration": {
+    "retained": "durable jobs, quality evidence, conservative result ownership and platform compatibility",
+    "completed": [
+      "live task progress/reopen/counters/elapsed",
+      "verified full-PDF hash reuse",
+      "partial and legacy results require explicit retry",
+      "platform/mode update feeds"
+    ],
+    "parallel_legacy_result_or_progress_system_introduced": false
+  },
+  "python_tests": {
+    "windows": {
+      "passed": 108,
+      "skipped": 1
+    },
+    "linux": {
+      "passed": 108,
+      "skipped": 1
+    },
+    "skip_reason": "Missing optional .cache/references/pi0-v3.pdf"
+  },
+  "javascript_both_platforms": [
+    "tasks",
+    "task_window",
+    "library (15 tests)",
+    "sync",
+    "packaged_startup"
+  ],
+  "windows_xpi": [
+    {
+      "mode": "bundled",
+      "ok": true,
+      "checks": [
+        "Compatible settings save: 设置已保存（仅当前配置及全局设置）。已排队任务仍使用入队时的配置。",
+        "Compatible UI saves its credential and capabilities",
+        "Provider credentials stay isolated",
+        "Bundled backend exposes persistent job listing",
+        "Multi-selection creates two independent owner records",
+        "Batch enqueue does not open paired readers",
+        "Task window shows live percentage, real counts and elapsed time",
+        "Closing and reopening progress never resubmits translation",
+        "Both PDFs are imported into real Zotero items",
+        "Partial quality is not relabelled complete",
+        "Partial PDFs are labelled on real Zotero attachments",
+        "Repeated polling never duplicates imports",
+        "Task dialog displays quality and save dimensions",
+        "Batch completion does not open paired readers",
+        "Trashing a paper never permanently erases its translated attachment",
+        "Trashed-paper outcome remains indexed"
+      ],
+      "zotero": "10.0.8",
+      "installed_build_id": "d31d8bf8d2c7826be1710514e091b01d1a8c2f491d046eb2d38ad92f48db199e",
+      "backend_source_matched": true,
+      "database_integrity": "ok",
+      "isolated_processes_after_exit": 0
+    },
+    {
+      "mode": "local",
+      "ok": true,
+      "checks": [
+        "Compatible settings save: 设置已保存（仅当前配置及全局设置）。已排队任务仍使用入队时的配置。",
+        "Compatible UI saves its credential and capabilities",
+        "Provider credentials stay isolated",
+        "Bundled backend exposes persistent job listing",
+        "Multi-selection creates two independent owner records",
+        "Batch enqueue does not open paired readers",
+        "Task window shows live percentage, real counts and elapsed time",
+        "Closing and reopening progress never resubmits translation",
+        "Both PDFs are imported into real Zotero items",
+        "Partial quality is not relabelled complete",
+        "Partial PDFs are labelled on real Zotero attachments",
+        "Repeated polling never duplicates imports",
+        "Task dialog displays quality and save dimensions",
+        "Batch completion does not open paired readers",
+        "Trashing a paper never permanently erases its translated attachment",
+        "Trashed-paper outcome remains indexed"
+      ],
+      "zotero": "10.0.8",
+      "installed_build_id": "56428c82de5cac20241aa5a103e6ad698c09d51e870c39dc3ba835d2353bb224",
+      "backend_source_matched": true,
+      "database_integrity": "ok",
+      "isolated_processes_after_exit": 0
+    }
+  ],
+  "linux_bundled_xpi": {
+    "ok": true,
+    "checks": 16,
+    "zotero": "10.0.8",
+    "database_integrity": "ok"
+  },
+  "windows_native_pipeline": {
+    "ok": true,
+    "provider_responses": "simulated",
+    "actual_provider_calls": 0,
+    "network_attempts": [],
+    "linguistic_quality_verified": false,
+    "scenarios": [
+      {
+        "scenario": "success",
+        "quality": "complete",
+        "counts": {
+          "total": 2,
+          "success": 2,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 0,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 0,
+          "failure_events": 0
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": true,
+          "marker_present": true,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "SimSun Regular",
+              "type": "Type0",
+              "extension": "ttf",
+              "embedded": true,
+              "embedded_bytes": 175964
+            }
+          ]
+        }
+      },
+      {
+        "scenario": "timeout",
+        "quality": "unusable",
+        "counts": {
+          "total": 2,
+          "success": 0,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 2,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 2,
+          "failure_events": 6
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": false,
+          "marker_present": false,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "Helvetica",
+              "type": "Type1",
+              "extension": "n/a",
+              "embedded": false,
+              "embedded_bytes": 0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "linux_pipeline": {
+    "ok": true,
+    "provider_responses": "simulated",
+    "actual_provider_calls": 0,
+    "network_attempts": [],
+    "linguistic_quality_verified": false,
+    "scenarios": [
+      {
+        "scenario": "success",
+        "quality": "complete",
+        "counts": {
+          "total": 2,
+          "success": 2,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 0,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 0,
+          "failure_events": 0
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": true,
+          "marker_present": true,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "Noto Serif CJK SC Regular",
+              "type": "Type0",
+              "extension": "otf",
+              "embedded": true,
+              "embedded_bytes": 24425908
+            }
+          ]
+        }
+      },
+      {
+        "scenario": "timeout",
+        "quality": "unusable",
+        "counts": {
+          "total": 2,
+          "success": 0,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 2,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 2,
+          "failure_events": 6
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": false,
+          "marker_present": false,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "Helvetica",
+              "type": "Type1",
+              "extension": "n/a",
+              "embedded": false,
+              "embedded_bytes": 0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "packages": [
+    {
+      "file": "dist/paperbridge-0.3.2-linux-x64.xpi",
+      "bytes": 286094869,
+      "sha256": "8e90a6e1bff7a39f394647218168421441c726459f5e0b79ccbceb9d602ba2de",
+      "platform": "linux-x64",
+      "python_mode": "bundled",
+      "build_id": "f387f2404beea537cbfd944851494ec7e6b8458a6bb3ae08710c99db50bccc51",
+      "source_files_checked": 23,
+      "manifest_difference": "platform/mode update_url only",
+      "draft_feed_verified": true
+    },
+    {
+      "file": "dist/paperbridge-0.3.2-linux-x64-local-python.xpi",
+      "bytes": 248176628,
+      "sha256": "b2327703d7ac820594f9fe44148996c839815efff1899c917ad371a95e894492",
+      "platform": "linux-x64",
+      "python_mode": "local",
+      "build_id": "a4502f82fd57f6f56a23b5166390d098e1c3a651952f88a9f92fcd60dc45d6ab",
+      "source_files_checked": 23,
+      "manifest_difference": "platform/mode update_url only",
+      "draft_feed_verified": true
+    },
+    {
+      "file": "dist/paperbridge-0.3.2-windows-x64.xpi",
+      "bytes": 198874157,
+      "sha256": "de35d661679e38ffeee90962c95b3af689717cf19b6135398a133488afb18c63",
+      "platform": "windows-x64",
+      "python_mode": "bundled",
+      "build_id": "d31d8bf8d2c7826be1710514e091b01d1a8c2f491d046eb2d38ad92f48db199e",
+      "source_files_checked": 23,
+      "manifest_difference": "platform/mode update_url only",
+      "draft_feed_verified": true
+    },
+    {
+      "file": "dist/paperbridge-0.3.2-windows-x64-local-python.xpi",
+      "bytes": 186940693,
+      "sha256": "4d32795aea13d812e2138499ea58c9f84fd435298a592f010182c464974fe3f9",
+      "platform": "windows-x64",
+      "python_mode": "local",
+      "build_id": "56428c82de5cac20241aa5a103e6ad698c09d51e870c39dc3ba835d2353bb224",
+      "source_files_checked": 23,
+      "manifest_difference": "platform/mode update_url only",
+      "draft_feed_verified": true
+    }
+  ],
+  "macos_release_disclosure": {
+    "release": "v0.4.2",
+    "tag_source_manifest_version": "0.3.1",
+    "release_notes_state_source_pending": true,
+    "asset_replaced": false
+  },
+  "limits": [
+    "Provider responses and XPI job outcomes are simulated; no paid provider calls",
+    "Native BabelDOC layout is verified separately; linguistic quality is not accepted",
+    "macOS unavailable; macOS-specific 0.4.2 sources are not in this branch",
+    "Linux local-Python package is built/checked but not GUI-tested in this turn",
+    "Feeds remain under dist/updates and are not published before release artifacts",
+    "Normal Zotero profile/library and original Windows Python environment were not changed"
+  ]
+}

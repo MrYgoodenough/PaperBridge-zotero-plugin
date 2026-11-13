@@ -11,6 +11,8 @@ from sanitize_runtime import sanitize_runtime
 
 # Source tree containing addon code and native runtime stages.
 ROOT = Path(__file__).resolve().parents[1]
+# Public repository hosting release artifacts and separately published update feeds.
+REPOSITORY = "MrYgoodenough/PaperBridge-zotero-plugin"
 
 
 def build_platform():
@@ -30,14 +32,20 @@ PLATFORM, SITE_PACKAGES = build_platform()
 parser = argparse.ArgumentParser()
 parser.add_argument("--python", choices=["bundled", "local"], default="bundled")
 mode = parser.parse_args().python
-version = json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))["version"]
+manifest = json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))
+version = manifest["version"]
 runtime = ROOT / f".cache/package/{PLATFORM}"
 if not (runtime / "runtime.json").exists():
     raise SystemExit("Run .venv/bin/python scripts/stage_runtime.py first")
 suffix = "-local-python" if mode == "local" else ""
+# Only the built addon points at its native platform and Python-mode update channel.
+manifest["applications"]["zotero"]["update_url"] = (
+    f"https://raw.githubusercontent.com/{REPOSITORY}/master/updates/{PLATFORM}{suffix}.json"
+)
 output = ROOT / "dist" / f"paperbridge-{version}-{PLATFORM}{suffix}.xpi"
 output.parent.mkdir(exist_ok=True)
-payload = runtime.parent / f"runtime-payload-{mode}.zip"
+# Different staged platforms can coexist; never reuse another platform's native payload.
+payload = runtime.parent / f"runtime-payload-{PLATFORM}-{mode}.zip"
 if sanitize_runtime(runtime):
     # Both variants share the staged binaries; neither may reuse an unsanitized payload.
     for cached in runtime.parent.glob("runtime-payload*.zip"):
@@ -83,8 +91,26 @@ with zipfile.ZipFile(output, "a", zipfile.ZIP_DEFLATED, compresslevel=9) as arch
             if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc":
                 info = zipfile.ZipInfo(prefix + path.relative_to(folder).as_posix(), (2026, 1, 1, 0, 0, 0))
                 info.compress_type = zipfile.ZIP_DEFLATED
-                archive.writestr(info, path.read_bytes())
+                contents = path.read_bytes()
+                if path == ROOT / "addon/manifest.json":
+                    contents = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+                archive.writestr(info, contents)
 with output.open("rb") as stream:
     digest = hashlib.file_digest(stream,"sha256").hexdigest()
 output.with_suffix(".xpi.sha256").write_text(f"{digest}  {output.name}\n")
+# Hash the completed XPI, not the cached runtime; keep unpublished feeds out of updates/.
+zotero = manifest["applications"]["zotero"]
+updates = {"addons": {zotero["id"]: {"updates": [{
+    "version": version,
+    "update_link": f"https://github.com/{REPOSITORY}/releases/download/v{version}/{output.name}",
+    "update_hash": "sha256:" + digest,
+    "applications": {"zotero": {
+        key: zotero[key] for key in ("strict_min_version", "strict_max_version")
+    }},
+}]}}}
+feed_dir = output.parent / "updates"
+feed_dir.mkdir(exist_ok=True)
+feed_path = feed_dir / f"{PLATFORM}{suffix}.json"
+feed_path.write_text(json.dumps(updates, indent=2) + "\n", encoding="utf-8")
 print(f"{output} ({output.stat().st_size:,} bytes)")
+print(f"Draft update feed: {feed_path}; publish separately only after the matching release artifact exists.")

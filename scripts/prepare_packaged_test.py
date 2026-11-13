@@ -9,11 +9,6 @@ from pathlib import Path
 
 # Keep generated integration-test files inside this checkout.
 ROOT = Path(__file__).resolve().parents[1]
-# Disposable profile whose data directory is separate from the user's library.
-PROFILE = ROOT / ".runtime/packaged-profile"
-PROFILE.mkdir(exist_ok=True)
-extensions = PROFILE / "extensions"
-extensions.mkdir(exist_ok=True)
 
 
 def build_platform():
@@ -33,7 +28,14 @@ addon_manifest=json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf
 version=addon_manifest["version"]
 parser = argparse.ArgumentParser()
 parser.add_argument("--local-python", default="", help="Existing Python 3.12 interpreter to test")
+parser.add_argument("--suite", choices=["packaged", "queue"], default="packaged",
+                    help="Queue smoke uses a separate profile and no provider calls")
 options = parser.parse_args()
+# Each suite owns its profile and data, never the user's normal Zotero library.
+PROFILE = ROOT / f".runtime/{options.suite}-profile"
+PROFILE.mkdir(parents=True, exist_ok=True)
+extensions = PROFILE / "extensions"
+extensions.mkdir(exist_ok=True)
 suffix = "-local-python" if options.local_python else ""
 shutil.copyfile(ROOT / f"dist/paperbridge-{version}-{build_platform()}{suffix}.xpi", extensions / "paperbridge@local.dev.xpi")
 (ROOT / ".runtime/packaged-options.json").write_text(json.dumps({"pythonPath":options.local_python}))
@@ -43,20 +45,31 @@ manifest = {"manifest_version":2,"name":"PaperBridge isolated integration tests"
     "strict_max_version":addon_manifest["applications"]["zotero"]["strict_max_version"],
     "update_url":"https://example.invalid/tests.json"}}}
 bootstrap = '''function install(){} function uninstall(){} function shutdown(){}
-async function startup(){
+function startup(){
+  // Zotero awaits each add-on's startup; do not block the real add-on's startup.
+  runTests().catch(async error => {
+    Zotero.logError(error);
+    await IOUtils.writeUTF8(PathUtils.join(PROJECT_ROOT_LITERAL, ".runtime", "packaged-test.json"),
+      JSON.stringify({ok:false,error:String(error),stack:error.stack},null,2));
+  });
+}
+async function runTests(){
   await Zotero.initializationPromise;
   await Zotero.uiReadyPromise;
   for(let i=0;i<100&&!Zotero.PaperBridge;i++) await Zotero.Promise.delay(100);
+  if(!Zotero.PaperBridge) throw new Error("PaperBridge did not start within 10 seconds");
   Services.scriptloader.loadSubScript(TEST_URI, {Zotero,Services,IOUtils,PathUtils,Cc,Ci,Components,ChromeUtils,PAPERBRIDGE_TEST_ROOT:PROJECT_ROOT_LITERAL});
-}'''.replace("TEST_URI",json.dumps((ROOT / "tests/packaged.js").as_uri())).replace("PROJECT_ROOT_LITERAL",json.dumps(str(ROOT)))
+}'''.replace("TEST_URI",json.dumps((ROOT / ("tests/queue_packaged.js" if options.suite == "queue" else "tests/packaged.js")).as_uri())).replace("PROJECT_ROOT_LITERAL",json.dumps(str(ROOT)))
+if options.suite == "queue":
+    bootstrap = bootstrap.replace("packaged-test.json", "queue-test.json")
 with zipfile.ZipFile(extensions / "paperbridge-tests@local.dev.xpi","w") as z:
     z.writestr("manifest.json",json.dumps(manifest))
     z.writestr("bootstrap.js",bootstrap)
-prefs = {"extensions.zotero.dataDir":str(ROOT / ".runtime/packaged-data"),"extensions.zotero.useDataDir":True,
+prefs = {"extensions.zotero.dataDir":str(ROOT / f".runtime/{options.suite}-data"),"extensions.zotero.useDataDir":True,
     "extensions.paperbridge.pythonPath": options.local_python,
     "extensions.autoDisableScopes":0,"extensions.enabledScopes":15,"extensions.startupScanScopes":15,
     "xpinstall.signatures.required":False,"browser.shell.checkDefaultBrowser":False}
-(ROOT / ".runtime/packaged-data").mkdir(exist_ok=True)
+(ROOT / f".runtime/{options.suite}-data").mkdir(exist_ok=True)
 (PROFILE / "user.js").write_text("\n".join(f"user_pref({json.dumps(k)}, {json.dumps(v)});" for k,v in prefs.items()))
 for name in ["addonStartup.json.lz4","extensions.json"]:
     (PROFILE / name).unlink(missing_ok=True)

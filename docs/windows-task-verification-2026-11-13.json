@@ -1,0 +1,405 @@
+{
+  "date": "2026-11-13",
+  "version": "0.3.1 development snapshot; not a new release",
+  "scope": "Windows compatibility of durable jobs, serial batch, result retention and profiles",
+  "environment": {
+    "os": "Windows 11 10.0.26200 x64",
+    "zotero": "10.0.8",
+    "native_python": "3.12.13",
+    "babeldoc": "0.6.4",
+    "pymupdf": "1.26.7",
+    "openai": "2.54.0",
+    "node_test_only": "24.22.2",
+    "powershell": "5.1"
+  },
+  "isolation": {
+    "normal_zotero_profile_used": false,
+    "original_windows_sources_modified": false,
+    "system_long_path_settings_modified": false,
+    "temporary_gui_task_removed": true
+  },
+  "windows_path_regression": {
+    "before": {
+      "failed": 25,
+      "passed": 63,
+      "skipped": 1
+    },
+    "error": "WinError 206 in JobStore.queue attempt directory creation",
+    "fix": "Flat UUID attempt directories; legacy paths retained; identity sidecar for lookup/pruning",
+    "same_checkout_and_pytest_basetemp_retested": true
+  },
+  "regression": {
+    "windows_pytest": {
+      "passed": 94,
+      "skipped": 1
+    },
+    "linux_pytest": {
+      "passed": 94,
+      "skipped": 1
+    },
+    "skip_reason": "Missing optional .cache/references/pi0-v3.pdf",
+    "javascript_both_platforms": [
+      "test_tasks.cjs",
+      "test_library.cjs (14 tests)",
+      "test_sync.cjs",
+      "test_packaged_startup.cjs"
+    ]
+  },
+  "windows_xpi_smoke": [
+    {
+      "ok": true,
+      "checks": [
+        "Compatible settings save: 设置已保存（仅当前配置及全局设置）。已排队任务仍使用入队时的配置。",
+        "Compatible UI saves its credential and capabilities",
+        "Provider credentials stay isolated",
+        "Bundled backend exposes persistent job listing",
+        "Multi-selection creates two independent owner records",
+        "Batch enqueue does not open paired readers",
+        "Both PDFs are imported into real Zotero items",
+        "Partial quality is not relabelled complete",
+        "Repeated polling never duplicates imports",
+        "Task dialog displays quality and save dimensions",
+        "Batch completion does not open paired readers",
+        "Trashing a paper never permanently erases its translated attachment",
+        "Trashed-paper outcome remains indexed"
+      ],
+      "zotero_version": "10.0.8",
+      "python_mode": "bundled",
+      "installed_build_id": "cc2791279bf1615fdb58ac6b8dc86e7591dc2b0d784781ef26a5838f16198b39",
+      "backend_source_matched": true,
+      "engine_outcomes": "simulated",
+      "actual_provider_calls": 0,
+      "database_integrity": "ok",
+      "isolated_processes_after_exit": 0
+    },
+    {
+      "ok": true,
+      "checks": [
+        "Compatible settings save: 设置已保存（仅当前配置及全局设置）。已排队任务仍使用入队时的配置。",
+        "Compatible UI saves its credential and capabilities",
+        "Provider credentials stay isolated",
+        "Bundled backend exposes persistent job listing",
+        "Multi-selection creates two independent owner records",
+        "Batch enqueue does not open paired readers",
+        "Both PDFs are imported into real Zotero items",
+        "Partial quality is not relabelled complete",
+        "Repeated polling never duplicates imports",
+        "Task dialog displays quality and save dimensions",
+        "Batch completion does not open paired readers",
+        "Trashing a paper never permanently erases its translated attachment",
+        "Trashed-paper outcome remains indexed"
+      ],
+      "zotero_version": "10.0.8",
+      "python_mode": "local",
+      "installed_build_id": "4dc6dd1f6e52822027cc8976b007134e14845a534307507ed7d0539e20744a03",
+      "backend_source_matched": true,
+      "engine_outcomes": "simulated",
+      "actual_provider_calls": 0,
+      "database_integrity": "ok",
+      "isolated_processes_after_exit": 0
+    }
+  ],
+  "windows_native_pipeline": {
+    "ok": true,
+    "provider_responses": "simulated",
+    "actual_provider_calls": 0,
+    "network_attempts": [],
+    "linguistic_quality_verified": false,
+    "scenarios": [
+      {
+        "scenario": "success",
+        "quality": "complete",
+        "counts": {
+          "total": 2,
+          "success": 2,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 0,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 0,
+          "failure_events": 0
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": true,
+          "marker_present": true,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "SimSun Regular",
+              "type": "Type0",
+              "extension": "ttf",
+              "embedded": true,
+              "embedded_bytes": 175964
+            }
+          ]
+        }
+      },
+      {
+        "scenario": "timeout",
+        "quality": "unusable",
+        "counts": {
+          "total": 2,
+          "success": 0,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 2,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 2,
+          "failure_events": 6
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": false,
+          "marker_present": false,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "Helvetica",
+              "type": "Type1",
+              "extension": "n/a",
+              "embedded": false,
+              "embedded_bytes": 0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "windows_production_attempt_path_pipeline": {
+    "ok": true,
+    "provider_responses": "simulated",
+    "actual_provider_calls": 0,
+    "network_attempts": [],
+    "linguistic_quality_verified": false,
+    "scenarios": [
+      {
+        "scenario": "success",
+        "quality": "complete",
+        "counts": {
+          "total": 2,
+          "success": 2,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 0,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 0,
+          "failure_events": 0
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": true,
+          "marker_present": true,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "SimSun Regular",
+              "type": "Type0",
+              "extension": "ttf",
+              "embedded": true,
+              "embedded_bytes": 175964
+            }
+          ]
+        }
+      },
+      {
+        "scenario": "timeout",
+        "quality": "unusable",
+        "counts": {
+          "total": 2,
+          "success": 0,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 2,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 2,
+          "failure_events": 6
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": false,
+          "marker_present": false,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "Helvetica",
+              "type": "Type1",
+              "extension": "n/a",
+              "embedded": false,
+              "embedded_bytes": 0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "linux_pipeline": {
+    "ok": true,
+    "provider_responses": "simulated",
+    "actual_provider_calls": 0,
+    "network_attempts": [],
+    "linguistic_quality_verified": false,
+    "scenarios": [
+      {
+        "scenario": "success",
+        "quality": "complete",
+        "counts": {
+          "total": 2,
+          "success": 2,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 0,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 0,
+          "failure_events": 0
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": true,
+          "marker_present": true,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "Noto Serif CJK SC Regular",
+              "type": "Type0",
+              "extension": "otf",
+              "embedded": true,
+              "embedded_bytes": 24425908
+            }
+          ]
+        }
+      },
+      {
+        "scenario": "timeout",
+        "quality": "unusable",
+        "counts": {
+          "total": 2,
+          "success": 0,
+          "cache": 0,
+          "skipped": 0,
+          "failed": 2,
+          "unknown": 0,
+          "unresolved": 0,
+          "attempts": 2,
+          "cache_hits": 0,
+          "fallbacks": 2,
+          "failure_events": 6
+        },
+        "completion_calls": 1,
+        "sdk_max_retries": 0,
+        "billing_uncertain": true,
+        "unknown_usage_requests": 1,
+        "pdf": {
+          "pages": 1,
+          "cjk_present": false,
+          "marker_present": false,
+          "source_title_present": true,
+          "fonts": [
+            {
+              "xref": 4,
+              "name": "Helvetica",
+              "type": "Type1",
+              "extension": "n/a",
+              "embedded": false,
+              "embedded_bytes": 0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "linux_rebuilt_bundled_xpi": {
+    "ok": true,
+    "checks": 13,
+    "zotero": "10.0.8",
+    "database_integrity": "ok",
+    "isolated_processes_after_exit": 0,
+    "engine_outcomes": "simulated"
+  },
+  "packages": [
+    {
+      "file": "dist/paperbridge-0.3.1-linux-x64.xpi",
+      "bytes": 286089983,
+      "sha256": "b6c0dba9541040f57bd26bd677c5b312d32449c6b59155d9a6dd5b6b4e6c0bf0",
+      "platform": "linux-x64",
+      "python_mode": "bundled",
+      "build_id": "b647a655b3b6867393a0a80e12c0e24318dd6194dbadc7558789e5e76b6e36de",
+      "source_files_matched": 23
+    },
+    {
+      "file": "dist/paperbridge-0.3.1-linux-x64-local-python.xpi",
+      "bytes": 248171736,
+      "sha256": "3df201c8d60c6abadd1af0e88caea89a6de909279f6ff9e8e1754bf25d862fcf",
+      "platform": "linux-x64",
+      "python_mode": "local",
+      "build_id": "085835c918450f56cb1af3d5b3133810591964f5765bd9c9ccaa37e3491c6668",
+      "source_files_matched": 23
+    },
+    {
+      "file": "dist/paperbridge-0.3.1-windows-x64.xpi",
+      "bytes": 198869269,
+      "sha256": "1af055cd9731efae3a7985662f6b1831c603edfdc115a4c68e0713e731b932ef",
+      "platform": "windows-x64",
+      "python_mode": "bundled",
+      "build_id": "cc2791279bf1615fdb58ac6b8dc86e7591dc2b0d784781ef26a5838f16198b39",
+      "source_files_matched": 23
+    },
+    {
+      "file": "dist/paperbridge-0.3.1-windows-x64-local-python.xpi",
+      "bytes": 186935798,
+      "sha256": "fc09bb1e88b7d2e2883406704b273ee251f821c36aa352ae8843ca1ac69dc5c5",
+      "platform": "windows-x64",
+      "python_mode": "local",
+      "build_id": "4dc6dd1f6e52822027cc8976b007134e14845a534307507ed7d0539e20744a03",
+      "source_files_matched": 23
+    }
+  ],
+  "limitations": [
+    "No real provider calls or linguistic quality acceptance in this validation",
+    "No macOS machine available; macOS XPI was not rebuilt",
+    "The queue smoke simulates job outcomes; real BabelDOC is checked separately offline",
+    "The first Windows harness run required stopping its isolated process after mixed-separator paths prevented reporting; final runs exit normally",
+    "Arbitrarily deep custom Windows data paths are not guaranteed",
+    "No Git push or GitHub Release update"
+  ]
+}

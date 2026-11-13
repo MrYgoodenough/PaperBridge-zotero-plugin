@@ -31,8 +31,8 @@ XPI 内按 `runtime/<平台>/` 存放运行时；插件启动时按 `Services.ap
 | `scripts/prepare_packaged_test.py` | 测试用 XPI 名称与提示按平台生成 |
 | `scripts/setup.ps1`、`scripts/serve.ps1` | Windows 下等价于 `setup.sh`、`serve.sh` |
 
-未改动：文献归属与缓存清理、分屏与同步滚动、设置项、DeepSeek 请求与段落缓存的
-数据格式。译文附件、`translations.json`、缓存目录结构在两平台完全一致。
+两平台使用同一套任务与附件归属实现。当前 0.3.2 新增的持久化任务、质量证据与
+进度接口见 [任务与成果架构](tasks-and-results.md)；历史格式继续读取，不要求迁移译文附件。
 
 ## 在 Windows 上开发与构建
 
@@ -43,7 +43,7 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 # 2. 打包运行时（.cache/package/windows-x64，约 450 MB）
 .\.venv\Scripts\python.exe scripts\stage_runtime.py
 
-# 3. 生成安装包（dist\paperbridge-0.3.1-windows-x64.xpi）
+# 3. 生成安装包（dist\paperbridge-0.3.2-windows-x64.xpi）
 .\.venv\Scripts\python.exe scripts\build.py            # 自带 Python，约 221 MB
 .\.venv\Scripts\python.exe scripts\build.py --python local   # 仅依赖，需自备 Python 3.12
 ```
@@ -60,7 +60,13 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 
 Zotero 10 兼容范围由 `addon/manifest.json` 的 `strict_max_version: 10.*` 声明。
 已有 Windows XPI 若仍声明 `9.*`，需要从当前源码重新运行 `scripts/build.py` 并安装新包；
-仅更新源码不会改变已安装的 XPI。当前更新地址为占位地址，需从文件安装。
+仅更新源码不会改变已安装的 XPI。旧版占位更新地址需先从文件安装新版。
+0.3.2 构建包使用 Windows/Python 模式独立更新地址，草稿清单在 `dist/updates/`；
+对应安装包发布后再发布清单，构建或同步源码不会自动启用更新。
+
+新任务尝试目录不再重复嵌套指纹与 UUID，避免常规数据路径触发 Windows MAX_PATH。
+旧目录仍可读取；测试根路径不需要人为缩短，也不要求修改系统注册表。
+Gecko 文件接口使用 `PathUtils.join(root, "folder", "file")`，不要拼接混合分隔符路径。
 
 2026-11-07 使用独立 Zotero 10.0.6 程序副本、profile 和文献库验证重建的自带 Python 包：
 插件菜单、设置保存、内置引擎解包与启动、选页翻译、译文附件、双向同步、独立阅读及关闭清理均通过。

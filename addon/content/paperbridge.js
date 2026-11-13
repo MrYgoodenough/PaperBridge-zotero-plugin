@@ -1,21 +1,30 @@
-/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils */
+/** Zotero commands and paired PDF reading; task execution lives in tasks.js. */
+/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, TranslationTasks */
+// One bridge is shared by all Zotero windows in the addon scope.
 var PaperBridge = {
   jobs: new Map(),
+  // Only the initiating reader command may wait and auto-open its saved result.
+  readerWaits: new Set(),
   splits: new Map(),
   buttons: new Set(),
   alive: true,
 
+  /** Read one addon preference. */
   pref(name) { return Zotero.Prefs.get("extensions.paperbridge." + name, true); },
+  /** Store one non-secret addon preference. */
   setPref(name, value) { Zotero.Prefs.set("extensions.paperbridge." + name, value, true); },
+  /** Initialize durable tasks and register Zotero UI entry points. */
   async start(id) {
     this.id = id;
     this.storageRoot = PathUtils.join(Zotero.DataDirectory.dir,"storage");
-    this.setPref("model", "deepseek-flash");
+    this.alive = true;
     await this.library.load();
+    this.tasks = new TranslationTasks(this);
+    await this.tasks.resume();
     this.toolbarHandler = event => this.toolbar(event);
     this.contextHandler = ({ reader, append }) => {
       if (reader._type !== "pdf") return;
-      append({ label: "DeepSeek 翻译并分屏", onCommand: () => this.action(() => this.translate(reader)) });
+      append({ label: "PaperBridge 翻译并分屏", onCommand: () => this.action(() => this.translate(reader)) });
       append({ label: "PaperBridge：打开已有译文", onCommand: () => this.action(() => this.openExisting(reader)) });
       append({ label: "PaperBridge：取消翻译", onCommand: () => this.action(() => this.cancel(reader.itemID)) });
     };
@@ -30,19 +39,27 @@ var PaperBridge = {
     this.notifier = Zotero.Notifier.registerObserver(this.observer,["tab","item"],"paperbridge");
     for (const win of Zotero.getMainWindows()) this.addMenus(win);
     // A newly installed plugin must also appear in readers that were already open.
-    for (const reader of Zotero.Reader._readers) {
-      await reader._initPromise;
-      const doc = reader._iframeWindow.document;
-      const host = doc.querySelector(".toolbar .end");
-      if (host && !doc.querySelector(".paperbridge-translate")) {
-        this.toolbar({ reader, doc, append: node => host.append(node) });
+    for (const reader of Zotero.Reader._readers || []) {
+      try {
+        await reader._initPromise;
+        const doc = reader._iframeWindow?.document;
+        const host = doc?.querySelector(".toolbar .end");
+        if (host && !doc.querySelector(".paperbridge-translate")) {
+          this.toolbar({ reader, doc, append: node => host.append(node) });
+        }
+      } catch (error) {
+        // Private reader changes must not disable the library queue or saved artifacts.
+        Zotero.logError(error);
       }
     }
   },
 
+  /** Release readers and leave backend interruptions available for explicit recovery. */
   async stop() {
     this.alive = false;
-    await Promise.allSettled([...this.jobs.keys()].map(id => this.cancel(id)));
+    this.taskWindow?.close();
+    // The backend records interrupted work on shutdown; never silently resubmit it.
+    if (this.tasks?.refreshing) await this.tasks.refreshing.catch(error => Zotero.logError(error));
     for (const tab of [...this.splits.keys()]) this.closeSplit(tab);
     Zotero.Notifier.unregisterObserver(this.notifier);
     await this.library.settled();
@@ -53,6 +70,7 @@ var PaperBridge = {
     await this.runtime.stop();
   },
 
+  /** Report a failed command without terminating the addon. */
   action(task) {
     return task().catch(error => {
       Zotero.logError(error);
@@ -60,6 +78,7 @@ var PaperBridge = {
     });
   },
 
+  /** Add single-paper and batch commands to a main window. */
   addMenus(win) {
     if (win.document.getElementById("paperbridge-menu")) return;
     const doc = win.document;
@@ -68,7 +87,9 @@ var PaperBridge = {
     menu.setAttribute("label", "PaperBridge · 论文对照翻译");
     const popup = doc.createXULElement("menupopup");
     for (const [label, command] of [
-      ["DeepSeek 翻译并分屏", () => this.translate()],
+      ["翻译并分屏", () => this.translate()],
+      ["批量翻译所选论文（仅保存）", () => this.tasks.batch()],
+      ["任务列表…", async () => this.showTasks()],
       ["打开已有译文分屏", () => this.openExisting()],
       ["取消当前论文翻译", async () => this.cancel((await this.source())?.id)],
       ["设置…", async () => this.settings()]
@@ -82,7 +103,7 @@ var PaperBridge = {
     doc.getElementById("menu_ToolsPopup").append(menu);
     const context = doc.createXULElement("menuitem");
     context.id = "paperbridge-item-menu";
-    context.setAttribute("label", "DeepSeek 翻译并分屏");
+    context.setAttribute("label", "PaperBridge：翻译并分屏");
     context.addEventListener("command", () => this.action(() => this.translate(null, true)));
     doc.getElementById("zotero-itemmenu").append(context);
     const saved = doc.createXULElement("menuitem");
@@ -90,20 +111,28 @@ var PaperBridge = {
     saved.setAttribute("label","PaperBridge：打开已有译文");
     saved.addEventListener("command",() => this.action(() => this.openExisting(null,true)));
     doc.getElementById("zotero-itemmenu").append(saved);
+    const batch = doc.createXULElement("menuitem");
+    batch.id = "paperbridge-batch-menu";
+    batch.setAttribute("label", "PaperBridge：批量翻译所选论文（仅保存）");
+    batch.addEventListener("command", () => this.action(() => this.tasks.batch()));
+    doc.getElementById("zotero-itemmenu").append(batch);
   },
 
+  /** Remove this addon's commands when a window closes. */
   removeMenus(win) {
     win.document.getElementById("paperbridge-menu")?.remove();
     win.document.getElementById("paperbridge-item-menu")?.remove();
     win.document.getElementById("paperbridge-existing-menu")?.remove();
+    win.document.getElementById("paperbridge-batch-menu")?.remove();
   },
 
+  /** Add a compact translation command to PDF toolbars. */
   toolbar({ reader, doc, append }) {
     if (reader._type !== "pdf" || doc.querySelector(".paperbridge-translate")) return;
     const button = doc.createElement("button");
     button.className = "toolbar-button paperbridge-translate";
     button.textContent = "译 / 分屏";
-    button.title = "DeepSeek 全文翻译并分屏 · 右键打开设置";
+    button.title = "论文翻译并分屏；执行中点击可重新打开任务进度 · 右键打开设置";
     button.style.cssText = "width:auto;padding:0 9px;font-size:12px;white-space:nowrap";
     button.addEventListener("click", () => this.action(() => this.translate(reader)));
     button.addEventListener("contextmenu", event => { event.preventDefault(); this.settings(); });
@@ -111,29 +140,62 @@ var PaperBridge = {
     append(button);
   },
 
+  /** Open the provider and runtime settings dialog. */
   settings() {
     Zotero.getMainWindow().openDialog("chrome://paperbridge/content/settings.xhtml", "paperbridge-settings",
       "chrome,centerscreen,resizable", { bridge: this });
   },
 
+  /** Focus a source in the shared progress/task view without opening PDF readers. */
+  showTasks(sourceID = null, recordID = null) {
+    if (this.taskWindow && !this.taskWindow.closed) {
+      this.taskWindow.arguments[0].sourceID = sourceID;
+      this.taskWindow.arguments[0].recordID = recordID;
+      this.taskWindow.focusSource?.(sourceID, recordID);
+      this.taskWindow.focus();
+      return;
+    }
+    this.taskWindow = Zotero.getMainWindow().openDialog("chrome://paperbridge/content/tasks.xhtml", "paperbridge-tasks",
+      "chrome,centerscreen,resizable", { bridge: this, sourceID, recordID });
+  },
+
+  /** Resolve a profile into a non-secret snapshot for newly queued tasks. */
+  configuration(profile = this.pref("profile") || "deepseek") {
+    const compatible = profile === "compatible";
+    return { profile, model: this.pref(compatible ? "compatibleModel" : "model"),
+      baseURL: this.pref(compatible ? "compatibleBaseURL" : "baseURL"),
+      language: this.pref("language"), pages: this.pref("pages"), capabilities: {
+        json_mode: compatible ? this.pref("compatibleJSON") !== false : true,
+        thinking_disabled: !compatible,
+        // The default output limit matches the existing DeepSeek adapter.
+        max_tokens: compatible ? Number(this.pref("compatibleMaxTokens")) || 8192 : 8192
+      } };
+  },
+
+  /** Reveal the local engine, records and disposable cache directory. */
   async openDataDirectory() {
     await IOUtils.makeDirectory(this.runtime.base,{ignoreExisting:true});
     this.runtime.file(this.runtime.base).launch();
   },
 
-  getKey() {
-    return Services.logins.findLogins("chrome://paperbridge", null, "DeepSeek")[0]?.password || "";
+  /** Read a profile's credential only from Zotero's login manager. */
+  getKey(profile = this.pref("profile") || "deepseek") {
+    const realm = profile === "compatible" ? "OpenAI-compatible" : "DeepSeek";
+    return Services.logins.findLogins("chrome://paperbridge", null, realm)[0]?.password || "";
   },
 
-  async saveKey(key) {
-    const old = Services.logins.findLogins("chrome://paperbridge", null, "DeepSeek");
+  /** Replace one profile credential without writing it into preferences or tasks. */
+  async saveKey(key, profile = this.pref("profile") || "deepseek") {
+    const realm = profile === "compatible" ? "OpenAI-compatible" : "DeepSeek";
+    const old = Services.logins.findLogins("chrome://paperbridge", null, realm);
     for (const login of old) Services.logins.removeLogin(login);
     if (!key) return;
     const login = Cc["@mozilla.org/login-manager/loginInfo;1"].createInstance(Ci.nsILoginInfo);
-    login.init("chrome://paperbridge", null, "DeepSeek", "api-key", key, "", "");
+    login.init("chrome://paperbridge", null, realm, "api-key", key, "", "");
     await Services.logins.addLoginAsync(login);
   },
 
+  /** Call the authenticated loopback backend, starting it lazily if needed. */
   async request(path, method = "GET", data) {
     const {port, token} = await this.runtime.ensure();
     const response = await fetch(`http://127.0.0.1:${port}${path}`, {
@@ -141,38 +203,52 @@ var PaperBridge = {
       body: data === undefined ? undefined : JSON.stringify(data),
     });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || `内置引擎错误 ${response.status}`);
+    if (!response.ok) {
+      const error = new Error(result.error || `内置引擎错误 ${response.status}`);
+      error.status = response.status;
+      throw error;
+    }
     return result;
   },
 
+  /** Resolve the active reader or selected library item's original PDF. */
   async source(reader, fromLibrary = false) {
     const item = await this.selection(reader,fromLibrary);
+    return this.sourceForItem(item);
+  },
+
+  /** Select one original PDF per paper, excluding generated attachments. */
+  async sourceForItem(item) {
     if (item?.isRegularItem()) {
       const attachments = await Zotero.Items.getAsync(item.getAttachments());
-      const source = attachments.find(attachment => attachment.isPDFAttachment() && !this.library.isTranslation(attachment));
+      const source = attachments.find(attachment => !attachment.deleted && attachment.isPDFAttachment() && !this.library.isTranslation(attachment));
       return source || null;
     }
     if (item?.isPDFAttachment()) return this.library.isTranslation(item) ? null : item;
     throw new Error("请打开 PDF，或在文献库选择包含 PDF 的论文。");
   },
 
+  /** Prefer the explicit reader unless invoked from a library context menu. */
   async selection(reader, fromLibrary = false) {
     const win = Zotero.getMainWindow();
     reader ||= !fromLibrary && Zotero.Reader.getByTabID(win.Zotero_Tabs.selectedID);
     return reader ? Zotero.Items.get(reader.itemID) : win.ZoteroPane.getSelectedItems()[0];
   },
 
+  /** Identify a legacy language-specific preference mapping. */
   mappingKey(source) {
     return `translation.${source.libraryID}.${source.key}.${this.pref("language")}`;
   },
 
+  /** Find an already saved result for the currently selected configuration. */
   async existing(source) {
-    return this.library.matching(source,{language:this.pref("language"),model:this.pref("model"),baseURL:this.pref("baseURL"),pages:this.pref("pages")});
+    return this.library.matching(source, this.configuration());
   },
 
+  /** Open a retained outcome even when its source is missing. */
   async openExisting(reader, fromLibrary = false) {
     const selected = await this.selection(reader,fromLibrary);
-    const saved = selected && await this.library.savedFor(selected,this.pref("language"));
+    const saved = selected && (await this.library.savedFor(selected,this.pref("language")) || await this.library.savedFor(selected));
     if (!saved) throw new Error("没有找到已保存的译文，请先执行翻译。");
     const source = await this.library.item(saved.record.libraryID,saved.record.sourceKey);
     if (source && !source.deleted && await source.fileExists()) await this.split(source,saved.attachment);
@@ -183,69 +259,50 @@ var PaperBridge = {
     return saved.attachment;
   },
 
+  /** Reuse the queue/save path, opening a split only for a single-item command. */
   async translate(reader, fromLibrary = false) {
     const source = await this.source(reader, fromLibrary);
-    if (!source || !await source.fileExists()) return this.openExisting(reader,fromLibrary);
-    if (this.jobs.has(source.id)) throw new Error("这篇论文正在翻译，可从 PaperBridge 菜单取消。");
-    const existing = await this.existing(source);
-    if (existing) {
-      this.setPref("lastUsage",JSON.stringify({api_requests:0,input_tokens:0,cached_input_tokens:0,
-        uncached_input_tokens:0,output_tokens:0,full_pdf_cache:true,model:this.pref("model"),date:new Date().toISOString()}));
-      return this.split(source, existing);
-    }
-    if (!this.getKey()) { this.settings(); return; }
-    await this.request("/health");
-    const path = await source.getFilePathAsync();
-    if (!path) throw new Error("请先下载此 PDF 附件。");
-    const originalStat = await IOUtils.stat(path);
-    const config = { model: this.pref("model"), baseURL: this.pref("baseURL"),
-      language: this.pref("language"), pages: this.pref("pages") };
-    const job = await this.request("/jobs", "POST", { source_path: path, api_key: this.getKey(),
-      model: config.model, base_url: config.baseURL, lang_out: config.language, pages: config.pages });
-    this.jobs.set(source.id, job.id);
-    const record = await this.library.put(source,null,config,job,originalStat);
-    const progress = new Zotero.ProgressWindow({ closeOnClick: true });
-    progress.changeHeadline("PaperBridge · DeepSeek 翻译");
-    const line = new progress.ItemProgress("chrome://zotero/skin/attachment-pdf.png", "准备翻译…");
-    progress.show();
-    progress.addDescription("保留公式、图片和表格结构。可在工具菜单中取消翻译。");
+    if (!source) return this.openExisting(reader,fromLibrary);
+    if (this.readerWaits.has(source.id) || this.tasks.active(source)) return this.showTasks(source.id);
+    // Reserve before any further await, including attachment checks and engine startup.
+    this.readerWaits.add(source.id);
     try {
-      let status = job;
-      while (this.alive && !["done", "failed", "cancelled"].includes(status.state)) {
-        line.setText(`${Math.round(status.progress)}% · ${status.stage}`);
-        line.setProgress(status.progress);
-        await Zotero.Promise.delay(1200);
-        status = await this.request(`/jobs/${job.id}`);
+      if (!await source.fileExists()) return await this.openExisting(reader,fromLibrary);
+      this.showTasks(source.id);
+      const config = this.tasks.config();
+      const previous = await this.tasks.reviewable(source, config);
+      if (this.tasks.active(source)) return this.showTasks(source.id);
+      if (previous) return this.showTasks(source.id, previous.recordID);
+      const result = await this.tasks.enqueue(source, config);
+      if (result.attachment) {
+        this.setPref("lastUsage",JSON.stringify({api_requests:0,input_tokens:0,cached_input_tokens:0,
+          uncached_input_tokens:0,output_tokens:0,full_pdf_cache:true,model:this.pref("model"),date:new Date().toISOString()}));
+        return await this.split(source, result.attachment);
       }
-      if (!this.alive || status.state === "cancelled") { line.setText("已取消翻译"); return; }
-      if (status.state === "failed") throw new Error(status.error);
-      if (!await this.library.ownerAlive(record)) { line.setText("论文条目已删除，译文任务已清理"); return; }
-      const usage = status.cached ? { api_requests:0,input_tokens:0,cached_input_tokens:0,
-        uncached_input_tokens:0,output_tokens:0,full_pdf_cache:true } : status.usage;
-      if (usage) this.setPref("lastUsage",JSON.stringify({ ...usage,model:config.model,date:new Date().toISOString() }));
-      line.setText("正在保存译文并打开分屏…");
-      const attachment = await Zotero.Attachments.importFromFile({
-        file: status.output_path, libraryID:record.libraryID, parentItemID:record.parentKey ? record.ownerID : undefined
-      });
-      attachment.setField("title", `译文 · ${config.language} · ${record.title}`);
-      attachment.addRelation("dc:relation",record.sourceURI);
-      await attachment.saveTx();
-      await this.library.attach(record,attachment);
-      line.setProgress(100);
-      line.setText(usage ? `已保存译文 · ${usage.api_requests} 次 API · 未命中 ${usage.uncached_input_tokens} token` : "翻译完成 · 已保存为 PDF 附件");
-      const original = await this.library.item(record.libraryID,record.sourceKey);
+      const attachment = await this.tasks.wait(result.record);
+      if (!attachment || !this.alive) return;
+      const original = await this.library.item(result.record.libraryID,result.record.sourceKey);
       if (original && !original.deleted && await original.fileExists()) await this.split(original,attachment);
     } finally {
-      this.jobs.delete(source.id);
-      progress.startCloseTimer(5000);
+      this.readerWaits.delete(source.id);
     }
   },
 
+  /** Cancel an owner's task without cancelling other owners of a shared PDF. */
   async cancel(sourceID) {
-    const job = this.jobs.get(sourceID);
-    if (job) await this.request(`/jobs/${job}/cancel`, "POST", {});
+    const record = [...this.library.records].reverse().find(record => record.sourceID === sourceID &&
+      !record.detached && !this.tasks.terminal(record.state));
+    if (record && this.tasks) await this.tasks.cancel(record);
   },
 
+  /** Check the private reader boundary with an actionable, non-destructive failure. */
+  readerView(reader) {
+    const view = reader?._internalReader?._primaryView;
+    if (!view || !reader._iframe) throw new Error("当前 Zotero 阅读器接口不可用；译文已保存，可直接打开译文附件。");
+    return view;
+  },
+
+  /** Open paired readers without coupling layout failure to translation saving. */
   async split(source, translated) {
     Zotero.debug("PaperBridge: opening source reader");
     const win = Zotero.getMainWindow();
@@ -253,7 +310,7 @@ var PaperBridge = {
     reader ||= Zotero.Reader.getByTabID(win.Zotero_Tabs.selectedID);
     await reader._initPromise;
     Zotero.debug("PaperBridge: source reader ready");
-    await reader._internalReader._primaryView.initializedPromise;
+    await this.readerView(reader).initializedPromise;
     this.closeSplit(reader.tabID);
     const container = reader._iframe.parentElement;
     const originalStyle = container.getAttribute("style") || "";
@@ -321,6 +378,7 @@ var PaperBridge = {
     }
   },
 
+  /** Add independent-reading controls and bounded divider resizing. */
   splitControls(state, doc) {
     // Keep navigation and search usable when each pane is narrower than a full reader.
     for (const target of [state.reader._iframeWindow.document, doc]) {
@@ -367,8 +425,9 @@ var PaperBridge = {
     listen(state.divider, "lostpointercapture", () => { dragging = false; });
   },
 
+  /** Register bidirectional page-coordinate synchronization and its cleanup callbacks. */
   bindSync(state) {
-    const views = [state.reader._internalReader._primaryView, state.right._primaryView];
+    const views = [this.readerView(state.reader), state.right._primaryView];
     state.frames = views.map(view => view._iframeWindow);
     state.apps = views.map(view => view._iframeWindow.PDFViewerApplication);
     views.forEach((view, index) => {
@@ -389,6 +448,7 @@ var PaperBridge = {
     });
   },
 
+  /** Transfer page coordinates only; this is not paragraph alignment. */
   syncPosition(state, index, viewLocation) {
     if (!state.apps) return;
     const source = state.apps[index].pdfViewer;
@@ -402,15 +462,17 @@ var PaperBridge = {
     target.scrollPageIntoView(Components.utils.cloneInto(destination, state.frames[1 - index]));
   },
 
+  /** Dispose every reader hook even if one private cleanup API has changed. */
   closeSplit(tabID) {
     const state = this.splits.get(tabID);
     if (!state) return;
     this.splits.delete(tabID);
-    for (const cleanup of state.cleanups) cleanup();
-    state.right?._primaryView?.destroy();
-    state.browser.remove();
-    state.divider.remove();
-    state.container.setAttribute("style", state.originalStyle);
-    state.reader._iframe.setAttribute("style", state.leftStyle);
+    const cleanups = [...state.cleanups, () => state.right?._primaryView?.destroy(),
+      () => state.browser.remove(), () => state.divider.remove(),
+      () => state.container.setAttribute("style", state.originalStyle),
+      () => state.reader._iframe.setAttribute("style", state.leftStyle)];
+    for (const cleanup of cleanups) {
+      try { cleanup(); } catch (error) { Zotero.logError(error); }
+    }
   }
 };
