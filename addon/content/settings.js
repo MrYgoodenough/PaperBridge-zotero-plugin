@@ -1,4 +1,4 @@
-/** Edit two isolated provider profiles and shared translation settings. */
+/** Edit isolated provider profiles and export an allowlisted diagnostic ZIP. */
 
 /** Initialize profile drafts without storing credentials in preferences. */
 window.addEventListener("load", function initializeSettings() {
@@ -13,6 +13,10 @@ window.addEventListener("load", function initializeSettings() {
   // Zotero integer preferences use signed 32-bit values.
   const maxPrefInteger = 2147483647;
   let saving = false;
+  // Export is independent of profile drafts and never submits their credentials.
+  let exporting = false;
+  // Keep the backend-returned path in this window only, not in preferences.
+  let diagnosticPath = "";
 
   /** Find a settings control. */
   function get(id) { return document.getElementById(id); }
@@ -101,6 +105,9 @@ window.addEventListener("load", function initializeSettings() {
       if (checkEngine) {
         const health = await bridge.request("/health");
         get("status").textContent = `设置已保存。排版引擎已就绪 · ${health.engine} · v${health.version}\nPython：${health.python}\n仅检查本地引擎；未验证 API Key、模型或服务商兼容性。`;
+        if (Number.isInteger(health.warning_count) && health.warning_count > 0) {
+          get("status").textContent += `\n非致命提醒：有 ${health.warning_count} 条任务记录未加载，原记录已保留；引擎仍可用，原文和已有译文仍可阅读。可导出脱敏诊断包。`;
+        }
       }
     } catch (error) {
       get("status").textContent = error.message;
@@ -118,8 +125,42 @@ window.addEventListener("load", function initializeSettings() {
     try { await bridge.openDataDirectory(); } catch (error) { get("status").textContent = error.message; }
   }
 
+  /** Export only aggregate diagnostics without saving or reading profile drafts. */
+  async function exportDiagnostics() {
+    if (exporting) return;
+    exporting = true;
+    get("diagnostics-export").disabled = true;
+    get("diagnostics-status").textContent = "正在生成脱敏诊断 ZIP…";
+    try {
+      const result = await bridge.request("/diagnostics", "POST", {});
+      if (typeof result.path !== "string" || !result.path) throw new Error("诊断接口未返回文件路径，请更新插件后重试。");
+      diagnosticPath = result.path;
+      get("diagnostics-path").textContent = diagnosticPath;
+      get("diagnostics-open").hidden = false;
+      get("diagnostics-status").textContent = "诊断 ZIP 已生成。只包含脱敏版本、平台、任务计数与导出安全状态；未上传任何文件。";
+    } catch (error) {
+      get("diagnostics-status").textContent = `诊断包未生成：${error.message}\n原文和已有译文仍可阅读；本地引擎需正常启动才能导出。`;
+    } finally {
+      get("diagnostics-export").disabled = false;
+      exporting = false;
+    }
+  }
+
+  /** Reveal the generated ZIP, or open its directory when reveal is unavailable. */
+  async function openDiagnostics() {
+    if (!diagnosticPath) return;
+    try {
+      const file = bridge.runtime.file(diagnosticPath);
+      try { file.reveal(); } catch (_) { file.parent.launch(); }
+    } catch (_) {
+      get("diagnostics-status").textContent = "无法自动打开文件位置，请复制下方路径在文件管理器中打开。诊断 ZIP 已保留。";
+    }
+  }
+
   get("close").addEventListener("click", close);
   get("data").addEventListener("click", openData);
+  get("diagnostics-export").addEventListener("click", exportDiagnostics);
+  get("diagnostics-open").addEventListener("click", openDiagnostics);
   // Do not fall back to legacy unscoped key access, which could mix credentials.
   if (typeof bridge.configuration !== "function") {
     get("status").textContent = "此设置界面需要支持双配置的 PaperBridge 主程序，请更新插件后重开设置。";

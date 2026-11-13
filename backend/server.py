@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from urllib.parse import quote, urlsplit
 import warnings
 from library_cache import ENGINE_VERSION, describe, normalize_config, prune
+from errors import explain_error
 from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -231,6 +232,7 @@ class JobStore:
         self.records = JOBS / "records"
         self.records.mkdir(exist_ok=True)
         self.closed = False
+        self.load_warnings = []
         self.pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="translate")
         for path in self.records.glob("*.json"):
             record = read_json(path)
@@ -239,19 +241,57 @@ class JobStore:
                         or record["id"] != path.stem
                         or not re.fullmatch(r"[a-f0-9]{32}", record["id"])
                         or not re.fullmatch(r"[a-f0-9]{64}", record["fingerprint"])
-                        or not isinstance(record["attempts"], list) or not record["attempts"]):
+                        or not isinstance(record["attempts"], list) or not record["attempts"]
+                        or any(not isinstance(attempt, dict) for attempt in record["attempts"])
+                        or not isinstance(record.get("created_at"), str)):
                     raise ValueError("Invalid job record")
                 self.jobs[record["id"]] = record
                 self.refresh_usage(record)
+                if record["state"] in {"queued", "running", "interrupted"} and self.recover_output(record):
+                    continue
                 if record["state"] in ACTIVE_STATES:
                     record.update(state="interrupted", stage="任务已中断，请确认后重试",
                                   error="Bridge stopped before this attempt finished")
                     record["attempts"][-1].update(state="interrupted", finished_at=timestamp(),
                                                    error=record["error"])
                     self.persist(record)
-            except (KeyError, TypeError, ValueError, OSError) as error:
+            except (KeyError, TypeError, ValueError, OSError, AttributeError) as error:
                 self.jobs.pop(path.stem, None)
-                warnings.warn(f"Cannot load job {path.name}: {error}")
+                message = f"Cannot load job {path.name}: {error}"
+                self.load_warnings.append(message)
+                warnings.warn(message)
+
+    def recover_output(self, job):
+        """Finalize verified local evidence after interruption, without running an engine."""
+        if job["state"] not in {"queued", "running", "interrupted"} or job["id"] in self.workers:
+            return False
+        attempt = job["attempts"][-1]
+        folder = self.attempt_folder(job, attempt)
+        quality = read_json(folder / "quality.json")
+        output = folder / "translated.pdf"
+        if quality.get("status") not in USABLE_QUALITIES or not pdf_present(output):
+            return False
+        manifest = read_json(folder / "manifest.json")
+        checksum = attempt.get("output_sha256") or manifest.get("output_sha256")
+        if checksum and file_hash(output) != checksum:
+            return False
+        if manifest.get("job_id", attempt["job_id"]) != attempt["job_id"]:
+            return False
+        if manifest.get("document_key", job["document_key"]) != job["document_key"]:
+            return False
+        # Use the normal finalization path; recovery is not a second result system.
+        try:
+            job["recovered_locally"] = True
+            self.finish(job, folder, 0, "", "")
+        except OSError as error:
+            warnings.warn(f"Recovered PDF remains available, but metadata could not be saved: {error}")
+        return job["state"] == "done"
+
+    def recover(self, job_id):
+        """Recheck an interrupted attempt's retained PDF on an explicit local request."""
+        with self.lock:
+            self.recover_output(self.jobs[job_id])
+            return self.snapshot(job_id)
 
     def attempt_folder(self, job, attempt=None):
         """Use short immutable paths for new attempts, retaining the legacy layout."""
@@ -299,7 +339,8 @@ class JobStore:
         atomic_json(folder / "identity.json", {name: job[name] for name in ("fingerprint", "document_key")})
         atomic_copy(JOBS / job["fingerprint"] / "source.pdf", folder / "source.pdf")
         job["attempts"].append(attempt)
-        job.update(state="queued", progress=0, phase="preparing", counts={}, stage="排队中", error=None, cached=False)
+        job.update(state="queued", progress=0, phase="preparing", counts={}, stage="排队中", error=None,
+                   error_code=None, error_hint=None, cached=False)
         self.refresh_usage(job)
         self.persist(job)
         self.jobs[job["id"]] = job
@@ -364,7 +405,9 @@ class JobStore:
         with self.lock:
             job = self.jobs[job_id]
             self.refresh_usage(job)
-            return deepcopy(job)
+            result = deepcopy(job)
+            result["output_available"] = bool(job.get("output_path") and pdf_present(Path(job["output_path"])))
+            return result
 
     def list_jobs(self):
         """List durable jobs in submission order for restoring the queue UI."""
@@ -595,8 +638,10 @@ class JobStore:
             error = redact(diagnostic, key) or "引擎未确认译文可用；请检查质量记录后决定是否重试"
         if not job.get("output_path"):
             job["quality"] = quality
-        attempt.update(state=state, error=error)
-        job.update(state=state, stage=stage, error=error, phase="finished")
+        guidance = explain_error(error) if error else {"code": None, "hint": None}
+        attempt.update(state=state, error=error, error_code=guidance["code"], error_hint=guidance["hint"])
+        job.update(state=state, stage=stage, error=error, error_code=guidance["code"],
+                   error_hint=guidance["hint"], phase="finished")
         if isinstance(quality.get("counts"), dict):
             job["counts"] = {name: value for name, value in quality["counts"].items()
                              if name in QUALITY_COUNTS and type(value) is int and value >= 0}
@@ -674,9 +719,14 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         try:
             if self.command == "GET" and path == "/health":
-                return self.respond(200, {"version": VERSION, "root": str(ROOT), "engine": "BabelDOC 0.6.4", "python":sys.executable})
+                return self.respond(200, {"version": VERSION, "root": str(ROOT), "engine": "BabelDOC 0.6.4", "python":sys.executable,
+                    "warning_count": len(getattr(self.server.store, "load_warnings", []))})
             if self.command == "GET" and path == "/jobs":
                 return self.respond(200, {"jobs": self.server.store.list_jobs()})
+            if self.command == "POST" and path == "/diagnostics":
+                from diagnostics import create_bundle
+                self.body()
+                return self.respond(200, {"path": str(create_bundle(self.server.store, RUNTIME))})
             if self.command == "POST" and path == "/alignment/validate":
                 from alignment import load_mapping
                 data = self.body()
@@ -694,18 +744,20 @@ class Handler(BaseHTTPRequestHandler):
                 if not 0 < size <= 16384:
                     return self.respond(413, {"error": "Invalid request size"})
                 return self.respond(202, self.server.store.submit(self.body()))
-            match = re.fullmatch(r"/jobs/([a-f0-9]{32})(/cancel|/retry)?", path)
+            match = re.fullmatch(r"/jobs/([a-f0-9]{32})(/cancel|/retry|/recover)?", path)
             if match and self.command == "GET" and not match[2]:
                 return self.respond(200, self.server.store.snapshot(match[1]))
             if match and self.command == "POST" and match[2] == "/retry":
                 return self.respond(202, self.server.store.retry(match[1], self.body()))
             if match and self.command == "POST" and match[2] == "/cancel":
                 return self.respond(200, self.server.store.cancel(match[1]))
+            if match and self.command == "POST" and match[2] == "/recover":
+                return self.respond(200, self.server.store.recover(match[1]))
             self.respond(404, {"error": "Unknown endpoint"})
         except KeyError:
             self.respond(404, {"error": "Job or field not found"})
         except (ValueError, TypeError, OSError) as error:
-            self.respond(400, {"error": str(error)})
+            self.respond(400, explain_error(error))
 
     do_GET = dispatch
     do_POST = dispatch

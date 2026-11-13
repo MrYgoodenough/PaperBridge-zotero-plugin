@@ -68,6 +68,7 @@ var TranslationTasks = class {
       // Persist the same owner row before describe() can wait for backend startup.
       const record = await this.bridge.library.put(source, null, config, { state: "queued" }, stat);
       let status;
+      let submitted = false;
       try {
         if (record.detached || !this.bridge.alive) return { record };
         await this.bridge.library.update(record, { state: "queued", lastError: "" });
@@ -76,17 +77,22 @@ var TranslationTasks = class {
         if (record.detached || !this.bridge.alive) return { record };
         await this.bridge.library.update(record, described);
         if (record.detached || !this.bridge.alive) return { record };
+        submitted = true;
         status = await this.bridge.request("/jobs", "POST", {
           source_path: path, api_key: key, model: config.model, base_url: config.baseURL,
           lang_out: config.language, pages: config.pages, profile: config.profile, capabilities: config.capabilities
         });
-        await this.bridge.library.update(record, status);
+        await this.bridge.library.update(record, { ...status, submissionState: "accepted" });
       } catch (error) {
         if (record.detached) return { record };
         try {
+          // A bridge rejection is different from a request whose response was lost.
+          const rejected = !status && (!submitted || (error.status >= 400 && error.status < 500 && error.status !== 408));
           await this.bridge.library.update(record, { state: status?.state || "interrupted",
-            lastError: (record.fingerprint ? "提交或归属保存未确认，未自动重发。刷新任务列表会尝试找回已有任务："
-              : "准备失败，未提交翻译。可显式重试：") + error.message });
+            submissionState: status ? "accepted" : rejected ? "rejected" : "unknown",
+            errorCode: error.code, errorHint: error.hint,
+            lastError: (rejected ? "未提交或后端已拒绝，未自动重发。修正问题后可显式重试："
+              : "提交或归属保存未确认，未自动重发。刷新任务列表会尝试找回已有任务：") + error.message });
         } finally {
           if (status) {
             this.statuses.set(status.id, status);
@@ -187,7 +193,11 @@ var TranslationTasks = class {
       if (!this.bridge.alive || record.detached || this.submitting.has(`${record.libraryID}:${record.sourceKey}`)) continue;
       if (!record.jobID && record.fingerprint && record.saveState !== "imported") {
         const recovered = [...jobs].reverse().find(job => job.fingerprint === record.fingerprint && job.document_key === record.documentKey);
-        if (recovered) await this.bridge.library.update(record, { jobID: recovered.id, lastError: "" });
+        if (recovered) await this.bridge.library.update(record, { jobID: recovered.id, submissionState: "accepted", lastError: "" });
+        else if (record.submissionState !== "rejected") await this.bridge.library.update(record, {
+          state: "interrupted", submissionState: "not_found",
+          lastError: "本次刷新未找到匹配任务；没有自动重发。可确认重复计费风险后显式重新提交。"
+        });
       }
       if (!record.jobID) continue;
       const status = this.statuses.get(record.jobID);
@@ -200,8 +210,11 @@ var TranslationTasks = class {
       }
       const latest = status.attempts?.at(-1);
       const quality = status.state === "done" ? status.quality : latest?.quality || status.quality;
-      const patch = { state: status.state, quality: quality || { status: "unknown" }, outputPath: status.output_path || null };
+      const patch = { state: status.state, quality: quality || { status: "unknown" },
+        outputPath: status.output_path || record.outputPath || null, outputAvailable: status.output_available };
       if (status.error) patch.lastError = status.error;
+      patch.errorCode = status.error_code;
+      patch.errorHint = status.error_hint;
       if (status.state === "done" && !record.saveState) patch.saveState = "produced";
       if (Object.entries(patch).some(([key, value]) => JSON.stringify(record[key]) !== JSON.stringify(value))) {
         await this.bridge.library.update(record, patch);
@@ -232,8 +245,29 @@ var TranslationTasks = class {
   /** Save artifacts separately from execution, retaining failed imports for retry. */
   async saveOnce(record, status) {
     try {
+      // Losing backend access must not erase an already known unusable verdict.
+      const knownUnusable = (status?.quality?.status || record.quality?.status) === "unusable";
+      if (status?.state === "interrupted" && record.jobID) {
+        try {
+          status = await this.bridge.request(`/jobs/${record.jobID}/recover`, "POST", {});
+          this.statuses.set(status.id, status);
+          await this.bridge.library.update(record, status);
+        } catch (error) {
+          // Missing/corrupt backend records must not block explicit local PDF recovery.
+          await this.bridge.library.update(record, { lastError: "后端核对失败；保留文件可作为未确认译文恢复：" + error.message,
+            errorCode: error.code, errorHint: error.hint });
+          status = null;
+        }
+      }
+      if (knownUnusable || (status?.quality?.status || record.quality?.status) === "unusable") {
+        throw new Error("本次结果已确认不可用；可打开保留文件位置核查，或显式重试翻译。");
+      }
+      if (!status || status.state !== "done" || !status.output_path) {
+        const path = await this.retainedOutput(record);
+        if (!Services.prompt.confirm(Zotero.getMainWindow(), "恢复保留的译文", "后端未确认本次结果。将把保留 PDF 保存为未确认译文，不调用模型，也不覆盖旧附件。是否继续？")) return null;
+        status = { state: "done", output_path: path, quality: { status: "unknown" } };
+      }
       if (!status || status.state !== "done" || !status.output_path) throw new Error("尚无可保存的译文 PDF。");
-      if (status.quality?.status === "unusable") throw new Error("本次结果不可用；请查看失败信息后重试翻译。");
       let attachment = await this.bridge.library.findAttachment(record);
       if (attachment && record.saveState === "imported") return attachment;
       if (!attachment) {
@@ -263,6 +297,19 @@ var TranslationTasks = class {
     }
   }
 
+  /** Check a retained PDF only for an explicit local recovery or reveal action. */
+  async retainedOutput(record) {
+    if (!record.outputPath || !await IOUtils.exists(record.outputPath)) throw new Error("保留的译文 PDF 不存在，请检查数据目录或备份；不会自动重新翻译。");
+    const bytes = await IOUtils.read(record.outputPath, { maxBytes: 5 });
+    if (String.fromCharCode(...bytes) !== "%PDF-") throw new Error("保留文件不是可识别的 PDF；请检查备份，不会自动重新翻译。");
+    return record.outputPath;
+  }
+
+  /** Reveal an existing local result even when its Zotero owner is unavailable. */
+  async revealOutput(record) {
+    await Zotero.File.reveal(await this.retainedOutput(record));
+  }
+
   /** Cancel only this owner; shared backend work continues for other owners. */
   async cancel(record) {
     if (this.terminal(record.state)) return;
@@ -277,6 +324,11 @@ var TranslationTasks = class {
   /** Retry only after consent, using the original endpoint and a current credential. */
   async retry(record) {
     if (!this.terminal(record.state)) throw new Error("任务仍在运行，请先取消或等待完成。");
+    if (!record.jobID && record.fingerprint && record.saveState !== "imported" && record.submissionState !== "rejected") {
+      // Reconcile first; never turn a lost response into an automatic second request.
+      await this.refresh();
+      if (record.jobID) throw new Error("已找回已有任务，请先检查其状态或保存成果，再决定是否重译。");
+    }
     const profile = record.profile || "deepseek";
     const current = this.bridge.configuration(profile);
     if (current.baseURL.replace(/\/$/, "") !== record.baseURL.replace(/\/$/, "")) {
@@ -286,11 +338,12 @@ var TranslationTasks = class {
     if (!key) throw new Error("请先保存该任务配置的 API Key。");
     const sourceWarning = record.jobID ? "将使用任务原有模型和源文件快照。" : record.saveState === "imported"
       ? "旧译文没有可重试的任务 ID，将保留旧附件，并用原配置和当前原文创建新任务。"
-      : "准备阶段未提交翻译，将使用任务原有配置和当前原文附件。";
+      : record.fingerprint && record.submissionState !== "rejected"
+        ? "本次刷新未找到任务，但旧请求可能已执行；将使用原配置和当前原文显式新建任务。"
+        : "准备阶段未提交或后端已拒绝，将使用任务原有配置和当前原文附件。";
     if (!Services.prompt.confirm(Zotero.getMainWindow(), "重试翻译", sourceWarning + "未收到响应的请求也可能已收费；重试可能重复计费。是否继续？")) return;
     if (!record.jobID) {
       // Imported legacy results predate durable job IDs; they are not lost submissions.
-      if (record.fingerprint && record.saveState !== "imported") throw new Error("提交结果未确认，请先刷新找回已有任务；不会自动重新发送。");
       const source = await this.bridge.library.item(record.libraryID, record.sourceKey);
       if (!source || source.deleted) throw new Error("原文附件不可用，请恢复条目后重试。");
       await this.bridge.library.update(record, { detached: true });

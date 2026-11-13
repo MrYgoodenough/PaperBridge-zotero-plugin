@@ -116,6 +116,33 @@ def test_build_feeds_match_platform_and_python_mode(build_tree, monkeypatch):
     assert (build_tree / "updates/published.json").read_bytes() == published_bytes
 
 
+def test_explicit_repackage_uses_the_staged_platform(build_tree, monkeypatch):
+    """A Linux packager must not put Linux paths or metadata in a Windows draft."""
+    script = build_tree / "scripts/build.py"
+    metadata_path = build_tree / ".cache/package/windows-x64/runtime.json"
+    staged_metadata = json.loads(metadata_path.read_bytes())
+    staged_metadata["buildId"] = "inherited-old-build"
+    metadata_path.write_text(json.dumps(staged_metadata))
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(platform, "machine", lambda: "x86_64")
+    monkeypatch.setattr(sys, "argv", [str(script), "--platform", "windows-x64", "--python", "local"])
+    runpy.run_path(str(script), run_name="__main__")
+    xpi = next((build_tree / "dist").glob("*.xpi"))
+    with zipfile.ZipFile(xpi) as archive:
+        prefix = "runtime/windows-x64/"
+        assert archive.read(prefix + "python/Lib/site-packages/native/module.bin") == b"windows-x64"
+        assert not any(name.startswith("runtime/linux-x64/") for name in archive.namelist())
+        metadata = json.loads(archive.read(prefix + "runtime.json"))
+        build_id = metadata.pop("buildId")
+        identity = hashlib.sha256(json.dumps(metadata, sort_keys=True).encode())
+        for path in sorted((build_tree / "backend").glob("*.py")):
+            identity.update(path.read_bytes())
+        assert metadata["platform"] == "windows-x64" and build_id == identity.hexdigest()
+    metadata_path.write_text('{"platform":"linux-x64"}')
+    with pytest.raises(SystemExit, match="metadata does not match"):
+        runpy.run_path(str(script), run_name="__main__")
+
+
 def test_source_package_versions_agree():
     """Keep the addon, project metadata and own lock entry on the same source version."""
     manifest = json.loads((ROOT / "addon/manifest.json").read_bytes())

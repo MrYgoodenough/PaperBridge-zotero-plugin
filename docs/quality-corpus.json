@@ -1,0 +1,45 @@
+{
+  "description": "Small fixed public digital-paper corpus; local PDFs and real translations are supplied explicitly. This is not a representative semantic acceptance benchmark.",
+  "schema_version": 1,
+  "license_note": "JMLR's author policy grants CC BY and retains author copyright; these older PDFs do not identify a license version. Only metadata is redistributed here. Verify the applicable license before redistributing PDFs or derivatives.",
+  "cases": [
+    {
+      "id": "scikit-learn-2011",
+      "title": "Scikit-learn: Machine Learning in Python",
+      "source_url": "https://www.jmlr.org/papers/v12/pedregosa11a.html",
+      "pdf_url": "https://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf",
+      "license": "CC BY under JMLR author policy; PDF license version unspecified",
+      "license_url": "https://www.jmlr.org/author-info.html",
+      "expected_source_pages": 6,
+      "source_sha256": "1c338a6b3c6c1dcafda3990a8098b8b50dd6c77616361396fb75f6822c6e0778",
+      "selected_pages": [2, 3, 4],
+      "bounded_smoke_selected_pages": [2],
+      "focus": ["author block and unselected pages", "code/API names", "tables and technical terminology", "references on pages 5-6", "reading order and embedded target fonts"],
+      "manual_checks": [
+        {"id": "accuracy", "category": "semantic", "page": 2, "focus": "Compare introduction claims and qualifications against the real source."},
+        {"id": "terminology", "category": "semantic", "page": 3, "focus": "Check algorithm/API names and technical meaning without invented additions."},
+        {"id": "reading-order", "category": "layout", "page": 4, "focus": "Visually inspect table labels, column order, clipping and legibility."},
+        {"id": "references", "category": "layout", "page": 5, "focus": "Visually confirm bibliography and URLs remain readable and unchanged."}
+      ]
+    },
+    {
+      "id": "liblinear-2008",
+      "title": "LIBLINEAR: A Library for Large Linear Classification",
+      "source_url": "https://www.jmlr.org/papers/v9/fan08a.html",
+      "pdf_url": "https://www.jmlr.org/papers/volume9/fan08a/fan08a.pdf",
+      "license": "CC BY under JMLR author policy; PDF license version unspecified (software BSD license is separate)",
+      "license_url": "https://www.jmlr.org/author-info.html",
+      "expected_source_pages": 4,
+      "source_sha256": "86b3b03c8ff30d9a633884daa00159add25d04d99b64d4010f4894a087127d0a",
+      "selected_pages": [1, 2, 3],
+      "bounded_smoke_selected_pages": [1],
+      "focus": ["display mathematics on page 2", "optimization terminology", "performance table on page 3", "references on page 4", "hyperlink targets"],
+      "manual_checks": [
+        {"id": "accuracy", "category": "semantic", "page": 1, "focus": "Compare classification claims, speed qualifications and negation."},
+        {"id": "terminology", "category": "semantic", "page": 2, "focus": "Check loss/optimization terminology and explanations around equations."},
+        {"id": "formula", "category": "layout", "page": 2, "focus": "Visually compare symbols, subscripts and formula/body separation."},
+        {"id": "table-references", "category": "layout", "page": 3, "focus": "Inspect table values/labels and also the unselected bibliography on page 4."}
+      ]
+    }
+  ]
+}

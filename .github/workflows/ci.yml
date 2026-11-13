@@ -1,0 +1,43 @@
+# Shared-source compatibility only; this does not build runtimes or certify native Zotero.
+name: Offline CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    name: Core offline (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+      PYTHONUTF8: "1"
+      UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.tools/python
+      UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          package-manager-cache: false
+      # setup-uv publishes exact tags; the v10 major alias does not exist.
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: "3.12"
+          activate-environment: true
+          no-project: true
+          enable-cache: false
+      # Match the core versions in uv.lock without installing BabelDOC/model dependencies.
+      - name: Install minimal offline-test dependencies
+        run: uv pip install --default-index https://pypi.org/simple "pytest==9.1.1" "pymupdf==1.26.7" "httpx==0.28.1"
+      - name: Python, Node, isolated launcher and six-package contracts
+        run: python scripts/check_offline.py --mode lightweight

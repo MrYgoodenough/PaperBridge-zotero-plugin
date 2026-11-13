@@ -24,6 +24,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CJK_MARKER = "离线验证"
 # Keep the synthetic title stable for checking the failed translation's retained PDF.
 SOURCE_TITLE = "Offline Integration Study"
+# Synthetic link actions are never fetched; they exercise final PDF restoration.
+BODY_LINK = "https://example.invalid/reflowed-body"
+UNSELECTED_LINK = "https://example.invalid/unselected-page"
 
 
 def configure_paths(output_root, run_root):
@@ -89,7 +92,7 @@ def blocked_network(attempts):
 
 
 def create_source(path):
-    """Generate one small English page without external sample files or fonts."""
+    """Generate one translated page and a linked untouched control page."""
     import pymupdf
 
     with pymupdf.open() as document:
@@ -103,6 +106,15 @@ def create_source(path):
             fontsize=12,
         )
         assert remaining >= 0, "Synthetic body did not fit on the page"
+        untouched = document.new_page()
+        untouched.insert_text((50, 80), "Unselected synthetic control page", fontsize=17)
+        untouched.insert_text((50, 130), "External link and internal citation remain available.", fontsize=12)
+        document[0].insert_link({"kind": pymupdf.LINK_URI, "from": pymupdf.Rect(50, 120, 400, 145),
+                                 "uri": BODY_LINK})
+        document[1].insert_link({"kind": pymupdf.LINK_URI, "from": pymupdf.Rect(50, 115, 150, 135),
+                                 "uri": UNSELECTED_LINK})
+        document[1].insert_link({"kind": pymupdf.LINK_GOTO, "from": pymupdf.Rect(180, 115, 310, 135),
+                                 "page": 0, "to": pymupdf.Point(50, 130)})
         document.save(path)
 
 
@@ -110,10 +122,14 @@ def inspect_pdf(path):
     """Read extracted text and embedded font metadata without assuming OS-specific names."""
     import pymupdf
 
-    fonts = {}
+    fonts, links = {}, []
     with pymupdf.open(path) as document:
         text = "".join(page.get_text() for page in document)
         for page in document:
+            for link in page.get_links():
+                links.append({"source_page": page.number + 1, "kind": link["kind"],
+                              "uri": link.get("uri"), "target_page": link.get("page"),
+                              "destination": document.xref_get_key(link["xref"], "A/D")[1]})
             for xref, extension, kind, name, *_ in page.get_fonts(full=True):
                 if xref in fonts:
                     continue
@@ -125,7 +141,7 @@ def inspect_pdf(path):
                 "cjk_present": any("\u3400" <= character <= "\u9fff" for character in text),
                 "marker_present": CJK_MARKER in "".join(text.split()),
                 "source_title_present": "".join(SOURCE_TITLE.split()) in "".join(text.split()),
-                "fonts": list(fonts.values())}
+                "fonts": list(fonts.values()), "links": links}
 
 
 def run_scenario(mode, folder, report):
@@ -152,7 +168,7 @@ def run_scenario(mode, folder, report):
     request = {"folder": str(folder), "api_key": "offline-only", "profile": "compatible",
                # A fresh model namespace prevents old successful cache rows masking a run.
                "model": f"{folder.parent.name}-{mode}", "base_url": "https://example.invalid/v1",
-               "lang_out": "zh-CN", "pages": ""}
+               "lang_out": "zh-CN", "pages": "1"}
     with patch.object(DeepSeekTranslator, "request_completion", completion):
         asyncio.run(translate(request))
 
@@ -161,6 +177,11 @@ def run_scenario(mode, folder, report):
     report.update(quality=quality["status"], counts=quality["counts"], usage=usage)
     # Opening the PDF is mandatory even on timeout: its existence is not success.
     pdf = report["pdf"] = inspect_pdf(folder / "translated.pdf")
+    assert pdf["pages"] == 2, pdf
+    assert not any(link["uri"] == BODY_LINK for link in pdf["links"]), pdf
+    assert sum(link["uri"] == UNSELECTED_LINK for link in pdf["links"]) == 1, pdf
+    internal = [link for link in pdf["links"] if link["source_page"] == 2 and "/Fit" in link["destination"]]
+    assert len(internal) == 1 and "/XYZ" not in internal[0]["destination"], pdf
     assert quality["status"] == ("complete" if mode == "success" else "unusable"), quality
     assert quality["finalized"] and quality["artifact_exists"], quality
     assert quality["inventory_observed"] and quality["translation_stage_completed"], quality

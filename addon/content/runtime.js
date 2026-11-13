@@ -1,6 +1,7 @@
 /** Unpack and launch the platform-specific engine inside the Zotero data directory. */
 /* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils */
 var BundledRuntime = class {
+  /** Keep engine state separate from Zotero attachments and credentials. */
   constructor(rootURI, version) {
     this.rootURI = rootURI;
     this.version = version;
@@ -32,18 +33,56 @@ var BundledRuntime = class {
     throw new Error(`此安装包不支持 ${os}（${abi}）。请安装与你的系统对应的版本。`);
   }
 
+  /** Reuse one launch and report actionable failures without exposing raw output. */
   async ensure() {
     if (this.connection) return this.connection;
-    this.pending ||= this.launch().catch(error => { this.pending = null; throw error; });
+    this.pending ||= this.launch().catch(error => {
+      this.pending = null;
+      throw this.startupError(error);
+    });
     return this.pending;
   }
 
+  /** Classify startup failures locally because the backend may not be available. */
+  startupError(error) {
+    if (error?.paperbridgeStartup) return error;
+    const text = String(error).toLowerCase();
+    let code = "startup";
+    let message = "本地引擎未能启动。";
+    let hint = "请检查 XPI 是否匹配系统；本机版请选择同架构 Python 3.12，自带版可重新安装完整 XPI。";
+    if (/filename too long|file name too long|path too long|max_path|winerror 206|路径过长|路径太长|ns_error_file_name_too_long/.test(text)) {
+      code = "long_path";
+      message = "引擎文件路径过长。";
+      hint = "请使用较短的数据目录或文件名后重试；无需修改系统长路径设置。";
+    } else if (/permission denied|access denied|sharing violation|being used by another process|winerror (?:5|32|33)\b|文件被占用|ns_error_file_access_denied|ns_error_file_is_locked/.test(text)) {
+      code = "file_busy";
+      message = "引擎文件被占用或无法访问。";
+      hint = "请检查目录写权限及同步/杀毒软件；关闭占用文件的其他程序后重试。";
+    } else if (/no space left|disk full|out of memory|cannot allocate memory|memoryerror|not enough memory|not enough storage|winerror (?:8|14|112)\b|onnx|tiktoken|font not found|缺少资源|磁盘空间不足|ns_error_file_no_device_space/.test(text)) {
+      code = "resource";
+      message = "本地资源不足或排版资源不可用。";
+      hint = "请检查磁盘空间和可用内存；缺少模型或字体时重新安装完整 XPI，插件不会自动下载资源。";
+    } else if (/glibc_|cannot open shared object|dll load failed|dyld|exec format error/.test(text)) {
+      hint = "请安装匹配当前系统与架构的 XPI；Linux 自带版需要 glibc ≥ 2.34，本机版需要同架构 Python 3.12。";
+    } else if (/启动超时/.test(text)) {
+      message = "本地引擎启动超时。";
+      hint = "请检查可用内存和磁盘、系统对 Python 的启动限制后重试；首次解包可能较慢。";
+    }
+    const result = new Error(`${message}\n${hint}\n不影响阅读原文和已有译文。引擎恢复后可在设置中导出脱敏诊断包。`);
+    result.code = code;
+    result.hint = hint;
+    result.paperbridgeStartup = true;
+    return result;
+  }
+
+  /** Wrap a platform path for native file operations. */
   file(path) {
     const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
     file.initWithPath(path);
     return file;
   }
 
+  /** Extract only the matching runtime and refresh its installation marker. */
   async unpack() {
     const platform = this.platform();
     const marker = PathUtils.join(this.home, "installed.json");
@@ -139,6 +178,7 @@ var BundledRuntime = class {
     });
     const process = this.process;
     this.output = "";
+    // Keep a bounded in-memory tail for classification, never for exports.
     (async () => {
       for (;;) {
         const text = await process.stdout.readString();
@@ -158,10 +198,10 @@ var BundledRuntime = class {
         this.connection = { port: info.port, token };
         return this.connection;
       }
-      if (!this.process) throw new Error("内置引擎启动失败：" + this.output);
+      if (!this.process) throw this.startupError("内置引擎启动失败：" + this.output);
       await Zotero.Promise.delay(200);
     }
-    throw new Error("内置引擎启动超时：" + this.output);
+    throw this.startupError("内置引擎启动超时：" + this.output);
   }
 
   /** Return common absolute interpreter paths without searching a ROS-modified PATH. */
@@ -210,6 +250,7 @@ var BundledRuntime = class {
     throw new Error(`本机版需要 ${platform.label} 版 Python 3.12（含 ssl、sqlite3）。请在设置中填写已有解释器的绝对路径，或安装自带 Python 的 XPI。插件不会自动安装或下载 Python。`);
   }
 
+  /** Remove only recognizable engine versions, not attachments or unknown folders. */
   async removeOldEngines() {
     const platform = this.platform();
     for (const path of await IOUtils.getChildren(this.base)) {
@@ -224,6 +265,7 @@ var BundledRuntime = class {
     }
   }
 
+  /** Extract missing bundled models without downloading or replacing existing files. */
   async seedCache() {
     const platform = this.platform();
     const resources = ["models/doclayout_yolo_docstructbench_imgsz1024.onnx",
@@ -245,6 +287,7 @@ var BundledRuntime = class {
     } finally { zip.close(); }
   }
 
+  /** Stop only this runtime's child process and reset its connection. */
   async stop() {
     const process = this.process;
     this.connection = null;

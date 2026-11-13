@@ -1,11 +1,13 @@
 /** Zotero commands and paired PDF reading; task execution lives in tasks.js. */
-/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, TranslationTasks, FragmentAlignment */
+/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, TranslationTasks, FragmentAlignment, Components, rootURI */
 // One bridge is shared by all Zotero windows in the addon scope.
 var PaperBridge = {
   jobs: new Map(),
   // Only the initiating reader command may wait and auto-open its saved result.
   readerWaits: new Set(),
   splits: new Map(),
+  // Reopening an attachment waits for the previous pane's final native annotation write.
+  annotationWrites: new Map(),
   buttons: new Set(),
   alive: true,
 
@@ -61,6 +63,7 @@ var PaperBridge = {
     // The backend records interrupted work on shutdown; never silently resubmit it.
     if (this.tasks?.refreshing) await this.tasks.refreshing.catch(error => Zotero.logError(error));
     for (const tab of [...this.splits.keys()]) this.closeSplit(tab);
+    await Promise.all(this.annotationWrites.values());
     Zotero.Notifier.unregisterObserver(this.notifier);
     await this.library.settled();
     Zotero.Reader._unregisterEventListenerByPluginID(this.id);
@@ -204,8 +207,10 @@ var PaperBridge = {
     });
     const result = await response.json();
     if (!response.ok) {
-      const error = new Error(result.error || `内置引擎错误 ${response.status}`);
+      const error = new Error([result.error || `内置引擎错误 ${response.status}`, result.hint].filter(Boolean).join("\n"));
       error.status = response.status;
+      error.code = result.code;
+      error.hint = result.hint;
       throw error;
     }
     return result;
@@ -321,7 +326,7 @@ var PaperBridge = {
     return result;
   },
 
-  /** Open paired readers without coupling layout failure to translation saving. */
+  /** Reuse an open pair, replacing the right reader only for a different translation. */
   async split(source, translated) {
     Zotero.debug("PaperBridge: opening source reader");
     const win = Zotero.getMainWindow();
@@ -330,6 +335,13 @@ var PaperBridge = {
     await reader._initPromise;
     Zotero.debug("PaperBridge: source reader ready");
     await this.readerView(reader).initializedPromise;
+    const existing = this.splits.get(reader.tabID);
+    if (existing?.reader === reader && existing.source.id === source.id
+      && existing.translated.id === translated.id) {
+      // Repeated commands share initialization and preserve both panes' reading state.
+      await existing.ready;
+      return;
+    }
     this.closeSplit(reader.tabID);
     const container = reader._iframe.parentElement;
     const originalStyle = container.getAttribute("style") || "";
@@ -353,12 +365,68 @@ var PaperBridge = {
     }, { capture: true }));
     browser.setAttribute("src", "resource://zotero/reader/reader.html");
     container.append(divider, browser);
+    state.ready = this.loadSplit(state, loaded, win);
+    await state.ready;
+  },
+
+  /** Show a nonfatal translated-annotation error without closing either PDF. */
+  annotationMessage(state, error) {
+    if (this.splits.get(state.reader.tabID) !== state) {
+      // A final save failure still needs a visible warning after its pane closes.
+      if (this.alive) Services.prompt.alert(Zotero.getMainWindow(), "PaperBridge", "译文批注未能保存：" + error.message);
+      return;
+    }
+    const doc = state.browser.contentWindow?.document;
+    if (!doc?.createElement) return;
+    let message = state.annotationMessage;
+    if (!message) {
+      message = doc.createElement("div");
+      message.setAttribute("role", "alert");
+      message.style.cssText = "position:fixed;top:45px;left:8px;right:8px;z-index:1000;padding:6px;background:var(--material-background,#fff);border:1px solid #c66;font-size:12px";
+      doc.body.append(message);
+      state.annotationMessage = message;
+      state.cleanups.push(() => message.remove());
+    }
+    message.textContent = "译文批注暂不可写；PDF 仍可阅读：" + error.message;
+  },
+
+  /** Lazily load the independent native adapter without changing bootstrap dependencies. */
+  async translatedAnnotationOptions(state, frame) {
+    await this.annotationWrites.get(state.translated.id);
+    if (this.splits.get(state.reader.tabID) !== state) return {};
+    try {
+      if (!Zotero.Annotations?.saveFromJSON) throw new Error("Zotero annotation API unavailable");
+      if (!this.AnnotationController) {
+        const scope = { Zotero, Components };
+        Services.scriptloader.loadSubScript(rootURI + "content/annotations.js", scope);
+        this.AnnotationController = scope.TranslationAnnotations;
+      }
+      if (!this.AnnotationController.supported(state.translated)) {
+        throw new Error("Zotero annotation attachment API unavailable");
+      }
+      state.annotations = new this.AnnotationController(state.translated, frame,
+        error => this.annotationMessage(state, error));
+      return state.annotations.options(await state.annotations.load());
+    } catch (error) {
+      // An unavailable reader contract must not break translation, tasks, or basic reading.
+      Zotero.debug("PaperBridge: translated annotations unavailable: " + error);
+      if (state.annotations) state.annotations.failed = true;
+      this.annotationMessage(state, error);
+      return { readOnly: true, showAnnotations: false };
+    }
+  },
+
+  /** Initialize only the still-current pair, without letting stale work close its replacement. */
+  async loadSplit(state, loaded, win) {
+    const { reader, translated, browser } = state;
     try {
       await loaded;
+      if (this.splits.get(reader.tabID) !== state) return;
       Zotero.debug("PaperBridge: translation reader frame loaded");
       const frame = browser.contentWindow;
       frame.addEventListener("error", event => Zotero.logError(event.error || event.message));
       const bytes = await IOUtils.read(await translated.getFilePathAsync());
+      if (this.splits.get(reader.tabID) !== state) return;
       const ftl = [];
       for (const locale of [...Services.locale.appLocalesAsBCP47].reverse()) {
         for (const name of ["branding/brand", "zotero", "reader"]) {
@@ -366,6 +434,8 @@ var PaperBridge = {
           try { ftl.push(Zotero.File.getContentsFromURL(url)); } catch (error) { Zotero.debug(`PaperBridge locale unavailable: ${url}`); }
         }
       }
+      const annotationOptions = await this.translatedAnnotationOptions(state, frame);
+      if (this.splits.get(reader.tabID) !== state) return;
       const options = {
         type: "pdf", data: { buf: bytes }, annotations: [], readOnly: true,
         primaryViewState: { pageIndex: reader._internalReader._state.primaryViewState?.pageIndex || 0, scale: "page-width" },
@@ -378,13 +448,15 @@ var PaperBridge = {
         onOpenContextMenu: () => {}, onSetDataTransferAnnotations: () => {},
         onToggleSidebar: () => {}, onChangeSidebarWidth: () => {}, onChangeSidebarView: () => {},
         onTextSelectionAnnotationModeChange: () => {}, onToolbarShiftTab: () => {}, onIframeTab: () => {},
-        onConfirm: (title, text) => Services.prompt.confirm(win, title, text)
+        onConfirm: (title, text) => Services.prompt.confirm(win, title, text),
+        ...annotationOptions
       };
       state.right = frame.wrappedJSObject.createReader(Components.utils.cloneInto(options, frame, { cloneFunctions: true }));
+      state.annotations?.connect(state.right);
       Zotero.debug("PaperBridge: translation reader created");
       state.right.setTitle("译文 · " + translated.getField("title"));
       await state.right._primaryView.initializedPromise;
-      if (!this.splits.has(reader.tabID)) return;
+      if (this.splits.get(reader.tabID) !== state) return;
       this.splitControls(state, frame.document);
       this.bindSync(state);
       const leftApp = reader._internalReader._primaryView._iframeWindow.PDFViewerApplication;
@@ -393,7 +465,7 @@ var PaperBridge = {
       rightApp.pdfViewer.currentScaleValue = "page-width";
       this.syncPosition(state, 0);
     } catch (error) {
-      this.closeSplit(reader.tabID);
+      if (this.splits.get(reader.tabID) === state) this.closeSplit(reader.tabID);
       throw error;
     }
   },
@@ -404,6 +476,10 @@ var PaperBridge = {
     for (const target of [state.reader._iframeWindow.document, doc]) {
       const style = target.createElement("style");
       style.textContent = "@media (max-width:700px){.toolbar .center.tools{display:none!important}.toolbar #read-aloud,.toolbar #navigateBack{display:none!important}.toolbar .start{gap:2px!important}.toolbar .divider{margin:0 2px!important}}";
+      if (target === doc && state.annotations) {
+        // Keep Zotero's actual annotation tools reachable even in a narrow translated pane.
+        style.textContent += "@media (max-width:700px){.toolbar{overflow-x:auto}.toolbar .center.tools{display:flex!important}.toolbar .start,.toolbar .center,.toolbar .end{flex-shrink:0}}";
+      }
       target.head.append(style);
       state.cleanups.push(() => style.remove());
     }
@@ -494,6 +570,15 @@ var PaperBridge = {
   closeSplit(tabID) {
     const state = this.splits.get(tabID);
     if (!state) return;
+    if (state.annotations) {
+      state.annotationSave = state.annotations.close();
+      this.annotationWrites.set(state.translated.id, state.annotationSave);
+      state.annotationSave.then(() => {
+        if (this.annotationWrites.get(state.translated.id) === state.annotationSave) {
+          this.annotationWrites.delete(state.translated.id);
+        }
+      });
+    }
     this.splits.delete(tabID);
     const cleanups = [...state.cleanups, () => state.right?._primaryView?.destroy(),
       () => state.browser.remove(), () => state.divider.remove(),

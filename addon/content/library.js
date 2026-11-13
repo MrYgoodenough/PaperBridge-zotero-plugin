@@ -114,7 +114,8 @@ var TranslationLibrary = class {
     const record = {version:TRANSLATION_VERSION, recordID:old.recordID || this.newID(), config, ...config};
     for (const key of ["libraryID", "sourceKey", "sourceID", "ownerKey", "ownerID", "parentKey",
       "attachmentKey", "attachmentID", "sourceURI", "title", "modified", "size", "rulesVersion",
-      "fingerprint", "documentKey", "importingAttachmentKey", "outputPath", "alignmentPath", "retryOf", "retryPendingSince"]) {
+      "fingerprint", "documentKey", "importingAttachmentKey", "outputPath", "alignmentPath", "retryOf", "retryPendingSince",
+      "submissionState", "outputAvailable", "errorCode", "errorHint"]) {
       record[key] = this.publicValue(old[key] ?? null);
     }
     record.jobID = old.jobID || null;
@@ -258,11 +259,13 @@ var TranslationLibrary = class {
     if (!record) throw new Error("Translation record is no longer in the library.");
     const changes = {...patch};
     for (const [from, to] of [["id", "jobID"], ["error", "lastError"], ["output_path", "outputPath"],
-      ["alignment_path", "alignmentPath"], ["document_key", "documentKey"]]) {
+      ["alignment_path", "alignmentPath"], ["document_key", "documentKey"], ["output_available", "outputAvailable"],
+      ["error_code", "errorCode"], ["error_hint", "errorHint"]]) {
       if (from in changes && !(to in changes)) changes[to] = changes[from];
     }
     for (const key of ["jobID", "state", "quality", "saveState", "lastError", "outputPath", "alignmentPath",
-      "fingerprint", "documentKey", "importingAttachmentKey", "detached", "retryPendingSince"]) {
+      "fingerprint", "documentKey", "importingAttachmentKey", "detached", "retryPendingSince", "submissionState", "outputAvailable",
+      "errorCode", "errorHint"]) {
       if (key in changes && changes[key] !== undefined) record[key] = this.publicValue(changes[key]);
     }
     if ((record.state === "done" || record.outputPath) && !record.saveState) record.saveState = "produced";

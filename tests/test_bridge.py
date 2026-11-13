@@ -8,6 +8,7 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -76,7 +77,8 @@ def running_store(store, monkeypatch):
         """Keep credentials out of argv/env and run a deterministic local engine fixture."""
         assert "secret-fixture" not in json.dumps(command)
         assert "PYTHONHOME" not in kwargs["env"] and "PYTHONPATH" not in kwargs["env"]
-        return popen([sys.executable, "-I", "-u", "-c", ENGINE_FIXTURE], **kwargs)
+        # Match production UTF-8 pipe handling, including isolated Windows interpreters.
+        return popen([sys.executable, "-X", "utf8", "-I", "-u", "-c", ENGINE_FIXTURE], **kwargs)
     monkeypatch.setattr(bridge.subprocess, "Popen", launch)
     yield store
     store.shutdown()
@@ -229,6 +231,56 @@ def test_loopback_auth_and_origin(store):
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_authenticated_local_recovery_and_diagnostics(store, tmp_path, monkeypatch):
+    """Exercise the real HTTP routes without model calls or private diagnostic fields."""
+    monkeypatch.setattr(bridge, "RUNTIME", tmp_path / "runtime")
+    job = store.submit(request(tmp_path))
+    folder = store.attempt_folder(job)
+    (folder / "translated.pdf").write_bytes(b"%PDF-retained-result")
+    (folder / "quality.json").write_text('{"status":"complete"}')
+    store.jobs[job["id"]].update(state="interrupted")
+    store.load_warnings.append("private record path must not be exported")
+    server = bridge.ThreadingHTTPServer(("127.0.0.1", 0), bridge.Handler)
+    server.token, server.store = "test-token", store
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    url = f"http://127.0.0.1:{server.server_port}"
+
+    def post(path, authenticated=True, data=b"{}"):
+        """Send a bounded local request using only the synthetic bridge token."""
+        headers = {"Authorization": "Bearer test-token"} if authenticated else {}
+        return urllib.request.urlopen(urllib.request.Request(url + path, data=data, headers=headers))
+
+    try:
+        for path in ("/diagnostics", f'/jobs/{job["id"]}/recover'):
+            with pytest.raises(urllib.error.HTTPError) as error:
+                post(path, authenticated=False)
+            assert error.value.code == 401
+        assert not (bridge.RUNTIME / "diagnostics").exists()
+        with post(f'/jobs/{job["id"]}/recover') as response:
+            result = json.load(response)
+            assert result["state"] == "done" and result["recovered_locally"]
+        assert not store.processes
+        with post("/diagnostics") as response:
+            bundle = Path(json.load(response)["path"])
+        assert bundle.parent == bridge.RUNTIME / "diagnostics"
+        with zipfile.ZipFile(bundle) as archive:
+            assert archive.namelist() == ["diagnostics.json"] and archive.testzip() is None
+            evidence = archive.read("diagnostics.json").decode("utf-8")
+            assert "secret-fixture" not in evidence and "test-token" not in evidence
+            assert job["id"] not in evidence and str(tmp_path) not in evidence
+            assert "private record path" not in evidence
+        with pytest.raises(urllib.error.HTTPError) as error:
+            post("/diagnostics", data=b"[]")
+        assert error.value.code == 400
+        guidance = json.load(error.value)
+        assert guidance["code"] and guidance["hint"] and guidance["error"]
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
 
 
 @pytest.mark.parametrize("state", ["queued", "running", "cancelling"])
@@ -563,3 +615,56 @@ def test_retry_persistence_failure_never_enqueues_or_mutates_original(store, tmp
     assert len(list(store.records.glob("*.json"))) == 1
     retry = store.retry(job["id"], {"api_key": "fresh-key"})
     assert retry["state"] == "queued" and len(scheduled) == 1
+
+
+def test_bad_attempt_record_does_not_disable_other_jobs(store, tmp_path):
+    """Keep malformed records on disk while valid interrupted jobs remain accessible."""
+    valid = store.submit(request(tmp_path))
+    damaged = {**valid, "id": "a" * 32, "attempts": [None]}
+    path = store.records / (damaged["id"] + ".json")
+    path.write_text(json.dumps(damaged))
+    with pytest.warns(UserWarning, match="Cannot load job"):
+        recovered = bridge.JobStore()
+    try:
+        assert path.is_file() and len(recovered.load_warnings) == 1
+        assert recovered.snapshot(valid["id"])["state"] == "interrupted"
+        assert damaged["id"] not in recovered.jobs
+    finally:
+        recovered.pool.shutdown()
+
+
+@pytest.mark.parametrize("quality,expected", [("complete", "done"), ("partial", "done"), ("unknown", "interrupted")])
+def test_local_final_output_is_recovered_without_resending(store, tmp_path, monkeypatch, quality, expected):
+    """Use final quality evidence after a crash, never schedule another engine request."""
+    job = store.submit(request(tmp_path))
+    folder = store.attempt_folder(job)
+    (folder / "translated.pdf").write_bytes(b"%PDF-retained-result")
+    (folder / "quality.json").write_text(json.dumps({"status": quality}))
+    monkeypatch.setattr(bridge.ThreadPoolExecutor, "submit", lambda *args: pytest.fail("Recovery scheduled an engine"))
+    recovered = bridge.JobStore()
+    try:
+        snapshot = recovered.snapshot(job["id"])
+        assert snapshot["state"] == expected and not recovered.processes
+        if expected == "done":
+            assert snapshot["output_available"] and snapshot["recovered_locally"]
+            assert bridge.verified_output(snapshot)
+            assert json.loads((folder / "manifest.json").read_text())["output_sha256"] == snapshot["output_sha256"]
+            Path(snapshot["output_path"]).unlink()
+            assert not recovered.snapshot(job["id"])["output_available"]
+    finally:
+        recovered.pool.shutdown()
+
+
+def test_local_recovery_does_not_accept_changed_pdf(store, tmp_path):
+    """Retain changed evidence without publishing it as a verified completed result."""
+    job = store.submit(request(tmp_path))
+    folder = store.attempt_folder(job)
+    (folder / "translated.pdf").write_bytes(b"%PDF-changed")
+    (folder / "quality.json").write_text('{"status":"complete"}')
+    (folder / "manifest.json").write_text(json.dumps({"output_sha256": "0" * 64}))
+    recovered = bridge.JobStore()
+    try:
+        assert recovered.snapshot(job["id"])["state"] == "interrupted"
+        assert (folder / "translated.pdf").exists()
+    finally:
+        recovered.pool.shutdown()

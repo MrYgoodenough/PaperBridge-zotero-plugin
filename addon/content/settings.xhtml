@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Settings for isolated DeepSeek and optional OpenAI-compatible profiles. -->
+<!-- Provider settings and a local, allowlisted diagnostic ZIP export. -->
 <window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge 设置" width="650" height="760">
   <html:style>
@@ -14,7 +14,7 @@
     .row { display: flex; gap: 14px; } .row > div { flex:1; }
     button { padding: 9px 14px; border:1px solid #8886; border-radius:6px; font:inherit; cursor:pointer; }
     .actions { display:flex; gap:8px; margin-top:22px; } #save { background:#2963d8;color:white;border-color:#2963d8; }
-    #status { white-space:pre-wrap; font-size:13px; } small { display:block; color:light-dark(#666,#aaa);margin-top:6px; }
+    #status, #diagnostics-status { white-space:pre-wrap; font-size:13px; } small { display:block; color:light-dark(#666,#aaa);margin-top:6px; }
   </html:style>
   <html:body>
     <html:h1>PaperBridge</html:h1>
@@ -66,6 +66,13 @@
     <html:small>「检查引擎」只检查本地排版引擎，不调用服务商 API，也不验证密钥、模型、余额或兼容性。</html:small>
     <html:p id="status" role="status"/>
     <html:p id="usage"/>
+    <html:details id="diagnostics">
+      <html:summary>脱敏诊断包</html:summary>
+      <html:small>只导出版本、平台、任务计数与导出安全状态；不含密钥、token、PDF、论文文本、用户绝对路径、原始日志或凭据库。不保存当前设置，不调用服务商，不自动上传。需本地引擎正常启动。</html:small>
+      <html:div class="actions"><html:button id="diagnostics-export">一键导出诊断 ZIP</html:button><html:button id="diagnostics-open" hidden="hidden">打开文件位置</html:button></html:div>
+      <html:p id="diagnostics-status" role="status"/>
+      <html:small id="diagnostics-path" style="overflow-wrap:anywhere;user-select:text"/>
+    </html:details>
     <html:small id="locations" style="overflow-wrap:anywhere"/>
     <html:small>删除规则：插件不会因论文条目或原 PDF 被移除而永久删除 Zotero 附件。失去关联的译文结果仍保留，仅可丢弃的临时缓存可能被清理。</html:small>
   </html:body>

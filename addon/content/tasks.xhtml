@@ -1,26 +1,237 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- One durable task view for preparation, live progress and retained outcomes. -->
+<!-- Compact task window for live progress, retained outcomes and available actions. -->
 <window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge 任务与进度" width="920" height="680">
+        xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge 翻译任务" width="860" height="640">
   <html:style>
-    :root { color-scheme:light dark; background:Canvas; color:CanvasText; }
-    body { font:14px system-ui,sans-serif; margin:24px; }
-    h1 { font-size:22px; margin-top:0; } p { line-height:1.6; }
-    .hint { opacity:.75; } .task { border:1px solid #8886; border-radius:8px; padding:14px; margin:12px 0; }
-    .task.selected { border-color:#467fd0; box-shadow:0 0 0 1px #467fd0; }
-    progress { width:100%; height:16px; margin:0 0 10px; accent-color:#467fd0; }
-    [hidden] { display:none !important; }
-    h2 { font-size:15px; margin:0 0 8px; overflow-wrap:anywhere; }
-    .details, #status { white-space:pre-wrap; overflow-wrap:anywhere; }
-    button { padding:6px 12px; margin-right:8px; font:inherit; cursor:pointer; }
-    button:disabled { cursor:default; } .actions { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
+    /* Shared palette keeps native controls and task surfaces in the same theme. */
+    :root {
+      color-scheme: light dark;
+      --page: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #eef1f5;
+      --text: #202733;
+      --text-muted: #5f6978;
+      --border: #dce1e8;
+      --accent: #285fc1;
+      --accent-hover: #204e9e;
+      --accent-soft: #eaf0fc;
+      --on-accent: #ffffff;
+      --success: #246643;
+      --success-soft: #eaf5ee;
+      --warning: #815b16;
+      --warning-soft: #faf2df;
+      --error: #ab3434;
+      --error-soft: #fbecec;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--page);
+      color: var(--text);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #1c1f24;
+        --surface: #252930;
+        --surface-soft: #2d323b;
+        --text: #e8ebf0;
+        --text-muted: #adb6c4;
+        --border: #3e4652;
+        --accent: #9bbcff;
+        --accent-hover: #bad0ff;
+        --accent-soft: #2c3a54;
+        --on-accent: #18243b;
+        --success: #9ed5b3;
+        --success-soft: #293d32;
+        --warning: #e9c779;
+        --warning-soft: #413824;
+        --error: #f0a2a2;
+        --error-soft: #452e32;
+      }
+    }
+
+    /* The HTML body owns scrolling inside the XUL window. */
+    body, body * { box-sizing: border-box; }
+    body {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      margin: 0;
+      padding: 22px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      font: 14px/1.5 system-ui, sans-serif;
+    }
+    [hidden] { display: none !important; }
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .page-header > div { min-width: 0; }
+    h1 { margin: 0; font-size: 22px; line-height: 1.35; }
+    .hint { margin: 6px 0 0; color: var(--text-muted); font-size: 13px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
+    .summary, .status, .batch-details {
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      background: var(--surface-soft);
+      color: var(--text-muted);
+    }
+    .summary:empty { display: none; }
+    .status { background: var(--surface); color: var(--text-muted); white-space: pre-wrap; }
+    .status.error { border-color: var(--error); color: var(--error); }
+
+    /* Hidden progress and actions leave terminal cards naturally compact. */
+    .task-list { display: flex; flex-direction: column; gap: 12px; }
+    .task {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+    }
+    .task.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .task-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    h2 { flex: 1; min-width: 0; margin: 0; font-size: 16px; line-height: 1.45; overflow-wrap: anywhere; }
+    .badge {
+      flex-shrink: 0;
+      max-width: 100%;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .badge.running { background: var(--accent-soft); color: var(--accent); }
+    .badge.success { background: var(--success-soft); color: var(--success); }
+    .badge.warning { background: var(--warning-soft); color: var(--warning); }
+    .badge.error { background: var(--error-soft); color: var(--error); }
+    .badge.muted { background: var(--surface-soft); color: var(--text-muted); }
+    .task-meta { margin-top: 6px; color: var(--text-muted); font-size: 12px; overflow-wrap: anywhere; }
+    .task-progress { margin-top: 14px; }
+    .progress-heading { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+    .phase { min-width: 0; overflow-wrap: anywhere; }
+    .percent { flex-shrink: 0; color: var(--accent); font-variant-numeric: tabular-nums; }
+    progress {
+      display: block;
+      width: 100%;
+      height: 8px;
+      margin: 8px 0;
+      border: 0;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--surface-soft);
+      accent-color: var(--accent);
+    }
+    progress::-moz-progress-bar { border-radius: 999px; background: var(--accent); }
+    progress::-webkit-progress-bar { border-radius: 999px; background: var(--surface-soft); }
+    progress::-webkit-progress-value { border-radius: 999px; background: var(--accent); }
+    .metrics { color: var(--text-muted); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .notice {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-left: 3px solid var(--warning);
+      border-radius: 6px;
+      background: var(--warning-soft);
+      color: var(--warning);
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .notice.error { border-color: var(--error); background: var(--error-soft); color: var(--error); }
+
+    /* Native buttons and disclosure markers retain clear keyboard navigation. */
+    button {
+      min-height: 34px;
+      max-width: 100%;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+      cursor: pointer;
+    }
+    button:not(:disabled):hover { background: var(--surface-soft); }
+    button.primary { border-color: var(--accent); background: var(--accent); color: var(--on-accent); font-weight: 600; }
+    button.primary:not(:disabled):hover { border-color: var(--accent-hover); background: var(--accent-hover); }
+    button.secondary { background: var(--surface); }
+    button.danger { color: var(--error); }
+    button.danger:not(:disabled):hover { border-color: var(--error); background: var(--error-soft); }
+    button:disabled { opacity: .5; cursor: default; }
+    button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .actions.buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .actions.buttons:empty { display: none; }
+    .task-details { margin-top: 12px; }
+    summary { cursor: pointer; overflow-wrap: anywhere; }
+    .task-details > summary { color: var(--text-muted); font-size: 13px; }
+    .details {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--surface-soft);
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .batch-details { margin-top: 0; background: var(--surface); }
+    .help { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-muted); }
+    .help > summary { color: var(--text); }
+    .help p { margin: 8px 0 0; }
+
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      .page-header { flex-direction: column; gap: 12px; }
+      .toolbar { width: 100%; }
+      .toolbar > button { flex: 1; min-width: 0; }
+      .task { padding: 14px; }
+      .task-header { flex-wrap: wrap; gap: 8px; }
+      .task-header > h2 { flex-basis: 100%; }
+      .progress-heading { flex-wrap: wrap; gap: 4px 12px; }
+      .actions.buttons > button { flex: 1 1 130px; min-width: 0; }
+    }
   </html:style>
   <html:body>
-    <html:h1>PaperBridge · 任务与进度</html:h1>
-    <html:p class="hint">可关闭此窗口，任务继续执行；阅读器中再次点击“译 / 分屏”可重开当前任务。批量任务串行执行，完成后只保存，不自动打开阅读器。百分比表示执行进度，不代表翻译质量；段落计数仅覆盖所选页。重启中断的任务不会自动重发；重试翻译可能重复计费，重试保存不会调用模型。</html:p>
-    <html:button id="refresh">刷新</html:button><html:button id="close">关闭</html:button>
-    <html:p id="status" role="status"/>
-    <html:div id="tasks"/>
+    <html:header class="page-header">
+      <html:div>
+        <html:h1>翻译任务</html:h1>
+        <html:p class="hint">关闭窗口不会中断翻译。</html:p>
+      </html:div>
+      <html:div class="toolbar">
+        <html:button id="refresh" class="secondary">刷新</html:button>
+        <html:button id="close" class="secondary">关闭</html:button>
+      </html:div>
+    </html:header>
+    <html:div id="summary" class="summary"/>
+    <html:details id="batch-details" class="task-details batch-details" hidden="hidden">
+      <html:summary id="batch-label">查看跳过原因</html:summary>
+      <html:div id="batch-skipped" class="details"/>
+    </html:details>
+    <html:p id="status" class="status" role="status" hidden="hidden"/>
+    <html:div id="tasks" class="task-list"/>
+    <html:details class="help">
+      <html:summary>使用说明</html:summary>
+      <html:p>批量任务串行执行，完成后只保存，不自动打开阅读器。</html:p>
+      <html:p>进度百分比不代表翻译质量；段落计数仅覆盖所选页。</html:p>
+      <html:p>重启中断的任务不会自动重发。重试翻译可能重复计费，重试保存不会调用模型。</html:p>
+      <html:p>阅读器中再次点击“译 / 分屏”可重新打开当前任务。</html:p>
+    </html:details>
   </html:body>
   <script src="chrome://paperbridge/content/tasks-window.js"/>
 </window>

@@ -1,4 +1,4 @@
-"""Build a standalone XPI with a platform-specific Python engine and model."""
+"""Package a staged platform-specific Python engine and the current addon source."""
 import hashlib
 import argparse
 import json
@@ -27,16 +27,31 @@ def build_platform():
     raise SystemExit(f"Unsupported build platform: {sys.platform} {platform.machine()}")
 
 
-# Runtime paths match stage_runtime.py and the addon launcher.
-PLATFORM, SITE_PACKAGES = build_platform()
+# A different host may repackage a stage, but cannot create its native dependencies.
+STAGED_SITE_PACKAGES = {
+    "macos-arm64": "python/lib/python3.12/site-packages",
+    "windows-x64": "python/Lib/site-packages",
+    "linux-x64": "python/lib/python3.12/site-packages",
+}
 parser = argparse.ArgumentParser()
 parser.add_argument("--python", choices=["bundled", "local"], default="bundled")
-mode = parser.parse_args().python
+parser.add_argument("--platform", choices=STAGED_SITE_PACKAGES,
+                    help="Repackage an existing stage; does not build or validate its native runtime")
+options = parser.parse_args()
+mode = options.python
+# Runtime paths match stage_runtime.py and the addon launcher, never the packaging host.
+PLATFORM = options.platform or build_platform()[0]
+SITE_PACKAGES = STAGED_SITE_PACKAGES[PLATFORM]
 manifest = json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))
 version = manifest["version"]
 runtime = ROOT / f".cache/package/{PLATFORM}"
 if not (runtime / "runtime.json").exists():
     raise SystemExit("Run .venv/bin/python scripts/stage_runtime.py first")
+metadata = json.loads((runtime / "runtime.json").read_text(encoding="utf-8"))
+if metadata.get("platform") != PLATFORM:
+    raise SystemExit("Staged runtime metadata does not match the selected package platform")
+if options.platform:
+    print(f"Repackaging the existing {PLATFORM} stage; native execution is not validated by this build.")
 suffix = "-local-python" if mode == "local" else ""
 # Only the built addon points at its native platform and Python-mode update channel.
 manifest["applications"]["zotero"]["update_url"] = (
@@ -76,9 +91,10 @@ if not payload.exists():
 shutil.copyfile(payload, output)
 with zipfile.ZipFile(output, "a", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
     archive.writestr("LICENSE",(ROOT / "LICENSE").read_text(encoding="utf-8"))
-    metadata=json.loads((runtime / "runtime.json").read_text(encoding="utf-8"))
     metadata["version"]=version
     metadata["pythonMode"]=mode
+    # Reused native stages can carry an old output identity; it is not an input.
+    metadata.pop("buildId", None)
     with payload.open("rb") as stream:
         metadata["payloadSha256"] = hashlib.file_digest(stream, "sha256").hexdigest()
     identity = hashlib.sha256(json.dumps(metadata,sort_keys=True).encode())

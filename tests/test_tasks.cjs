@@ -160,6 +160,61 @@ async function batchReview() {
   assert.equal(test.library.records.length, outcomes.length + 3, "reviewable history remains unchanged");
 }
 
+/** Exercise explicit rejected/unknown submissions and local PDF recovery. */
+async function recoveryFlow(source) {
+  for (const rejection of [true, false]) {
+    const test = setup();
+    let sends = 0;
+    test.library.item = async () => source;
+    test.bridge.request = async (_, method) => {
+      if (method !== "POST") return [];
+      if (++sends === 1) throw Object.assign(new Error("not accepted"), rejection ? { status: 400 } : {});
+      return { id: "explicit-retry", state: "queued" };
+    };
+    await assert.rejects(test.tasks.enqueue(source), /not accepted/);
+    const record = test.library.records[0];
+    assert.equal(record.submissionState, rejection ? "rejected" : "unknown");
+    await test.tasks.refresh();
+    assert.equal(sends, 1, "refresh never dispatches a translation");
+    await test.tasks.retry(record);
+    assert.equal(sends, 2, "a user-confirmed retry has an exit even when no job was accepted");
+    assert.equal(record.detached, true);
+  }
+  const found = setup();
+  const pending = { sourceID: source.id, sourceKey: source.key, libraryID: 1, state: "interrupted",
+    fingerprint: "fingerprint", documentKey: "document", baseURL: "https://test.invalid" };
+  found.library.records.push(pending);
+  found.bridge.request = async (_, method) => {
+    assert.notEqual(method, "POST", "finding the first attempt must not resubmit it");
+    return [{ id: "found", state: "running", fingerprint: "fingerprint", document_key: "document" }];
+  };
+  await assert.rejects(found.tasks.retry(pending), /已找回/);
+
+  for (const missingBackend of [false, true]) {
+    const local = setup();
+    local.context.IOUtils.exists = async () => true;
+    local.context.IOUtils.read = async (_, options) => {
+      assert.equal(options.maxBytes, 5);
+      return Uint8Array.from([37, 80, 68, 70, 45]);
+    };
+    const retained = { recordID: "retained", libraryID: 1, state: "interrupted", outputPath: "/retained.pdf", title: "Paper",
+      jobID: missingBackend ? "missing" : null };
+    local.library.records.push(retained);
+    local.bridge.request = async path => {
+      assert.equal(path, "/jobs/missing/recover", "Only local recovery is attempted, never model submission");
+      throw Object.assign(new Error("Job record missing"), { status: 404 });
+    };
+    const attachment = await local.tasks.save(retained, missingBackend ? { state: "interrupted" } : undefined);
+    assert.equal(attachment.key, "PDF1");
+    assert.match(attachment.title, /质量未确认/);
+    assert.equal(local.imports(), 1);
+  }
+  const unusable = setup();
+  const failed = { state: "failed", outputPath: "/retained.pdf", quality: { status: "unusable" } };
+  await assert.rejects(unusable.tasks.save(failed), /已确认不可用/);
+  assert.equal(unusable.imports(), 0, "Known unusable output must not be promoted to unknown-quality success");
+}
+
 /** Run meaningful queue contracts rather than duplicating backend scheduling tests. */
 async function main() {
   const test = setup();
@@ -299,6 +354,7 @@ async function main() {
   assert.equal(legacy.library.records.length, 2, "the old imported result remains in history");
   await readerFlow(source);
   await batchReview();
+  await recoveryFlow(source);
   console.log("Batch deduplication, shared cancellation, idempotent save and passive/lost-response recovery passed");
 }
 

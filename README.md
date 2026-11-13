@@ -6,7 +6,7 @@ Zotero 9 / 10 的一体化论文翻译插件。默认使用 `deepseek-flash` 翻
 
 ## 安装
 
-请按平台选择已发布安装包。当前源码为 **0.3.2**：增加可靠任务、串行批量、详细进度与双配置，尚未创建对应 Release，开发者可自行构建。
+请按平台选择已发布安装包。当前源码为 **0.3.2**：支持可靠任务、串行批量、双配置、脱敏诊断和独立的译文原生批注。Linux / Windows 的四种开发 XPI 已完成基础原生功能隔离验收，仍是未发布的本地草稿；更新通道的空列表表示暂无已发布新版本。源码更新不等于已发布安装包或语义质量验收。
 
 | 平台 | 已发布安装包 |
 |---|---|
@@ -14,7 +14,7 @@ Zotero 9 / 10 的一体化论文翻译插件。默认使用 `deepseek-flash` 翻
 | Windows x64 | [0.3.1 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.1/paperbridge-0.3.1-windows-x64.xpi) |
 | Linux amd64（glibc ≥ 2.34；Ubuntu 24.04 已验证） | [0.3.1 安装与构建说明](docs/linux.md) |
 
-**源码与发布包范围不同**：macOS 0.4.2 发布包另有译文原生批注、长公式 LaTeX 复制与持久公式缓存，详见 [发布说明](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)。这些专属源码尚未合入本分支；不要用当前 0.3.2 源码构建包覆盖该版本并期待保留这些功能。
+**源码与发布包范围不同**：macOS 0.4.2 发布包另有译文原生批注、长公式 LaTeX 复制与持久公式缓存，详见 [发布说明](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)。对应源码尚未合入本分支；当前源码独立接入基础译文批注，不包含该公式实现，不应覆盖该 macOS 发布包。
 
 安装方法如下：
 1. Zotero → **工具 → 插件 → 齿轮 → 从文件安装插件**，选择上述 XPI。
@@ -34,7 +34,7 @@ Zotero 9 / 10 的一体化论文翻译插件。默认使用 `deepseek-flash` 翻
 - 入队时固定源文件快照和模型配置。重启后的中断任务不会自动重发；重试翻译可能重复计费，重试保存不调用模型。
 - 默认双向同步翻页、滚动位置和缩放；右下角可切换为独立阅读。
 - 拖动中间分隔线调整宽度，“关闭分屏”恢复原生阅读器。
-- 右侧为只读阅读；需要批注时，直接打开保存的译文附件。
+- 右侧译文支持 Zotero 原生高亮、下划线与笔记，批注保存为译文附件的子条目，重开或独立阅读器也能查看。没有原文↔译文批注复制，权限或接口不可用时该侧只读降级，详见 [批注说明](docs/annotations.md)。
 - **工具 → PaperBridge → 取消当前论文翻译** 可终止任务。
 
 ## 排版与宋体
@@ -51,13 +51,17 @@ Zotero 9 / 10 的一体化论文翻译插件。默认使用 `deepseek-flash` 翻
 
 ## 数据与用量
 
-内置引擎位于 **Zotero 数据目录 / paperbridge / engine**；段落缓存和任务状态分别保存在同级 `cache/`、`.runtime/`。升级或切换版本仅保留一个引擎，模型及缓存继续共用；成功任务自动删除临时 PDF 和过程文件。设置页“数据目录”可直接打开该位置。不依赖开发工程；关闭或禁用插件时停止引擎和未完成的任务。
+内置引擎位于 **Zotero 数据目录 / paperbridge / engine**；段落缓存和任务状态分别保存在同级 `cache/`、`.runtime/`。升级或切换版本只替换引擎，模型、任务及可恢复成果继续保留；只清理能够确认无归属的临时缓存。设置页“数据目录”可直接打开该位置。不依赖开发工程；关闭或禁用插件时停止引擎和未完成的任务。
 
 已保存的译文 PDF 优先复用，段落缓存按端点、模型和配置隔离。任务目录保存版本化记录、各次尝试、成果清单、`quality.json` 和 `usage.json`，不记录密钥。任务表用量为重试链累计值；丢失响应或缺失用量的请求明确标为未知，不能将记录当成最终账单。
 
 进度窗口显示当前阶段、百分比、已处理段落、缓存复用和用时，支持取消、显式重试与打开译文。关闭窗口不会取消任务，可从阅读器或工具菜单重开。部分及未确认译文始终可显式打开，但不会作为完整成果自动复用。
 
 “完整”表示所选页面的可翻译单元已通过结构及应用检查，不保证语言质量。部分译文会明确标注，旧结果没有证据时显示“未确认”；未选页、图表、公式及参考文献仍按规则保留。成果附属记录是本地数据，不保证随 Zotero PDF 跨设备同步。
+
+任务记录损坏时保留原文件并跳过该记录，不影响其他任务。已生成的译文可先核对本地证据；证据不足时，经确认保存为“质量未确认”，不调用模型、不覆盖旧附件。已确认不可用的结果只保留文件供核查，不能冒充未确认的成功结果。
+
+设置页可导出**本地脱敏诊断 ZIP**，只包含版本、平台和任务汇总，不包含密钥、PDF、正文、用户路径或原始日志，也不会自动上传。启动、资源不足、长路径、文件占用及服务商错误提供对应操作建议。
 
 平台说明见 [Linux](docs/linux.md)、[Windows](docs/windows.md)。历史发布包的验证不等于当前开发源码已完成跨平台验收。
 
@@ -80,15 +84,13 @@ macOS 在打包前运行 `curl -L --fail --output .cache/opencv-4.12.0.tar.gz ht
 
 `stage_runtime.py` 从 `uv.lock` 收集本平台运行依赖及公开模型资源，`build.py` 将运行时与插件合并到单个 XPI。引擎运行时加载所需的 `.pyi` 类型资源一并保留；开发测试库不打入运行时。
 
-构建还会在 `dist/updates/` 生成分平台、分 Python 模式的 Zotero 更新清单。先上传匹配的 XPI，再发布对应清单至仓库 `updates/`；单纯构建或同步源码不会发布更新。旧版占位更新地址仍需手动安装新版一次。
+构建还会在 `dist/updates/` 生成分平台、分 Python 模式的 Zotero 更新草稿。先上传匹配的 XPI，再发布对应清单至仓库 `updates/`；公开通道的空列表表示暂无已发布更新，不是下载故障。单纯构建或同步源码不会发布安装包，旧版占位更新地址仍需手动安装新版一次。
 
 ```sh
-.venv/bin/python -m pytest tests/test_bridge.py tests/test_preserve.py tests/test_usage.py tests/test_deepseek.py --basetemp=.runtime/pytest -q
-node tests/test_sync.cjs
-node tests/test_packaged_startup.cjs
-node tests/test_tasks.cjs
-node tests/test_library.cjs
+.venv/bin/python scripts/check_offline.py
 ```
+
+轻量 CI 在 Linux、Windows、macOS 上使用 Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx，运行 `scripts/check_offline.py --mode lightweight`，检查基础路径、启动环境、核心逻辑及六种小包/更新契约；不调用服务商、不安装 BabelDOC 模型或打包大型运行时。上面的默认完整检查另需项目已安装的引擎依赖。CI 不等于原生 Zotero 或未合并 macOS 0.4.2 实机验收；论文核对见 [质量检查](docs/quality-review.md)，安装包与清单核对见 [发布说明](docs/releasing.md)。
 
 `scripts/prepare_packaged_test.py` 将完整 XPI 和单独的测试辅助插件安装到工程内的隔离配置。测试辅助插件不会进入发布包。
 
