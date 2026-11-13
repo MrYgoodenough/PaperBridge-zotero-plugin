@@ -108,6 +108,10 @@
     await until(() => bridge.taskWindow?.document.querySelectorAll(".task").length >= 2, "Task dialog rows did not render");
     check(bridge.taskWindow.document.querySelector("body").textContent.includes("部分可用"), "Task dialog displays quality and save dimensions");
     check(bridge.splits.size === 0, "Batch completion does not open paired readers");
+    await main.ZoteroPane.selectItems(parents.map(parent => parent.id));
+    const repeated = await bridge.tasks.batch();
+    check(repeated.skipped.length === 2 && repeated.queued === 0 && submitted === 2,
+      "Repeated batch selection routes partial outcomes to explicit review without resubmitting");
     parents[0].deleted = true;
     await parents[0].saveTx();
     await bridge.library.schedule();

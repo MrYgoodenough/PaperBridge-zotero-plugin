@@ -118,6 +118,48 @@ async function readerFlow(source) {
   assert.equal(splits, 2, "verified complete attachments retain the single-reader split path");
 }
 
+/** Keep batch selection from silently resending reviewable outcomes. */
+async function batchReview() {
+  const test = setup();
+  const config = test.bridge.configuration();
+  const outcomes = [
+    { state: "failed" }, { state: "interrupted" }, { state: "cancelled" },
+    { state: "done", quality: { status: "partial" }, saveState: "imported" },
+    { state: "done", quality: { status: "unusable" } },
+    { state: "done", quality: { status: "unknown" }, saveState: "imported" },
+    { state: "done", quality: { status: "complete" }, saveState: "import_failed" }
+  ];
+  const sources = outcomes.map((outcome, index) => {
+    const source = { id: index + 10, key: "SOURCE" + index, libraryID: 1, getField: () => "Paper " + index,
+      fileExists: async () => true, getFilePathAsync: async () => "/paper" + index + ".pdf" };
+    test.library.records.push({ ...outcome, recordID: "review" + index, sourceID: source.id,
+      sourceKey: source.key, libraryID: source.libraryID, config });
+    return source;
+  });
+  const cached = { ...sources[0], id: 30, key: "COMPLETE" };
+  // Older failures must not block the latest complete, saved outcome.
+  test.library.records.push({ state: "failed", sourceID: cached.id, sourceKey: cached.key, libraryID: 1, config },
+    { state: "done", quality: { status: "complete" }, saveState: "imported",
+      sourceID: cached.id, sourceKey: cached.key, libraryID: 1, config });
+  const fresh = { ...sources[0], id: 31, key: "NEW", getFilePathAsync: async () => "/fresh.pdf" };
+  test.library.matching = async source => source.id === cached.id ? { id: 99 } : null;
+  const focused = [];
+  test.bridge.showTasks = (sourceID, recordID) => { if (recordID) focused.push(recordID); };
+  test.bridge.sourceForItem = async item => item;
+  test.context.Zotero.getMainWindow = () => ({ ZoteroPane: {
+    getSelectedItems: () => [...sources, sources[0], cached, fresh]
+  } });
+  const summary = await test.tasks.batch();
+  assert.equal(summary.skipped.length, outcomes.length);
+  assert.ok(summary.skipped.every(message => message.includes("显式重试或重新保存")));
+  assert.deepEqual(focused, outcomes.map((_, index) => "review" + index));
+  assert.equal(summary.cached, 1);
+  assert.equal(summary.queued, 1, "reviewable items must not block unrelated new work");
+  assert.equal(test.requests.length, 1, "only the new paper may send a translation request");
+  assert.equal(test.requests[0].data.source_path, "/fresh.pdf");
+  assert.equal(test.library.records.length, outcomes.length + 3, "reviewable history remains unchanged");
+}
+
 /** Run meaningful queue contracts rather than duplicating backend scheduling tests. */
 async function main() {
   const test = setup();
@@ -256,6 +298,7 @@ async function main() {
   assert.equal(imported.attachmentKey, "OLD");
   assert.equal(legacy.library.records.length, 2, "the old imported result remains in history");
   await readerFlow(source);
+  await batchReview();
   console.log("Batch deduplication, shared cancellation, idempotent save and passive/lost-response recovery passed");
 }
 

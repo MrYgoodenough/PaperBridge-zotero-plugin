@@ -8,7 +8,7 @@ PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译�
 - 后端完整结果缓存由已记录的 PDF SHA-256 校验，旧记录可从 manifest 读取校验值；缺少证据或文件已改变时不自动复用，文件本身仍保留。前端只有完整质量附件可自动复用，部分/未知成果仍可显式打开。
 - `backend/library_cache.py`：唯一的非秘密配置规范化、整篇指纹与段落命名空间。新增模型能力时，前后端配置、缓存键和测试应一起调整；不要把密钥加入身份。
 - `backend/deepseek.py`、`usage.py`、`batching.py`：请求能力、实际用量及固定引擎的翻译单元证据。`quality.json` 的完整/部分/不可用/未知与 PDF 是否生成分开判断；完整不等于语义质量认证。
-- `addon/content/tasks.js`：多选入队、恢复状态、逐项取消和保存；批量不调用分屏。不同论文可共享后端 job，但各自拥有独立记录、保存状态及附件。重试必须使用返回的新 job ID 和 `forkAttempt()` 的新归属记录。
+- `addon/content/tasks.js`：多选入队、恢复状态、逐项取消和保存；批量不调用分屏。单篇和批量入口都把当前配置、未变原文的未完成或未确认成果转到任务列表，不自动重发；批量跳过这些条目后继续其余论文。不同论文可共享后端 job，但各自拥有独立记录、保存状态及附件。重试必须使用返回的新 job ID 和 `forkAttempt()` 的新归属记录。
 - `addon/content/library.js`：版本 2 的 `translations.json`、附件归属与恢复标记。`put()` 固定配置，`update()` 更新状态，`findAttachment()` 恢复导入，`attach()` 完成保存。损坏索引先备份、禁用清理，不推断其余数据可删除。
 - `addon/content/settings.*`、`prefs.js`：默认 DeepSeek 加一个可选兼容 profile；凭据分别保存在 Zotero 登录管理器。切换设置只影响后续入队任务。
 - `addon/content/paperbridge.js`：单篇入口及原有页级分屏同步。私有 Zotero/PDF.js 接口仍局限于阅读路径，保存失败和阅读失败不会混为同一执行状态。

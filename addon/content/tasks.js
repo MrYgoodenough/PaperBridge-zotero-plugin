@@ -122,6 +122,12 @@ var TranslationTasks = class {
         if (!source) throw new Error("没有可翻译的原文 PDF");
         if (sources.has(source.id)) continue;
         sources.add(source.id);
+        // Batch selection is not consent to resend incomplete or unconfirmed work.
+        const previous = await this.reviewable(source, config);
+        if (previous) {
+          this.bridge.showTasks(source.id, previous.recordID);
+          throw new Error("已有未完成或未确认的结果，请在任务列表中检查，并显式重试或重新保存。");
+        }
         const result = await this.enqueue(source, config, key);
         summary[result.attachment ? "cached" : "queued"]++;
       } catch (error) {
