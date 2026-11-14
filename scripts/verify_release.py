@@ -4,6 +4,7 @@ from fnmatch import fnmatchcase
 import hashlib
 import json
 from pathlib import Path
+from package_inventory import collect_inventory, write_inventory
 import re
 import sys
 from urllib.error import HTTPError, URLError
@@ -21,16 +22,17 @@ PLATFORMS = {
     "macos-arm64": ("python/bin/python3.12", "python/lib/python3.12/site-packages"),
     "windows-x64": ("python/python.exe", "python/Lib/site-packages"),
 }
-# Core addon files include the newly integrated native annotation controller.
+# Production controllers include notes and startup diagnostics, not just reader UI.
 REQUIRED_ADDON_FILES = (
     "manifest.json", "bootstrap.js", "content/runtime.js", "content/library.js",
     "content/tasks.js", "content/alignment.js", "content/paperbridge.js", "content/annotations.js",
+    "content/notes.js", "content/diagnostics.js",
 )
-# The current backend requires these modules, including errors and diagnostics.
+# The current backend requires these modules, including trace and provider diagnostics.
 REQUIRED_BACKEND_FILES = (
     "alignment.py", "batching.py", "compact_math.py", "deepseek.py", "diagnostics.py",
-    "engine.py", "errors.py", "fonts.py", "launcher.py", "library_cache.py",
-    "preserve.py", "references.py", "server.py", "usage.py",
+    "engine.py", "errors.py", "fonts.py", "fragment_trace.py", "launcher.py", "library_cache.py",
+    "preserve.py", "references.py", "server.py", "usage.py", "provider_check.py",
 )
 # Only model and tokenizer assets are intentional build.py cache payloads.
 ASSET_DIRECTORIES = (".cache/babeldoc/models/", ".cache/babeldoc/tiktoken/")
@@ -128,7 +130,7 @@ def _audit_archive(archive, prefix, site_packages, mode):
     return names
 
 
-def verify_release(xpi, sha256, feed, source_manifest=SOURCE_MANIFEST):
+def verify_release(xpi, sha256, feed, source_manifest=SOURCE_MANIFEST, previous_inventory=None):
     """Verify explicit local artifacts without staging, rebuilding or publishing."""
     xpi, sha256, feed = Path(xpi), Path(sha256), Path(feed)
     source = _json_object(Path(source_manifest).read_bytes(), "Source manifest")
@@ -192,7 +194,7 @@ def verify_release(xpi, sha256, feed, source_manifest=SOURCE_MANIFEST):
             if name.startswith(backend_prefix) and name.endswith(".py") and "/" not in name[len(backend_prefix):]:
                 identity.update(archive.read(name))
         _require(identity.hexdigest() == build_id, "Runtime buildId does not match packaged backend bytes.")
-    # Hash the finished XPI once; do not unpack or re-hash its large native/model payload.
+    # Hash the finished XPI once; inventory only reads sources, metadata and license evidence.
     with xpi.open("rb") as stream:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()
     _check_checksum(sha256.read_bytes(), xpi.name, digest)
@@ -212,7 +214,8 @@ def verify_release(xpi, sha256, feed, source_manifest=SOURCE_MANIFEST):
         _require(compatibility.get(key) == zotero[key], f"Feed Zotero {key} differs from built manifest.")
     return {"version": version, "addonId": addon_id, "platform": platform, "pythonMode": mode,
             "buildId": build_id, "sha256": digest, "xpiName": xpi.name, "xpiSize": xpi.stat().st_size,
-            "updateUrl": update_url, "updateLink": update_link, "feed": draft}
+            "updateUrl": update_url, "updateLink": update_link, "feed": draft,
+            "inventory": collect_inventory(xpi, digest, previous_inventory)}
 
 
 def _read_public(url, *, head=False, label="Public resource", missing_hint=""):
@@ -296,27 +299,49 @@ def main(argv=None):
     parser.add_argument("--sha256", type=Path, required=True, help="Explicit matching .xpi.sha256 sidecar")
     parser.add_argument("--feed", type=Path, required=True, help="Explicit platform/mode draft update JSON")
     parser.add_argument("--source-manifest", type=Path, default=SOURCE_MANIFEST, help="Expected source addon manifest")
+    parser.add_argument("--report", type=Path, help="Write verification status and actual package inventory JSON")
+    parser.add_argument("--previous-inventory", type=Path, help="Optional same-platform/mode size baseline; warnings only")
     parser.add_argument("--online", action="store_true", help="Also check public feed and GitHub assets, read-only")
     args = parser.parse_args(argv)
     try:
-        result = verify_release(args.xpi, args.sha256, args.feed, args.source_manifest)
-    except (VerificationError, OSError, zipfile.BadZipFile, RuntimeError) as error:
+        inputs = [args.xpi, args.sha256, args.feed, args.source_manifest]
+        if args.previous_inventory:
+            inputs.append(args.previous_inventory)
+        if args.report and args.report.resolve() in {path.resolve() for path in inputs}:
+            raise VerificationError("Report must not overwrite an input artifact or source manifest.")
+        result = verify_release(args.xpi, args.sha256, args.feed, args.source_manifest, args.previous_inventory)
+    except (ValueError, OSError, zipfile.BadZipFile, RuntimeError) as error:
         print(f"LOCAL-FAILED: {error}", file=sys.stderr)
         return 1
     print(f"LOCAL-CONSISTENT: {result['xpiName']}")
     print(f"Addon {result['addonId']} | version {result['version']} | {result['platform']} | Python {result['pythonMode']}")
     print(f"SHA-256: {result['sha256']}\nBuild ID: {result['buildId']}")
+    inventory = result["inventory"]
+    print(f"Actual archive/expanded bytes: {inventory['archive']['bytes']:,} / {inventory['archive']['expandedBytes']:,}")
+    for warning in inventory["warnings"]:
+        print("WARN: " + warning)
+    # Public status is separate from local artifact consistency and native acceptance.
+    publication, status = "not_checked", 0
     if args.online:
         try:
             verify_online(result)
         except (VerificationError, OSError) as error:
             print(f"PUBLICATION-NOT-VERIFIED: {error}", file=sys.stderr)
-            return 1
-        print("PUBLISHED-METADATA-VERIFIED: public feed, download URL and GitHub asset digests agree.")
+            publication, status = "not_verified", 1
+        else:
+            publication = "metadata_verified"
+            print("PUBLISHED-METADATA-VERIFIED: public feed, download URL and GitHub asset digests agree.")
     else:
         print("PUBLICATION-NOT-CHECKED: local consistency is not evidence of a published update.")
     print("AUTOMATIC-UPDATE-NOT-TESTED: Zotero installation and newer-version delivery are separate checks.")
-    return 0
+    if args.report:
+        try:
+            write_inventory(args.report, {"localVerification": "consistent", "publication": publication,
+                                          "automaticUpdate": "not_tested", **result})
+        except OSError as error:
+            print(f"REPORT-FAILED: {error}", file=sys.stderr)
+            return 1
+    return status
 
 
 if __name__ == "__main__":

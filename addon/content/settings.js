@@ -13,6 +13,8 @@ window.addEventListener("load", function initializeSettings() {
   // Zotero integer preferences use signed 32-bit values.
   const maxPrefInteger = 2147483647;
   let saving = false;
+  // Both explicit checks share one UI lock and never save drafts.
+  let checking = false;
   // Export is independent of profile drafts and never submits their credentials.
   let exporting = false;
   // Keep the backend-returned path in this window only, not in preferences.
@@ -92,28 +94,72 @@ window.addEventListener("load", function initializeSettings() {
     get("status").textContent = "设置已保存（仅当前配置及全局设置）。已排队任务仍使用入队时的配置。";
   }
 
-  /** Save once and optionally check only the local layout engine. */
+  /** Save the current profile without checking an engine or service. */
   async function handleSave(event) {
-    if (saving) return;
-    const checkEngine = event.currentTarget.id === "test";
+    if (saving || checking) return;
     saving = true;
     // Lock editing across asynchronous key writes to prevent profile/key races.
-    const controls = document.querySelectorAll("input, select, #save, #test");
+    const controls = document.querySelectorAll("input, select, #save, #test, #service-check");
     for (const control of controls) control.disabled = true;
     try {
       await save();
-      if (checkEngine) {
-        const health = await bridge.request("/health");
-        get("status").textContent = `设置已保存。排版引擎已就绪 · ${health.engine} · v${health.version}\nPython：${health.python}\n仅检查本地引擎；未验证 API Key、模型或服务商兼容性。`;
-        if (Number.isInteger(health.warning_count) && health.warning_count > 0) {
-          get("status").textContent += `\n非致命提醒：有 ${health.warning_count} 条任务记录未加载，原记录已保留；引擎仍可用，原文和已有译文仍可阅读。可导出脱敏诊断包。`;
-        }
-      }
     } catch (error) {
       get("status").textContent = error.message;
     } finally {
       for (const control of controls) control.disabled = false;
       saving = false;
+    }
+  }
+
+  /** Freeze a validated service draft without saving preferences or credentials. */
+  function serviceDraft() {
+    const profile = get("profile").value;
+    if (!Object.hasOwn(profiles, profile)) throw new Error("请选择翻译服务配置。");
+    const fields = profiles[profile];
+    const model = get(fields.model).value.trim();
+    const key = get(fields.key).value.trim();
+    if (!model || /[\s\u0000-\u001f\u007f]/.test(model)) throw new Error("请填写有效模型名称。");
+    if (!key || /[\s\u0000-\u001f\u007f]/.test(key)) throw new Error("请填写当前配置的有效 API Key；不会借用另一套密钥。");
+    return { profile, base_url: endpoint(get(fields.baseURL).value.trim()), model, api_key: key,
+      lang_out: get("language").value, pages: "", capabilities: { max_tokens: 512,
+        json_mode: profile === "deepseek" || get("compatibleJSON").checked,
+        thinking_disabled: profile === "deepseek" } };
+  }
+
+  /** Check local readiness or one confirmed public provider sample, never saving drafts. */
+  async function check(event) {
+    if (saving || checking) return;
+    const provider = event.currentTarget.id === "service-check";
+    let draft;
+    try {
+      if (provider) {
+        draft = serviceDraft();
+        if (!bridge.confirm("检查服务将使用当前配置草稿发送一条公开短样例，输出上限 512 tokens，可能计费。不会保存设置、翻译论文、自动重试或回退其他服务。继续？")) return;
+      }
+    } catch (error) {
+      get("status").textContent = error.message;
+      return;
+    }
+    checking = true;
+    const controls = document.querySelectorAll("input, select, #save, #test, #service-check");
+    for (const control of controls) control.disabled = true;
+    get("status").textContent = provider ? "正在检查服务（一次短请求）…" : "正在检查已保存配置的本地引擎…";
+    try {
+      if (provider) {
+        const result = await bridge.request("/providers/check", "POST", { ...draft, confirmed: true });
+        get("status").textContent = result.ok
+          ? "服务已响应且翻译 JSON 格式可用。仅一次公开短样例；未保存草稿，未验证真实论文质量或账单。"
+          : [result.error || "服务检查未通过。", result.hint || "", "未保存草稿；请求可能已计费，不会自动重试。"].filter(Boolean).join("\n");
+      } else {
+        const health = await bridge.request("/health");
+        get("status").textContent = `排版引擎已就绪 · ${health.engine} · v${health.version}\nPython：${health.python}\n未保存草稿，未调用服务商。若修改 Python 路径，请先明确保存后再检查。`;
+        if (health.warning_count > 0) get("status").textContent += `\n有 ${health.warning_count} 条记录警告；已有文件保留，可导出脱敏诊断包。`;
+      }
+    } catch (error) {
+      get("status").textContent = error.message;
+    } finally {
+      for (const control of controls) control.disabled = false;
+      checking = false;
     }
   }
 
@@ -125,21 +171,23 @@ window.addEventListener("load", function initializeSettings() {
     try { await bridge.openDataDirectory(); } catch (error) { get("status").textContent = error.message; }
   }
 
-  /** Export only aggregate diagnostics without saving or reading profile drafts. */
+  /** Export safe counters and lifecycle events without saving profile drafts. */
   async function exportDiagnostics() {
     if (exporting) return;
     exporting = true;
     get("diagnostics-export").disabled = true;
     get("diagnostics-status").textContent = "正在生成脱敏诊断 ZIP…";
     try {
-      const result = await bridge.request("/diagnostics", "POST", {});
+      const result = await bridge.exportDiagnostics();
       if (typeof result.path !== "string" || !result.path) throw new Error("诊断接口未返回文件路径，请更新插件后重试。");
       diagnosticPath = result.path;
       get("diagnostics-path").textContent = diagnosticPath;
       get("diagnostics-open").hidden = false;
-      get("diagnostics-status").textContent = "诊断 ZIP 已生成。只包含脱敏版本、平台、任务计数与导出安全状态；未上传任何文件。";
+      get("diagnostics-status").textContent = result.source === "addon_only"
+        ? "本地插件侧诊断 ZIP 已生成（引擎不可用，后端版本/详情未确认）。不含秘密或正文，未上传。"
+        : "诊断 ZIP 已生成，含固定阶段/错误码摘要。不含秘密或正文，未上传。";
     } catch (error) {
-      get("diagnostics-status").textContent = `诊断包未生成：${error.message}\n原文和已有译文仍可阅读；本地引擎需正常启动才能导出。`;
+      get("diagnostics-status").textContent = `诊断包未生成：${error.message}\n原文和已有译文仍可阅读；请检查本地目录写权限后重试。`;
     } finally {
       get("diagnostics-export").disabled = false;
       exporting = false;
@@ -184,7 +232,8 @@ window.addEventListener("load", function initializeSettings() {
   showProfile();
   get("profile").addEventListener("change", showProfile);
   get("save").addEventListener("click", handleSave);
-  get("test").addEventListener("click", handleSave);
+  get("test").addEventListener("click", check);
+  get("service-check").addEventListener("click", check);
   get("locations").textContent = `译文：${bridge.storageRoot}/<附件 key>/translated.pdf\n缓存与引擎：${bridge.runtime.base}`;
   if (bridge.library.lastError) get("status").textContent = "上次缓存清理未完成：" + bridge.library.lastError;
   const recorded = bridge.pref("lastUsage");

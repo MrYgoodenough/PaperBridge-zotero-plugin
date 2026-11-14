@@ -3,6 +3,8 @@ from pathlib import Path
 import os
 import subprocess
 import sys
+import unicodedata
+import warnings
 
 # Keep generated font faces in the project's or plugin's own cache.
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,6 +12,51 @@ FONT_DIR = Path(os.environ.get("PAPERBRIDGE_CACHE_DIR",ROOT / ".cache")) / "font
 # The engine's FontMapper only accepts a font whose file name contains "serif" when the
 # primary family is serif, and pairs bold text with a font whose header sets the bold bit.
 NAMES = {"regular": "SongtiSerif-Regular.ttf", "bold": "SongtiSerif-Bold.ttf"}
+# MuPDF reverse maps shared glyph IDs; these aliases must not replace ordinary copied text.
+TEXT_ALIASES = {0x00A0: 0x0020, 0x00AD: 0x002D, 0x2011: 0x002D}
+# CJK compatibility ideographs normalize to the unified characters used by translation text.
+CJK_COMPATIBILITY_RANGES = ((0xF900, 0xFAFF), (0x2F800, 0x2FA1F))
+
+
+def _normalize_cmap(font):
+    """Remove same-glyph compatibility aliases so PDF ToUnicode keeps ordinary text searchable."""
+    removed = 0
+    for table in font["cmap"].tables:
+        if not table.isUnicode():
+            continue
+        for code, glyph in list(table.cmap.items()):
+            canonical = TEXT_ALIASES.get(code)
+            if any(first <= code <= last for first, last in CJK_COMPATIBILITY_RANGES):
+                normalized = unicodedata.normalize("NFKC", chr(code))
+                canonical = ord(normalized) if len(normalized) == 1 else None
+            if canonical is not None and canonical != code and table.cmap.get(canonical) == glyph:
+                del table.cmap[code]
+                removed += 1
+    return removed
+
+
+def _normalize_cached_font(path):
+    """Repair an existing cache face atomically without modifying or redistributing its system source."""
+    from fontTools.ttLib import TTFont, TTLibError
+
+    temporary = path.with_suffix(".unicode.tmp")
+    try:
+        changed = False
+        with TTFont(path) as font:
+            if _normalize_cmap(font):
+                font.save(temporary)
+                changed = True
+        # Windows cannot replace a font cache while its original handle is still open.
+        if changed:
+            temporary.replace(path)
+    except (OSError, TTLibError) as error:
+        # Keep readable existing fonts even if a cache copy cannot be normalized.
+        warnings.warn(f"Cached font Unicode normalization was unavailable; copy/search may be affected: {error}")
+    finally:
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 def _bold(font):
@@ -113,22 +160,24 @@ def _load(source):
 
 def _save(font, target, owner):
     """Export one face and release the source collection or font."""
-    font.save(target)
-    if owner is not None:
-        owner.close()
-    else:
-        font.close()
+    try:
+        _normalize_cmap(font)
+        font.save(target)
+    finally:
+        if owner is not None:
+            owner.close()
+        else:
+            font.close()
 
 
 def prepare_songti():
     """Extract installed Chinese serif faces without redistributing system fonts."""
     FONT_DIR.mkdir(parents=True, exist_ok=True)
     regular, bold = FONT_DIR / NAMES["regular"], FONT_DIR / NAMES["bold"]
-    if regular.exists() and bold.exists():
-        return
     errors = []
     for kind, target in (("regular", regular), ("bold", bold)):
         if target.exists():
+            _normalize_cached_font(target)
             continue
         for source in _sources(kind == "bold"):
             try:

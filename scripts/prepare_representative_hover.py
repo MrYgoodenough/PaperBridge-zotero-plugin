@@ -334,12 +334,13 @@ def prepare(evidence, output, corpus, network_events):
                 "cache_before": cache_inventory(cache / "paragraphs.sqlite"),
                 "versions": {name: version(name) for name in ("babeldoc", "pymupdf", "onnxruntime", "openai")},
                 "source_code_sha256": {name: digest(ROOT / "backend" / name) for name in (
-                    "engine.py", "batching.py", "fragment_trace.py", "alignment.py", "deepseek.py", "usage.py")},
+                    "engine.py", "batching.py", "fragment_trace.py", "alignment.py", "deepseek.py", "usage.py",
+                    "preserve.py", "library_cache.py", "fonts.py")},
                 "limits": ["Only historical selected pages are reapplied; no full-paper translation.",
                            "Verified means applied identity plus final text/geometry, not semantic correctness.",
                            "No cross-column/cross-page or native Zotero acceptance is performed here.",
-                           "Unknown unchanged author/email entries retain their production quality status.",
-                           "Historical affiliation wrapping and copyright reconstruction defects may remain.",
+                           "Recognized bibliographic metadata stays in its original language and vector style.",
+                           "Quality and visual defects require separate review; cache replay is not human acceptance.",
                            "Local PDFs/derivatives are QA inputs, not licensed release attachments."],
                 "network_guard_scope": "Python socket/DNS audit, HTTP send guard, cache-only before provider dispatch; ONNX telemetry disabled"}
     manifest_path = output / "manifest.json"

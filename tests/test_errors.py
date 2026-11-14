@@ -14,6 +14,8 @@ from backend.errors import explain_error
     (MemoryError("private text"), "resource"),
     (OSError(errno.ENOSPC, "private disk"), "resource"),
     ("missing doclayout.onnx", "resource"),
+    ("安装包缺少所需排版资源。请重新安装 XPI；PaperBridge 不会自动下载资源。", "resource"),
+    ("安装包的 tokenizer 资源缺失或损坏。请重新安装 XPI；PaperBridge 不会自动下载资源。", "resource"),
     (OSError(errno.ENAMETOOLONG, "private filename"), "long_path"),
     ("[WinError 206] filename too long", "long_path"),
     (OSError(errno.EBUSY, "private PDF"), "file_busy"),

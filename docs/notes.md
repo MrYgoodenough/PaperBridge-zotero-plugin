@@ -1,0 +1,121 @@
+<!-- Native note module contracts, integration points, and pending acceptance boundaries. -->
+# 译文批注与选区 → Zotero 独立笔记
+
+## 模块与接入
+
+`addon/content/notes.js` 在脚本加载作用域导出 `PaperBridgeNotes`，无启动副作用、无 UI 注册、无后端请求。`alignment.js` 的现有分屏控制器已接两个独立操作，点击时通过 `Services.scriptloader.loadSubScript()` 懒加载模块；错误只作为**文本**显示在笔记专属状态，不关闭阅读器、不禁用基本阅读或双向显式定位。
+
+### 分屏操作与 reader 边界
+
+- **选区存笔记**：从译文 `_primaryView._iframeWindow.document.getSelection()` 读取实际文字、Range 首尾的 `.textLayer` 和 `.page[data-page-number]`。按钮主指针按下/键盘激活时先捕获，避免之后的工具栏焦点导致选区丢失；不设置 Range、不恢复或注入 Selection、不从原文或映射猜文字。只接受一个连接中的单页范围，跨页/多范围明确提示分开保存。
+- 页索引取实际选区 DOM 所在页，不用 viewer 当前页号猜。可用时通过 PDFDocumentProxy `getPageLabels()` 读取真实页标签；标签查询失败退回物理页号，不阻止笔记。当前有限 UI 不推断或传入 unitID。
+- **批注汇总笔记**：参数为 `state.translated` 和 `state.source`，只导出译文附件自己的已保存 native children。先等待 `state.annotations.pending`；在现有公开源码 reader `_state.annotations` 可读时，用 native JSON 只读比较 key、类型、文字/评论、位置、页标签与颜色。仍在原生防抖保存中的变化会提示稍后重试；绝不手动补写、复制或移动批注。`_state` 不是稳定承诺 API，是沿用现有 adapter 的只读兼容边界，Zotero/reader 升级须复核。
+- 定位/高亮映射缺失不影响笔记操作。两个笔记按钮在完整“保存＋打开”动作期间都禁用，直接重复调用也返回当前同一 Promise。动作结束后的新明确请求允许另建 note。
+- 保存成功立即显示 native note key，再调用正式 `Zotero.Notes.open(note.id, null, { openInWindow: true })` 打开独立原生窗口，保留阅读器标签。打开失败仍显示“已保存”，提示到库中手动打开、勿重复保存；不伪装成创建失败或重发保存。保存结果不确定单独显示 native key 和“未确认”，不自动重试。
+- 分屏关闭前尚未开始保存的异步请求会取消；已交给 note 模块保存的操作不删除或回滚其成果。旧请求不能改动重新打开的分屏控件。单独笔记窗口由 Zotero 原生管理。
+
+两个入口均返回 `Promise<Zotero.Item>`，成功结果为已保存的原生 `note`：
+
+```js
+const note = await PaperBridgeNotes.createFromAnnotations({
+  translatedAttachment,
+  sourceAttachment, // Optional, explicit provenance link only.
+  annotationIDs: [nativeAnnotationItem.id, nativeAnnotationItem.key]
+});
+
+const selectionNote = await PaperBridgeNotes.createFromSelection({
+  translatedAttachment,
+  sourceAttachment, // Optional; never infer a source page.
+  text: actualSelectionText,
+  pageIndex: actualTranslatedPageIndex, // Zero-based physical PDF page.
+  pageLabel: actualTranslatedPageLabel, // Optional; otherwise physical pageIndex + 1.
+  unitID: verifiedUnitID // Optional plain-text provenance, not a lookup or persistent index.
+});
+```
+
+- 附件参数是已保存的 native Zotero PDF item，不是路径、reader JSON 或批注对象。模块用 `Zotero.Items.get()` 核对当前条目；依赖原生 item 数据加载接口。
+- `annotationIDs` 支持数值 item ID 或字符串 native key；省略表示导出当前附件全部未删除批注，空数组报错。混合/重复 ID 与 key 按条目去重。只读取译文附件自己的 `getAnnotations()` 子条目，跨附件、已删除或不存在的指定 ID 报错，不静默漏掉。
+- 主代理应先等待译文批注 adapter 的待保存操作完成，再调用入口。尚在 reader 内存、没有成为 native 子条目的批注不在本模块范围内；不得为笔记功能复制批注至原文附件。
+- 片段必须传入**实际选区文字**与实际译文页索引。不从悬停、缓存、语义或源文猜测正文，不自动翻译、不调用模型。传入真实 PDF page label 可保留罗马页码等标签；省略时记录的是物理页号，不声称是印刷页码。
+- 可选源附件须属于同库、同论文父项（两份均独立的 PDF 也可显式传入）。仅加源附件回链，不推定其页码，不证明片段对齐。
+- 已挂论文的译文附件生成论文父项下的独立 note，绝不把 note 挂在 PDF 下或修改 PDF 自带 note 字段。独立 PDF 生成同库根 note，不隐式归入分类。
+
+## 原生 API 与安全边界
+
+实现依据 Zotero **10.0.8 官方公开源码**，使用 `Annotations.toJSON()`、`EditorInstanceUtilities.serializeAnnotations(json, true)`、`URI.getItemURI/getLibraryPath()` 和 `Item.setNote/saveTx()`。原生 serializer 保留附件 URI/key、真实批注 key、译文位置与页标签、论文 citation/locator；完整 note 用原生 `data-citation-items` 容器和 schema 10。
+
+- 选区作为临时序列化输入，没有 `id/annotationKey`，不生成虚假 annotation 子条目。其位置仅包含明确提供的 `pageIndex`，不杜撰矩形；另有显式 `zotero://open-pdf/...?...page=` 回链保证可回到译文物理页。真实批注回链同时带 `annotation=`。个人未同步库与 group 库走官方协议路径，group 使用 group ID 而非 library ID。
+- 引用是论文父项引用；独立 PDF 无论文 CSL citation，保留附件回链和页码。即便自定义 native note 模板省略引用区域，显式附件链接仍保留。
+- 可读的只读/外部/他人批注可以复制；目标 library 必须可写、父论文必须可编辑且未删除。`filesEditable=false` 不禁止独立文本笔记，因为没有修改附件文件。真正只读库、feed、删除父项或非法附件会在保存前报错。异步读取后复核目标归属和权限。
+- 原生 HTML 先在标准 DOM 的 **inert template** 内解析，再白名单重建。只保留基础排版、native span/img citation/annotation 元数据，以及缓存 PNG/JPEG 的 base64 图像；去掉脚本、SVG、iframe、事件属性、style 和任意模板链接。模块自建标题、unitID、可见页码、附件链接均 HTML 转义，不接受外部图片 URL 或 SVG data URI。不提供任意富 HTML 输入接口。
+- 高亮、下划线、便签、文字、区域、绘图走原生序列化。区域/绘图只使用 `toJSON()` 已提供的缓存图像，不启动 PDFWorker、不新建图像附件。没有文字/评论且缺缓存的条目会明确失败，不保存看似成功的空笔记。缓存图像采用 inline data URI，其真实编辑器/重开表现仍须原生验收。
+- 单段选区/单条批注文字或评论上限 200,000 JS 字符，页标签和 unitID 上限 256 字符，完整 HTML 上限 8,000,000 字符。超限和异常控制字符明确报错，绝不悄悄截断。
+
+源码参考（只使用官方公开源码，未读取私有 reverse 资产）：
+
+- [editorInstance.js：createNoteFromAnnotations / serializeAnnotations](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/xpcom/editorInstance.js)
+- [annotations.js：toJSON](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/xpcom/annotations.js)
+- [item.js：getAnnotations / setNote / isEditable](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/xpcom/data/item.js)
+- [uri.js：getLibraryPath / getItemURI](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/xpcom/uri.js)
+- [ZoteroProtocolHandler.mjs：open-pdf 路由](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/ZoteroProtocolHandler.mjs)
+- [data/notes.js：Notes.open](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/xpcom/data/notes.js)
+- [zoteroPane.js：loadURI](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/zoteroPane.js)
+- [data/dataObject.js：reload](https://github.com/zotero/zotero/blob/10.0.8/chrome/content/zotero/xpcom/data/dataObject.js)
+
+## 一次保存与失败处理
+
+不直接使用默认 `createNoteFromAnnotations()`：其 10.0.8 实现先保存空 note、再保存正文。本模块在读取、序列化、过滤和复核全部成功后创建 note，**每次操作仅调用一次 `saveTx()`**；没有预保存、写后补存、自动重试或额外 DB/index。
+
+同模块实例内、相同参数的并发动作共用进行中的 Promise/结果；批注 ID/key 别名与重复标识会归一化。整个 native 数据读取阶段也在去重范围内。省略批注列表与显式列表不视作同一请求。完成后清除内存记录：之后新的明确动作允许生成新的 note，不永久封禁同样内容。UI 仍应在等待期间禁用按钮，成功后显示/打开返回的 note，不能自动重发命令。
+
+保存失败抛出 `error.code === 'NOTE_SAVE_FAILED'`，携带 `noteKey`、`libraryID`、`cause`，消息明确要求检查该 native key 后再决定是否重试。原生事务或通知异常可能使调用方无法确认提交结果；本模块不把异常伪装为成功，也不自动再建一份。主代理可用 `Zotero.Items.getByLibraryAndKey(error.libraryID, error.noteKey)` 检查候选；不能仅凭内存缓存存在就声称 DB 已提交。实际存储状态不确定时向用户显示 key 与错误，不自动重试。读取、权限、HTML 或内容失败均发生在保存前，不生成空 note。
+
+## 离线测试与 Linux 待验收契约
+
+```sh
+node --test tests/test_notes.cjs
+node --test tests/test_notes.cjs tests/test_annotations.cjs tests/test_sync.cjs
+node --test tests/test_alignment.cjs tests/test_notes.cjs tests/test_annotations.cjs tests/test_sync.cjs
+```
+
+`test_notes.cjs` 的 10 项离线测试检查入口编排、元数据形状、父项/根 note 与 group 链接、选区转义、并发去重、只读处理、输入错误、白名单、缓存图像，以及保存前/保存时失败。采用小型 native-item、serializer、inert-DOM 替身；**不是实际 Zotero 编辑器、Gecko HTML 解析或数据库事务验收**，不启动 Zotero、不触碰日常 profile、不请求模型。
+
+`test_alignment.cjs` 另加 6 项笔记 controller 检查：真实选区接口/焦点捕获与页标签、并发禁用、无效范围、原生保存队列/防抖状态、保存和打开的独立错误、关闭/复用后的迟到结果；加 2 项 native harness 隔离拒绝/配置路由检查，覆盖新 run 路径、指定报告、显式拒绝、路径不匹配和旧调用默认值。原有双向定位/hover 检查保留。替身不能认证 Gecko 跨 compartment DOM/Selection 包装或真实原生编辑器行为。
+
+现有 `tests/alignment_packaged.js` 增加了 **尚未执行**的原生步骤：可信鼠标拖选译文真实文字 → 实际笔记按钮；可信原生高亮工具拖选 → 实际汇总按钮；快速重复点击计数、`Notes.open` 返回与实际 `zotero:note` 编辑器 item、原生 note 的 citation/annotation 元数据和显式回链、PDF 字节/原生批注不变，以及分屏关闭/重开后 note 仍在。失败记录真实 stage/check，不注入选区或构造批注。需父 harness 的授权 fixture 在指定页提供完整可见文字 span；没有合适 span 时明确失败，不以注入替代。profile/data 不匹配时不写报告、不导入也不退出 Zotero。
+
+Runner 可在 harness 加载作用域传入以下配置；新验收须使用新的 run ID，不复用有历史数据的默认目录：
+
+```js
+PAPERBRIDGE_ALIGNMENT_TEST = {
+  isolated: true,
+  phase: "create", // Use "reopen" in the next native process.
+  expectedProfileDirectory: "/absolute/new-run/profile",
+  expectedDataDirectory: "/absolute/new-run/data",
+  statePath: "/absolute/new-run/alignment-state.json",
+  reportPath: "/absolute/new-run/alignment-create.json"
+};
+```
+
+传入配置时必须显式 `isolated: true`，且实际 profile/data 分别与期望路径一致，才允许执行和写报告。未传配置时保持旧调用兼容：`.runtime/alignment-profile`、`.runtime/alignment-data`、`.runtime/alignment-test.json`；默认 `phase: "create"`、state 为 `.runtime/alignment-state.json`。缺省路径字段也使用这些旧值，fixture 位置不变。
+
+- **create**：保留完整双向定位、真实选区/原生高亮存 note、重复点击和分屏关闭/重开检查。全部动作完成后从 native item 重新读取已保存正文，保存两条 `noteRecords` 的 HTML/key/library/parent/实际文字/页码、citation/annotation 元数据及实际回链；另存父论文身份、子 note keys、两个附件身份/路径/PDF SHA-256、原生批注 JSON snapshot 和 `Services.appinfo.processID`。这是验收 state 文件，不是生产索引或数据库。继续前须确认 create 报告 `ok: true`。
+- **reopen**：正常退出 create 后，在同一 profile/data 的**新 native 进程**传入 `phase: "reopen"`，保留同一 `statePath`，换用新 `reportPath`。只读取 state，核对不同 PID、父论文/附件/note 归属、精确正文/引用/页码/回链、PDF bytes、批注 snapshot 和 note 数量。通过正式 `Zotero.Notes.open()` 打开已有 note，通过 `ZoteroPane.loadURI()` 路由**实际存下的译文回链**，只读观察正确译文页和已有批注选中；不调用 controller、不重新建 note/导入附件/注入批注，也不通过补设目标页掩盖回链失败。打开后再核对正文、附件和批注未变，写报告并正常 quit。state 不重写。
+
+两阶段均正常 quit；安装 XPI、create 新 run ID 和同 profile reopen 由 `prepare_nonmac_test.py` / 主代理负责，harness 不复制/重写 XPI、不修改 restart 或安装 metadata。分屏重开和真实进程冷重开是不同检查；新增冷重开分支尚未实际启动验收。
+
+宿主私有接口仍需复核：生产 UI 借用 `_internalReader._primaryView._iframeWindow` / `right._primaryView._iframeWindow` 取得 iframe，另只读 `right._state.annotations` 判断防抖是否保存；这些是 Zotero 官方公开源码中的实现字段，不是稳定公开扩展 API。iframe 的 `PDFViewerApplication` 和 textLayer/page DOM 也属 reader/PDF.js 实现契约，JSON 字段结构差异可能使汇总保守提示“仍在保存”。原生 harness 另依赖 `zotero:note` window type 与 `zotero-note-editor` 元素 ID 来确认实际编辑器，这只是测试 UI 契约；生产打开使用已核对的正式 `Zotero.Notes.open()`，核心 notes 模块没有这些宿主私有字段依赖。本轮尚未运行原生环境，没有把这些兼容风险称作已发生故障。
+
+冷重开 harness 的额外契约：`loadURI()` 返回 void，必须等实际 reader/页渲染，不能将返回视为导航成功；tab 使用已有 `Reader.getByTabID()`，原生独立 reader 窗口只读 `zotero:reader` 的 `window.reader`。观察批注选中依赖 reader 私有 `_state.selectedAnnotationIDs`，已对照 Zotero 10.0.8 对应的[官方 reader 源码](https://github.com/zotero/reader/blob/c3d467bfcb9e3a8cacfbbe04c5c7fd1369030a36/src/common/reader.js)，不是稳定扩展 API。原生 note window unload 的 `saveSync()` 实际启动异步保存，harness 等待正式 `Zotero.DB.waitForTransaction()` 后用 `note.reload(["note"], true)` 读持久化正文；若正常编辑器打开/关闭规范化 HTML 而改变正文，精确比较会明确失败，不重写 checkpoint 假装保留。实际回链观察不声称每次都发生了物理位移（reader 可能已在该页），也不替代人工点击 citation preview / inline 图像验收。
+
+主代理打包后，在获授权的 Linux Zotero 10.0.8 **隔离 profile/data** 检查以下契约；本子任务没有启动或验收 Zotero：
+
+1. 模块实际加载，作用域能解析 `PaperBridgeNotes`；`Zotero.getMainWindow().DOMParser` 的 inert template 路径可用。缺 API/解析失败只报本动作错误，基本阅读和现有原生批注继续工作。
+2. 通过真实 reader 工具创建译文高亮/下划线/评论，等待 adapter 保存。导出全部和指定子集，确认 native note 仅一条、parent/library 正确，原文/译文 PDF、已有批注归属与内容未变。独立 PDF 单独验证根 note。
+3. 打开返回 note，检查实际引用预览、`data-citation-items` 和 native annotation 元数据仍保留；真实点击回链应打开**译文附件、正确物理页及已有批注**。选区入口无批注 key，点击显式回链仍准确回到指定译文页。源附件链接不伪称对应页。
+4. 真实划选含引号、`&`、中文、换行和类似 HTML 的文字；比对主代理传入的 actualSelectionText，检查原生 note 的文字/格式、页标签与 unitID，不接受脚本/事件执行。自定义恶意模板须经真实 Gecko 解析验证无活动内容/外部资源加载。
+5. 重复快速点击及在加载延迟时重复点击，只得到同一返回 note；成功后明确再点允许创建第二条。保存失败显示 attempted key、不自动重试，核查是否有已提交 note，不将缓存判断冒充 DB 结果。
+6. 区域/绘图有 native 缓存时检查图像、citation 与回链；缺缓存检查可读错误且无空 note。真实 group 许可需要可用授权测试库：notes 可写/files 不可写与 library 全只读分别验证；本轮小替身不代替 group 原生验收。
+7. 正常退出并真冷重开同一隔离 profile/data，确认 note 正文、引用、页码与回链、inline 图像保留；检查 note 数量、批注未改及停机数据库完整性。
+
+核心与有限分屏 UI/reader 挂接已交付；真实 Linux alignment/notes 验收仍待主代理完成。尤其须验证真实 pointerdown→focus→click 的 Selection 保留、文本层 Range 的 Gecko 包装、原生 reader 防抖 JSON 比较、PDFDocumentProxy 页标签接口、`Notes.open` 窗口、实际回链和两阶段冷重开证据。没有 Windows/macOS 验收、BabelDOC 迁移、术语、新语言、双向批注同步或隐式收费功能；本轮未启动 Zotero、重建、提交或维护 MEMORY。

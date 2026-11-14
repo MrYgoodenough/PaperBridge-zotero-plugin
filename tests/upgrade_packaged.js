@@ -1,11 +1,12 @@
 /** Verify an actual XPI upgrade in one explicitly isolated profile without model jobs. */
-/* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, PAPERBRIDGE_UPGRADE_TEST */
-(async () => {
+/* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils, PAPERBRIDGE_UPGRADE_TEST */
+var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
   // The helper supplies an exact disposable profile/data pair for both process phases.
   const config = PAPERBRIDGE_UPGRADE_TEST;
   // This synthetic credential is persisted only in the isolated native login manager.
   const fixtureKey = "paperbridge-isolated-upgrade-fixture";
-  const report = { ok: false, phase: config.phase, providerCalls: 0, checks: [] };
+  const report = { ok: false, phase: config.phase, providerCalls: 0, checks: [], processID: Services.appinfo.processID,
+    automaticUpdateVerified: false };
   // Close only readers opened by this helper through Zotero's normal tab lifecycle.
   const sampleReaders = new Set();
   let isolated = false, bridge;
@@ -51,7 +52,9 @@
   }
 
   /** Exercise the real settings button and read the generated allowlisted ZIP. */
-  async function diagnostics() {
+  async function diagnostics(addonOnly = false) {
+    // Exercise a realistically narrow native dialog without a strict screenshot/pixel gate.
+    const narrowWidth = 380, narrowHeight = 620, layoutTolerance = 2, settleMilliseconds = 250;
     const dialog = Zotero.getMainWindow().openDialog("chrome://paperbridge/content/settings.xhtml",
       "paperbridge-upgrade-settings", "chrome,centerscreen,resizable", { bridge });
     try {
@@ -68,6 +71,10 @@
         await Zotero.Promise.delay(100);
       }
       const path = dialog.document.getElementById("diagnostics-path").textContent;
+      dialog.resizeTo(narrowWidth, narrowHeight);
+      await Zotero.Promise.delay(settleMilliseconds);
+      const body = dialog.document.querySelector("body");
+      check(body.scrollWidth <= body.clientWidth + layoutTolerance, "Native settings remain within a narrow window after export");
       const zip = Cc["@mozilla.org/libjar/zip-reader;1"].createInstance(Ci.nsIZipReader);
       zip.open(bridge.runtime.file(path));
       try {
@@ -80,11 +87,90 @@
         reader.init(stream);
         const text = reader.read(reader.available());
         reader.close();
+        const summary = JSON.parse(text);
+        check(summary.schema_version === 2 && Array.isArray(summary.events?.startup)
+          && Array.isArray(summary.events?.jobs), "Native diagnostic export includes safe lifecycle timelines");
+        check(summary.runtime_status.export_source === (addonOnly ? "addon_only" : "backend"),
+          "Native ZIP identifies whether the backend was actually available");
         check(!text.includes(fixtureKey) && !text.includes(config.expectedDataDirectory),
           "Native diagnostic export contains neither the test credential nor library paths");
       } finally { zip.close(); }
       report.diagnosticsPath = path;
+      return { path, summary: JSON.parse(await readZip(path)) };
     } finally { dialog.close(); }
+  }
+
+  /** Decode one native diagnostic entry without reading any other file or preference. */
+  async function readZip(path) {
+    const zip = Cc["@mozilla.org/libjar/zip-reader;1"].createInstance(Ci.nsIZipReader);
+    zip.open(bridge.runtime.file(path));
+    try {
+      const stream = Cc["@mozilla.org/scriptableinputstream;1"].createInstance(Ci.nsIScriptableInputStream);
+      stream.init(zip.getInputStream("diagnostics.json"));
+      try { return stream.read(stream.available()); }
+      finally { stream.close(); }
+    } finally { zip.close(); }
+  }
+
+  /** Exercise real startup failure and native ZIP/temp fallback only in the isolated extracted engine. */
+  async function startupDiagnostics() {
+    const runtime = bridge.runtime;
+    check(samePath(runtime.home, PathUtils.join(config.expectedDataDirectory, "paperbridge", "engine")),
+      "Startup fault injection targets only this isolated extracted engine");
+    const serverPath = PathUtils.join(runtime.home, "backend", "server.py");
+    const original = await IOUtils.read(serverPath);
+    const statePath = runtime.state;
+    const badState = PathUtils.join(config.expectedDataDirectory, "diagnostics-state-file");
+    await runtime.stop();
+    try {
+      // Fault injection changes only this disposable extracted copy, not source or installed XPI.
+      await IOUtils.writeUTF8(serverPath, 'raise RuntimeError("tokenizer resource missing secret-fixture")\n');
+      let failure;
+      try { await bridge.request("/health"); } catch (error) { failure = error; }
+      check(failure?.code === "resource", "Native startup failure receives the production resource classification");
+      const first = await diagnostics(true);
+      check(first.summary.runtime_status.engine_ready === false
+        && first.summary.versions.babeldoc === "unknown"
+        && first.summary.events.startup.some(event => event.stage === "failed" && event.code === "resource"),
+      "Startup-failed export keeps safe failure stages without claiming a backend version");
+      await IOUtils.writeUTF8(badState, "isolated non-directory state path");
+      runtime.state = badState;
+      const temporary = await diagnostics(true);
+      check(temporary.path.startsWith(PathUtils.tempDir), "Native diagnostic ZIP falls back to the OS temp directory");
+      report.startupDiagnostics = { resourceFailure: true, nativeZip: true, tempFallback: true };
+      await IOUtils.remove(temporary.path);
+    } finally {
+      runtime.state = statePath;
+      await runtime.stop();
+      await IOUtils.write(serverPath, original);
+      await IOUtils.remove(badState, { ignoreAbsent: true });
+    }
+    check((await bridge.request("/health")).version === config.expectedVersion,
+      "Restoring the isolated engine recovers local readiness without any translation request");
+  }
+
+  /** Install an exact local candidate with AddonManager; a file copy is not an upgrade. */
+  async function installCandidate() {
+    const { AddonManager } = ChromeUtils.importESModule("resource://gre/modules/AddonManager.sys.mjs");
+    check(await sha256(config.upgradeXpi) === config.upgradeSha256, "Native candidate input matches its actual XPI hash");
+    const install = await AddonManager.getInstallForFile(bridge.runtime.file(config.upgradeXpi));
+    let ended = false, failure;
+    const listener = {
+      /** Observe a completed native installation rather than assuming install() returned success. */
+      onInstallEnded(_install, addon) { ended = addon.id === "paperbridge@local.dev" && addon.version === config.upgradeVersion; },
+      /** Retain a native installation failure instead of substituting file replacement. */
+      onInstallFailed(value) { failure = new Error("Native candidate install failed: " + value.error); },
+      /** Native user cancellation is not successful installation. */
+      onInstallCancelled() { failure = new Error("Native candidate install cancelled"); }
+    };
+    install.addListener(listener);
+    try {
+      Promise.resolve(install.install()).catch(error => { failure = error; });
+      await until(() => { if (failure) throw failure; return ended; }, "Native candidate installation did not finish");
+      const addon = await AddonManager.getAddonByID("paperbridge@local.dev");
+      check(addon.version === config.upgradeVersion, "AddonManager reports the installed newer candidate");
+      report.nativeFileInstall = { version: addon.version, xpiSha256: config.upgradeSha256 };
+    } finally { install.removeListener(listener); }
   }
 
   /** Open an explicitly supplied output in Zotero's actual native PDF reader. */
@@ -112,11 +198,80 @@
   /** Smoke-check only native rendering, not bilingual semantic acceptance. */
   async function readerSamples() {
     for (const sample of config.readerPDFs || []) {
-      const { page } = await openPDF(sample.path, sample.page);
+      const { page, native, frame, app } = await openPDF(sample.path, sample.page);
       const text = [...page.div.querySelectorAll(".textLayer span")].map(span => span.textContent).join("");
       check(/[\u3400-\u9fff\uf900-\ufaff]/.test(text), "Real translated sample page " + sample.page + " renders selectable Chinese in Zotero");
+      check(!/[\uf900-\ufaff\u00ad]/.test(text), "New translated text does not copy compatibility ideographs or soft-hyphen aliases");
+      await copyAndSearch(native, frame, app, page, sample.searchTerm || "摘要");
     }
     report.nativeTranslatedSamples = (config.readerPDFs || []).length;
+  }
+
+  /** Drag a real text-layer word and run the reader's find controller, without injecting a Selection. */
+  async function copyAndSearch(native, frame, app, page, term) {
+    // Stable page text and focused native input are required before a selection can be measured.
+    const moveSteps = 6, movementDelay = 60, selectionTolerance = 2;
+    const main = Zotero.getMainWindow();
+    main.focus();
+    Services.focus.activeWindow = main;
+    main.Zotero_Tabs.select(native.tabID);
+    const nativeFrame = Components.utils.unwaiveXrays(frame);
+    nativeFrame.focus();
+    app.pdfViewer.currentScaleValue = "page-width";
+    await until(() => page.renderingState === 3 && page.scale === app.pdfViewer.currentScale,
+      "Native copy page did not finish width-fit rendering");
+    const span = [...page.div.querySelectorAll(".textLayer span")].find(node => node.textContent.includes(term));
+    check(!!span, "Native text layer contains the exact searchable term " + term);
+    const node = span.firstChild, offset = node.textContent.indexOf(term);
+    const range = frame.document.createRange();
+    range.setStart(node, offset); range.setEnd(node, offset + term.length);
+    const initial = range.getBoundingClientRect();
+    // A PDF.js span can cover many lines; center the chosen glyph range, not the whole span.
+    app.pdfViewer.container.scrollTop += (initial.top + initial.bottom) / 2 - frame.innerHeight / 2;
+    // Await real scroll/layout before reading hit coordinates, not a fixed focus assumption.
+    let last, stable = 0;
+    await until(() => {
+      const box = range.getBoundingClientRect();
+      const current = JSON.stringify([box.left, box.top, box.right, box.bottom]);
+      stable = current === last ? stable + 1 : 0;
+      last = current;
+      return stable >= 3;
+    }, "Native copy text layer did not settle");
+    const box = range.getBoundingClientRect();
+    const y = (box.top + box.bottom) / 2, x = box.left + 0.5, end = box.right + selectionTolerance;
+    report.copyProbe = { term, page: app.pdfViewer.currentPageNumber, scale: app.pdfViewer.currentScale,
+      box: [box.left, box.top, box.right, box.bottom], viewport: [frame.innerWidth, frame.innerHeight],
+      selectedTab: main.Zotero_Tabs.selectedID, tabID: native.tabID, focus: frame.document.hasFocus(),
+      startElement: frame.document.elementFromPoint(x, y)?.localName };
+    await IOUtils.writeUTF8(config.reportPath, JSON.stringify(report, null, 2));
+    check(x > 0 && end < frame.innerWidth && y > 0 && y < frame.innerHeight,
+      "Native copy term is actually inside the target viewport");
+    const utilities = nativeFrame.windowUtils || nativeFrame.docShell.domWindowUtils;
+    const events = [];
+    /** Record actual Gecko-delivered events instead of trusting a focus request. */
+    function observe(event) { events.push({ type: event.type, trusted: event.isTrusted }); }
+    for (const type of ["mousedown", "mouseup"]) frame.document.addEventListener(type, observe, { once: true, capture: true });
+    utilities.sendMouseEvent("mousemove", x, y, 0, 0, 0);
+    utilities.sendMouseEvent("mousedown", x, y, 0, 1, 0);
+    for (let step = 1; step <= moveSteps; step++) {
+      utilities.sendMouseEvent("mousemove", x + (end - x) * step / moveSteps, y, 0, 0, 0,
+        false, 0, 1, true, false, 1);
+      await Zotero.Promise.delay(movementDelay);
+    }
+    utilities.sendMouseEvent("mouseup", end, y, 0, 1, 0);
+    report.copyProbe.actualSelection = frame.document.getSelection()?.toString();
+    report.copyProbe.input = events;
+    await IOUtils.writeUTF8(config.reportPath, JSON.stringify(report, null, 2));
+    check(events.some(event => event.type === "mousedown" && event.trusted)
+      && events.some(event => event.type === "mouseup" && event.trusted), "Native selection drag delivers trusted mouse input");
+    await until(() => frame.document.getSelection()?.toString().includes(term), "Trusted drag did not select the exact target term");
+    const selected = frame.document.getSelection().toString();
+    check(selected.includes(term) && !/[\uf900-\ufaff\u00ad]/.test(selected), "Real native selection keeps canonical copy text " + term);
+    app.eventBus.dispatch("find", Components.utils.cloneInto({ source: null, type: "", query: term,
+      phraseSearch: true, caseSensitive: false, entireWord: false, highlightAll: false, findPrevious: false }, frame));
+    await until(() => app.findController.pageMatches.some(matches => matches.length > 0), "Native find did not locate the canonical term");
+    check(app.findController.pageMatches.some(matches => matches.length > 0), "Native reader search finds " + term);
+    (report.nativeCopySearch ||= []).push({ term, selected, findMatchCount: app.findController.pageMatches.reduce((n, matches) => n + matches.length, 0) });
   }
 
   /** Click the decoded native PDF link hotspot, never guessing body coordinates. */
@@ -181,6 +336,8 @@
     report.health = await bridge.request("/health");
     check(bridge.runtime.version === config.expectedVersion && report.health.version === config.expectedVersion,
       "Installed addon and actual native engine match the selected XPI version");
+    if (config.expectedXpiSha256) check(await sha256(PathUtils.join(config.expectedProfileDirectory, "extensions", "paperbridge@local.dev.xpi"))
+      === config.expectedXpiSha256, "Cold native installation matches the exact candidate XPI hash");
     const jobs = await bridge.request("/jobs");
     check((Array.isArray(jobs) ? jobs : jobs.jobs).length === 0, "Upgrade verification never submits a model job");
     const installed = await IOUtils.readJSON(PathUtils.join(bridge.runtime.home, "installed.json"));
@@ -204,14 +361,22 @@
         { state: "done", quality: { status: "unknown" } }, await IOUtils.stat(sourcePath));
       await IOUtils.writeUTF8(stateSentinel, '{"synthetic":"retained job-state area"}');
       await IOUtils.writeUTF8(cacheSentinel, '{"synthetic":"retained cache area"}');
+      const paragraphPath = PathUtils.join(bridge.runtime.cache, "paragraphs.sqlite");
+      if (config.paragraphCachePath) await IOUtils.copy(config.paragraphCachePath, paragraphPath);
       await IOUtils.writeUTF8(config.statePath, JSON.stringify({ libraryID: source.libraryID,
         sourceKey: source.key, translatedKey: translated.key, annotationKey, recordID: record.recordID,
         previousBuildId: installed.buildId, previousVersion: installed.version,
-        sourceHash: await sha256(sourcePath), translatedHash: await sha256(await translated.getFilePathAsync()) }, null, 2));
+        sourceHash: await sha256(sourcePath), translatedHash: await sha256(await translated.getFilePathAsync()),
+        processID: report.processID, paragraphCacheSha256: config.paragraphCachePath ? await sha256(paragraphPath) : null }, null, 2));
       check(translated.getAnnotations().length === 1, "Baseline stores a native annotation on the translated fixture");
       check(bridge.library.records.some(value => value.recordID === record.recordID), "Baseline persists a real translation ownership record");
+      if (config.upgradeXpi) {
+        await checkpoint("native-file-install");
+        await installCandidate();
+      }
     } else if (config.phase === "reopen") {
       const saved = await IOUtils.readJSON(config.statePath);
+      check(saved.processID !== report.processID, "Upgrade acceptance uses a genuinely new native process");
       check(installed.version === config.expectedVersion && installed.buildId !== saved.previousBuildId,
         "Restart replaces the old engine build rather than reusing its installation marker");
       const source = await Zotero.Items.getByLibraryAndKeyAsync(saved.libraryID, saved.sourceKey);
@@ -228,8 +393,12 @@
       check((await IOUtils.readJSON(stateSentinel)).synthetic === "retained job-state area"
         && (await IOUtils.readJSON(cacheSentinel)).synthetic === "retained cache area",
       "Engine replacement leaves task-state and cache directories intact");
+      if (saved.paragraphCacheSha256) check(await sha256(PathUtils.join(bridge.runtime.cache, "paragraphs.sqlite"))
+        === saved.paragraphCacheSha256, "Upgrade preserves the exact historical paragraph cache database");
       await checkpoint("settings-diagnostics");
       await diagnostics();
+      await checkpoint("startup-failed-diagnostics");
+      await startupDiagnostics();
       await checkpoint("native-translated-samples");
       await readerSamples();
       await checkpoint("native-internal-link");

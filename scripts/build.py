@@ -7,6 +7,7 @@ import shutil
 import sys
 import zipfile
 from pathlib import Path
+from package_inventory import collect_inventory, write_inventory
 from sanitize_runtime import sanitize_runtime
 
 # Source tree containing addon code and native runtime stages.
@@ -37,6 +38,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--python", choices=["bundled", "local"], default="bundled")
 parser.add_argument("--platform", choices=STAGED_SITE_PACKAGES,
                     help="Repackage an existing stage; does not build or validate its native runtime")
+parser.add_argument("--previous-inventory", type=Path, help="Optional same-platform/mode size baseline; warnings only")
 options = parser.parse_args()
 mode = options.python
 # Runtime paths match stage_runtime.py and the addon launcher, never the packaging host.
@@ -114,6 +116,10 @@ with zipfile.ZipFile(output, "a", zipfile.ZIP_DEFLATED, compresslevel=9) as arch
 with output.open("rb") as stream:
     digest = hashlib.file_digest(stream,"sha256").hexdigest()
 output.with_suffix(".xpi.sha256").write_text(f"{digest}  {output.name}\n")
+# Inspect completed bytes, not the stage's estimates or unverified license names.
+inventory_path = output.with_suffix(".xpi.inventory.json")
+inventory = collect_inventory(output, digest, options.previous_inventory)
+write_inventory(inventory_path, inventory)
 # Hash the completed XPI, not the cached runtime; keep unpublished feeds out of updates/.
 zotero = manifest["applications"]["zotero"]
 updates = {"addons": {zotero["id"]: {"updates": [{
@@ -129,4 +135,5 @@ feed_dir.mkdir(exist_ok=True)
 feed_path = feed_dir / f"{PLATFORM}{suffix}.json"
 feed_path.write_text(json.dumps(updates, indent=2) + "\n", encoding="utf-8")
 print(f"{output} ({output.stat().st_size:,} bytes)")
+print(f"Package inventory: {inventory_path} ({len(inventory['warnings'])} advisory warnings)")
 print(f"Draft update feed: {feed_path}; publish separately only after the matching release artifact exists.")

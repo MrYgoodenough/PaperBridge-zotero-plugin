@@ -1,4 +1,4 @@
-"""Verify tiny real build.py outputs and mocked public metadata without a network."""
+"""Verify build.py outputs from synthetic runtimes; public responses are mocked."""
 from copy import deepcopy
 import hashlib
 from io import BytesIO
@@ -25,9 +25,10 @@ HOSTS = (("linux", "x86_64", "linux-x64"), ("darwin", "arm64", "macos-arm64"),
 
 @pytest.fixture
 def build_release(tmp_path, monkeypatch):
-    """Run the unchanged builder on synthetic runtimes inside a disposable checkout."""
+    """Run the current builder on synthetic runtimes inside a disposable checkout."""
     files = {
         "scripts/build.py": (ROOT / "scripts/build.py").read_bytes(),
+        "scripts/package_inventory.py": (ROOT / "scripts/package_inventory.py").read_bytes(),
         "addon/manifest.json": (ROOT / "addon/manifest.json").read_bytes(),
         "addon/bootstrap.js": b"// Synthetic bootstrap.\n",
         "addon/content/runtime.js": b"// Synthetic runtime controller.\n",
@@ -36,6 +37,8 @@ def build_release(tmp_path, monkeypatch):
         "addon/content/alignment.js": b"// Synthetic alignment controller.\n",
         "addon/content/paperbridge.js": b"// Synthetic addon.\n",
         "addon/content/annotations.js": b"// Synthetic annotation controller.\n",
+        "addon/content/notes.js": b"// Synthetic notes controller.\n",
+        "addon/content/diagnostics.js": b"// Synthetic diagnostics controller.\n",
         "LICENSE": b"Synthetic license.\n",
     }
     for source in (ROOT / "backend").glob("*.py"):
@@ -103,8 +106,8 @@ def _rewrite_xpi(artifacts, *, replace=None, remove=()):
     _refresh_hashes(artifacts)
 
 
-def test_real_builder_outputs_pass_all_six_channels(build_release):
-    """Match all platform/mode outputs and leave every explicit input untouched."""
+def test_fixture_builder_outputs_and_inventories_match_all_six_channels(build_release):
+    """Check exact ZIP evidence for synthetic channels, not native build acceptance."""
     for host, machine, target in HOSTS:
         for mode in ("bundled", "local"):
             artifacts = build_release(host, machine, target, mode)
@@ -113,8 +116,91 @@ def test_real_builder_outputs_pass_all_six_channels(build_release):
             assert (result["platform"], result["pythonMode"]) == (target, mode)
             assert result["sha256"] == hashlib.sha256(before[0]).hexdigest()
             assert result["buildId"]
+            inventory = json.loads(artifacts[0].with_suffix(".xpi.inventory.json").read_bytes())
+            assert result["inventory"] == inventory
+            assert inventory["nativeExecution"] == "not_tested" and inventory["licenseCompliance"] == "unknown"
+            assert inventory["runtime"]["buildId"] == result["buildId"]
+            with zipfile.ZipFile(artifacts[0]) as archive:
+                entries = archive.infolist()
+                assert inventory["archive"] == {
+                    "name": artifacts[0].name, "sha256": result["sha256"], "bytes": len(before[0]),
+                    "compressedEntryBytes": sum(entry.compress_size for entry in entries),
+                    "expandedBytes": sum(entry.file_size for entry in entries), "entryCount": len(entries),
+                    "fileCount": sum(not entry.is_dir() for entry in entries),
+                }
+                assert inventory["entries"] == [
+                    {"path": entry.filename, "compressedBytes": entry.compress_size, "expandedBytes": entry.file_size}
+                    for entry in sorted(entries, key=lambda entry: entry.filename)
+                ]
+                sources = {item["path"]: item for item in inventory["sourceModules"]}
+                expected = set(verifier.REQUIRED_ADDON_FILES) | {
+                    f"runtime/{target}/backend/{source.name}" for source in (ROOT / "backend").glob("*.py")
+                }
+                assert set(sources) == expected
+                for name, item in sources.items():
+                    contents = archive.read(name)
+                    assert item["bytes"] == len(contents) and item["sha256"] == hashlib.sha256(contents).hexdigest()
             assert [path.read_bytes() for path in artifacts] == before
     verifier.urlopen.assert_not_called()
+
+
+def test_inventory_reports_only_packaged_dependency_license_evidence(build_release, tmp_path):
+    """Use fictitious distributions to check located, empty, missing and unknown evidence."""
+    stage = tmp_path / ".cache/package/linux-x64"
+    metadata = json.loads((stage / "runtime.json").read_bytes())
+    metadata["packages"] = [{"name": "Inventory.Test", "version": "1.1"},
+                            {"name": "Absent_Test", "version": "4.0"}]
+    (stage / "runtime.json").write_text(json.dumps(metadata), encoding="utf-8")
+    site = verifier.PLATFORMS["linux-x64"][1]
+    dist = "inventory_test-1.2.dist-info/"
+    files = {
+        site + "/" + dist + "METADATA": (
+            "Name: Inventory_Test\nVersion: 1.2\nLicense: Synthetic-only\n"
+            "License-Expression: LicenseRef-Inventory-Test\n"
+            "Classifier: License :: Other/Proprietary License\n"
+            "License-File: LICENSE\nLicense-File: missing-NOTICE.txt\nLicense-File: empty.txt\n\n"
+        ).encode(),
+        site + "/" + dist + "licenses/LICENSE": b"Synthetic license evidence, not a real dependency license.\n",
+        site + "/" + dist + "licenses/empty.txt": b"",
+        site + "/" + dist + "RECORD": b"inventory_test/NOTICE.txt,,\n",
+        site + "/inventory_test/NOTICE.txt": b"Synthetic owned notice.\n",
+        site + "/unknown_test-1.0.dist-info/METADATA": b"Name: Unknown_Test\nVersion: \nLicense: UNKNOWN\n\n",
+        site + "/neighbour/LICENSE": b"Unrelated evidence must not be borrowed.\n",
+    }
+    for relative, contents in files.items():
+        path = stage / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(contents)
+    notices = tmp_path / "addon/licenses"
+    notices.mkdir()
+    (notices / "CPython-3.12.14.txt").write_text("Synthetic unassigned notice.\n", encoding="utf-8")
+    inventory = verifier.verify_release(*build_release())["inventory"]
+    packages = {item["name"]: item for item in inventory["dependencies"]}
+    package = packages["Inventory_Test"]
+    assert (package["version"], package["declaredVersion"]) == ("1.2", "1.1")
+    evidence = package["license"]
+    assert evidence["status"] == "reported" and evidence["recordStatus"] == "read"
+    assert evidence["fields"] == {"License": "Synthetic-only", "License-Expression": "LicenseRef-Inventory-Test"}
+    assert evidence["classifiers"] == ["License :: Other/Proprietary License"]
+    assert evidence["missingDeclaredFiles"] == ["missing-NOTICE.txt"]
+    prefix = "runtime/linux-x64/" + site + "/"
+    assert {item["path"] for item in evidence["files"]} == {
+        prefix + dist + "licenses/LICENSE", prefix + dist + "licenses/empty.txt", prefix + "inventory_test/NOTICE.txt",
+    }
+    assert any(item["bytes"] == 0 for item in evidence["files"])
+    for name in ("Absent_Test", "Unknown_Test"):
+        assert packages[name]["version"] == "unknown" and packages[name]["license"]["status"] == "unknown"
+        assert packages[name]["license"]["files"] == []
+    components = {item["name"]: item for item in inventory["components"]}
+    assert components["CPython interpreter/stdlib"]["license"]["status"] == "unknown"
+    assert [item["path"] for item in components["PaperBridge"]["license"]["files"]] == ["LICENSE"]
+    assert [item["path"] for item in components["Addon notices (unassigned)"]["license"]["files"]] == [
+        "licenses/CPython-3.12.14.txt",
+    ]
+    assert inventory["licenseCompliance"] == "unknown"
+    assert any("version unknown or inconsistent: Inventory_Test" in warning for warning in inventory["warnings"])
+    assert any("License evidence unknown, absent or empty: Inventory_Test" in warning for warning in inventory["warnings"])
+    assert any("metadata missing: Absent_Test" in warning for warning in inventory["warnings"])
 
 
 def test_sidecar_requires_final_xpi_hash_and_filename(build_release):
@@ -188,8 +274,10 @@ def test_runtime_identity_and_new_modules_are_required(build_release):
         _rewrite_xpi(artifacts, replace={member: json.dumps(metadata).encode()})
         with pytest.raises(verifier.VerificationError, match=message):
             verifier.verify_release(*artifacts)
-    for member in ("content/annotations.js", "runtime/linux-x64/backend/errors.py",
-                   "runtime/linux-x64/backend/diagnostics.py", "runtime/linux-x64/python/bin/python3.12"):
+    for member in ("content/annotations.js", "content/notes.js", "content/diagnostics.js",
+                   "runtime/linux-x64/backend/errors.py", "runtime/linux-x64/backend/diagnostics.py",
+                   "runtime/linux-x64/backend/provider_check.py", "runtime/linux-x64/backend/fragment_trace.py",
+                   "runtime/linux-x64/python/bin/python3.12"):
         artifacts = build_release()
         _rewrite_xpi(artifacts, remove=(member,))
         with pytest.raises(verifier.VerificationError, match="Required module|interpreter presence"):
@@ -238,13 +326,17 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
     """Mock only public GET/HEAD responses; never download an XPI or use credentials."""
     artifacts = build_release()
     result = verifier.verify_release(*artifacts)
+    report = artifacts[0].with_suffix(".xpi.verification.json")
     argv = ["--xpi", str(artifacts[0]), "--sha256", str(artifacts[1]), "--feed", str(artifacts[2]),
-            "--source-manifest", str(artifacts[3])]
+            "--source-manifest", str(artifacts[3]), "--report", str(report)]
     capsys.readouterr()
     assert verifier.main(argv) == 0
     output = capsys.readouterr()
     assert "LOCAL-CONSISTENT" in output.out and "PUBLICATION-NOT-CHECKED" in output.out
     assert "AUTOMATIC-UPDATE-NOT-TESTED" in output.out and not output.err
+    document = json.loads(report.read_bytes())
+    assert document["localVerification"] == "consistent" and document["publication"] == "not_checked"
+    assert document["automaticUpdate"] == "not_tested" and document["inventory"] == result["inventory"]
     verifier.urlopen.assert_not_called()
     checksum = artifacts[1].read_bytes()
     release = {
@@ -288,6 +380,7 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
     output = capsys.readouterr()
     assert "PUBLISHED-METADATA-VERIFIED" in output.out and not output.err
     assert "AUTOMATIC-UPDATE-NOT-TESTED" in output.out
+    assert json.loads(report.read_bytes())["publication"] == "metadata_verified"
     assert [method for _, method in calls] == ["GET", "GET", "HEAD", "GET"]
     api_url = calls[1][0]
     assert api_url.endswith("/releases/tags/v" + result["version"])
@@ -303,6 +396,7 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
         assert "PUBLICATION-NOT-VERIFIED" in output.err and "HTTP 404" in output.err
         assert label in output.err and hint in output.err
         assert "PUBLISHED-METADATA-VERIFIED" not in output.out
+        assert json.loads(report.read_bytes())["publication"] == "not_verified"
         http_failures.clear()
     assert not any("/releases/latest" in url for url, _ in calls)
     xpi_asset = release["assets"].pop(0)
@@ -341,6 +435,20 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
     release["assets"][1]["digest"] = None
     assert verifier.main(argv + ["--online"]) == 1
     assert "checksum asset size/digest" in capsys.readouterr().err
+
+
+def test_verification_report_cannot_overwrite_inputs(build_release, capsys):
+    """Protect explicit artifacts and the optional size baseline from report writes."""
+    artifacts = build_release()
+    before = [path.read_bytes() for path in artifacts]
+    argv = ["--xpi", str(artifacts[0]), "--sha256", str(artifacts[1]), "--feed", str(artifacts[2]),
+            "--source-manifest", str(artifacts[3])]
+    baseline = artifacts[0].with_suffix(".xpi.inventory.json")
+    baseline_bytes = baseline.read_bytes()
+    for path in (*artifacts, baseline):
+        assert verifier.main(argv + ["--previous-inventory", str(baseline), "--report", str(path)]) == 1
+        assert "Report must not overwrite" in capsys.readouterr().err
+    assert [path.read_bytes() for path in artifacts] == before and baseline.read_bytes() == baseline_bytes
 
 
 @pytest.mark.parametrize("status", (403, 404))

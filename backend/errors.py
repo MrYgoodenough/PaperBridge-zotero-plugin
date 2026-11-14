@@ -26,7 +26,8 @@ def explain_error(error):
         code = "file_busy"
     elif isinstance(error, MemoryError) or number in {errno.ENOSPC, errno.ENOMEM} or windows_number in {8, 14, 112} or any(word in text for word in (
         "no space left", "disk full", "out of memory", "cannot allocate memory", "memoryerror",
-        "not enough memory", "not enough storage", "缺少资源", "缺少模型", "模型文件", "font not found", "font file", "onnx", "tiktoken", "磁盘空间不足")):
+        "not enough memory", "not enough storage", "缺少资源", "缺少模型", "排版资源", "资源缺失", "模型文件",
+        "font not found", "font file", "onnx", "tiktoken", "tokenizer", "磁盘空间不足")):
         code = "resource"
     elif getattr(error, "status_code", None) in {401, 402, 403, 408, 429, 500, 502, 503, 504} or re.search(
         r"(?:http(?: status)?|error code|status code)\s*[:=]?\s*(?:401|402|403|408|429|500|502|503|504)\b", text

@@ -177,7 +177,7 @@ async def _translate(request, quality):
     from babeldoc.docvision.doclayout import DocLayoutModel
     import onnxruntime
     onnxruntime.disable_telemetry_events()
-    from preserve import ProtectedLayoutModel, restore_regions
+    from preserve import ProtectedLayoutModel, metadata_regions, restore_regions
     from fragment_trace import FragmentTrace
     from references import reference_regions
     import pymupdf
@@ -210,7 +210,8 @@ async def _translate(request, quality):
     translator.write_usage()
     with pymupdf.open(source) as document:
         references = reference_regions(document)
-    layout_model = ProtectedLayoutModel(DocLayoutModel.load_available(),references)
+        metadata = metadata_regions(document)
+    layout_model = ProtectedLayoutModel(DocLayoutModel.load_available(), references, metadata)
     config = TranslationConfig(
         translator=translator, input_file=source, lang_in="en",
         lang_out=request["lang_out"], doc_layout_model=layout_model, pages=request["pages"] or None,
@@ -238,7 +239,8 @@ async def _translate(request, quality):
             translator.fragment_trace.write(folder / "translated.pdf", folder / "alignment.json", quality)
             quality.write(artifact_exists=True)
             translator.write_usage(excluded_graphic_characters=layout_model.excluded_characters,
-                                   excluded_reference_characters=layout_model.excluded_reference_characters)
+                                   excluded_reference_characters=layout_model.excluded_reference_characters,
+                                   excluded_metadata_characters=layout_model.excluded_metadata_characters)
             return
     raise RuntimeError("BabelDOC 提前结束，未生成译文")
 

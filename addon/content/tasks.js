@@ -211,7 +211,8 @@ var TranslationTasks = class {
       const latest = status.attempts?.at(-1);
       const quality = status.state === "done" ? status.quality : latest?.quality || status.quality;
       const patch = { state: status.state, quality: quality || { status: "unknown" },
-        outputPath: status.output_path || record.outputPath || null, outputAvailable: status.output_available };
+        outputPath: status.output_path || record.outputPath || null, outputAvailable: status.output_available,
+        events: Array.isArray(status.events) ? status.events : record.events || [] };
       if (status.error) patch.lastError = status.error;
       patch.errorCode = status.error_code;
       patch.errorHint = status.error_hint;

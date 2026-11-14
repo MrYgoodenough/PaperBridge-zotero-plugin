@@ -28,6 +28,7 @@ def build_tree(tmp_path, monkeypatch):
     """Stage tiny files for all hosts in one checkout to expose cache/feed collisions."""
     files = {
         "scripts/build.py": (ROOT / "scripts/build.py").read_bytes(),
+        "scripts/package_inventory.py": (ROOT / "scripts/package_inventory.py").read_bytes(),
         "addon/manifest.json": (ROOT / "addon/manifest.json").read_bytes(),
         "addon/bootstrap.js": b"// Addon fixture.\n",
         "addon/assets/manifest.json": b'{"fixture": "not the addon manifest"}\n',
@@ -141,6 +142,37 @@ def test_explicit_repackage_uses_the_staged_platform(build_tree, monkeypatch):
     metadata_path.write_text('{"platform":"linux-x64"}')
     with pytest.raises(SystemExit, match="metadata does not match"):
         runpy.run_path(str(script), run_name="__main__")
+
+
+def test_build_size_baseline_is_advisory_only(build_tree, monkeypatch):
+    """Report like-for-like growth and unknown baselines without rejecting tiny packages."""
+    script = build_tree / "scripts/build.py"
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(platform, "machine", lambda: "x86_64")
+    monkeypatch.setattr(sys, "argv", [str(script)])
+    runpy.run_path(str(script), run_name="__main__")
+    xpi = next((build_tree / "dist").glob("*.xpi"))
+    inventory_path = xpi.with_suffix(".xpi.inventory.json")
+    baseline = build_tree / "previous.inventory.json"
+    baseline.write_bytes(inventory_path.read_bytes())
+    previous = json.loads(baseline.read_bytes())
+    (build_tree / "addon/bootstrap.js").write_bytes(b"// Growing synthetic addon.\n" * 100)
+    monkeypatch.setattr(sys, "argv", [str(script), "--previous-inventory", str(baseline)])
+    runpy.run_path(str(script), run_name="__main__")
+    current = json.loads(inventory_path.read_bytes())
+    assert current["sizeTrend"]["status"] == "compared"
+    for field in ("bytes", "expandedBytes"):
+        trend = current["sizeTrend"]["sizes"][field]
+        assert trend["previous"] == previous["archive"][field]
+        assert trend["current"] == current["archive"][field] and trend["delta"] > 0
+    assert any("advisory only, no size gate" in warning for warning in current["warnings"])
+    previous["runtime"]["platform"] = "windows-x64"
+    baseline.write_text(json.dumps(previous), encoding="utf-8")
+    runpy.run_path(str(script), run_name="__main__")
+    assert json.loads(inventory_path.read_bytes())["sizeTrend"]["status"] == "unknown"
+    baseline.unlink()
+    runpy.run_path(str(script), run_name="__main__")
+    assert json.loads(inventory_path.read_bytes())["sizeTrend"]["status"] == "unknown" and xpi.is_file()
 
 
 def test_source_package_versions_agree():

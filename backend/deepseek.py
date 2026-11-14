@@ -10,6 +10,7 @@ from pathlib import Path
 
 from usage import MeteredTranslator, ResultQuality
 from library_cache import PROMPT_VERSION, add_document_column, normalize_config, paragraph_namespace
+from provider_check import request_completion as provider_completion
 
 # Keep the existing two-request concurrency limit independent of batch size.
 WIRE_CONCURRENCY = 2
@@ -184,13 +185,7 @@ class DeepSeekTranslator(MeteredTranslator):
 
     def request_completion(self, messages):
         """Send exactly one request using only explicitly declared provider capabilities."""
-        options = {"model": self.model, "messages": messages, "temperature": 0,
-                   "max_tokens": self.capabilities["max_tokens"]}
-        if self.capabilities["json_mode"]:
-            options["response_format"] = {"type": "json_object"}
-        if self.capabilities["thinking_disabled"]:
-            options["extra_body"] = {"thinking": {"type": "disabled"}}
-        return self.client.chat.completions.create(**options)
+        return provider_completion(self.client, self.model, self.capabilities, messages)
 
     def do_llm_translate(self, text, rate_limit_params=None):
         """Adapt pinned BabelDOC batch and single-paragraph prompts without retry decorators."""

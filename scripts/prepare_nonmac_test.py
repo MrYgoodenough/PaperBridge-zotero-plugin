@@ -39,7 +39,10 @@ def prepare(options):
     suffix = "-local-python" if options.local_python else ""
     package = options.xpi or ROOT / "dist" / f"paperbridge-{source_manifest['version']}-{platform_id()}{suffix}.xpi"
     config_path = ROOT / ".runtime" / (name + "-options.json")
-    report_path = ROOT / ".runtime" / (name + "-" + options.phase + ".json")
+    if options.report_label and (len(options.report_label) > 32 or not options.report_label.replace("-", "").isalnum()):
+        raise ValueError("Use a short alphanumeric/hyphen report label")
+    label = "-" + options.report_label if options.report_label else ""
+    report_path = ROOT / ".runtime" / (name + "-" + options.phase + label + ".json")
     if report_path.exists():
         raise ValueError("This phase already has evidence; choose a new run ID")
     if options.phase == "create":
@@ -66,6 +69,21 @@ def prepare(options):
         config.update({key: previous[key] for key in ("baselineVersion", "baselineXpiSha256")})
     if options.case_manifest:
         config["caseManifest"] = str(options.case_manifest.resolve())
+        if options.suite == "upgrade":
+            cases = json.loads(options.case_manifest.read_text(encoding="utf-8"))["cases"]
+            config.update(sourcePDF=cases[0]["source_pdf"], translatedPDF=cases[0]["translated_pdf"],
+                          readerPDFs=[{"path": case["translated_pdf"], "page": page,
+                                       "searchTerm": "机器学习" if case["id"] == "scikit-learn-2011" else "600,000"}
+                                      for case in cases for page in case["selected_pages_one_based"]])
+    if options.suite == "upgrade" and not options.case_manifest:
+        raise ValueError("An upgrade test needs an explicit real case manifest")
+    if options.upgrade_xpi:
+        with zipfile.ZipFile(options.upgrade_xpi) as archive:
+            candidate = json.loads(archive.read("manifest.json"))
+        config.update(upgradeXpi=str(options.upgrade_xpi.resolve()), upgradeVersion=candidate["version"],
+                      upgradeSha256=hashlib.sha256(options.upgrade_xpi.read_bytes()).hexdigest())
+    if options.paragraph_cache:
+        config["paragraphCachePath"] = str(options.paragraph_cache.resolve())
     if options.expected_xpi:
         config["expectedXpiPath"] = str(options.expected_xpi.resolve())
         with options.expected_xpi.open("rb") as stream:
@@ -110,6 +128,7 @@ async function runTests() {
     PAPERBRIDGE_TEST_ROOT: ROOT_PATH, TEST_GLOBAL: config};
   Services.scriptloader.loadSubScript(TEST_URI, scope);
   if (scope.PAPERBRIDGE_UPDATE_TEST_PROMISE) await scope.PAPERBRIDGE_UPDATE_TEST_PROMISE;
+  if (scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE) await scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE;
 }
 /** Retain actual helper progress before the acceptance script owns its own report. */
 async function helperCheckpoint(stage) {
@@ -117,8 +136,12 @@ async function helperCheckpoint(stage) {
     stage, processID: Services.appinfo.processID, checks: []}, null, 2));
 }
 """
-        script = "reading_packaged.js" if options.suite == "reading" else "update_packaged.js"
-        global_name = "PAPERBRIDGE_READING_TEST" if options.suite == "reading" else "PAPERBRIDGE_UPDATE_TEST"
+        script, global_name = {
+            "reading": ("reading_packaged.js", "PAPERBRIDGE_READING_TEST"),
+            "update": ("update_packaged.js", "PAPERBRIDGE_UPDATE_TEST"),
+            "alignment": ("alignment_packaged.js", "PAPERBRIDGE_ALIGNMENT_TEST"),
+            "upgrade": ("upgrade_packaged.js", "PAPERBRIDGE_UPGRADE_TEST"),
+        }[options.suite]
         for key, value in {"CONFIG_PATH": json.dumps(str(config_path)),
                            "TEST_URI": json.dumps((ROOT / "tests" / script).as_uri()),
                            "ROOT_PATH": json.dumps(str(ROOT)), "TEST_GLOBAL": global_name}.items():
@@ -145,7 +168,7 @@ async function helperCheckpoint(stage) {
 def main():
     """Expose explicit artifacts and cold phases without guessing or modifying public feeds."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=("reading", "update"), required=True)
+    parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade"), required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--phase", choices=("create", "reopen"), default="create")
     parser.add_argument("--xpi", type=Path, help="Exact baseline/test XPI, installed only during create")
@@ -153,6 +176,9 @@ def main():
     parser.add_argument("--case-manifest", type=Path)
     parser.add_argument("--expected-version", default="")
     parser.add_argument("--expected-xpi", type=Path)
+    parser.add_argument("--upgrade-xpi", type=Path, help="Native file-install candidate, never a public update claim")
+    parser.add_argument("--paragraph-cache", type=Path, help="Explicit historical cache clone for preservation checks")
+    parser.add_argument("--report-label", default="", help="Retain a failed phase report while retrying the same isolated profile")
     print(json.dumps(prepare(parser.parse_args()), ensure_ascii=False))
 
 

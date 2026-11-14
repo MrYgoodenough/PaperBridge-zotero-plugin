@@ -30,7 +30,7 @@ RUNTIME = Path(os.environ.get("PAPERBRIDGE_STATE_DIR",ROOT / ".runtime"))
 # Durable records and immutable artifact folders share the existing cache root.
 JOBS = RUNTIME / "jobs"
 # Public plugin version.
-VERSION = "0.3.4"
+VERSION = "0.3.5"
 # Independently versioned on-disk records.
 RECORD_VERSION = 1
 # Active attempts must never restart automatically after losing their worker.
@@ -44,6 +44,8 @@ USAGE_GAUGES = ("failed_requests", "in_flight_requests", "unknown_usage_requests
 STOP_TIMEOUT = 5
 # Maximum diagnostic characters exposed by a job.
 ERROR_LIMIT = 4000
+# Retain lifecycle transitions in existing job JSON, not a second log database.
+JOB_EVENT_LIMIT = 64
 # Only explicit quality evidence permits an output to become the current result.
 USABLE_QUALITIES = {"complete", "partial"}
 # Explicit retries may repeat charges even when the previous response was lost.
@@ -126,7 +128,7 @@ def configuration(request, key):
     if not isinstance(capabilities, dict) or redact(capabilities, key) != capabilities:
         raise ValueError("Capabilities must be a nonsecret object")
     encoded = json.dumps(config, allow_nan=False)
-    if key in encoded or quote(key, safe="") in encoded:
+    if key and (key in encoded or quote(key, safe="") in encoded):
         raise ValueError("Credentials must not appear in job configuration")
     return config
 
@@ -301,8 +303,19 @@ class JobStore:
         return root / "attempts" / f'{attempt["job_id"]}-{attempt["number"]}'
 
     def persist(self, job):
-        """Atomically commit a credential-free job and its attempt history."""
+        """Commit the job and a bounded state/phase/error transition history."""
         job["updated_at"] = timestamp()
+        code = job.get("error_code")
+        if not code and job.get("error"):
+            code = explain_error(job["error"])["code"]
+        event = {"at": job["updated_at"], "state": job.get("state", "unknown"),
+                 "phase": job.get("phase"), "code": code, "attempt": len(job.get("attempts", []))}
+        events = job.get("events")
+        events = [entry for entry in events if isinstance(entry, dict)] if isinstance(events, list) else []
+        # Progress percentages do not create new events; retries and failure codes do.
+        if not events or any(events[-1].get(name) != event[name] for name in ("state", "phase", "code", "attempt")):
+            events.append(event)
+        job["events"] = events[-JOB_EVENT_LIMIT:]
         atomic_json(self.records / (job["id"] + ".json"), job)
 
     def refresh_usage(self, job):
@@ -725,8 +738,16 @@ class Handler(BaseHTTPRequestHandler):
                 return self.respond(200, {"jobs": self.server.store.list_jobs()})
             if self.command == "POST" and path == "/diagnostics":
                 from diagnostics import create_bundle
-                self.body()
-                return self.respond(200, {"path": str(create_bundle(self.server.store, RUNTIME))})
+                data = self.body()
+                return self.respond(200, {"path": str(create_bundle(self.server.store, RUNTIME, data.get("startup")))})
+            if self.command == "POST" and path == "/providers/check":
+                from provider_check import check_provider
+                data = self.body()
+                if data.get("confirmed") is not True:
+                    raise ValueError("检查服务会发送一次短请求且可能计费；必须先明确确认。")
+                # Probe only the supplied frozen draft, never a job, saved key or fallback profile.
+                settings = configuration(data, "")
+                return self.respond(200, check_provider(settings, data.get("api_key")))
             if self.command == "POST" and path == "/alignment/validate":
                 from alignment import load_mapping
                 data = self.body()

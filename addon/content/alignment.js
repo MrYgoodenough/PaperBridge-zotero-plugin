@@ -1,5 +1,5 @@
-/** Explicit localization and opt-in bilateral hover of parent-validated request units. */
-/* global Components */
+/** Bilateral localization, independent hover, and explicit native translated-note actions. */
+/* global Components, Zotero, Services, rootURI */
 var FragmentAlignment = class FragmentAlignment {
   // Highlight lifetime is cosmetic, not a page-render readiness deadline.
   static HIGHLIGHT_MS = 2500;
@@ -15,6 +15,8 @@ var FragmentAlignment = class FragmentAlignment {
   static HOVER_PRIORITY = -1;
   // Native font line boxes slightly overhang painted glyph bounds; allow two CSS pixels.
   static TEXT_RECT_TOLERANCE = 2;
+  // Share one lazily loaded native note module across split controllers.
+  static Notes = null;
 
   /** Create one controller per split; loading and hash validation belong to the parent. */
   constructor({ loadMapping } = {}) {
@@ -97,9 +99,9 @@ var FragmentAlignment = class FragmentAlignment {
       Math.max(converted[0], converted[2]), Math.max(converted[1], converted[3])];
   }
 
-  /** Accept PDF content, not native annotation editors, handles, or overlaid controls. */
+  /** Accept PDF content, not links, native annotation layers, or overlaid controls. */
   static contentPage(target) {
-    if (target?.closest?.(".customAnnotationLayer, .annotation-popup, .toolbar, button, input, textarea, [contenteditable]")) return null;
+    if (target?.closest?.("a, [role=link], .annotationLayer, .customAnnotationLayer, .annotation-popup, .toolbar, button, input, textarea, [contenteditable]")) return null;
     return target?.closest?.(".page[data-page-number]") || null;
   }
 
@@ -110,13 +112,18 @@ var FragmentAlignment = class FragmentAlignment {
     this.disposed = false;
     this.mapping = null;
     this.point = null;
+    this.sourcePoint = null;
     this.pending = null;
+    this.pendingIndex = null;
     this.hoverEnabled = false;
     this.hoverPointer = null;
     this.hoverUnit = null;
     this.hoverHighlights = [null, null];
     this.hoverFrameRequest = null;
     this.hoverRepaint = false;
+    this.noteOperation = null;
+    this.noteSelection = null;
+    this.lastNoteResult = null;
     const leftFrame = state.reader?._internalReader?._primaryView?._iframeWindow;
     const rightFrame = state.right?._primaryView?._iframeWindow;
     this.frames = [leftFrame, rightFrame];
@@ -127,7 +134,12 @@ var FragmentAlignment = class FragmentAlignment {
     this.control.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;gap:5px;max-width:330px";
     this.button = doc.createElement("button");
     this.button.textContent = "定位原文片段";
+    this.button.className = "paperbridge-localize-source";
     this.button.style.cssText = "font:inherit;padding:5px 8px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer;white-space:nowrap";
+    this.targetButton = doc.createElement("button");
+    this.targetButton.textContent = "定位译文片段";
+    this.targetButton.className = "paperbridge-localize-target";
+    this.targetButton.style.cssText = this.button.style.cssText;
     this.status = doc.createElement("span");
     this.status.setAttribute("role", "status");
     this.status.setAttribute("aria-live", "polite");
@@ -136,19 +148,48 @@ var FragmentAlignment = class FragmentAlignment {
     this.hoverButton.className = "paperbridge-paragraph-hover-toggle";
     this.hoverButton.setAttribute("aria-label", "原译文段落双向高亮");
     this.hoverButton.style.cssText = this.button.style.cssText;
-    this.control.append(this.button, this.status, this.hoverButton);
+    this.control.append(this.button, this.status, this.targetButton, this.hoverButton);
+    this.selectionNoteButton = doc.createElement("button");
+    this.selectionNoteButton.className = "paperbridge-selection-note";
+    this.selectionNoteButton.textContent = "选区存笔记";
+    this.selectionNoteButton.title = "将译文 PDF 的实际单页选区存为独立 Zotero 笔记。";
+    this.selectionNoteButton.style.cssText = this.button.style.cssText;
+    this.annotationsNoteButton = doc.createElement("button");
+    this.annotationsNoteButton.className = "paperbridge-annotations-note";
+    this.annotationsNoteButton.textContent = "批注汇总笔记";
+    this.annotationsNoteButton.title = "汇总译文附件已保存的原生批注；不修改 PDF 或批注。";
+    this.annotationsNoteButton.style.cssText = this.button.style.cssText;
+    this.noteStatus = doc.createElement("span");
+    this.noteStatus.setAttribute("role", "status");
+    this.noteStatus.setAttribute("aria-live", "polite");
+    this.noteStatus.style.cssText = this.status.style.cssText;
+    this.control.append(this.selectionNoteButton, this.annotationsNoteButton, this.noteStatus);
     const control = this.control;
     state.cleanups.push(() => {
       if (this.control === control) this.dispose();
     });
     this.listen(this.button, "click", () => this.localize());
+    this.listen(this.targetButton, "click", () => this.localize(0));
     this.listen(this.hoverButton, "click", () => this.toggleHover());
+    // Capture before toolbar focus can collapse the real PDF selection; never alter that selection.
+    this.listen(this.selectionNoteButton, "pointerdown", event => {
+      if (event.button === 0 && event.isPrimary !== false) this.captureNoteSelection();
+    });
+    this.listen(this.selectionNoteButton, "keydown", event => {
+      if (event.key === "Enter" || event.key === " ") this.captureNoteSelection();
+    });
+    this.listen(this.selectionNoteButton, "pointercancel", () => { this.noteSelection = null; });
+    this.listen(this.selectionNoteButton, "click", () => this.createNote("selection"));
+    this.listen(this.annotationsNoteButton, "click", () => this.createNote("annotations"));
+    this.selectionNoteButton.disabled = !rightFrame?.document?.getSelection || !state.translated;
+    this.annotationsNoteButton.disabled = !state.translated;
 
     this.pagesAvailable = this.apps.every(app => typeof app?.pdfViewer?.getPageView === "function"
       && typeof app?.eventBus?.on === "function" && typeof app?.eventBus?.off === "function");
     this.hoverAvailable = this.pagesAvailable && this.frames.every(frame =>
       typeof frame.Highlight === "function" && frame.CSS?.highlights);
-    this.localizeAvailable = this.pagesAvailable && typeof this.apps[0].pdfViewer.scrollPageIntoView === "function";
+    this.navigationAvailable = this.apps.map(app => this.pagesAvailable
+      && typeof app.pdfViewer.scrollPageIntoView === "function");
     this.updateHoverButton("正在读取片段映射…");
     if (!this.pagesAvailable) {
       this.setStatus("片段定位接口不可用；仍可正常阅读。", true);
@@ -156,7 +197,9 @@ var FragmentAlignment = class FragmentAlignment {
       return control;
     }
     // Observe before native selection handlers stop bubbling, without cancelling their behavior.
-    this.listen(rightFrame.document, "pointerup", event => this.rememberPoint(event), { capture: true, passive: true });
+    this.frames.forEach((frame, index) => {
+      this.listen(frame.document, "pointerup", event => this.rememberPoint(event, index), { capture: true, passive: true });
+    });
     this.bindPageEvents();
     this.bindHoverEvents();
     if (arguments.length >= 2) {
@@ -193,17 +236,21 @@ var FragmentAlignment = class FragmentAlignment {
           // Release stale native ranges after this layout callback, including pagesdestroy.
           this.scheduleHover(true);
           if (type === "pagerendered") {
-            if (index === 1 && event?.pageNumber !== this.point?.page + 1) return;
-            if (index === 0 && event?.pageNumber !== (this.pending || this.highlightSource)?.page + 1) return;
+            const point = index === 0 ? this.sourcePoint : this.point;
+            const destination = index === this.pendingIndex ? this.pending
+              : index === this.highlightIndex ? this.highlightSide : null;
+            if (event?.pageNumber !== point?.page + 1 && event?.pageNumber !== destination?.page + 1) return;
           }
           this.clearHighlight();
-          if (index === 1) this.point = null;
-          if (index === 0 && type === "pagerendered" && this.pending) {
+          if (index === 0) this.sourcePoint = null;
+          else this.point = null;
+          if (index === this.pendingIndex && type === "pagerendered" && this.pending) {
             this.showHighlight();
-          } else if (index === 0 && type === "pagechanging" && event?.pageNumber === this.pending?.page + 1) {
-            // A navigation-induced page change must not discard the pending source highlight.
+          } else if (index === this.pendingIndex && type === "pagechanging" && event?.pageNumber === this.pending?.page + 1) {
+            // A navigation-induced page change must not discard the pending destination highlight.
           } else {
             this.pending = null;
+            this.pendingIndex = null;
           }
         };
         app.eventBus.on(type, handler);
@@ -217,6 +264,9 @@ var FragmentAlignment = class FragmentAlignment {
     const checked = FragmentAlignment.checkMapping(mapping);
     this.clearHighlight();
     this.pending = null;
+    this.pendingIndex = null;
+    this.point = null;
+    this.sourcePoint = null;
     this.clearHover();
     this.mapping = checked.mapping;
     if (!this.mapping) {
@@ -224,8 +274,9 @@ var FragmentAlignment = class FragmentAlignment {
       this.hoverPointer = null;
     }
     const unavailable = reason || checked.reason;
-    this.setStatus(this.mapping ? (this.localizeAvailable ? "点击译文片段，再按定位按钮。"
-      : "片段定位接口不可用；悬停高亮仍可使用。") : unavailable, !this.mapping);
+    this.setStatus(this.mapping ? (this.navigationAvailable.every(Boolean)
+      ? "点击或拖选片段，再按对应定位按钮。"
+      : "部分片段定位接口不可用；其他可用功能不受影响。") : unavailable, !this.mapping);
     this.updateHoverButton(this.mapping ? "" : unavailable);
     this.scheduleHover();
   }
@@ -233,8 +284,142 @@ var FragmentAlignment = class FragmentAlignment {
   /** Display status without alerts or changes to ordinary reading behavior. */
   setStatus(message, disabled = false) {
     this.status.textContent = message;
-    this.button.disabled = disabled || !this.localizeAvailable;
+    this.button.disabled = disabled || !this.mapping || !this.navigationAvailable[0];
     this.button.title = message;
+    this.targetButton.disabled = disabled || !this.mapping || !this.navigationAvailable[1];
+    this.targetButton.title = message;
+  }
+
+  /** Load only the official native-note adapter when the user requests a note. */
+  noteAPI() {
+    if (!FragmentAlignment.Notes) {
+      const scope = { Zotero };
+      Services.scriptloader.loadSubScript(rootURI + "content/notes.js", scope);
+      if (!scope.PaperBridgeNotes?.createFromSelection || !scope.PaperBridgeNotes?.createFromAnnotations) {
+        throw new Error("原生笔记模块未能加载。");
+      }
+      FragmentAlignment.Notes = scope.PaperBridgeNotes;
+    }
+    return FragmentAlignment.Notes;
+  }
+
+  /** Read only one actual, connected translated text-layer range and its physical page. */
+  selectionForNote() {
+    const selection = this.frames[1]?.document?.getSelection();
+    const text = selection?.toString() || "";
+    if (!text.trim() || selection.isCollapsed || selection.rangeCount !== 1) {
+      throw new Error("请先在译文 PDF 中拖选实际文字。");
+    }
+    const range = selection.getRangeAt(0);
+    const start = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer;
+    const end = range.endContainer.nodeType === 3 ? range.endContainer.parentElement : range.endContainer;
+    const page = FragmentAlignment.contentPage(start);
+    const endPage = FragmentAlignment.contentPage(end);
+    if (!start?.closest?.(".textLayer") || !end?.closest?.(".textLayer") || !page?.isConnected
+      || (page !== endPage && !page.isSameNode?.(endPage))) {
+      throw new Error("笔记需要译文 PDF 内的单页文字选区；跨页选区请分开保存。");
+    }
+    const pageIndex = Number(page.getAttribute("data-page-number")) - 1;
+    if (!Number.isSafeInteger(pageIndex) || pageIndex < 0) throw new Error("无法读取选区的实际译文页码。");
+    return { text, pageIndex, page };
+  }
+
+  /** Retain this explicit button activation's selection, not a hover or guessed fragment. */
+  captureNoteSelection() {
+    if (this.disposed || this.noteOperation) return;
+    try { this.noteSelection = this.selectionForNote(); }
+    catch (error) { this.noteSelection = { error }; }
+  }
+
+  /** Await native persistence and reject visible edits still inside the reader's debounce. */
+  async waitForNoteAnnotations(state) {
+    await state.annotations?.pending;
+    if (state.annotations?.failed) throw new Error("译文批注保存失败，请确认原生批注保存状态后再汇总。");
+    // Existing adapter compatibility boundary: inspect public-source reader state, never write it.
+    const live = state.right?._state?.annotations;
+    if (!live) return;
+    await state.translated.loadDataType("childItems");
+    const items = state.translated.getAnnotations();
+    if (items.length !== live.length) throw new Error("译文批注仍在原生保存，请稍后再汇总。");
+    for (const value of live) {
+      const item = items.find(annotation => annotation.key === value.id);
+      if (!item) throw new Error("译文批注仍在原生保存，请稍后再汇总。");
+      await item.loadAllData();
+      const json = await Zotero.Annotations.toJSON(item);
+      // Compare content relevant to this note, ignoring transient reader image URLs and permissions.
+      const fields = ["type", "text", "comment", "pageLabel", "color", "position"];
+      if (fields.some(field => JSON.stringify(json[field] || "") !== JSON.stringify(value[field] || ""))) {
+        throw new Error("译文批注仍在原生保存，请稍后再汇总。");
+      }
+    }
+  }
+
+  /** Keep save and open outcomes separate; repeated clicks share the complete current action. */
+  createNote(kind) {
+    if (this.disposed) return Promise.resolve(null);
+    if (this.noteOperation) return this.noteOperation;
+    const state = this.state;
+    const control = this.control;
+    let selection = this.noteSelection;
+    this.noteSelection = null;
+    if (kind === "selection" && !selection) {
+      try { selection = this.selectionForNote(); }
+      catch (error) { selection = { error }; }
+    }
+    this.selectionNoteButton.disabled = true;
+    this.annotationsNoteButton.disabled = true;
+    this.noteStatus.textContent = "正在创建独立笔记…";
+    const operation = Promise.resolve().then(async () => {
+      let note;
+      try {
+        if (selection?.error) throw selection.error;
+        if (kind === "annotations") await this.waitForNoteAnnotations(state);
+        if (this.disposed || this.control !== control) return null;
+        const api = this.noteAPI();
+        const args = { translatedAttachment: state.translated, sourceAttachment: state.source };
+        if (kind === "selection") {
+          if (!selection.page.isConnected) throw new Error("译文选区页面已关闭，请重新划选。");
+          let labels;
+          try { labels = await this.apps[1]?.pdfDocument?.getPageLabels?.(); }
+          catch (error) { /* Physical pages remain valid when PDF labels cannot be read. */ }
+          if (this.disposed || this.control !== control) return null;
+          note = await api.createFromSelection({ ...args, text: selection.text, pageIndex: selection.pageIndex,
+            pageLabel: labels?.[selection.pageIndex] || undefined });
+        } else {
+          note = await api.createFromAnnotations(args);
+        }
+      } catch (error) {
+        if (!this.disposed && this.control === control) {
+          const message = error.code === "NOTE_SAVE_FAILED" ? "笔记保存结果未确认：" : "笔记未能创建：";
+          this.noteStatus.textContent = message + (error.message || error);
+        }
+        return { note: null, opened: false, error };
+      }
+      const result = { note, opened: false };
+      if (this.disposed || this.control !== control) return result;
+      this.lastNoteResult = result;
+      this.noteStatus.textContent = "笔记已保存（" + note.key + "）。";
+      try {
+        if (!Zotero.Notes?.open) throw new Error("Zotero 原生笔记打开接口不可用。");
+        await Zotero.Notes.open(note.id, null, { openInWindow: true });
+        result.opened = true;
+      } catch (error) {
+        result.openError = error;
+        if (!this.disposed && this.control === control) {
+          this.noteStatus.textContent = "笔记已保存（" + note.key + "），但打开失败；请在 Zotero 库中打开，勿重复保存：" + (error.message || error);
+        }
+      }
+      return result;
+    }).finally(() => {
+      if (this.control !== control || this.noteOperation !== operation) return;
+      this.noteOperation = null;
+      if (!this.disposed) {
+        this.selectionNoteButton.disabled = !this.frames[1]?.document?.getSelection || !state.translated;
+        this.annotationsNoteButton.disabled = !state.translated;
+      }
+    });
+    this.noteOperation = operation;
+    return operation;
   }
 
   /** Show an independent per-split switch and a nonfatal mapping availability reason. */
@@ -435,56 +620,70 @@ var FragmentAlignment = class FragmentAlignment {
     };
   }
 
-  /** Remember ordinary primary pointer releases without cancelling native selection or links. */
-  rememberPoint(event) {
+  /** Remember either pane's release point; never consume links, selection, or annotations. */
+  rememberPoint(event, index = 1) {
     if (event.button !== 0 || event.isPrimary === false) return;
-    const page = event.target?.closest?.(".page[data-page-number]");
+    // Toolbar releases must retain the PDF hit until the subsequent explicit button click.
+    if (!event.target?.closest?.(".page[data-page-number]")) return;
+    if (index === 0) this.sourcePoint = null;
+    else this.point = null;
+    const page = FragmentAlignment.contentPage(event.target);
     if (!page) return;
-    this.point = null;
+    const label = index === 0 ? "原文" : "译文";
     try {
       const pageIndex = Number(page.getAttribute("data-page-number")) - 1;
       if (!Number.isSafeInteger(pageIndex) || pageIndex < 0) return;
-      const pageView = this.apps[1].pdfViewer.getPageView(pageIndex);
+      const pageView = this.apps[index].pdfViewer.getPageView(pageIndex);
       // Gecko may expose the same DOM node through Xray and waived reader wrappers.
       if (!pageView || (pageView.div !== page && !pageView.div?.isSameNode?.(page))
         || !pageView.viewport?.convertToPdfPoint) return;
       if (pageView.renderingState != null && pageView.renderingState !== FragmentAlignment.RENDERING_FINISHED) {
-        this.setStatus("译文页面仍在渲染，请稍后点击片段。", !this.mapping);
+        this.setStatus(label + "页面仍在渲染，请稍后点击片段。", !this.mapping);
         return;
       }
       const point = FragmentAlignment.pdfPoint(pageView, event.clientX, event.clientY);
-      if (point) this.point = { page: pageIndex, point };
+      if (point) {
+        const remembered = { page: pageIndex, point };
+        if (index === 0) this.sourcePoint = remembered;
+        else this.point = remembered;
+      }
     } catch (error) {
-      this.setStatus("无法读取当前译文页面坐标；仍可正常阅读。", !this.mapping);
+      this.setStatus("无法读取当前" + label + "页面坐标；仍可正常阅读。", !this.mapping);
     }
   }
 
   /** Navigate only after the explicit action resolves exactly one verified rectangle. */
-  localize() {
-    if (this.disposed || !this.mapping || !this.localizeAvailable) return;
+  localize(index = 1) {
+    if (this.disposed || !this.mapping || ![0, 1].includes(index) || !this.navigationAvailable[1 - index]) return;
     this.clearHighlight();
     this.pending = null;
-    if (!this.point) return this.setStatus("请先点击译文 PDF 中的片段。");
-    const hit = FragmentAlignment.hitTest(this.mapping, this.point.page, this.point.point);
-    if (hit.status === "ambiguous") return this.setStatus("此处映射矩形重叠，无法唯一定位原文。");
+    this.pendingIndex = null;
+    const point = index === 0 ? this.sourcePoint : this.point;
+    const label = index === 0 ? "译文" : "原文";
+    if (!point) return this.setStatus("请先点击或拖选" + (index === 0 ? "原文" : "译文") + " PDF 中的片段。");
+    const hit = FragmentAlignment.hitTest(this.mapping, point.page, point.point, index === 0 ? "source" : "target");
+    if (hit.status === "ambiguous") return this.setStatus("此处映射矩形重叠，无法唯一定位" + label + "。");
     if (!hit.unit) return this.setStatus("此处没有已验证的片段映射。");
-    const source = hit.unit.source;
-    const viewer = this.apps[0].pdfViewer;
-    if (source.page >= viewer.pagesCount) return this.setStatus("映射的原文页不存在；仍可正常阅读。");
+    const destinationSide = index === 0 ? hit.unit.target : hit.unit.source;
+    const destinationIndex = 1 - index;
+    const viewer = this.apps[destinationIndex].pdfViewer;
+    if (destinationSide.page >= viewer.pagesCount) return this.setStatus("映射的" + label + "页不存在；仍可正常阅读。");
     try {
       this.guardNavigation();
-      this.pending = source;
+      this.pending = destinationSide;
+      this.pendingIndex = destinationIndex;
       // XYZ accepts PDF-native coordinates, including negative crop-box origins.
-      const destination = { pageNumber: source.page + 1,
-        destArray: [null, { name: "XYZ" }, source.rects[0][0], source.rects[0][3], null],
+      const destination = { pageNumber: destinationSide.page + 1,
+        destArray: [null, { name: "XYZ" }, destinationSide.rects[0][0], destinationSide.rects[0][3], null],
         allowNegativeOffset: true };
       const cloned = typeof Components !== "undefined" && Components.utils?.cloneInto
-        ? Components.utils.cloneInto(destination, this.frames[0]) : destination;
+        ? Components.utils.cloneInto(destination, this.frames[destinationIndex]) : destination;
       viewer.scrollPageIntoView(cloned);
-      this.setStatus("已定位原文片段。");
+      this.setStatus("已定位" + label + "片段。");
       if (this.pending) this.showHighlight();
     } catch (error) {
       this.pending = null;
+      this.pendingIndex = null;
       this.clearHighlight();
       this.setStatus("片段定位失败：" + (error.message || "阅读器接口不可用。"));
     }
@@ -524,45 +723,56 @@ var FragmentAlignment = class FragmentAlignment {
     return overlay;
   }
 
-  /** Paint an explicitly localized source fragment with a separate cosmetic expiration timer. */
+  /** Paint either destination using its own viewport and cosmetic expiration timer. */
   showHighlight() {
     if (!this.pending || this.disposed) return;
     try {
-      const overlay = this.createHighlight(this.pending, 0, "paperbridge-fragment-highlight",
+      const index = this.pendingIndex;
+      const overlay = this.createHighlight(this.pending, index, "paperbridge-fragment-highlight",
         "background:rgba(255,210,0,.28);border:2px solid #e5a900");
       if (!overlay) return;
       this.clearHighlight();
       this.highlight = overlay;
-      this.highlightSource = this.pending;
+      this.highlightSide = this.pending;
+      this.highlightIndex = index;
       this.pending = null;
+      this.pendingIndex = null;
       this.guardNavigation();
-      this.highlightTimer = this.frames[0].setTimeout(() => this.clearHighlight(), FragmentAlignment.HIGHLIGHT_MS);
+      this.highlightTimer = this.frames[index].setTimeout(() => this.clearHighlight(), FragmentAlignment.HIGHLIGHT_MS);
     } catch (error) {
+      const label = this.pendingIndex === 1 || this.highlightIndex === 1 ? "译文" : "原文";
       this.pending = null;
+      this.pendingIndex = null;
       this.clearHighlight();
-      this.setStatus("已定位原文；当前页面无法显示临时高亮。");
+      this.setStatus("已定位" + label + "；当前页面无法显示临时高亮。");
     }
   }
 
   /** Remove the temporary overlay and cancel its cosmetic expiration timer. */
   clearHighlight() {
-    if (this.highlightTimer != null) this.frames[0].clearTimeout(this.highlightTimer);
+    if (this.highlightTimer != null) this.frames[this.highlightIndex].clearTimeout(this.highlightTimer);
     this.highlightTimer = null;
     this.highlight?.remove();
     this.highlight = null;
-    this.highlightSource = null;
+    this.highlightSide = null;
+    this.highlightIndex = null;
   }
 
   /** Release listeners, timers, pending work, and controls on split closure. */
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.noteSelection = null;
+    this.selectionNoteButton.disabled = true;
+    this.annotationsNoteButton.disabled = true;
     this.clearHighlight();
     this.clearHover();
     this.hoverEnabled = false;
     this.hoverPointer = null;
     this.pending = null;
+    this.pendingIndex = null;
     this.point = null;
+    this.sourcePoint = null;
     this.mapping = null;
     for (const remove of this.removers.splice(0)) remove();
     if (this.state.alignmentNavigationUntil === this.navigationUntil) this.state.alignmentNavigationUntil = 0;

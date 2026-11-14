@@ -12,6 +12,8 @@ var BundledRuntime = class {
     this.pending = null;
     this.process = null;
     this.connection = null;
+    // Only fixed startup stages and codes are eligible for diagnostics, never raw output.
+    this.diagnosticEvents = [];
   }
 
   /** Describe the runtime layout and interpreter architecture for this platform. */
@@ -43,6 +45,16 @@ var BundledRuntime = class {
     return this.pending;
   }
 
+  /** Record a small safe startup timeline without extra files or raw exceptions. */
+  diagnosticEvent(stage, code = null) {
+    const stages = ["starting", "unpacking", "selecting_python", "launching", "waiting", "ready", "failed"];
+    const codes = ["startup", "resource", "long_path", "file_busy", "provider", "general"];
+    if (!stages.includes(stage)) return;
+    this.diagnosticEvents.push({ at: new Date().toISOString(), stage, code: codes.includes(code) ? code : null });
+    // Keep several attempts available without collecting an unbounded console history.
+    this.diagnosticEvents = this.diagnosticEvents.slice(-32);
+  }
+
   /** Classify startup failures locally because the backend may not be available. */
   startupError(error) {
     if (error?.paperbridgeStartup) return error;
@@ -58,7 +70,7 @@ var BundledRuntime = class {
       code = "file_busy";
       message = "引擎文件被占用或无法访问。";
       hint = "请检查目录写权限及同步/杀毒软件；关闭占用文件的其他程序后重试。";
-    } else if (/no space left|disk full|out of memory|cannot allocate memory|memoryerror|not enough memory|not enough storage|winerror (?:8|14|112)\b|onnx|tiktoken|font not found|缺少资源|磁盘空间不足|ns_error_file_no_device_space/.test(text)) {
+    } else if (/no space left|disk full|out of memory|cannot allocate memory|memoryerror|not enough memory|not enough storage|winerror (?:8|14|112)\b|onnx|tiktoken|tokenizer|font not found|缺少资源|排版资源|资源缺失|磁盘空间不足|ns_error_file_no_device_space/.test(text)) {
       code = "resource";
       message = "本地资源不足或排版资源不可用。";
       hint = "请检查磁盘空间和可用内存；缺少模型或字体时重新安装完整 XPI，插件不会自动下载资源。";
@@ -68,7 +80,8 @@ var BundledRuntime = class {
       message = "本地引擎启动超时。";
       hint = "请检查可用内存和磁盘、系统对 Python 的启动限制后重试；首次解包可能较慢。";
     }
-    const result = new Error(`${message}\n${hint}\n不影响阅读原文和已有译文。引擎恢复后可在设置中导出脱敏诊断包。`);
+    this.diagnosticEvent("failed", code);
+    const result = new Error(`${message}\n${hint}\n不影响阅读原文和已有译文。设置中仍可导出本地脱敏诊断包。`);
     result.code = code;
     result.hint = hint;
     result.paperbridgeStartup = true;
@@ -153,6 +166,8 @@ var BundledRuntime = class {
 
   /** Start the isolated engine and wait for its loopback service to become ready. */
   async launch() {
+    this.diagnosticEvent("starting");
+    this.diagnosticEvent("unpacking");
     await this.unpack();
     await this.seedCache();
     const runtime = this.state;
@@ -160,6 +175,7 @@ var BundledRuntime = class {
     await IOUtils.makeDirectory(runtime, { ignoreExisting: true });
     await IOUtils.remove(infoPath, { ignoreAbsent: true });
     const { Subprocess } = ChromeUtils.importESModule("resource://gre/modules/Subprocess.sys.mjs");
+    this.diagnosticEvent("selecting_python");
     this.python = await this.selectPython(Subprocess);
     const environment = { PYTHONNOUSERSITE:"1",PYTHONDONTWRITEBYTECODE:"1",PYTHONPATH:null,PYTHONHOME:null,
       PAPERBRIDGE_CACHE_DIR:this.cache,PAPERBRIDGE_STATE_DIR:this.state };
@@ -168,6 +184,7 @@ var BundledRuntime = class {
       environment.LD_LIBRARY_PATH = null;
       environment.LD_PRELOAD = null;
     }
+    this.diagnosticEvent("launching");
     this.process = await Subprocess.call({
       command: this.python,
       arguments: ["-X", "utf8", "-I", "-S", "-B", PathUtils.join(this.home, "backend", "launcher.py"), "server.py", "0", "--parent-pid", String(Services.appinfo.processID)],
@@ -177,6 +194,7 @@ var BundledRuntime = class {
       stderr: "stdout"
     });
     const process = this.process;
+    this.diagnosticEvent("waiting");
     this.output = "";
     // Keep a bounded in-memory tail for classification, never for exports.
     (async () => {
@@ -196,6 +214,7 @@ var BundledRuntime = class {
         const info = JSON.parse(await IOUtils.readUTF8(infoPath));
         const token = (await IOUtils.readUTF8(PathUtils.join(runtime, "token"))).trim();
         this.connection = { port: info.port, token };
+        this.diagnosticEvent("ready");
         return this.connection;
       }
       if (!this.process) throw this.startupError("内置引擎启动失败：" + this.output);

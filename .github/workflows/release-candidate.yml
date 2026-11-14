@@ -1,0 +1,195 @@
+# Manual native runtime candidates only; no release assets, feeds or Zotero acceptance.
+name: Release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_os:
+        description: "Candidate target (Linux this round; Windows is opt-in, no macOS)"
+        type: choice
+        required: true
+        default: linux
+        options:
+          - linux
+          - windows
+          - all
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    name: Native candidate (${{ matrix.target }})
+    runs-on: ${{ matrix.target == 'linux' && 'ubuntu-24.04' || 'windows-2022' }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(inputs.target_os == 'all' && '["linux","windows"]' || format('["{0}"]', inputs.target_os)) }}
+    env:
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONNOUSERSITE: "1"
+      PYTHONUTF8: "1"
+      ORT_DISABLE_TELEMETRY: "1"
+      UV_PROJECT_ENVIRONMENT: ${{ github.workspace }}/.venv
+      UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.tools/python
+      UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+      # Enforce the existing setup.ps1 sync too, without changing either setup script.
+      UV_LOCKED: "true"
+      UV_MANAGED_PYTHON: "true"
+      PB_PLATFORM: ${{ matrix.target == 'linux' && 'linux-x64' || 'windows-x64' }}
+      PB_PYTHON: ${{ matrix.target == 'linux' && '.venv/bin/python' || '.venv/Scripts/python.exe' }}
+      PB_STAGED_PYTHON: ${{ matrix.target == 'linux' && '.cache/package/linux-x64/python/bin/python3.12' || '.cache/package/windows-x64/python/python.exe' }}
+      PB_SITE_PACKAGES: ${{ matrix.target == 'linux' && 'python/lib/python3.12/site-packages' || 'python/Lib/site-packages' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          package-manager-cache: false
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: "3.12"
+          activate-environment: true
+          no-project: true
+          enable-cache: false
+      - name: Linux fonts and existing setup
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y fontconfig fonts-noto-cjk
+          sh scripts/setup.sh
+      - name: Windows fonts and existing setup
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          # This pinned free font is a runner prerequisite; build.py never ships font caches.
+          $font = Join-Path $env:WINDIR "Fonts/NotoSerifSC-VF.ttf"
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/google/fonts/8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5/ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf" -OutFile $font
+          & .\scripts\setup.ps1
+      - name: Check locked engine and source identity
+        run: |
+          git diff --exit-code -- pyproject.toml uv.lock addon/manifest.json backend/server.py
+          "$PB_PYTHON" -I -B - <<'PY'
+          """Require real installed pinned dependencies, not fixture substitutions."""
+          from importlib.metadata import version
+          import sys
+          assert sys.version_info[:2] == (3, 12)
+          assert version("babeldoc") == "0.6.4"
+          assert version("pymupdf") == "1.26.7"
+          PY
+      - name: Full offline contracts (no provider calls)
+        run: '"$PB_PYTHON" -B scripts/check_offline.py --mode full'
+      - name: Stage real native dependencies, layout model and tokenizer
+        run: '"$PB_PYTHON" -B scripts/stage_runtime.py'
+      - name: Isolated staged interpreter and model load
+        run: |
+          "$PB_STAGED_PYTHON" -I -S -B - <<'PY'
+          """Exercise the real stage without host site-packages, network or Zotero."""
+          import hashlib
+          from importlib.metadata import version
+          import json
+          import os
+          from pathlib import Path
+          import socket
+          import sys
+
+          stage = Path.cwd() / ".cache/package" / os.environ["PB_PLATFORM"]
+          assert Path(sys.base_prefix).resolve() == (stage / "python").resolve()
+          sys.path[:0] = [str(stage / os.environ["PB_SITE_PACKAGES"]), str(stage / "backend")]
+          os.environ["TIKTOKEN_CACHE_DIR"] = str(stage / ".cache/babeldoc/tiktoken")
+
+          def no_network(*args, **kwargs):
+              """Missing staged assets must fail, never fall back to downloads."""
+              raise RuntimeError("Network is disabled during the staged runtime check")
+
+          socket.socket.connect = socket.socket.connect_ex = no_network
+          socket.getaddrinfo = no_network
+          import cv2
+          import numpy as np
+          import onnxruntime as ort
+          import pymupdf
+          import tiktoken
+          ort.disable_telemetry_events()
+          from engine import localize_cache
+          localize_cache()
+          from babeldoc.format.pdf import high_level
+
+          for module in (cv2, np, ort, pymupdf, tiktoken, high_level):
+              assert Path(module.__file__).resolve().is_relative_to(stage.resolve())
+          assert version("babeldoc") == "0.6.4" and version("pymupdf") == "1.26.7"
+          assert cv2.cvtColor(np.zeros((2, 2, 3), dtype=np.uint8), cv2.COLOR_BGR2GRAY).shape == (2, 2)
+          model = stage / ".cache/babeldoc/models/doclayout_yolo_docstructbench_imgsz1024.onnx"
+          session = ort.InferenceSession(str(model), providers=["CPUExecutionProvider"])
+          tokenizer = tiktoken.encoding_for_model("gpt-4o")
+          assert tokenizer.encode("PaperBridge offline candidate")
+          with model.open("rb") as stream:
+              model_sha = hashlib.file_digest(stream, "sha256").hexdigest()
+          proof = {
+              "sourceCommit": os.environ["GITHUB_SHA"], "runtime": json.loads((stage / "runtime.json").read_bytes()),
+              "check": "native_imports_and_model_load", "network": "blocked_for_check",
+              "zoteroAcceptance": "not_tested", "translationSemantics": "not_tested",
+              "model": {"path": model.relative_to(stage).as_posix(), "bytes": model.stat().st_size, "sha256": model_sha},
+              "onnxruntime": ort.__version__, "providers": session.get_providers(), "opencv": cv2.__version__,
+              "tokenizerEncoding": tokenizer.name,
+          }
+          Path("dist").mkdir(exist_ok=True)
+          Path("dist/candidate-stage.json").write_text(json.dumps(proof, indent=2) + "\n", encoding="utf-8")
+          PY
+      - name: Build and verify both actual XPIs
+        run: |
+          "$PB_PYTHON" -B - <<'PY'
+          """Save exact package reports; size and license warnings are not size gates."""
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+          version = json.loads(Path("addon/manifest.json").read_bytes())["version"]
+          platform = os.environ["PB_PLATFORM"]
+          lines = [f"## {version} {platform} candidate", "No publication/feed changes or native Zotero acceptance."]
+          for mode in ("bundled", "local"):
+              subprocess.run([sys.executable, "-B", "scripts/build.py", "--python", mode], check=True)
+              suffix = "-local-python" if mode == "local" else ""
+              xpi = Path("dist") / f"paperbridge-{version}-{platform}{suffix}.xpi"
+              report = xpi.with_suffix(".xpi.verification.json")
+              subprocess.run([sys.executable, "-B", "scripts/verify_release.py", "--xpi", str(xpi),
+                              "--sha256", str(xpi.with_suffix(".xpi.sha256")), "--feed",
+                              f"dist/updates/{platform}{suffix}.json", "--report", str(report)], check=True)
+              inventory = json.loads(report.read_bytes())["inventory"]
+              size = inventory["archive"]
+              lines.append(f"- {mode}: {size['bytes']:,} archive / {size['expandedBytes']:,} expanded bytes; "
+                           f"{len(inventory['warnings'])} advisory warnings; license compliance unknown.")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:
+              stream.write("\n".join(lines) + "\n")
+          PY
+      # Separate already-compressed variants, short retention, no large stage/cache upload.
+      - name: Save bundled candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-${{ env.PB_PLATFORM }}-bundled-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            dist/paperbridge-*-${{ env.PB_PLATFORM }}.xpi*
+            dist/updates/${{ env.PB_PLATFORM }}.json
+            dist/candidate-stage.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
+      - name: Save local-Python candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-${{ env.PB_PLATFORM }}-local-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            dist/paperbridge-*-${{ env.PB_PLATFORM }}-local-python.xpi*
+            dist/updates/${{ env.PB_PLATFORM }}-local-python.json
+            dist/candidate-stage.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3

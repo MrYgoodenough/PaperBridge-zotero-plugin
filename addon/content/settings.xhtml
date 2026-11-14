@@ -4,16 +4,18 @@
         xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge 设置" width="650" height="760">
   <html:style>
     :root { color-scheme: light dark; background-color: Canvas; color: CanvasText; }
-    body { font: 15px "Songti SC", "SimSun", serif; box-sizing:border-box; height:100vh; overflow-y:auto; margin:0; padding:24px; background-color: Canvas; color: CanvasText; }
+    body { font: 15px "Songti SC", "SimSun", serif; box-sizing:border-box; width:100%; height:100vh; overflow-y:auto; overflow-x:hidden; margin:0; padding:24px; background-color: Canvas; color: CanvasText; }
     [hidden] { display:none !important; }
     h1 { font-size: 23px; margin: 0 0 6px; } p { color: light-dark(#62666e,#bbb); line-height:1.6; }
     label { display: block; margin: 16px 0 6px; font-weight: 550; }
-    input, select { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #8886; border-radius:6px; background: light-dark(#fff,#333); color:inherit; font:inherit; }
+    input, select { box-sizing: border-box; min-width:0; max-width:100%; width: 100%; padding: 9px 10px; border: 1px solid #8886; border-radius:6px; background: light-dark(#fff,#333); color:inherit; font:inherit; }
     input[type="checkbox"] { width:auto; margin-right:8px; }
     details { margin-top:16px; padding:12px; border:1px solid #8886; border-radius:6px; } summary { cursor:pointer; }
-    .row { display: flex; gap: 14px; } .row > div { flex:1; }
+    .row { display: flex; flex-wrap:wrap; gap: 14px; } .row > div { flex:1; min-width:0; }
     button { padding: 9px 14px; border:1px solid #8886; border-radius:6px; font:inherit; cursor:pointer; }
-    .actions { display:flex; gap:8px; margin-top:22px; } #save { background:#2963d8;color:white;border-color:#2963d8; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; } #save { background:#2963d8;color:white;border-color:#2963d8; }
+    label, p, small { overflow-wrap:anywhere; } button { max-width:100%; }
+    @media (max-width:480px) { body { padding:16px; } }
     #status, #diagnostics-status { white-space:pre-wrap; font-size:13px; } small { display:block; color:light-dark(#666,#aaa);margin-top:6px; }
   </html:style>
   <html:body>
@@ -54,6 +56,7 @@
     <html:small>费用由服务商收取，插件无法核实价格或实际账单；失败或结果未知的请求也可能已收费，重试可能重复计费。</html:small>
     <html:label for="language">目标语言（全局）</html:label>
     <html:select id="language"><html:option value="zh-CN">简体中文</html:option><html:option value="zh-TW">繁體中文</html:option><html:option value="ja">日本語</html:option></html:select>
+    <html:small>本轮仅简体中文有完整交付基线；繁体/日文保留切换接口，对应离线字体与端到端支持尚未实现。</html:small>
     <html:div class="row">
       <html:div><html:label for="pages">页码范围（全局，空白表示全文）</html:label><html:input id="pages" placeholder="例如 1-3,5"/></html:div>
     </html:div>
@@ -62,13 +65,13 @@
     <html:small>本机版需要与系统架构一致的 Python 3.12，留空检测常见位置；第三方依赖随 XPI 提供。</html:small></html:div>
     <html:small>排版依赖随安装包提供，插件不自动下载资源。</html:small>
     <html:small>任务入队时冻结所选配置、密钥、目标语言与页码；之后保存或切换配置不会改变已排队或运行中的任务。</html:small>
-    <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">保存并检查引擎</html:button><html:button id="data">数据目录</html:button><html:button id="close">关闭</html:button></html:div>
-    <html:small>「检查引擎」只检查本地排版引擎，不调用服务商 API，也不验证密钥、模型、余额或兼容性。</html:small>
+    <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">检查本地引擎</html:button><html:button id="service-check">检查服务（短请求）</html:button><html:button id="data">数据目录</html:button><html:button id="close">关闭</html:button></html:div>
+    <html:small>两种检查都不保存设置。引擎检查使用已保存的 Python 配置，不调用服务商；服务检查使用当前配置草稿，确认后仅发送一条公开样例请求（输出上限 512 tokens、无自动重试），可能收费，不验证真实论文语义质量。</html:small>
     <html:p id="status" role="status"/>
     <html:p id="usage"/>
     <html:details id="diagnostics">
       <html:summary>脱敏诊断包</html:summary>
-      <html:small>只导出版本、平台、任务计数与导出安全状态；不含密钥、token、PDF、论文文本、用户绝对路径、原始日志或凭据库。不保存当前设置，不调用服务商，不自动上传。需本地引擎正常启动。</html:small>
+      <html:small>只导出版本、平台、任务计数及固定阶段/错误码事件；不含密钥、token、PDF、论文文本、用户绝对路径、原始日志或凭据库。不保存当前设置，不调用服务商，不自动上传。引擎无法启动时仍可导出仅含插件侧信息的本地 ZIP。</html:small>
       <html:div class="actions"><html:button id="diagnostics-export">一键导出诊断 ZIP</html:button><html:button id="diagnostics-open" hidden="hidden">打开文件位置</html:button></html:div>
       <html:p id="diagnostics-status" role="status"/>
       <html:small id="diagnostics-path" style="overflow-wrap:anywhere;user-select:text"/>

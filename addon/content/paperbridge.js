@@ -15,6 +15,8 @@ var PaperBridge = {
   pref(name) { return Zotero.Prefs.get("extensions.paperbridge." + name, true); },
   /** Store one non-secret addon preference. */
   setPref(name, value) { Zotero.Prefs.set("extensions.paperbridge." + name, value, true); },
+  /** Ask for explicit consent before a settings action can contact a provider. */
+  confirm(message) { return Services.prompt.confirm(Zotero.getMainWindow(), "PaperBridge", message); },
   /** Initialize durable tasks and register Zotero UI entry points. */
   async start(id) {
     this.id = id;
@@ -181,6 +183,24 @@ var PaperBridge = {
     this.runtime.file(this.runtime.base).launch();
   },
 
+  /** Export safe diagnostics locally when the authenticated bridge is unavailable. */
+  async exportDiagnostics() {
+    if (!this.LocalDiagnostics) {
+      const scope = { Zotero, Services, Cc, Ci, IOUtils, PathUtils };
+      Services.scriptloader.loadSubScript(rootURI + "content/diagnostics.js", scope);
+      this.LocalDiagnostics = scope.LocalDiagnostics;
+    }
+    try {
+      const result = await this.request("/diagnostics", "POST", {
+        startup: this.LocalDiagnostics.startup(this.runtime.diagnosticEvents)
+      });
+      return { ...result, source: "bridge" };
+    } catch (_) {
+      // The fallback exports no exception text and never resubmits a translation.
+      return this.LocalDiagnostics.create(this.runtime, this.library.records);
+    }
+  },
+
   /** Read a profile's credential only from Zotero's login manager. */
   getKey(profile = this.pref("profile") || "deepseek") {
     const realm = profile === "compatible" ? "OpenAI-compatible" : "DeepSeek";
@@ -191,8 +211,18 @@ var PaperBridge = {
   async saveKey(key, profile = this.pref("profile") || "deepseek") {
     const realm = profile === "compatible" ? "OpenAI-compatible" : "DeepSeek";
     const old = Services.logins.findLogins("chrome://paperbridge", null, realm);
-    for (const login of old) Services.logins.removeLogin(login);
-    if (!key) return;
+    if (!key) {
+      // Clearing is explicit; replacement must never erase the previous value first.
+      for (const login of old) Services.logins.removeLogin(login);
+      return;
+    }
+    if (old.length) {
+      const changed = old[0].clone();
+      changed.password = key;
+      // The native update preserves the old login if validation or persistence fails.
+      Services.logins.modifyLogin(old[0], changed);
+      return;
+    }
     const login = Cc["@mozilla.org/login-manager/loginInfo;1"].createInstance(Ci.nsILoginInfo);
     login.init("chrome://paperbridge", null, realm, "api-key", key, "", "");
     await Services.logins.addLoginAsync(login);

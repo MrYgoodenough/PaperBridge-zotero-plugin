@@ -1,5 +1,6 @@
 """Restore original protected vectors and reliable links in the final PDF writeout."""
 import json
+import re
 from pathlib import Path
 
 import pymupdf
@@ -10,6 +11,60 @@ PROTECTED = {"figure", "table", "isolate_formula", "isolated_formula", "formula"
 LINK_COORDINATE_TOLERANCE = 0.01
 # Cover detector edges when redacting and restoring original vectors.
 REGION_PADDING = (-1, -1, 1, 1)
+# Email-backed author/affiliation blocks are bibliographic metadata, not body prose.
+AUTHOR_EMAIL = re.compile(r"[\w.+-]+@[\w.-]+\.[a-z]{2,}", re.I)
+# Older TeX PDFs extract the copyright glyph as a c with a combining circle.
+COPYRIGHT_NOTICE = re.compile(r"^(?:©|c\u20dd|copyright)\s*(?:©\s*)?\d{4}\b", re.I)
+# Limit the author detector to the paper's opening pages and an explicit abstract.
+AUTHOR_PAGE_LIMIT = 2
+# Long bold prose cannot be interpreted as an author name.
+AUTHOR_NAME_LIMIT = 80
+# PyMuPDF font flags identify the original bold names and italic affiliations.
+BOLD_FLAG = 16
+# Italic affiliation lines provide the second independent author-block signal.
+ITALIC_FLAG = 2
+# Legal notices are preserved only in the footer, never inside a body example.
+COPYRIGHT_FOOTER_START = 0.80
+
+
+def metadata_regions(document):
+    """Identify narrow legal notices and email-backed author metadata, leaving body text translatable."""
+    result = {}
+    for index, page in enumerate(document):
+        # Optional metadata protection must not guess across rotated/cropped coordinate systems.
+        if page.rotation or page.cropbox != page.mediabox:
+            continue
+        lines = [line for block in page.get_text("dict")["blocks"] for line in block.get("lines", [])
+                 if line.get("spans")]
+        text = {id(line): "".join(span["text"] for span in line["spans"]).strip() for line in lines}
+        boxes = [tuple(line["bbox"]) for line in lines
+                 if line["bbox"][1] >= page.rect.height * COPYRIGHT_FOOTER_START
+                 and COPYRIGHT_NOTICE.match(text[id(line)])]
+        abstracts = [line["bbox"][1] for line in lines if text[id(line)].casefold() == "abstract"]
+        if index < AUTHOR_PAGE_LIMIT and abstracts:
+            front = [line for line in lines if line["bbox"][3] < min(abstracts)]
+            emails = [line for line in front if AUTHOR_EMAIL.search(text[id(line)])]
+            names = [line for line in front if len(text[id(line)]) <= AUTHOR_NAME_LIMIT
+                     and "@" not in text[id(line)] and any(span["flags"] & BOLD_FLAG for span in line["spans"])
+                     and any(line["bbox"][2] <= email["bbox"][0]
+                             and line["bbox"][1] < email["bbox"][3]
+                             and email["bbox"][1] < line["bbox"][3] for email in emails)]
+            if names:
+                start = min(line["bbox"][1] for line in names)
+                affiliations = [line for line in front if line["bbox"][1] >= start
+                                and all(span["flags"] & ITALIC_FLAG for span in line["spans"] if span["text"].strip())]
+                members = [*names, *emails, *affiliations]
+                if affiliations:
+                    rectangle = pymupdf.Rect(members[0]["bbox"])
+                    for line in members[1:]:
+                        rectangle |= pymupdf.Rect(line["bbox"])
+                    # Ambiguous intervening prose is not protected merely because an email exists.
+                    intervening = [line for line in front if pymupdf.Rect(line["bbox"]).intersects(rectangle)]
+                    if all(any(line is member for member in members) for line in intervening):
+                        boxes.append(tuple(rectangle))
+        if boxes:
+            result[index] = boxes
+    return result
 
 
 def regions_from_layout(layout):
@@ -34,13 +89,15 @@ def exclude_protected_characters(page, height, boxes):
 class ProtectedLayoutModel:
     """Record every translated page, including pages with no protected regions."""
 
-    def __init__(self, model, references=None):
+    def __init__(self, model, references=None, metadata=None):
         """Wrap the detector and collect regions needed for final restoration."""
         self.model = model
         self.regions = {}
         self.excluded_characters = 0
         self.references = references or {}
         self.excluded_reference_characters = 0
+        self.metadata = metadata or {}
+        self.excluded_metadata_characters = 0
 
     @property
     def stride(self):
@@ -53,7 +110,10 @@ class ProtectedLayoutModel:
             reference_boxes = self.references.get(page.page_number,[])
             self.excluded_reference_characters += exclude_protected_characters(
                 page,document[page.page_number].mediabox.height,reference_boxes)
-            self.regions[page.page_number] = [*regions_from_layout(layout),*reference_boxes]
+            metadata_boxes = self.metadata.get(page.page_number, [])
+            self.excluded_metadata_characters += exclude_protected_characters(
+                page, document[page.page_number].mediabox.height, metadata_boxes)
+            self.regions[page.page_number] = [*regions_from_layout(layout), *reference_boxes, *metadata_boxes]
             self.excluded_characters += exclude_protected_characters(
                 page, document[page.page_number].mediabox.height, self.regions[page.page_number])
             yield page, layout

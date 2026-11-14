@@ -10,7 +10,7 @@ from urllib.parse import urlsplit, urlunsplit
 # Translation instructions are shared by document and paragraph cache identities.
 PROMPT_VERSION = "paperbridge-compact-v1"
 # Result evidence changes invalidate full PDFs, not valid paragraph translations.
-ENGINE_VERSION = "babeldoc-0.6.4-protected-v4-no-references"
+ENGINE_VERSION = "babeldoc-0.6.4-protected-v5-metadata"
 # Separate evidence-bearing results from legacy PDF-only jobs.
 QUALITY_VERSION = 1
 # Preserve the existing provider and request limits unless explicitly configured.
@@ -74,7 +74,7 @@ def normalize_config(request):
 
 def document_identity(content, request):
     """Return fingerprint and document_key SHA-256 strings using canonical nonsecret settings."""
-    settings = {**normalize_config(request), "prompt": PROMPT_VERSION, "font": "songti-sc-v1",
+    settings = {**normalize_config(request), "prompt": PROMPT_VERSION, "font": "songti-sc-v2-unicode",
                 "engine": ENGINE_VERSION, "quality_version": QUALITY_VERSION}
     return {"fingerprint": hashlib.sha256(content + json.dumps(settings, sort_keys=True).encode()).hexdigest(),
             "document_key": hashlib.sha256(content).hexdigest()}

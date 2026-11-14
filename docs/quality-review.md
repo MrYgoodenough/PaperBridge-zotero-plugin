@@ -1,10 +1,11 @@
+<!-- Offline compatibility checks, real-paper provenance, and explicit review limits. -->
 # Offline CI and fixed-paper quality review
 
 This entry point separates reproducible PDF structure checks from explicitly recorded human semantic and visual review. It never translates, contacts a provider, loads credentials, or invents scores.
 
 ## Lightweight CI
 
-`.github/workflows/ci.yml` is configured to run one Linux job with the locked Python 3.12 project environment and Node 22. Dependency installation requires network access; the checks themselves need no external services:
+`.github/workflows/ci.yml` runs a Linux/Windows/macOS lightweight matrix with Python 3.12 and Node 22. It installs only pytest, PyMuPDF and httpx; dependency installation requires network access, but the checks need no external services:
 
 - `pytest tests`, with external plugin autoload and inherited pytest options disabled;
 - all built-in Node suites matching `tests/test_*.cjs`, including annotation logic, not native UI acceptance;
@@ -13,7 +14,7 @@ This entry point separates reproducible PDF structure checks from explicitly rec
 
 It does not stage a complete runtime, launch Zotero, use real API keys, call paid APIs, impose a package-size hard gate, or run a three-platform GUI matrix. A missing optional reference PDF remains an explicit pytest skip. New Python tests under `tests/` and Node suites matching `tests/test_*.cjs` are collected automatically by `scripts/check_offline.py`.
 
-The workflow is configured but **has not run on GitHub for this implementation**. Local test results do not establish a GitHub CI pass, native acceptance or publication.
+The 0.3.4 source baseline passed [GitHub run 43636036885](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43636036885) on all three runners. Each newer source revision still needs its own run; this is not native acceptance or publication.
 
 The runner removes inherited Python/native-library paths and common credential environment variables from child processes. Its pytest socket guard blocks external DNS/TCP and permits only local service connections. This is an accidental-network-call guard, **not an OS sandbox**; it does not constrain arbitrary subprocesses. Existing subprocess tests use local fixtures. Standalone integration/translation scripts in `tests/` are not executed by pytest collection.
 
@@ -115,10 +116,18 @@ The separately authorized run translated **exactly sklearn page 2 and LIBLINEAR 
 
 All four actual provider calls returned `deepseek-flash`; SDK retries, paid reruns, API probes and local paragraph-cache hits were zero. Usage is fully reported (2,295 input / 1,693 output total; no cached input); no monetary cost was estimated. Eight unselected pages passed exact text and 144-dpi pixel preservation checks. New Chinese fonts are embedded; original unembedded Base-14 fonts remain a structural warning. Font/embed acceptance and native copy/search behavior remain pending, not a font-quality pass.
 
-The inspected Chinese prose is readable and the selected terminology/numeric qualifications were recognizable, **not human-accepted**. Actual layout issues remain: sklearn's second affiliation wraps inside “sur Yvette”; LIBLINEAR's copyright glyph separates into `c○`. Extracted compatibility ideographs/nonbreaking hyphens also need copying/search review. Both PDFs contain zero link annotations, so target-preservation passes are empty-target comparisons, not proof of clickable URLs. Both reports remain `needs_review` / `not_accepted`, with semantic and visual human verdicts `not_evaluated`; native copy/search and human bilingual/layout acceptance remain pending. Translated display math/tables and broader corpus evaluation remain separate checks. No public PDFs or diagnostic ZIPs are published by this run.
+The historical prose was readable in assistant spot inspection, **not human-accepted**. These outputs had affiliation wrapping inside “sur Yvette”, lost author styling and copyright reconstruction as `c○`; see the 0.3.5 repair below. The historical review records remain `needs_review` / `not_accepted` and are not rewritten. Both PDFs contain zero link annotations, so an empty-target comparison proves no clickable-link behavior. Translated display math/tables and wider human bilingual review remain separate work; these QA PDFs are not release assets.
+
+## 0.3.5 source-vector repair and cache-only replay
+
+`preserve.metadata_regions()` recognizes only an email/bold-name/italic-affiliation block before an explicit abstract on opening pages, and a year-bearing copyright notice in the footer. Ambiguous layouts are left to the normal pipeline. Recognized bibliographic metadata is kept in its **original language and vector fonts**; titles, abstracts and body prose are not blanket-protected. The existing exclusion/restoration path performs the repair, without a separate PDF rewrite implementation.
+
+Two selected pages were reapplied through `engine.translate` using an isolated copy of the existing paragraph cache: **19 cache hits, zero misses, zero provider/HTTP/DNS attempts**, with historical inputs unchanged. Both new structural ledgers are `complete`; this means all considered paragraphs were applied or intentionally protected, **not semantic acceptance**. The two author blocks and LIBLINEAR copyright have exact source text and 144-dpi pixels. All eight unselected pages retain exact text and pixels. Full-page and detail PNGs were visually inspected by the assistant.
+
+The full-PDF identity is now `babeldoc-0.6.4-protected-v5-metadata`; paragraph identity is unchanged so valid old translations remain reusable. Existing PDFs and old job directories are preserved, not silently rewritten. Native copy/search and upgrade evidence must refer to the exact new XPI; broader formulas/tables and genuine human review remain open.
 
 ## Offline synthetic links versus native acceptance
 
 The separate two-page synthetic link pipeline exercises success and lost-response simulation with **zero actual network/provider calls**. Its simulated responses/usage are not paid-corpus evidence. PDF link preservation in that pipeline does not establish clickable-link behavior in Zotero, and the real papers above have no link annotations to exercise it.
 
-Final Linux Zotero 10.0.8 evidence is indexed in `.runtime/p0-p1-native-verification.json`, tied to the actual installed XPI hashes for bundled/local Python. Each variant passed 21 annotation-create/close/delete and 8 process-restart/standalone-reader checks, plus the native manual-upgrade, task/settings and reader smoke checks. Both selected real pages rendered selectable Chinese. A trusted click on the synthetic pipeline's decoded native internal-link hotspot navigated from page 2 to page 1; this accepts that page-level link behavior, not precise body alignment or the real papers' empty link comparisons. All final processes exited 0 and their databases passed integrity checks. Windows native access is blocked by SSH; no new macOS native acceptance or package replacement is claimed. See [release verification](releasing.md) for local consistency and publication boundaries, independently of human quality review.
+Historical Linux Zotero 10.0.8 evidence in `.runtime/p0-p1-native-verification.json` covers the earlier annotation, restart, settings and synthetic internal-link smoke checks. Later 0.3.4 Linux/Windows scope is recorded in [nonmac verification](nonmac-verification-2026-11-15.json); neither record certifies a newer XPI. The 0.3.5 task does not perform Windows/macOS native acceptance. See [release verification](releasing.md) for candidate-build, publication and native-test boundaries, independently of human quality review.

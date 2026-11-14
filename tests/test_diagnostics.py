@@ -47,7 +47,8 @@ def test_private_data_not_exported_or_read(tmp_path, monkeypatch):
     # A directory scan would fail even if its contents were later filtered out.
     monkeypatch.setattr(diagnostics.Path, "iterdir", lambda self: pytest.fail("must not scan state"))
     payload = read_bundle(diagnostics.create_bundle(jobs, state))
-    assert set(payload) == {"schema_version", "versions", "platform", "tasks", "safety"}
+    assert set(payload) == {"schema_version", "versions", "platform", "tasks", "events", "runtime_status", "safety"}
+    assert payload["schema_version"] == 2
     assert set(payload["versions"]) == {"paperbridge", "python", "babeldoc", "pymupdf"}
     assert payload["tasks"]["total"] == 3
     assert payload["tasks"]["states"]["failed"] == 1
@@ -144,3 +145,23 @@ def test_explicit_warning_count_without_warning_text(tmp_path):
     assert "private" not in json.dumps(payload)
     invalid = read_bundle(diagnostics.create_bundle({"jobs": [], "warning_count": "private-path"}, tmp_path))
     assert invalid["safety"]["warning_count"] is None
+
+
+def test_anonymous_timeline_allowlist(tmp_path):
+    """Keep useful transitions while rejecting identifiers and raw diagnostic fields."""
+    at = "2026-11-15T01:02:03.456Z"
+    private = "sk-secret /home/private/paper.pdf 论文正文"
+    event = {"at": at, "state": "failed", "phase": "typesetting", "code": "resource", "attempt": 2,
+             "error": private, "job_id": private, "stage": private}
+    startup = [{"at": at, "stage": "failed", "code": "resource", "error": private},
+               {"at": private, "stage": "failed"}, {"at": at, "stage": private}]
+    jobs = [{"id": private, "state": "failed", "events": [event, {"at": at, "state": private}]}]
+    payload = read_bundle(diagnostics.create_bundle(jobs, tmp_path, startup))
+    assert payload["events"]["startup"] == [{"at": at, "stage": "failed", "code": "resource"}]
+    assert payload["events"]["jobs"] == [{"task": 1, "events": [
+        {"at": at, "state": "failed", "phase": "typesetting", "code": "resource", "attempt": 2}]}]
+    assert payload["runtime_status"] == {"engine_ready": True, "export_source": "backend"}
+    assert private not in json.dumps(payload, ensure_ascii=False)
+    # Older records without events stay readable; absence is not fabricated history.
+    assert read_bundle(diagnostics.create_bundle([{"state": "done"}], tmp_path))["events"]["jobs"] == [
+        {"task": 1, "events": []}]

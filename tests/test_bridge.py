@@ -274,7 +274,9 @@ def test_authenticated_local_recovery_and_diagnostics(store, tmp_path, monkeypat
             result = json.load(response)
             assert result["state"] == "done" and result["recovered_locally"]
         assert not store.processes
-        with post("/diagnostics") as response:
+        startup = [{"at": "2026-11-15T01:02:03.456Z", "stage": "ready", "code": None,
+                    "private": "secret-fixture"}]
+        with post("/diagnostics", data=json.dumps({"startup": startup}).encode()) as response:
             bundle = Path(json.load(response)["path"])
         assert bundle.parent == bridge.RUNTIME / "diagnostics"
         with zipfile.ZipFile(bundle) as archive:
@@ -283,15 +285,57 @@ def test_authenticated_local_recovery_and_diagnostics(store, tmp_path, monkeypat
             assert "secret-fixture" not in evidence and "test-token" not in evidence
             assert job["id"] not in evidence and str(tmp_path) not in evidence
             assert "private record path" not in evidence
+            payload = json.loads(evidence)
+            assert payload["schema_version"] == 2
+            assert payload["events"]["startup"] == [{"at": startup[0]["at"], "stage": "ready", "code": None}]
         with pytest.raises(urllib.error.HTTPError) as error:
             post("/diagnostics", data=b"[]")
         assert error.value.code == 400
         guidance = json.load(error.value)
         assert guidance["code"] and guidance["hint"] and guidance["error"]
+        import provider_check
+        checks = []
+
+        def check_draft(settings, credential):
+            """Replace only SDK dispatch while exercising authentication and draft validation."""
+            checks.append((settings, credential))
+            return {"ok": True, "request_invocations": 1, "billing": "unknown"}
+
+        monkeypatch.setattr(provider_check, "check_provider", check_draft)
+        draft = {"profile": "compatible", "base_url": "https://unused.invalid/v1", "model": "draft-model",
+                 "lang_out": "zh-CN", "api_key": "fixture-only-key", "confirmed": False}
+        with pytest.raises(urllib.error.HTTPError) as error:
+            post("/providers/check", data=json.dumps(draft).encode())
+        assert error.value.code == 400 and checks == []
+        draft["confirmed"] = True
+        with post("/providers/check", data=json.dumps(draft).encode()) as response:
+            assert json.load(response)["request_invocations"] == 1
+        assert len(checks) == 1 and checks[0][0]["model"] == "draft-model"
+        assert checks[0][1] == "fixture-only-key" and len(store.jobs) == 1
     finally:
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
+
+
+def test_job_timeline_records_transitions_not_percentages(store, tmp_path):
+    """Keep a short restartable timeline without duplicating percentage updates or raw errors."""
+    job = store.jobs[store.submit(request(tmp_path))["id"]]
+    assert len(job["events"]) == 1 and job["events"][0]["state"] == "queued"
+    job["progress"] = 12
+    store.persist(job)
+    assert len(job["events"]) == 1
+    job.update(state="running", phase="translating")
+    store.persist(job)
+    job.update(state="failed", error="tokenizer resource missing secret-fixture")
+    store.persist(job)
+    assert job["events"][-1]["code"] == "resource"
+    assert "secret-fixture" not in json.dumps(job["events"])
+    for number in range(bridge.JOB_EVENT_LIMIT + 2):
+        job["phase"] = "translating" if number % 2 else "typesetting"
+        store.persist(job)
+    assert len(job["events"]) == bridge.JOB_EVENT_LIMIT
+    assert bridge.read_json(store.records / (job["id"] + ".json"))["events"] == job["events"]
 
 
 @pytest.mark.parametrize("state", ["queued", "running", "cancelling"])

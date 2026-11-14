@@ -1,4 +1,4 @@
-/** Mock-only geometry, explicit DOM localization, native CSS hover, and cleanup contracts. */
+/** Mock-only bilateral localization, CSS hover, translated-note actions, and cleanup contracts. */
 // Built-in modules keep this frontend suite independent of Zotero and new dependencies.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -7,6 +7,8 @@ const vm = require('node:vm');
 const test = require('node:test');
 // Resolve from this file so the suite also runs outside the repository root.
 const moduleSource = fs.readFileSync(path.join(__dirname, '../addon/content/alignment.js'), 'utf8');
+// Check the native harness refusal path without running an actual Zotero profile.
+const nativeHarnessSource = fs.readFileSync(path.join(__dirname, 'alignment_packaged.js'), 'utf8');
 
 /** Implement only DOM/event-bus registration used by the module. */
 class Events {
@@ -270,7 +272,7 @@ function mapping() {
 /** Build a split using only reader APIs already used by PaperBridge. */
 function fixture(options = {}) {
   const clones = [];
-  const context = vm.createContext({ Components: { utils: {
+  const context = vm.createContext({ ...options.globals, Components: { utils: {
     /** Simulate cross-compartment cloning and record the intended source frame. */
     cloneInto(value, frame) {
       clones.push({ value, frame });
@@ -295,6 +297,7 @@ function fixture(options = {}) {
   const timers = new Map();
   let timerId = 0;
   const destinations = [];
+  const targetDestinations = [];
   const leftBus = new Events();
   const rightBus = new Events();
   const leftViewer = {
@@ -314,6 +317,12 @@ function fixture(options = {}) {
     container: rightDoc.createElement('div'),
     /** Return only the translated page. */
     getPageView(index) { return index === 0 ? rightPage : undefined; },
+    /** Observe translated navigation through the same native API as the original pane. */
+    scrollPageIntoView(destination) {
+      if (options.targetNavigationError) throw new Error('mock target navigation failure');
+      targetDestinations.push(destination);
+      rightBus.emit('pagechanging', { pageNumber: destination.pageNumber });
+    },
   };
   const leftFrame = Object.assign(new Events(), { document: leftDoc, PDFViewerApplication: { pdfViewer: leftViewer, eventBus: leftBus },
     Highlight, CSS: { highlights: new Map() },
@@ -323,7 +332,12 @@ function fixture(options = {}) {
     clearTimeout(id) { timers.delete(id); },
   });
   const rightFrame = Object.assign(new Events(), { document: rightDoc, PDFViewerApplication: { pdfViewer: rightViewer, eventBus: rightBus },
-    Highlight, CSS: { highlights: new Map() } });
+    Highlight, CSS: { highlights: new Map() },
+    /** Keep destination-pane highlight timers deterministic too. */
+    setTimeout(callback, ms) { timers.set(++timerId, { callback, ms }); return timerId; },
+    /** Cancel a translated-pane visual timer. */
+    clearTimeout(id) { timers.delete(id); },
+  });
   // RAF stays opt-in so existing cases retain the immediate mock-only fallback.
   let animationFrames = null;
   if (options.animationFrames) {
@@ -354,18 +368,24 @@ function fixture(options = {}) {
   const controller = new Alignment(options);
   return { Alignment, controller, state, leftPage, rightPage, leftViewport, rightViewport,
     leftDoc, rightDoc, leftBus, rightBus, timers, destinations, clones, leftFrame, rightFrame, leftViewer, rightViewer,
-    animationFrames, nativeText };
+    animationFrames, nativeText, targetDestinations };
 }
 
-/** Release inside the translated rectangle using CSS coordinates, not assumed page heights. */
-function pointer(f, eventOverrides = {}) {
-  // Target PDF point (20, 30) becomes viewport point (60, 45), then receives CSS border scaling.
+/** Release either pane's fragment using its current viewport and CSS border scaling. */
+function pointer(f, eventOverrides = {}, side = 'target') {
+  const pageView = side === 'source' ? f.leftPage : f.rightPage;
+  const doc = side === 'source' ? f.leftDoc : f.rightDoc;
+  const point = side === 'source' ? [-5, 50] : [20, 30];
+  const [x, y] = pageView.viewport.convertToViewportPoint(...point);
+  const div = pageView.div;
+  const box = div.getBoundingClientRect();
   let prevented = false;
-  const event = { target: f.rightPage.div, button: 0, isPrimary: true,
-    clientX: 100 + (60 + 5) * 1.5, clientY: 200 + (45 + 5) * 1.5,
+  const event = { target: div, button: 0, isPrimary: true,
+    clientX: box.left + (x * div.clientWidth / pageView.viewport.width + div.clientLeft) * box.width / div.offsetWidth,
+    clientY: box.top + (y * div.clientHeight / pageView.viewport.height + div.clientTop) * box.height / div.offsetHeight,
     /** Detect accidental cancellation of native selection or links. */
     preventDefault() { prevented = true; }, ...eventOverrides };
-  f.rightDoc.emit('pointerup', event);
+  doc.emit('pointerup', event);
   return prevented;
 }
 
@@ -447,6 +467,281 @@ test('schema checks reject malformed contracts without validating files or hash 
   assert.equal(Alignment.checkMapping({ ...mapping(), units: [] }).mapping, null);
 });
 
+/** Supply only the native APIs used by the note UI, retaining the actual controller. */
+function noteFixture() {
+  const calls = { loaded: [], selected: [], annotations: [], opened: [] };
+  const hooks = {};
+  const note = { id: 300, key: 'NOTE0001' };
+  const api = {
+    /** Capture exactly what the real selection controller passes to notes.js. */
+    async createFromSelection(args) {
+      calls.selected.push(args);
+      if (hooks.save) await hooks.save();
+      return note;
+    },
+    /** Record the attachment-only native summary request. */
+    async createFromAnnotations(args) {
+      calls.annotations.push(args);
+      if (hooks.save) await hooks.save();
+      return note;
+    }
+  };
+  const globals = { rootURI: 'chrome://test-addon/',
+    Zotero: {
+      Notes: {
+        /** Observe the official native window-opening contract separately from saving. */
+        async open(id, location, options) {
+          calls.opened.push({ id, location, options });
+          if (hooks.open) await hooks.open();
+        }
+      },
+      Annotations: {
+        /** Return the persisted native text/position used by the debounce check. */
+        async toJSON(item) { return item.json; }
+      }
+    },
+    Services: { scriptloader: {
+      /** Model lazy script loading without registering UI or starting Zotero. */
+      loadSubScript(url, scope) {
+        calls.loaded.push(url);
+        if (hooks.load) hooks.load();
+        scope.PaperBridgeNotes = api;
+      }
+    } }
+  };
+  const f = fixture({ globals });
+  const persisted = [];
+  f.state.source = { id: 20, key: 'SOURCE01' };
+  f.state.translated = { id: 21, key: 'TRANS001',
+    /** Model public child-data loading without persistence. */
+    async loadDataType() {},
+    /** Read only persisted annotation items. */
+    getAnnotations() { return persisted; }
+  };
+  Object.assign(f.rightDoc.selection, { isCollapsed: false,
+    /** Native selection supplies actual text, independent of mapping contents. */
+    toString() { return 'Actual <translated> selection & punctuation.'; },
+    /** Expose the actual selected text layer's range boundaries. */
+    getRangeAt() { return { startContainer: f.nativeText.target.first, endContainer: f.nativeText.target.second }; }
+  });
+  f.rightFrame.PDFViewerApplication.pdfDocument = {
+    /** Page labels are the native PDF labels, not the viewer's current page guess. */
+    async getPageLabels() { return ['iv']; }
+  };
+  f.controller.attach(f.state, null, 'No mapping');
+  return { ...f, calls, hooks, note, persisted, globals };
+}
+
+/** Read the translated selection before toolbar focus, regardless of mapping availability. */
+test('note UI lazily uses actual translated selection/page labels without changing bilateral localization', async () => {
+  const f = noteFixture();
+  const originalStatus = f.controller.status.textContent;
+  assert.equal(f.calls.loaded.length, 0);
+  assert.equal(f.controller.selectionNoteButton.disabled, false);
+  f.controller.selectionNoteButton.emit('pointerdown', { button: 0 });
+  f.rightDoc.selection.isCollapsed = true;
+  const result = await f.controller.createNote('selection');
+  assert.equal(result.note, f.note);
+  assert.equal(result.opened, true);
+  assert.deepEqual(f.calls.loaded, ['chrome://test-addon/content/notes.js']);
+  assert.equal(f.calls.selected[0].text, 'Actual <translated> selection & punctuation.');
+  assert.equal(f.calls.selected[0].pageIndex, 0);
+  assert.equal(f.calls.selected[0].pageLabel, 'iv');
+  assert.equal(f.calls.selected[0].translatedAttachment, f.state.translated);
+  assert.equal(f.calls.selected[0].sourceAttachment, f.state.source);
+  assert.deepEqual(JSON.parse(JSON.stringify(f.calls.opened)), [{ id: 300, location: null, options: { openInWindow: true } }]);
+  assert.equal(f.controller.status.textContent, originalStatus);
+  assert.deepEqual(f.destinations, []);
+  assert.deepEqual(f.targetDestinations, []);
+  close(f);
+});
+
+/** Saving and opening share one disabled action, and opening failure never repeats the save. */
+test('continuous note clicks share the pending action and preserve save success on native open failure', async () => {
+  const f = noteFixture();
+  let resolveSave;
+  f.hooks.save = () => new Promise(resolve => { resolveSave = resolve; });
+  f.hooks.open = async () => { throw new Error('Native window failed'); };
+  const first = f.controller.createNote('selection');
+  assert.equal(f.controller.selectionNoteButton.disabled, true);
+  assert.equal(f.controller.annotationsNoteButton.disabled, true);
+  assert.equal(f.controller.createNote('selection'), first);
+  assert.equal(f.controller.createNote('annotations'), first);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.calls.selected.length, 1);
+  resolveSave();
+  const result = await first;
+  assert.equal(result.note, f.note);
+  assert.equal(result.opened, false);
+  assert.match(f.controller.noteStatus.textContent, /已保存.*打开失败.*勿重复保存/);
+  assert.equal(f.calls.opened.length, 1);
+  assert.equal(f.calls.annotations.length, 0);
+  assert.equal(f.controller.selectionNoteButton.disabled, false);
+  close(f);
+});
+
+/** No source-only, collapsed, multi-range, non-PDF, or cross-page selection is silently accepted. */
+test('invalid real-selection boundaries fail only the note UI before loading or saving', async () => {
+  const f = noteFixture();
+  const selection = f.rightDoc.selection;
+  const ordinary = selection.getRangeAt;
+  for (const invalid of [
+    () => { selection.isCollapsed = true; },
+    () => { selection.rangeCount = 2; },
+    () => { selection.getRangeAt = () => ({ startContainer: f.controller.status, endContainer: f.controller.status }); },
+    () => { selection.getRangeAt = () => ({ startContainer: f.nativeText.target.first, endContainer: f.nativeText.source.first }); }
+  ]) {
+    selection.isCollapsed = false;
+    selection.rangeCount = 1;
+    selection.getRangeAt = ordinary;
+    invalid();
+    const result = await f.controller.createNote('selection');
+    assert.equal(result.note, null);
+    assert.match(f.controller.noteStatus.textContent, /笔记未能创建/);
+    assert.equal(f.controller.status.textContent, 'No mapping');
+    assert.equal(f.controller.selectionNoteButton.disabled, false);
+  }
+  assert.equal(f.calls.loaded.length, 0);
+  assert.equal(f.calls.selected.length, 0);
+  close(f);
+});
+
+/** Wait for the current native write queue; never manufacture reader annotations to flush it. */
+test('annotation summary waits for native persistence and rejects reader-only pending edits', async () => {
+  const f = noteFixture();
+  let resolveWrite;
+  f.state.annotations = { pending: new Promise(resolve => { resolveWrite = resolve; }) };
+  const json = { key: 'ANNOT001', type: 'highlight', text: 'Actual saved highlight', comment: '',
+    pageLabel: 'iv', color: '#ffd400', position: { pageIndex: 0, rects: [[1, 2, 3, 4]] } };
+  f.state.right._state = { annotations: [{ ...json, id: json.key }] };
+  const operation = f.controller.createNote('annotations');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.calls.annotations.length, 0);
+  f.persisted.push({ key: json.key, json,
+    /** Native data load is a read, not a synthetic annotation write. */
+    async loadAllData() {}
+  });
+  resolveWrite();
+  assert.equal((await operation).note, f.note);
+  assert.equal(f.calls.annotations[0].translatedAttachment, f.state.translated);
+  assert.equal(f.calls.annotations[0].sourceAttachment, f.state.source);
+  assert.equal('text' in f.calls.annotations[0], false);
+  f.state.right._state.annotations[0].comment = 'Not saved yet';
+  const failed = await f.controller.createNote('annotations');
+  assert.equal(failed.note, null);
+  assert.match(f.controller.noteStatus.textContent, /仍在原生保存/);
+  assert.equal(f.calls.annotations.length, 1);
+  close(f);
+});
+
+/** Loading/save failure must preserve the PDF, localization buttons, and retry availability. */
+test('note loader or save failures stay separate from mapping and reading controls', async () => {
+  const f = noteFixture();
+  f.controller.setMapping(mapping());
+  const status = f.controller.status.textContent;
+  f.hooks.load = () => { throw new Error('Note module unavailable'); };
+  assert.equal((await f.controller.createNote('selection')).note, null);
+  assert.match(f.controller.noteStatus.textContent, /module unavailable/);
+  delete f.hooks.load;
+  f.hooks.save = async () => {
+    const error = new Error('Check attempted native key NOTE0001');
+    error.code = 'NOTE_SAVE_FAILED';
+    throw error;
+  };
+  assert.equal((await f.controller.createNote('selection')).note, null);
+  assert.match(f.controller.noteStatus.textContent, /native key NOTE0001/);
+  assert.match(f.controller.noteStatus.textContent, /保存结果未确认/);
+  assert.equal(f.controller.status.textContent, status);
+  assert.equal(f.controller.button.disabled, false);
+  assert.equal(f.controller.targetButton.disabled, false);
+  assert.equal(f.calls.opened.length, 0);
+  close(f);
+});
+
+/** Closing or reusing a controller must not revive controls or save an invisible late request. */
+test('note actions closed before saving are cancelled and late open outcomes cannot change a reused split', async () => {
+  const f = noteFixture();
+  const cancelled = f.controller.createNote('selection');
+  close(f);
+  assert.equal(await cancelled, null);
+  assert.equal(f.calls.selected.length, 0);
+  f.controller.attach(f.state, mapping());
+  let rejectOpen;
+  f.hooks.open = () => new Promise((resolve, reject) => { rejectOpen = reject; });
+  const operation = f.controller.createNote('selection');
+  await new Promise(resolve => setImmediate(resolve));
+  const savedStatus = f.controller.noteStatus;
+  assert.match(savedStatus.textContent, /已保存/);
+  close(f);
+  f.controller.attach(f.state, mapping());
+  rejectOpen(new Error('Old native open failed'));
+  assert.equal((await operation).note, f.note);
+  assert.equal(f.controller.noteStatus.textContent || '', '');
+  assert.equal(f.controller.selectionNoteButton.disabled, false);
+  assert.doesNotMatch(savedStatus.textContent, /Old native/);
+  close(f);
+});
+
+/** The native note harness must never write, import, or quit an unrelated daily profile. */
+test('native alignment/notes harness refuses an unrelated profile without writes or quit', async () => {
+  const calls = { errors: [], writes: 0, quits: 0 };
+  const scope = { PAPERBRIDGE_TEST_ROOT: '/isolated/project',
+    PathUtils: { join: (...parts) => parts.join('/'), normalize: value => value },
+    Ci: { nsIFile: {}, nsIAppStartup: { eAttemptQuit: 1 } },
+    Services: {
+      dirsvc: { get: () => ({ path: '/daily/profile' }) },
+      startup: { quit: () => { calls.quits++; } }
+    },
+    IOUtils: { writeUTF8: async () => { calls.writes++; } },
+    Zotero: { version: '10.0.8', DataDirectory: { dir: '/daily/data' }, logError: error => calls.errors.push(error) }
+  };
+  await vm.runInNewContext(nativeHarnessSource, scope);
+  assert.equal(calls.errors.length, 1);
+  assert.equal(calls.writes, 0);
+  assert.equal(calls.quits, 0);
+});
+
+/** Exercise only isolation/configuration routing, stopping before native setup with a missing bridge. */
+test('native harness accepts fresh configured paths and report output while preserving legacy defaults', async () => {
+  const root = '/isolated/project';
+  const legacyProfile = root + '/.runtime/alignment-profile';
+  const legacyData = root + '/.runtime/alignment-data';
+  const legacyReport = root + '/.runtime/alignment-test.json';
+  const config = { isolated: true, expectedProfileDirectory: '/new-run/profile',
+    expectedDataDirectory: '/new-run/data', reportPath: '/new-run/create.json' };
+  const cases = [
+    { config, profile: config.expectedProfileDirectory, data: config.expectedDataDirectory, output: config.reportPath },
+    { config: { ...config, isolated: false }, profile: config.expectedProfileDirectory, data: config.expectedDataDirectory },
+    { config, profile: config.expectedProfileDirectory, data: '/other-run/data' },
+    { config, profile: '/other-run/profile', data: config.expectedDataDirectory },
+    { profile: legacyProfile, data: legacyData, output: legacyReport },
+    { config: { isolated: true }, profile: legacyProfile, data: legacyData, output: legacyReport }
+  ];
+  for (const entry of cases) {
+    const calls = { errors: [], writes: [], quits: 0 };
+    const scope = { PAPERBRIDGE_TEST_ROOT: root,
+      PathUtils: { join: (...parts) => parts.join('/'), normalize: value => value },
+      Ci: { nsIFile: {}, nsIAppStartup: { eAttemptQuit: 1 } },
+      Services: {
+        dirsvc: { get: () => ({ path: entry.profile }) },
+        startup: { quit: () => { calls.quits++; } }
+      },
+      IOUtils: { writeUTF8: async (path, value) => { calls.writes.push({ path, report: JSON.parse(value) }); } },
+      Zotero: { version: '10.0.8', DataDirectory: { dir: entry.data }, logError: error => calls.errors.push(error) }
+    };
+    if (entry.config !== undefined) scope.PAPERBRIDGE_ALIGNMENT_TEST = entry.config;
+    await vm.runInNewContext(nativeHarnessSource, scope);
+    assert.equal(calls.errors.length, 1);
+    assert.equal(calls.quits, entry.output ? 1 : 0);
+    assert.equal(calls.writes.length, entry.output ? 1 : 0);
+    if (entry.output) {
+      assert.equal(calls.writes[0].path, entry.output);
+      assert.equal(calls.writes[0].report.checks[0].pass, true);
+      assert.match(calls.errors[0].message, /PaperBridge is unavailable/);
+    }
+  }
+});
+
 test('hit testing distinguishes unique, missing, and overlapping rectangle hits', () => {
   const { Alignment } = fixture();
   const value = mapping();
@@ -488,7 +783,7 @@ test('pointerup remembers a hit but only the toolbar action navigates and paints
   // Reader and event wrappers can differ while referring to the same native DOM page.
   const pageWrapper = { getAttribute: name => f.rightPage.div.getAttribute(name) };
   f.rightPage.div.isSameNode = candidate => candidate === pageWrapper;
-  pointer(f, { target: { closest: () => pageWrapper } });
+  pointer(f, { target: { closest: selector => selector === '.page[data-page-number]' ? pageWrapper : null } });
   assert.deepEqual(Array.from(f.controller.point.point), [20, 30]);
   assert.equal(pointer(f), false);
   pointer(f, { target: control.children[0] });
@@ -499,7 +794,7 @@ test('pointerup remembers a hit but only the toolbar action navigates and paints
     destArray: [null, { name: 'XYZ' }, -20, 60, null], allowNegativeOffset: true }]);
   assert.equal(f.clones[0].frame, f.leftFrame);
   assert.deepEqual(f.leftViewport.calls.rect, [[-20, 40], [10, 60], [-15, 65], [5, 75]]);
-  assert.equal(f.rightViewport.calls.rect.length, 0);
+  assert.ok(f.rightViewport.calls.rect.every(point => point[0] === 20 && point[1] === 30));
   const overlay = f.leftPage.div.querySelector('.paperbridge-fragment-highlight');
   assert.equal(overlay.children.length, 2);
   assert.equal(overlay.children[0].style.left, '80px');
@@ -527,6 +822,149 @@ test('toolbar, secondary, and non-primary pointer releases do not create a remem
   assert.equal(f.destinations.length, 0);
   assert.match(control.children[1].textContent, /先点击/);
   close(f);
+});
+
+test('source selection release is passive and only the translated-location button navigates', () => {
+  const f = fixture();
+  f.controller.attach(f.state, mapping());
+  const selection = { ...f.leftDoc.selection };
+  const listener = f.leftDoc.listeners.get('pointerup')[0];
+  assert.equal(listener.options.capture, true);
+  assert.equal(listener.options.passive, true);
+  assert.equal(pointer(f, { stopPropagation() { throw new Error('Native delivery intercepted'); } }, 'source'), false);
+  assert.deepEqual(Array.from(f.controller.sourcePoint.point), [-5, 50]);
+  assert.deepEqual(f.leftDoc.selection, selection);
+  assert.equal(f.destinations.length + f.targetDestinations.length, 0);
+  f.controller.targetButton.emit('click');
+  assert.deepEqual(f.targetDestinations, [{ pageNumber: 1,
+    destArray: [null, { name: 'XYZ' }, 10, 40, null], allowNegativeOffset: true }]);
+  assert.equal(f.destinations.length, 0);
+  assert.equal(f.clones[0].frame, f.rightFrame);
+  assert.equal(f.controller.highlightIndex, 1);
+  const overlay = f.rightPage.div.querySelector('.paperbridge-fragment-highlight');
+  assert.equal(overlay.children.length, 1);
+  assert.deepEqual(['left', 'top', 'width', 'height'].map(key => overlay.children[0].style[key]),
+    ['30px', '15px', '60px', '60px']);
+  assert.equal(f.state.sync, true);
+  assert.equal(f.state.active, 1);
+  assert.equal(f.controller.hoverEnabled, false);
+  f.controller.hoverButton.emit('click');
+  hover(f, 'source');
+  assert.ok(f.controller.hoverUnit);
+  [...f.timers.values()][0].callback();
+  assert.equal(f.controller.highlight, null);
+  assert.ok(f.controller.hoverUnit, 'Explicit expiration does not change hover');
+  pointer(f);
+  f.controller.button.emit('click');
+  assert.equal(f.destinations.length, 1, 'Existing reverse action still works');
+  assert.equal(f.controller.highlightIndex, 0);
+  assert.deepEqual(f.leftDoc.selection, selection);
+  close(f);
+  assert.equal(f.leftDoc.count() + f.rightDoc.count(), 0);
+  assert.equal(f.controller.sourcePoint, null);
+  assert.equal(f.controller.targetButton.count(), 0);
+  assert.equal(f.timers.size, 0);
+});
+
+test('native links and annotation controls clear only that pane hit and never consume events', () => {
+  for (const side of ['source', 'target']) {
+    const f = fixture();
+    f.controller.attach(f.state, mapping());
+    const pageView = side === 'source' ? f.leftPage : f.rightPage;
+    const button = side === 'source' ? f.controller.targetButton : f.controller.button;
+    const otherKey = side === 'source' ? 'point' : 'sourcePoint';
+    pointer(f, {}, side === 'source' ? 'target' : 'source');
+    for (const [tag, className] of [['a', ''], ['div', 'annotationLayer'],
+      ['div', 'customAnnotationLayer'], ['div', 'annotation-popup'], ['button', '']]) {
+      pointer(f, {}, side);
+      const control = pageView.div.ownerDocument.createElement(tag);
+      control.className = className;
+      pageView.div.append(control);
+      assert.equal(pointer(f, { target: control,
+        stopPropagation() { throw new Error('Native delivery intercepted'); } }, side), false);
+      button.emit('click');
+      assert.match(f.controller.status.textContent, /请先/);
+      assert.ok(f.controller[otherKey], 'The opposite pane retains its independent hit');
+      assert.equal(f.destinations.length + f.targetDestinations.length, 0);
+      control.remove();
+    }
+    close(f);
+  }
+});
+
+test('source misses, overlaps, missing mapping, bad target pages and navigation errors never guess', () => {
+  for (const mode of ['miss', 'overlap', 'unit-overlap', 'mapping', 'page', 'navigation', 'rendering']) {
+    const f = fixture({ targetNavigationError: mode === 'navigation' });
+    const value = mapping();
+    if (mode === 'overlap') value.units.push({ ...value.units[0], id: 'other' });
+    if (mode === 'unit-overlap') value.units[0].source.rects.push([...value.units[0].source.rects[0]]);
+    if (mode === 'page') value.units[0].target.page = 5;
+    if (mode === 'miss') value.units[0].source.rects = [[100, 100, 110, 110]];
+    f.controller.attach(f.state, mode === 'mapping' ? null : value);
+    if (mode === 'rendering') f.leftPage.renderingState = 0;
+    pointer(f, {}, 'source');
+    assert.doesNotThrow(() => f.controller.targetButton.emit('click'));
+    assert.equal(f.destinations.length + f.targetDestinations.length, 0, mode);
+    assert.equal(f.controller.highlight, null, mode);
+    assert.match(f.controller.status.textContent, {
+      miss: /没有已验证/, overlap: /重叠/, 'unit-overlap': /重叠/, mapping: /没有可用/,
+      page: /译文页不存在/, navigation: /mock target navigation failure/, rendering: /请先/,
+    }[mode]);
+    assert.equal(f.state.sync, true);
+    close(f);
+  }
+});
+
+test('each navigation API degrades only its own direction, and new mappings clear both hits', () => {
+  for (const index of [0, 1]) {
+    const f = fixture();
+    delete (index === 0 ? f.leftViewer : f.rightViewer).scrollPageIntoView;
+    f.controller.attach(f.state, mapping());
+    assert.equal(f.controller.button.disabled, index === 0);
+    assert.equal(f.controller.targetButton.disabled, index === 1);
+    assert.equal(f.controller.hoverButton.disabled, false);
+    pointer(f, {}, 'source');
+    pointer(f);
+    (index === 0 ? f.controller.targetButton : f.controller.button).emit('click');
+    assert.equal(f.destinations.length + f.targetDestinations.length, 1);
+    f.controller.setMapping(mapping());
+    assert.equal(f.controller.point, null);
+    assert.equal(f.controller.sourcePoint, null);
+    assert.equal(f.controller.highlight, null);
+    f.controller.setMapping(null, 'hash_changed');
+    assert.equal(f.controller.button.disabled, true);
+    assert.equal(f.controller.targetButton.disabled, true);
+    assert.equal(f.controller.status.textContent, 'hash_changed');
+    close(f);
+  }
+});
+
+test('pending translated highlights wait for their rendered viewport and clear on geometry or close', () => {
+  for (const cancellation of [null, 'scalechanging', 'rotationchanging', 'pagesdestroy', 'close']) {
+    const f = fixture();
+    f.rightPage.renderingState = 0;
+    f.controller.attach(f.state, mapping());
+    pointer(f, {}, 'source');
+    f.controller.targetButton.emit('click');
+    assert.equal(f.targetDestinations.length, 1);
+    assert.equal(f.controller.pendingIndex, 1);
+    f.rightBus.emit('pagerendered', { pageNumber: 3 });
+    assert.ok(f.controller.pending);
+    if (cancellation === 'close') close(f);
+    else if (cancellation) f.rightBus.emit(cancellation);
+    f.rightPage.renderingState = 3;
+    f.rightBus.emit('pagerendered', { pageNumber: 1 });
+    assert.equal(!!f.controller.highlight, cancellation === null);
+    if (!cancellation) {
+      f.leftBus.emit('pagerendered', { pageNumber: 1 });
+      assert.ok(f.controller.highlight, 'Unrelated source render does not remove the target paint');
+      f.rightBus.emit('rotationchanging');
+      assert.equal(f.controller.highlight, null);
+    }
+    close(f);
+    assert.equal(f.timers.size, 0);
+    assert.equal(f.controller.pending, null);
+  }
 });
 
 test('overlaps and misses show nonfatal status instead of guessing a source', () => {
@@ -781,7 +1219,8 @@ test('the appended hover toggle is opt-in and independent of sync and navigation
     const button = f.controller.hoverButton;
     assert.equal(control.children[0], f.controller.button);
     assert.equal(control.children[1], f.controller.status);
-    assert.equal(control.children[2], button);
+    assert.equal(control.children[2], f.controller.targetButton);
+    assert.equal(control.children[3], button);
     assert.equal(button.classList.contains('paperbridge-paragraph-hover-toggle'), true);
     assert.equal(button.getAttribute('aria-pressed'), 'false');
     assert.equal(f.controller.hoverEnabled, false);

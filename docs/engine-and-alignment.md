@@ -7,6 +7,8 @@
 
 ## 引擎接口研究
 
+新版引擎迁移仅保留为**低优先级研究背景，不作为 TODO 或本轮实现目标**；当前 0.6.4 的生产采集、保护适配、字体处理、可信映射与定位能力继续保留，不以升级替代现有功能修复。
+
 `scripts/probe_engine.py` 在所选研究环境中运行真实解析、排版、字体处理和 PDF 写出，仅模拟 `DeepSeekTranslator.request_completion()` 的 response。默认输出到 `.runtime/engine-interface-probe/<版本>-<随机标识>/`，包含 `report.json`、各模式日志和 PDF。
 
 ```text
@@ -67,7 +69,8 @@ python scripts/verify_providers.py --run --max-tokens 128
 
 - `backend/server.py` 保留生产尝试目录中的 `alignment.json`，若文件存在则暴露 `alignment_path`。`POST /alignment/validate` 仅接收 `mapping_path`、`source_path`、`output_path` 做本地验证，不创建或重试 job。
 - `addon/content/library.js` 将 `alignment_path` 持久化为归属记录的 `alignmentPath`，重试保留旧归属并使用新尝试的路径。`paperbridge.js.loadAlignment()` 按原文/译文附件归属取 sidecar，用两份当前附件的实际路径交给后端验证；`bootstrap.js` 加载 `alignment.js`。
-- `addon/content/alignment.js` 只检查父级已验证 mapping 的内存形状。用户先点击译文，再显式按“定位原文片段”；通过对应页的 PDF.js viewport 换算，只有唯一矩形命中才导航到原文。重叠/歧义或未命中不猜配，不自动连续追踪。
+- `addon/content/alignment.js` 只检查父级已验证 mapping 的内存形状，在同一控制器中提供两个显式按钮：**原文点击/拖选结束 →“定位译文片段”**，**译文点击/拖选结束 →“定位原文片段”**。普通点击或拖选仅被动记录该侧最后一次主指针松开的 PDF 落点，不跳页、不取消事件、不修改原生 selection；工具栏松开保留落点，页内链接、批注层和交互控件不作为落点并清除该侧旧记录。拖选按松开位置定位，不按整段选区/文本猜配，不支持仅键盘选区的新定位。
+- 两个按钮只使用各自输入侧的记录，通过该页自己的 PDF.js viewport 换算；只有唯一已验证矩形命中才以 `XYZ` 导航对应侧的第一矩形，并用目标页自己的 viewport 显示短暂高亮。同单元矩形重叠也拒绝显式定位；歧义、未命中或目标页不存在只显示非致命原因，不猜配、不重译、不自动追踪。缩放、旋转、相关页重绘或换页清除该侧旧落点；替换 mapping 清除两侧记录。导航沿用现有页同步回跳抑制，不修改同步模式、主动侧或两侧缩放。任一侧导航接口缺失只禁用朝该侧的按钮。
 - 独立的“段落高亮”开关位于右下角，默认关闭。开启后，两侧的被动 `pointermove` 用各自页的 viewport 命中同一已验证单元，在两份 PDF 中高亮对应的原生文本项。**最小单位是可追溯请求片段**，不是按句子或单词重新切分；同单元的矩形重叠仍可悬停，不同单元的歧义、无映射或未验证区域不处理。
 - 悬停使用各 PDF 内的 **CSS Custom Highlights**：只为完全落入该单元矩形的原生文本项注册 Range，`priority=-1`，不抢占搜索等原生高亮。浅蓝背景经原生 `textLayer` opacity 柔化后约为 10%，不修改该 opacity、不增加页级 DOM overlay，也不修改 PDF、canvas、text span、批注或 selection。显式定位仍使用独立的短暂 DOM 高亮与页同步回跳抑制，原生批注保存机制不变。
 - 悬停不导航、不切换同步模式、不请求模型；离开、拖选、关闭开关或分屏会清理它。滚动重新命中鼠标下的区域，缩放/旋转后的悬停使用当前 viewport 和原生文本层；对应页不可见或尚未渲染时不强行滚动。缺少 CSS 高亮 API 只禁用悬停，有可信映射和定位接口时仍保留显式定位。
@@ -78,7 +81,7 @@ python scripts/verify_providers.py --run --max-tokens 128
 
 - 阅读器右键的“PaperBridge：打开已有译文”和工具菜单的“打开已有译文分屏”调用 `paperbridge.js` 的 `openExisting()` / `split()`，只打开已保存的译文分屏，不做片段跳转。
 - 同一阅读器、原文和译文的重复打开复用现有分屏（初始化中也共享 `state.ready`），不重读译文 PDF，不重置页码、缩放、分屏宽度或同步模式；选择不同译文或关闭分屏后才重新创建。`loadSplit()` 负责初始化，过期初始化不得关闭替代分屏。
-- 当前支持译文→原文的显式定位，以及原文↔译文的双向悬停高亮；两者独立，悬停不等于导航或双向批注复制。无 sidecar 的旧译文仍可打开，但映射控件不可用。
+- 共享源码当前提供有限可信片段的原文↔译文显式定位，以及独立的双向悬停高亮；两者不是全文自动对齐、悬停导航或双向批注复制。无 sidecar 的旧译文仍可打开，但两个定位按钮和映射悬停不可用。新增原文→译文路径的原生验收及包交付仍需分别执行，不能继承旧版译文→原文验收结论。
 
 ## 静态测试与原生套件入口
 
@@ -92,7 +95,7 @@ node tests/test_sync.cjs
 node tests/test_packaged_startup.cjs
 ```
 
-原生阅读器入口是 `tests/alignment_packaged.js`（显式定位）和 `tests/hover_packaged.js`（双向悬停及原生批注叠加），使用已重建的当前平台 XPI：
+原生阅读器入口是 `tests/alignment_packaged.js`（双向显式定位）和 `tests/hover_packaged.js`（双向悬停及原生批注叠加），使用已重建的当前平台 XPI：
 
 ```text
 python scripts/prepare_packaged_test.py --suite alignment
@@ -102,6 +105,8 @@ python scripts/prepare_packaged_test.py --suite hover --run-id check
 运行 Zotero 时指定准备脚本返回的独立 profile（`-no-remote -profile <绝对路径>`），仅使用其对应的测试 data，不运行在日常 profile。测试前在 **`.runtime/alignment-fixture/`** 准备同次可信采集的 `source.pdf`、`translated.pdf`、`alignment.json`，保持 PDF 字节不变；准备脚本不生成这些 fixture，缺失时套件不代为翻译。悬停套件只在测试 profile 关闭首次启动欢迎页，避免系统浏览器遮住 Zotero 后触发原生绘制节流。
 
 套件测试真实附件归属、后端验证和阅读器映射/批注及降级，禁止 `POST /jobs` 和重试，**不调用 providers**。显式定位结果为 `.runtime/alignment-test.json`；命名悬停套件的 profile/data 为 `.runtime/hover-<run-id>-profile` / `-data`，结果为 `.runtime/hover-<run-id>-result.json`。默认 `--suite packaged` 是另一套可能调用付费 API 的测试，不能用它替代这两套。
+
+双向显式套件在各侧独立挑选唯一已验证矩形，用原生 down/up 点击后再按对应按钮；覆盖双向 100%/150%/200%、页同步开启/关闭、独立缩放/旋转、调整宽度、分屏重开、选区未被定位动作改变、旧成果和 hash 变化降级。仅输入及目的地准备临时暂停同步，受测定位仍走真实控制器及同步抑制；分别记录两侧实际导航与物理移动，不赋值控制器落点冒充点击。几何变更逐侧等待完成，避免并发触发两份原生页面重构；此套件不替代真实拖选、链接点击和批注保存验收。
 
 代表性缓存片段和冷进程重开的独立入口是 `scripts/prepare_nonmac_test.py --suite reading` / `tests/reading_packaged.js`。`--phase create` 指定确切 XPI 与 `--case-manifest`；`--phase reopen` 复用同一 run ID 的 profile/data，不重装插件或重置设置。实际公共自动更新使用该准备器的 `--suite update` / `tests/update_packaged.js`，不是用文件替换模拟，发布前后步骤见 [releasing.md](releasing.md)。两套均禁止提交翻译任务。
 
