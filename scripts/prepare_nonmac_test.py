@@ -75,6 +75,8 @@ def prepare(options):
         # Reading external options at startup keeps the installed helper unchanged across cold restarts.
         bootstrap = """/** Run isolated native acceptance without blocking the real add-on's startup. */
 /* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils */
+// Keep launch failures observable even when the acceptance script cannot load.
+var testConfig;
 /** The helper owns no persistent production state. */
 function install() {}
 /** Keep acceptance evidence when removing the helper. */
@@ -83,17 +85,36 @@ function uninstall() {}
 function shutdown() {}
 /** Dispatch after other add-ons finish their startup callbacks. */
 function startup() {
-  runTests().catch(error => Zotero.logError(error));
+  runTests().catch(failed);
+}
+/** Report helper failures only inside the explicitly prepared test profile. */
+async function failed(error) {
+  Zotero.logError(error);
+  if (!testConfig?.isolated || PathUtils.normalize(Services.dirsvc.get("ProfD", Ci.nsIFile).path)
+      !== PathUtils.normalize(testConfig.expectedProfileDirectory)) return;
+  const report = {ok: false, phase: testConfig.phase, stage: "helper-error", checks: [],
+    processID: Services.appinfo.processID, errors: [{message: String(error), stack: error.stack || ""}]};
+  try { await IOUtils.writeUTF8(testConfig.reportPath, JSON.stringify(report, null, 2)); }
+  finally { Services.startup.quit(Ci.nsIAppStartup.eAttemptQuit); }
 }
 /** Load the caller-owned configuration after native startup. */
 async function runTests() {
+  const config = testConfig = JSON.parse(await IOUtils.readUTF8(CONFIG_PATH));
+  await helperCheckpoint("helper-initialization");
   await Zotero.initializationPromise;
+  await helperCheckpoint("helper-ui-ready");
   await Zotero.uiReadyPromise;
-  const config = JSON.parse(await IOUtils.readUTF8(CONFIG_PATH));
+  await helperCheckpoint("helper-script-loading");
   for (let attempt = 0; attempt < 300 && !Zotero.PaperBridge; attempt++) await Zotero.Promise.delay(100);
-  Services.scriptloader.loadSubScript(TEST_URI,
-    {Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils,
-      PAPERBRIDGE_TEST_ROOT: ROOT_PATH, TEST_GLOBAL: config});
+  const scope = {Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils,
+    PAPERBRIDGE_TEST_ROOT: ROOT_PATH, TEST_GLOBAL: config};
+  Services.scriptloader.loadSubScript(TEST_URI, scope);
+  if (scope.PAPERBRIDGE_UPDATE_TEST_PROMISE) await scope.PAPERBRIDGE_UPDATE_TEST_PROMISE;
+}
+/** Retain actual helper progress before the acceptance script owns its own report. */
+async function helperCheckpoint(stage) {
+  await IOUtils.writeUTF8(testConfig.reportPath, JSON.stringify({ok: false, phase: testConfig.phase,
+    stage, processID: Services.appinfo.processID, checks: []}, null, 2));
 }
 """
         script = "reading_packaged.js" if options.suite == "reading" else "update_packaged.js"

@@ -127,6 +127,14 @@
   async function page(index, number) {
     return until(() => {
       const viewer = split.apps[index].pdfViewer, view = viewer.getPageView(number);
+      const bounds = view?.div?.getBoundingClientRect();
+      report.renderProbe = { side: sides[index], requestedPage: number + 1,
+        currentPage: viewer.currentPageNumber, currentScale: viewer.currentScale, scaleValue: viewer.currentScaleValue,
+        renderingState: view?.renderingState, pageScale: view?.scale, rotation: view?.viewport?.rotation,
+        viewerRotation: viewer.pagesRotation, textItems: view?.div?.querySelectorAll(".textLayer span").length,
+        pageBounds: bounds && { left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height },
+        scrollTop: viewer.container.scrollTop, viewportHeight: viewer.container.clientHeight,
+        documentVisibility: split.frames[index].document.visibilityState };
       return view?.renderingState === 3 && view.div?.isConnected && view.scale === viewer.currentScale
         && view.viewport.rotation === viewer.pagesRotation && view.div.querySelector(".textLayer span") && view;
     }, "Render " + sides[index] + " page " + (number + 1));
@@ -237,6 +245,12 @@
 
   /** Hover an actual native glyph and require bilateral paint with unchanged canvas and records. */
   async function hover(index, unit, rectangle, source, target, label) {
+    const main = Zotero.getMainWindow();
+    main.focus();
+    Services.focus.activeWindow = main;
+    Components.utils.unwaiveXrays(split.frames[index]).focus();
+    await until(() => split.frames.every(frame => frame.document.visibilityState === "visible"),
+      "Both native panes are visible for trusted hover");
     let point = pointFor(index, unit[sides[index]], rectangle, unit.id);
     if (!point) {
       // Explicit native navigation exposes text hidden by the toolbar; hover itself still cannot navigate.
@@ -259,6 +273,7 @@
     await until(() => {
       report.hoverProbe = { label, input: { x: point.x, y: point.y, pdf: point.pdf, text: point.text },
         events, activeUnit: split.alignment.hoverUnit?.id, pointer: split.alignment.hoverPointer, paint: paint(unit),
+        documentVisibility: split.frames.map(frame => frame.document.visibilityState),
         outerFrame: { available: !!split.frames[index].frameElement,
           sameControlDocument: !!split.frames[index].frameElement?.ownerDocument?.isSameNode(split.alignment.control.ownerDocument) } };
       return split.alignment.hoverUnit?.id === unit.id && report.hoverProbe.paint.every(item => item.pass);
@@ -404,9 +419,12 @@
       }, { passive: true }));
       for (const [index, side] of sides.entries()) {
         split.apps[index].pdfViewer.currentScaleValue = "page-width";
-        // A cold reopen can restore page two; do not wait for an offscreen first page to render.
-        split.apps[index].pdfViewer.currentPageNumber = mapping.units[0][side].page + 1;
-        await page(index, mapping.units[0][side].page);
+        // Selecting an already current page does not reset a restored scroll position.
+        const first = mapping.units[0][side];
+        const initialMarginPoints = 80;
+        split.apps[index].pdfViewer.scrollPageIntoView(Components.utils.cloneInto({ pageNumber: first.page + 1,
+          destArray: [null, { name: "XYZ" }, first.rects[0][0], first.rects[0][3] + initialMarginPoints, null] }, split.frames[index]));
+        await page(index, first.page);
       }
       await settle();
       check(!split.alignment.hoverEnabled, "Independent switch starts off after process/split creation: " + entry.id);

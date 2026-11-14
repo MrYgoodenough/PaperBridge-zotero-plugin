@@ -1,7 +1,8 @@
 /** Verify native update delivery and cold-restart preservation in an isolated Zotero profile. */
 /* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, ChromeUtils,
           PAPERBRIDGE_TEST_ROOT, PAPERBRIDGE_UPDATE_TEST */
-(async () => {
+// Expose the async result so the isolated helper can retain early loading/isolation failures.
+var PAPERBRIDGE_UPDATE_TEST_PROMISE = (async () => {
   // The external options file is the only harness input changed between process phases.
   const config = PAPERBRIDGE_UPDATE_TEST;
   // Use the production identity and exact public channels, never a test feed or latest release.
@@ -35,9 +36,11 @@
 
   /** Keep test writes inside the caller's checkout, not a daily profile. */
   function insideRoot(path) {
-    const prefix = normalized(PathUtils.join(PAPERBRIDGE_TEST_ROOT, "test-path-marker"))
-      .slice(0, -"test-path-marker".length);
-    return !!path && normalized(path).startsWith(prefix);
+    if (!path) return false;
+    // Gecko normalization on Linux requires an existing path; the state file is not created yet.
+    const root = normalized(PAPERBRIDGE_TEST_ROOT), parent = normalized(PathUtils.parent(path));
+    const separator = Zotero.isWin ? "\\" : "/";
+    return parent === root || parent.startsWith(root + separator);
   }
 
   /** Add only observations which actually passed in the running application. */
@@ -400,7 +403,8 @@
       && [config.expectedProfileDirectory, config.expectedDataDirectory, config.statePath, config.reportPath].every(insideRoot);
     if (!isolated) throw new Error("Refusing native update checks outside the explicit isolated profile/data/root");
     // This test-only registry survives production-addon hot restart, but never crosses process phases.
-    const runKey = normalized(config.statePath) + ":" + config.phase;
+    const runKey = PathUtils.join(normalized(PathUtils.parent(config.statePath)), PathUtils.filename(config.statePath))
+      + ":" + config.phase;
     Zotero.paperbridgeUpdateTestRuns ||= new Set();
     if (Zotero.paperbridgeUpdateTestRuns.has(runKey)) return;
     Zotero.paperbridgeUpdateTestRuns.add(runKey);
@@ -554,6 +558,7 @@
     report.error = String(error);
     report.stack = error.stack;
     Zotero.logError(error);
+    if (!isolated || !ownsRun) throw error;
   } finally {
     if (isolated && ownsRun) {
       // An offered download must not remain owned by nobody after metadata validation fails.
