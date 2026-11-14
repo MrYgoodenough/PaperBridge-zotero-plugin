@@ -1,7 +1,7 @@
 <!-- Linux installation requirements and native development entry points. -->
 # Linux 安装与开发
 
-Linux amd64 使用 `paperbridge-0.3.3-linux-x64.xpi`，支持 Zotero 9 / 10，实测环境为 Ubuntu 24.04 amd64、Zotero 10.0.8。安装包包含独立 CPython 3.12、CPU 版面引擎、模型和 tokenizer，运行时不依赖系统 Python、CUDA 或 ROS2。当前预编译包的 ELF 依赖要求 **glibc ≥ 2.34**，不使用 Ubuntu 24.04 专用接口；满足该基线的其他发行版尚未逐一实机验证。未提供 musl/Alpine 和 ARM64 安装包。
+Linux amd64 使用 `paperbridge-0.3.4-linux-x64.xpi`，支持 Zotero 9 / 10，实测环境为 Ubuntu 24.04 amd64、Zotero 10.0.8。安装包包含独立 CPython 3.12、CPU 版面引擎、模型和 tokenizer，运行时不依赖系统 Python、CUDA 或 ROS2。当前预编译包的 ELF 依赖要求 **glibc ≥ 2.34**，不使用 Ubuntu 24.04 专用接口；满足该基线的其他发行版尚未逐一实机验证。未提供 musl/Alpine 和 ARM64 安装包。
 
 ## 使用
 

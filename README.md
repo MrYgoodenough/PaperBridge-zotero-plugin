@@ -7,15 +7,15 @@ Zotero 9 / 10 的一体化论文翻译插件。默认使用 `deepseek-flash` 翻
 
 ## 安装
 
-请按平台选择安装包。当前共享源码为 **0.3.3**：支持可靠任务、串行批量、双配置、脱敏诊断、独立的译文原生批注和段落双向高亮。各平台的发布范围独立，源码更新不等于其他平台安装包或全文翻译质量已验收。
+请按平台选择安装包。当前共享源码为 **0.3.4**：支持可靠任务、串行批量、双配置、脱敏诊断、独立的译文原生批注和段落双向高亮。各平台的发布范围独立，源码更新不等于其他平台安装包或全文翻译质量已验收。
 
 | 平台 | 已发布安装包 |
 |---|---|
 | macOS Apple Silicon（arm64） | [0.4.2 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.4.2/paperbridge-0.4.2-macos-arm64.xpi) |
-| Windows x64 | [0.3.3 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-windows-x64.xpi) |
-| Linux amd64（glibc ≥ 2.34；Ubuntu 24.04 已验证） | [0.3.3 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-linux-x64.xpi) |
+| Windows x64 | [0.3.4 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-windows-x64.xpi) |
+| Linux amd64（glibc ≥ 2.34；Ubuntu 24.04 已验证） | [0.3.4 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-linux-x64.xpi) |
 
-已有独立 Python 3.12 的用户可选择 [Windows 本地 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-windows-x64-local-python.xpi) 或 [Linux 本地 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-linux-x64-local-python.xpi)，并在高级设置中指定解释器。一般用户推荐自带 Python 版。
+已有独立 Python 3.12 的用户可选择 [Windows 本地 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-windows-x64-local-python.xpi) 或 [Linux 本地 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-linux-x64-local-python.xpi)，并在高级设置中指定解释器。一般用户推荐自带 Python 版。
 
 **源码与发布包范围不同**：macOS 0.4.2 发布包另有译文原生批注、长公式 LaTeX 复制与持久公式缓存，详见 [发布说明](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)。对应源码尚未合入本分支；当前源码独立接入基础译文批注，不包含该公式实现，不应覆盖该 macOS 发布包。
 

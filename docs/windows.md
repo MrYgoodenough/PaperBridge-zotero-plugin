@@ -5,7 +5,7 @@
 依赖目录、字体来源和构建脚本也都是 macOS 专用的。本目录的代码已改为按平台分发，
 共享源码按平台构建安装包；独立发布的 macOS 0.4.2 源码尚未合入，不应使用本分支覆盖该包。
 
-Windows x64 安装 `paperbridge-0.3.3-windows-x64.xpi`。一般用户使用自带 Python 版；
+Windows x64 安装 `paperbridge-0.3.4-windows-x64.xpi`。一般用户使用自带 Python 版；
 本地 Python 版需在高级设置指定 x64 CPython 3.12。右下角「段落高亮」默认关闭，
 只映射可追溯的翻译请求片段，不修改 PDF 或批注。
 
@@ -48,7 +48,7 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 # 2. 打包运行时（.cache/package/windows-x64，约 450 MB）
 .\.venv\Scripts\python.exe scripts\stage_runtime.py
 
-# 3. 生成安装包（dist\paperbridge-0.3.3-windows-x64.xpi）
+# 3. 生成安装包（dist\paperbridge-0.3.4-windows-x64.xpi）
 .\.venv\Scripts\python.exe scripts\build.py            # 自带 Python
 .\.venv\Scripts\python.exe scripts\build.py --python local   # 仅依赖，需自备 Python 3.12
 ```
@@ -66,7 +66,7 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 Zotero 10 兼容范围由 `addon/manifest.json` 的 `strict_max_version: 10.*` 声明。
 已有 Windows XPI 若仍声明 `9.*`，需要从当前源码重新运行 `scripts/build.py` 并安装新包；
 仅更新源码不会改变已安装的 XPI。旧版占位更新地址需先从文件安装新版。
-0.3.3 构建包使用 Windows/Python 模式独立更新地址，草稿清单在 `dist/updates/`；
+0.3.4 构建包使用 Windows/Python 模式独立更新地址，草稿清单在 `dist/updates/`；
 对应安装包发布后再发布清单，构建或同步源码不会自动启用更新。
 
 新任务尝试目录不再重复嵌套指纹与 UUID，避免常规数据路径触发 Windows MAX_PATH。

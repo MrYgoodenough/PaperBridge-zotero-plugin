@@ -8,11 +8,15 @@ installs, uploads, changes versions or writes public feeds.
 
 ## Platform and source scope
 
-Shared source is **0.3.3**. The independently released macOS 0.4.2 implementation
+Shared source is **0.3.4**. The independently released macOS 0.4.2 implementation
 has not been merged, so do not rebuild or replace that release using this branch.
 Linux/Windows acceptance does not certify macOS or translation semantics.
 The lightweight three-platform CI checks shared-source contracts, not native
 Zotero, complete runtime builds or the missing macOS implementation.
+
+Keep `backend/server.py`'s public health version, `addon/manifest.json`,
+`pyproject.toml` and the package entry in `uv.lock` consistent. The focused
+`tests/test_bridge.py` version check guards this release contract.
 
 ## Build an existing native stage
 
@@ -37,8 +41,8 @@ Use the project interpreter and the actual target/version filenames:
 
 ```sh
 .venv/bin/python scripts/verify_release.py \
-  --xpi dist/paperbridge-0.3.3-linux-x64.xpi \
-  --sha256 dist/paperbridge-0.3.3-linux-x64.xpi.sha256 \
+  --xpi dist/paperbridge-0.3.4-linux-x64.xpi \
+  --sha256 dist/paperbridge-0.3.4-linux-x64.xpi.sha256 \
   --feed dist/updates/linux-x64.json
 ```
 
@@ -80,6 +84,12 @@ development build a distinct newer version so its real update path can be tested
 `scripts/prepare_nonmac_test.py --suite update` and `tests/update_packaged.js`
 exercise `AddonManager.findUpdates`, its returned installer, and a cold process
 restart with the same profile/data; a manually copied XPI is not automatic delivery.
+
+For daily profiles, retain a stopped-profile backup and use Zotero's native
+**Install Add-on From File** or native update installer. File replacement alone
+does not prove which version AddonManager loaded. Verify the active native addon,
+installed XPI hash and lazy engine's health/installed marker; do not erase addon
+metadata, preferences or NSS credentials to force a successful result.
 
 Never use `releases/latest/download` as a platform fallback: `latest` is
 repository-wide, and a newer macOS-only release does not contain Windows/Linux
