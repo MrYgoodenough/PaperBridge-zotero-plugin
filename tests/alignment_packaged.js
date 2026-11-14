@@ -1,5 +1,5 @@
 /** Exercise isolated navigation/notes, then verify native notes in a new process. */
-/* global Zotero, Services, IOUtils, PathUtils, Ci, Components, PAPERBRIDGE_TEST_ROOT, PAPERBRIDGE_ALIGNMENT_TEST */
+/* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils, PAPERBRIDGE_TEST_ROOT, PAPERBRIDGE_ALIGNMENT_TEST */
 (async () => {
   // The alignment suite owns these paths; never import into the daily library.
   const root = PAPERBRIDGE_TEST_ROOT;
@@ -69,6 +69,22 @@
       return Zotero.isWin ? path.toLowerCase() : path;
     };
     return normalize(left) === normalize(right);
+  }
+
+  /** Bind native note/navigation evidence to the active installed XPI, not current source files. */
+  async function verifyPackage(profile) {
+    const { AddonManager } = ChromeUtils.importESModule("resource://gre/modules/AddonManager.sys.mjs");
+    const addon = await AddonManager.getAddonByID("paperbridge@local.dev");
+    check(addon?.isActive && addon.version === config.expectedVersion,
+      "Native note/navigation checks use the active expected addon version", { version: addon?.version });
+    const bytes = await IOUtils.read(PathUtils.join(profile, "extensions", "paperbridge@local.dev.xpi"));
+    const hash = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
+    hash.init(hash.SHA256);
+    hash.update(bytes, bytes.length);
+    const sha256 = Array.from(hash.finish(false), byte => byte.charCodeAt(0).toString(16).padStart(2, "0")).join("");
+    report.package = { version: addon.version, sha256 };
+    check(sha256 === (config.expectedXpiSha256 || config.baselineXpiSha256),
+      "Native note/navigation checks match the exact installed candidate XPI hash", { sha256 });
   }
 
   /** Summarize actual reading position without claiming pixel-perfect visual alignment. */
@@ -711,7 +727,11 @@
     const annotation = await until(() => split.translated.getAnnotations().find(item =>
       !previousKeys.has(item.key) && item.annotationType === "highlight"), "Trusted native highlight was not persisted");
     await split.annotations.pending;
-    check(annotation.annotationText.trim() === highlight.spanText.trim(), "Summary fixture is an actual native translated highlight");
+    // Native annotation text uses NFKC (including full-width punctuation); keep both observed strings.
+    check(annotation.parentID === split.translated.id && annotation.annotationPosition.pageIndex === pageIndex
+      && annotation.annotationText.trim().normalize("NFKC") === highlight.spanText.trim().normalize("NFKC"),
+    "Summary fixture is an actual native translated highlight", {
+      actualText: annotation.annotationText, pdfText: highlight.spanText, annotationKey: annotation.key });
     await noteTool(split, "pointer");
     const beforeSummary = await noteAnnotations(split);
     const summary = await clickNote(split, split.alignment.annotationsNoteButton, parent, "Native annotation→note");
@@ -743,6 +763,7 @@
     "Harness is running only in the disposable alignment profile/data", {
       profile, data: Zotero.DataDirectory.dir, expectedProfileDirectory, expectedDataDirectory });
     check(phase === "create" || phase === "reopen", "Harness phase is create or reopen", { phase });
+    if (config) await verifyPackage(profile);
     if (phase === "reopen") {
       await coldReopen(profile);
       report.ok = true;

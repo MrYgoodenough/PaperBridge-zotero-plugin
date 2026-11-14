@@ -68,7 +68,7 @@ const selectionNote = await PaperBridgeNotes.createFromSelection({
 
 同模块实例内、相同参数的并发动作共用进行中的 Promise/结果；批注 ID/key 别名与重复标识会归一化。整个 native 数据读取阶段也在去重范围内。省略批注列表与显式列表不视作同一请求。完成后清除内存记录：之后新的明确动作允许生成新的 note，不永久封禁同样内容。UI 仍应在等待期间禁用按钮，成功后显示/打开返回的 note，不能自动重发命令。
 
-保存失败抛出 `error.code === 'NOTE_SAVE_FAILED'`，携带 `noteKey`、`libraryID`、`cause`，消息明确要求检查该 native key 后再决定是否重试。原生事务或通知异常可能使调用方无法确认提交结果；本模块不把异常伪装为成功，也不自动再建一份。主代理可用 `Zotero.Items.getByLibraryAndKey(error.libraryID, error.noteKey)` 检查候选；不能仅凭内存缓存存在就声称 DB 已提交。实际存储状态不确定时向用户显示 key 与错误，不自动重试。读取、权限、HTML 或内容失败均发生在保存前，不生成空 note。
+新 note 不预设 key，由 `saveTx()` 原生分配；提前标记身份会让 `setNote()` 要求尚未加载的 `primaryData`。保存失败抛出 `error.code === 'NOTE_SAVE_FAILED'`，携带 `noteKey`、`libraryID`、`cause`，只报告实际已分配的 key；分配前失败为 `null`，消息要求检查论文笔记后再决定是否重试。原生事务或通知异常可能使调用方无法确认提交结果；本模块不把异常伪装为成功，也不自动再建一份。仅有 key 时可用 `Zotero.Items.getByLibraryAndKey(error.libraryID, error.noteKey)` 检查候选；不能仅凭内存缓存存在就声称 DB 已提交。读取、权限、HTML 或内容失败均发生在保存前，不生成空 note。
 
 ## 离线测试与 Linux 待验收契约
 

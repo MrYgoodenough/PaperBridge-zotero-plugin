@@ -55,8 +55,7 @@ var PaperBridgeNotes = (() => {
   /** Check note permissions, not file-edit or annotation-author permissions. */
   function context(translatedAttachment, sourceAttachment) {
     if (!Zotero.Item || !Zotero.Items?.get || !Zotero.Libraries?.get || !Zotero.URI?.getItemURI
-      || !Zotero.URI.getLibraryPath || !Zotero.EditorInstanceUtilities?.serializeAnnotations
-      || !Zotero.DataObjectUtilities?.generateKey) {
+      || !Zotero.URI.getLibraryPath || !Zotero.EditorInstanceUtilities?.serializeAnnotations) {
       throw new Error('The native Zotero note APIs are unavailable');
     }
     const attachment = attachmentItem(translatedAttachment, 'Translated attachment');
@@ -188,15 +187,17 @@ var PaperBridgeNotes = (() => {
     const note = new Zotero.Item('note');
     note.libraryID = current.attachment.libraryID;
     if (current.parent) note.parentID = current.parent.id;
-    note.key = Zotero.DataObjectUtilities.generateKey();
+    // Let saveTx allocate the key: identifying a new Item first prevents setNote from loading its data.
     note.setNote(noteHTML);
     try {
       await note.saveTx();
     } catch (cause) {
-      const error = new Error('Zotero could not confirm note creation. Check native note key '
-        + note.key + ' in library ' + note.libraryID + ' before retrying. ' + (cause?.message || cause));
+      const noteKey = note.key || null;
+      const identity = noteKey ? 'Check native note key ' + noteKey : 'No native note key was assigned; check the paper notes';
+      const error = new Error('Zotero could not confirm note creation. ' + identity
+        + ' in library ' + note.libraryID + ' before retrying. ' + (cause?.message || cause));
       error.code = 'NOTE_SAVE_FAILED';
-      error.noteKey = note.key;
+      error.noteKey = noteKey;
       error.libraryID = note.libraryID;
       error.cause = cause;
       throw error;

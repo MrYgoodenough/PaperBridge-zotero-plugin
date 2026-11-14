@@ -126,12 +126,29 @@ function fixture({ standalone = false, group = false } = {}) {
   // A native note is allocated only after successful preparation and receives one saveTx call.
   class Note {
     /** Model only native note type construction. */
-    constructor(type) { assert.equal(type, 'note'); }
+    constructor(type) {
+      assert.equal(type, 'note');
+      this._key = null;
+      this._primaryDataLoaded = false;
+    }
+    /** Expose only the native key, which saveTx allocates directly. */
+    get key() { return this._key; }
+    /** Model Zotero's identified-versus-loaded constraint on caller-assigned keys. */
+    set key(value) {
+      if (this._primaryDataLoaded) throw new Error('Cannot change key after object is already loaded');
+      this._key = value;
+    }
     /** Record the completed HTML without persisting it yet. */
-    setNote(html) { this.html = html; }
+    setNote(html) {
+      if (this._key && !this._primaryDataLoaded) throw new Error("'primaryData' not loaded for item");
+      this._primaryDataLoaded = true;
+      this.html = html;
+    }
     /** Model ordinary failure and commit-then-reject uncertainty without implicit retry. */
     async saveTx() {
       calls.saved.push(this);
+      if (options.beforeKeyFailure) throw options.beforeKeyFailure;
+      this._key = 'NOTE' + String(++serial).padStart(4, '0');
       if (options.saveFailure && !options.afterCommit) throw options.saveFailure;
       this.id = 100 + serial;
       items.set(this.id, this);
@@ -148,10 +165,6 @@ function fixture({ standalone = false, group = false } = {}) {
     Libraries: {
       /** Return the fixture library's current permissions. */
       get: () => library
-    },
-    DataObjectUtilities: {
-      /** Generate a native-shaped key without a permanent custom index. */
-      generateKey: () => 'NOTE' + String(++serial).padStart(4, '0')
     },
     URI: {
       /** Include actual group identity or unsynced personal-library identity. */
@@ -364,7 +377,7 @@ test('read/serializer/parser failures and late permission loss do not create an 
   assert.equal(f.calls.saved.length, 0);
 });
 
-/** Native save errors carry the attempted key and never cause automatic second saves. */
+/** Native save errors carry an actually allocated key and never cause automatic second saves. */
 test('failed or commit-uncertain save exposes the native note key without automatic retry', async () => {
   for (const afterCommit of [false, true]) {
     const f = fixture();
@@ -380,4 +393,18 @@ test('failed or commit-uncertain save exposes the native note key without automa
     assert.equal(f.calls.saved.length, 1);
     assert.equal([...f.items.values()].filter(item => item instanceof f.Zotero.Item).length, afterCommit ? 1 : 0);
   }
+});
+
+/** Failures before native key allocation report no invented identity or automatic retry. */
+test('save failure before key allocation exposes an unknown identity', async () => {
+  const f = fixture();
+  f.options.beforeKeyFailure = new Error('Transaction unavailable');
+  await assert.rejects(f.api.createFromSelection({ translatedAttachment: f.translated, text: 'Actual', pageIndex: 0 }), error => {
+    assert.equal(error.code, 'NOTE_SAVE_FAILED');
+    assert.equal(error.noteKey, null);
+    assert.match(error.message, /No native note key was assigned/);
+    return true;
+  });
+  assert.equal(f.calls.saved.length, 1);
+  assert.equal([...f.items.values()].filter(item => item instanceof f.Zotero.Item).length, 0);
 });
