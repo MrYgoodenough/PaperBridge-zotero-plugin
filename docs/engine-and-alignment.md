@@ -51,7 +51,7 @@ python scripts/verify_providers.py --run --max-tokens 128
 | `source` / `target` | `{page, rects}`；**page 从 0 开始**，`rects` 为非空 `[x0, y0, x1, y1]` 列表 |
 | `metadata`（可选） | 候选、验证、排除数量及排除原因，供诊断使用 |
 
-`build_mapping(source_path, output_path, candidates)` 只接受上游捕获的同单元候选：`id`、两侧位置、`source_text` / `target_text` 和 `applied: true`。它在实际 PDF 中验证文本绘制证据、几何范围和字面文本，处理 CropBox、旋转及 UserUnit；文本只做 NFKC 与空白规范化，保留大小写，不做语义、相似度或跨段猜配。候选失败只计入排除原因；sidecar 不保存候选的全文文本。
+`build_mapping(source_path, output_path, candidates)` 只接受上游捕获的同单元候选：`id`、两侧位置、`source_text` / `target_text` 和 `applied: true`。它在实际 PDF 中验证文本绘制证据、几何范围和字面文本，处理 CropBox、旋转及 UserUnit。比较 NFKC 后的非空白字形序列，容忍 PDF 抽取增删的词间/行间空格，并仅将排版连字符 U+2010/U+2011 视为 `-`；大小写、数学负号、长破折号、缺字和 NUL 可见性断点仍不同。不做语义、相似度或跨段猜配。候选失败只计入排除原因；sidecar 不保存候选的全文文本。
 
 `write_mapping()` 原子写入 sidecar，不写 PDF。`load_mapping()` 复核 Schema、两份当前 PDF 的 SHA-256 和真实页几何；缺失、损坏、hash 变化或没有已验证单元时返回 `{available: false, reason}`。加载不重新猜配文本，也不触发翻译。
 

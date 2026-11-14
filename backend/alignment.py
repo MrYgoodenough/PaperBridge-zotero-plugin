@@ -24,11 +24,20 @@ _GEOMETRY_EPSILON = 0.0001
 _PAINTED_TEXT_FLAGS = 16 | 32
 # Match glyph origins between PyMuPDF's raw text and paint trace APIs.
 _ORIGIN_DIGITS = 3
+# Fonts may encode the same printed hyphen differently; mathematical and long dashes are distinct.
+_LAYOUT_HYPHENS = str.maketrans({"\u2010": "-", "\u2011": "-"})
 
 
 def _normalize_text(text):
     """Normalize Unicode compatibility forms and whitespace, preserving case."""
     return " ".join(unicodedata.normalize("NFKC", text).split())
+
+
+def _layout_text(text):
+    """Compare captured printed glyphs despite extractor spacing and font hyphen encoding."""
+    # The producer and PDF extractor add/remove word and line spaces independently.
+    # Preserve NUL gaps so this cannot join hidden, clipped or unrelated character runs.
+    return "".join(_normalize_text(text).translate(_LAYOUT_HYPHENS).split())
 
 
 def _open_pdf(content):
@@ -208,7 +217,7 @@ def _candidate(candidate, documents, spaces, texts, seen):
         except Exception as error:
             # Extraction failure disables this candidate, not translation or PDFs.
             raise ValueError(f"{side}_text_unavailable") from error
-        if _normalize_text(expected) not in observed:
+        if _layout_text(expected) not in _layout_text(observed):
             raise ValueError(f"{side}_text_not_found")
         unit[side] = location
     return unit

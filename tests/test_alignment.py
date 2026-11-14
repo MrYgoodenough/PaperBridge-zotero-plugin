@@ -7,7 +7,7 @@ import json
 import pymupdf
 import pytest
 
-from backend.alignment import build_mapping, load_mapping, write_mapping
+from backend.alignment import _layout_text, build_mapping, load_mapping, write_mapping
 
 
 def _pdf(path, text, *, crop=False, rotation=0, hidden=False, overlay=False, user_unit=1, opacity=1):
@@ -231,6 +231,20 @@ def test_positioned_words_allow_extracted_whitespace(tmp_path):
         document.save(source)
     mapping = build_mapping(source, output, [candidate])
     assert len(mapping["units"]) == 1, mapping["metadata"]
+
+
+def test_layout_glyphs_allow_only_spacing_and_printed_hyphen_variants(tmp_path):
+    """Real glyph sequences survive producer/extractor spaces without fuzzy content matching."""
+    source, output, candidate = _pair(tmp_path)
+    candidate["source_text"] = "Originalphrase"
+    candidate["target_text"] = "Trans lated\nphrase"
+    assert len(build_mapping(source, output, [candidate])["units"]) == 1
+    assert _layout_text("Scikit\u2010learn \u2011 Python") == _layout_text("Scikit-learn- Python")
+    assert _layout_text("a\0b") != _layout_text("a b")
+    assert _layout_text("x\u2212y") != _layout_text("x-y")
+    assert _layout_text("x\u2013y") != _layout_text("x-y")
+    candidate["target_text"] = "Translated phraze"
+    assert build_mapping(source, output, [candidate])["units"] == []
 
 
 def test_failed_atomic_replace_preserves_previous_sidecar(tmp_path, monkeypatch):

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PaperBridge · 论文对照翻译",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "DeepSeek 全文翻译、保留论文排版与公式图表、原译文分屏阅读。",
   "author": "PaperBridge contributors",
   "applications": {
