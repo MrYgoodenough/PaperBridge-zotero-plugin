@@ -14,6 +14,7 @@
 5. 平台审计核对了四种现有 Linux/Windows XPI 的版本、更新 URL、29 个发货源码文件及包身份；未重建、覆盖或重新发布安装包。原生安装、阅读、更新及冷重开结论采用既有明确范围的验收，不冒充本次重新实机运行。
 6. 三路只读审计分别负责平台发布、后端质量/可靠性、翻译扩展能力；主代理整合阅读体验并执行更新。未改 addon/backend 生产代码，未调用付费模型，未操作日常 Zotero 或其凭据库，未创建分支/worktree。GitHub 认证仅在 Windows 既有 Git Credential Manager 内使用，未导出或保存 token。
 7. 本地维护仅涉及本报告和 MEMORY 的当前基线/未解决风险。过程材料在本任务独立的 `agent/codex` 目录；未读取其他任务的禁止过程目录，未生成用户任务指令文件。
+8. 报告/记忆已按默认 master 分支普通快进推送；远端 SHA 及公开报告字节核对一致。Windows Git Credential Manager 输出 `Unable to persist credentials with the wincredman credential store`，但 Git push 退出 0、远端已更新；这是非阻断的凭据持久化警告，不伪装成无警告，也未擅自更换凭据后端。Windows HEAD/工作文件保持。
 
 ## TODO 逐项判定
 
