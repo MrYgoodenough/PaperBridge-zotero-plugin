@@ -5,12 +5,13 @@
 - 改动生产 addon/backend 后必须重建各平台 XPI；同名旧包不会跟随源码更新。四种 0.3.4 包均核对 29 个发货源码文件及最终 XPI SHA-256，在 Ubuntu 24.04 / Win11 + Zotero 10.0.8 各通过 290 项代表性片段读取、304 项同 profile 真冷重开、112 项悬停/批注/降级检查；正常退出、库完整性 `ok`、无隔离引擎残留。Windows 在 `desktop-hz` 使用历史原生 stage 重打包后实机验证，不是交叉编译。当前包与限定范围见 `docs/nonmac-verification-2026-11-15.json`；macOS 未重建。
 - GitHub `v0.3.4` 有四种已验收 XPI 与四份校验文件。根目录 `updates/` 四条 Linux/Windows 独立通道已发布 0.3.4，精确公开 URL、内容/版本/资产 hash 均实测一致；先发布资产再启用清单，不使用查询串绕缓存。四种包均实际完成 `AddonManager.findUpdates` → 公共下载/安装 → 同 profile 真冷重开（0.3.2→0.3.4，18+14 项），并核对当前 health/installed marker 版本和 build ID。`0.3.3` 历史公开资产保留但曾发现后端公开版本不一致，当前使用修复后的 0.3.4。不要把仓库级 `releases/latest` 当作平台回退：Latest 仍为独立 macOS 0.4.2，其 tag/资产/通道未改动；`example.invalid` 的旧安装仍需原生手动安装一次。
 - 日常安装必须保留停机 profile/库备份，并使用 Zotero 原生文件安装或更新安装器；只复制 XPI 不证明 AddonManager 实际加载版本。核对原生插件版本、落盘 XPI hash、延迟引擎 health/marker，再正常退出和同 profile 真冷重开；不得清除插件元数据、preferences 或 NSS 凭据来制造成功。
-- `.github/workflows/ci.yml` 是 Linux/Windows/macOS 轻量矩阵，Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx，运行 `scripts/check_offline.py --mode lightweight`。GitHub run `43613934143` 已核验 0.3.4 源码 `8b2cd6632886`：三平台及全部步骤 success。默认 `full` 另检查已安装引擎依赖。CI 不调用服务商、不构建大型 runtime，也不等于 macOS 原生验收；setup-uv 使用 `v10.3.3` 完整 tag。
+- `.github/workflows/ci.yml` 是 Linux/Windows/macOS 轻量矩阵，Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx，运行 `scripts/check_offline.py --mode lightweight`。GitHub run `43636036885` 已核验 0.3.4 源码 `ed7b1ed8e042`：三平台及全部步骤 success。默认 `full` 另检查已安装引擎依赖。CI 不调用服务商、不构建大型 runtime，也不等于 macOS 原生验收；setup-uv 使用 `v10.3.3` 完整 tag。
 - 运行时按 `macos-arm64`、`windows-x64`、`linux-x64` 独立构建。Linux amd64 自带 CPython 3.12，解释器路径 `python/bin/python3.12`；当前 Linux 包的原生库要求 glibc ≥ 2.34。Ubuntu 24.04 + Zotero 10.0.8 已实测，其他发行版尚未实机验证。
 - Linux 使用官方 OpenCV headless wheel，需保留各 wheel 的 `.libs`；仅 macOS 需要自编译精简 OpenCV。打包用 uv 管理的独立解释器，不用系统 Python 作为可重定位运行时。
 - Linux 中文字体通过 fontconfig 查询已安装的思源宋体等中文衬线字体，选择简体中文字面并导出到插件缓存；CFF 字面以 `.ttf` 缓存名保存，但 PDF 中实际为嵌入的 OTF。系统字体不随 XPI 分发。
 - 项目及插件启动的 Linux Python 清除继承的 Python 和原生库路径；不修改父环境、系统 Python、ROS2 或 shell 配置。开发环境、模型、测试状态位于项目自己的 `.tools`、`.venv`、`.cache`、`.runtime`。
 - 正式译文是 Zotero PDF 附件；插件不再因论文进回收站或原文缺失永久删除译文。Zotero 自身的删除行为不变。可恢复成果、任务和共享归属都保留，只有已确认无归属的临时缓存可清理；损坏索引禁用清理。
+- 未完成目标以 GitHub [TODO #1](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/issues/1) 的原目标及限定子项为准。PDF 笔记批注不是 Zotero 独立笔记回写，双侧悬停不是原文点击导航，本地 Python 发行版不是本地翻译模型；不要混用这些完成口径。
 
 ## 任务与成果接口
 
@@ -75,7 +76,9 @@
 
 - GitHub 已发布 macOS `v0.4.2`（原生译文批注、公式 LaTeX 与缓存），但发布说明明确其源码待同步，该 tag 中 manifest 仍为 0.3.1。本分支 0.3.4 不含这些专属源码，不要冒充 0.4.2 或用本分支重建包覆盖该 macOS 发布产物；需另行取得对应开发源码再合并。本次非 macOS 发布保持该 tag/资产/通道和仓库 Latest 不变。
 - Linux / Win11 自带和本地 Python 0.3.4 包已在 Zotero 10.0.8 实测；Zotero 9、其他 Linux 发行版和 macOS 未重复实机验证。三平台轻量 CI 不替代这些原生/完整引擎验收。
-- BabelDOC 0.6.4 的已披露解析安全问题仍未修复；隔离不是安全回移。当前生产映射仅基于固定 0.6.4 自身 adapter；0.7.1 的捕获、保护和字体路线仍有明确迁移障碍，不能将此功能或 public probe 冒充引擎升级完成。
+- BabelDOC 0.6.4 未完成独立安全核查。仓库历史“已披露解析安全问题”主张缺具体上游公告或受影响路径引用；GitHub 全局 advisory 对该版本的查询无结果也不证明安全。上游 [PR #566](https://github.com/funstory-ai/BabelDOC/pull/566) 涉及缓存目录校验但未合并，尚不能证明本插件的可利用路径或某版本已修复。隔离不是 OS 沙箱或安全回移；0.7.1 的捕获、保护和字体路线仍有明确迁移障碍，不能将 public probe 冒充升级完成。
+- `paperbridge.js saveKey()` 仍先删除旧登录项再异步添加；添加失败时可能丢失旧密钥，尚未修复或做失败注入。`errors.py explain_error()` 将 `engine.py` 两条生产排版/tokenizer 资源缺失消息归为 startup；现有诊断 ZIP 还依赖 bridge 正常启动，不能覆盖启动失败排障。
+- 繁体/日文已有 UI 和请求配置，但对应离线字体及区域字形未完成交付验收。中文字体路线偏向 SC 字面，日文依赖上游资源解析且运行期禁止补下载；不能将下拉框存在视为多语言离线能力完整。
 - 固定论文工具为 `scripts/review_quality.py` / `docs/quality-corpus.json`。用户授权的真实 DeepSeek 检查仅翻译 sklearn 第 2 页、LIBLINEAR 第 1 页；4 次 `deepseek-flash` 请求、2,295 输入/1,693 输出 tokens，无 SDK 重试。八个未选页文本及 144-dpi 像素保留；两份账本仍为 partial，6/10 个已应用但未变化条目仍 unknown。证据在 `.runtime/quality-p1-20261114/summary.json`；不能擅自补跑付费探测/全文或把助手抽查当人工验收。
 - 代表性论文所选页的可追溯片段、缓存命中定位、批注叠加与真冷重开已原生验收，但历史翻译质量仍 partial，机构名断行、版权符号重构和作者字体层级未修复，全文语义/字体/复制/搜索的人类验收没有完成。两份源 PDF 没有链接批注，不能借空比较声称链接通过；兼容服务还需独立授权的真实验证。裁剪/UserUnit 有合成坐标检查，但无新增 macOS 或裁剪 PDF 原生验收；对齐 sidecar 不保证随 Zotero PDF 同步。
 - 原生 PDF 连续几何重构仍须留意 WebRender 稳定性：旋转/缩放应分别等待对应页和文本层就绪，避免同步突发连发。最终四种包正常退出，并不等于全部上游渲染组合均已认证稳定。
