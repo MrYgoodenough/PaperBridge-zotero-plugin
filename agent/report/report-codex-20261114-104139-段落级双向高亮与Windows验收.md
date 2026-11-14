@@ -33,7 +33,7 @@
 - 四种模式的原生合成窗口截图均已检查：无批注正文可见两侧浅蓝高亮，原有黄色批注仍可见。截图使用 Gecko `WindowGlobalParent.drawSnapshot`，不是重建的 PDF/DOM 合成图。
 - Windows 引擎由既有父进程 watcher 自然退出，最终观察分别约 **3.03 秒 / 3.62 秒**；验收允许 30 秒有界等待并保留全部 PID 观察，未强杀后再记为通过。
 
-当前提交的三平台轻量 CI 尚待推送后核对；既有 CI 的成功不能替代本轮新源码或 macOS 原生验收。
+本轮源码 `f852ddc871ae` 已推送至 `master`；[GitHub Offline CI 43548039959](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43548039959) 的 Linux / Windows / macOS 三个 job 及测试步骤均为 success。该轻量 CI 不替代 macOS 原生验收；后续只补充本报告和验收索引，不改变已验收的发货源码。
 
 ## 失败及修正，如实保留
 
@@ -51,4 +51,5 @@
 - 只验收当前结构可追溯的单页请求片段；未做句词、代表性真实论文对齐准确率、跨栏跨页原生验证、语义质量或冷进程重启验收。部分重叠/未验证情况属于静态补充探针，不冒充复杂原生夹具。
 - macOS 本轮没有重建或原生验收，未覆盖已有 macOS 0.4.2 Release。缺 API 或 sidecar 仍只停用映射功能，普通阅读和原生批注保持可用。
 - README、开发入口和 MEMORY 已维护为当前基线；过程日志只放在报告/忽略的过程目录，未写入 README 或 TODO。
+- Linux 没有可用的非交互推送凭据，因此通过 Windows 既有凭据转交 Git bundle 做正常快进推送。GCM 发出凭据保存警告，但实际远端提交及 CI 已核验；未修改凭据配置，也未输出 token。Windows 工程的 HEAD、分支及工作文件前后核对均未改变。
 - 包位于 `dist/`：Linux / Windows 自带和本地 Python 四个 `paperbridge-0.3.2-*.xpi`。完整 hash、安装核验、截图索引和范围见 `docs/paragraph-hover-verification-2026-11-14.json`。本轮只是更新安装包草稿，不发布非空更新清单；需要手动安装当前平台包，默认不开启高亮。

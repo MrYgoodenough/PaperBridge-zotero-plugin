@@ -5,7 +5,7 @@
 - Windows 历史 0.3.1 包的真实翻译/分屏证据见 `docs/windows-compatibility-0.3.1.json`。定位原型基线 0.3.2 在 Linux / Win11 + Zotero 10.0.8 的自带/本地 Python 四种 XPI，各通过 17 项任务/批量和 54 项定位原型隔离检查，数据库完整性为 `ok`，测试进程退出。证据见 `docs/next-stage-verification-2026-11-13.json`；禁网成功/响应丢失及字体基线见 `docs/recovery-verification-2026-11-13.json`。定位样本只有一页两单元，不能当作论文对齐准确率验收。
 - 改动生产 addon/backend 后必须重建各平台 XPI；同名旧包不会跟随源码更新。当前 Linux/Windows 四种 0.3.2 包均与 29 个发货源码文件一致，各通过 Zotero 10.0.8 的 112 项原生悬停/批注/降级检查，正常退出、数据库完整性 `ok`、无测试引擎残留；macOS 未重建。Windows 是复用历史原生运行时重打包后在 `desktop-hz` 实机验证，不是交叉编译。当前包 hash、真实安装核验及范围见 `docs/paragraph-hover-verification-2026-11-14.json`。`build.py --platform` 只选择已有原生 stage。
 - 更新 URL 按平台/Python 模式独立；`dist/updates/` 是草稿，根目录 `updates/` 的四条 Linux/Windows 通道使用合法空列表表示暂无已发布更新。2026-11-14 已逐个核验精确公开 URL 为 HTTP 200，返回体与提交一致，无查询串绕过缓存。必须先上传匹配的 XPI/校验文件，才能发布非空清单；空清单不等于 0.3.2 发布或自动送达，`verify_release.py --online` 对 0.3.2 非空草稿仍正确返回发布不一致。不要把仓库级 `releases/latest` 当作平台回退，它只有 macOS 0.4.2；旧安装包的 `example.invalid` 仍需手动安装一次，macOS 通道未改动。
-- `.github/workflows/ci.yml` 是 Linux/Windows/macOS 的轻量矩阵，Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx；运行 `scripts/check_offline.py --mode lightweight`。2026-11-14 GitHub run `43528230775` 已实际核验源码 `d1ccc229`：三平台全部 success，各 187 passed / 1 skipped / 1 deselected，7 个 Node 脚本、23 个语法检查和六种模拟启动契约通过。默认 `full` 另检查已安装的引擎依赖。CI 不调用服务商、不构建大型 runtime，不验收 macOS 0.4.2 或原生 Zotero 功能；setup-uv 使用确实存在的 `v10.3.3` 完整 tag，而非不存在的 `v10` 别名。
+- `.github/workflows/ci.yml` 是 Linux/Windows/macOS 的轻量矩阵，Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx；运行 `scripts/check_offline.py --mode lightweight`。2026-11-14 GitHub run `43548039959` 已实际核验段落高亮源码 `f852ddc871ae`：三平台及各自测试/启动契约步骤全部 success，索引见 `docs/paragraph-hover-verification-2026-11-14.json`。默认 `full` 另检查已安装的引擎依赖。CI 不调用服务商、不构建大型 runtime，不验收 macOS 0.4.2 或原生 Zotero 功能；setup-uv 使用 `v10.3.3` 完整 tag，而非不存在的 `v10` 别名。
 - 运行时按 `macos-arm64`、`windows-x64`、`linux-x64` 独立构建。Linux amd64 自带 CPython 3.12，解释器路径 `python/bin/python3.12`；当前 Linux 包的原生库要求 glibc ≥ 2.34。Ubuntu 24.04 + Zotero 10.0.8 已实测，其他发行版尚未实机验证。
 - Linux 使用官方 OpenCV headless wheel，需保留各 wheel 的 `.libs`；仅 macOS 需要自编译精简 OpenCV。打包用 uv 管理的独立解释器，不用系统 Python 作为可重定位运行时。
 - Linux 中文字体通过 fontconfig 查询已安装的思源宋体等中文衬线字体，选择简体中文字面并导出到插件缓存；CFF 字面以 `.ttf` 缓存名保存，但 PDF 中实际为嵌入的 OTF。系统字体不随 XPI 分发。
@@ -63,6 +63,7 @@
 ## Windows 接续验证
 
 - `ssh desktop-hz` 已配置独立公钥登录，别名使用专用 IdentityFile 和 `IdentitiesOnly yes`；密码和私钥不在仓库内。Windows 验证使用 `D:\Zotero\zotero.exe`，工程为 `E:\ZoteroPlugin\PaperBridge-zotero-plugin`。原 Windows 草稿已按 `docs/update-0.3.2.md` 合并；远端备份 `.runtime/windows-wip-before-takeover-20261113.zip` 及 stash `1585dab3ddd69ff0d22c8a2a787914b1fc717d85` 不要盲目重套。本地原 Windows 包另保存在 `.runtime/windows-package-before-p1`。
+- Linux 当前无可用的非交互 GitHub 推送凭据；可将 Git bundle 交给 Windows 工程的既有 Git Credential Manager 做普通快进推送，不签出、不改其 HEAD/分支/工作文件。不要输出或持久化 token，也不要为此强制重置 Windows 工程。
 - 本轮 Windows P0/P1 包在 `.runtime\windows-p1-validation-20261114` 的隔离源码、Python、profile/data 验证，没有安装到日常 profile；新包在该目录的 `dist/`，原 Windows 工程根 `dist/` 的同名旧包没有被覆盖。测试 Python 是该目录 `.venv\Scripts\python.exe`，不要依赖其他产品的 Python/Node。Windows 现有 Git 凭据可经 Git Credential Manager 使用，切勿输出或保存 token。
 - 当前段落高亮验收使用新目录 `E:\PBHover-1114`，自带/本地 Python 的最终 run ID 为 `wb5` / `wl1`；测试源、XPI、profile/data 与日常工程分开。复用上述项目 Python / `.tools\node.exe`，未安装到日常 profile，也未覆盖日常工程的 dist。
 - 2026-11-13 的旧定位/任务基线使用 `.runtime\windows-validation-20261113` 隔离源码、Python、profile/data，未安装到日常 profile；两种包退出后无测试引擎残留，库完整性为 `ok`。当时原 `.venv` 不可直接使用，隔离环境复制已有 Windows 原生运行时建立。该证据不接受本轮变更后的包。
@@ -77,5 +78,5 @@
 - BabelDOC 0.6.4 的已披露解析安全问题仍未修复；隔离不是安全回移。当前生产映射仅基于固定 0.6.4 自身 adapter；0.7.1 的捕获、保护和字体路线仍有明确迁移障碍，不能将此功能或 public probe 冒充引擎升级完成。
 - 固定论文工具为 `scripts/review_quality.py` / `docs/quality-corpus.json`。用户授权的真实 DeepSeek 检查仅翻译 sklearn 第 2 页、LIBLINEAR 第 1 页；4 次 `deepseek-flash` 请求、2,295 输入/1,693 输出 tokens，无 SDK 重试。八个未选页文本及 144-dpi 像素保留；两份账本仍为 partial，6/10 个已应用但未变化条目仍 unknown。证据在 `.runtime/quality-p1-20261114/summary.json`；不能擅自补跑付费探测/全文或把助手抽查当人工验收。
 - 真实样本的字体/复制/搜索与双语排版人工验收尚未完成，存在机构名断行、版权符号重构等问题；两份源 PDF 没有链接批注，不能借空比较声称链接通过。兼容服务、代表性论文/人工对齐核对、跨栏跨页及缓存命中定位仍未验收。裁剪/UserUnit 有合成坐标检查，但无新增 macOS 或裁剪 PDF 原生验收；对齐 sidecar 不保证随 Zotero PDF 同步。
-- Linux 隔离测试中出现过一次 Zotero 原生异常退出，未定位；最终两种 XPI 的定位/任务套件均正常退出、数据库为 `ok`。发布前仍需复核退出稳定性。
+- 原生 PDF 连续几何重构仍须留意 WebRender 稳定性：旋转/缩放应分别等待对应页和文本层就绪，避免同步突发连发。最终四种包正常退出，并不等于全部上游渲染组合均已认证稳定；发布前仍需复核。
 - 隔离测试自动退出阶段出现过 Zotero 的事务关闭警告；退出后的 `PRAGMA integrity_check` 为 `ok`，引擎已停止。快速重复文献操作后的退出仍需留意该上游警告。

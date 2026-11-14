@@ -276,5 +276,34 @@
       "ok": true
     }
   ],
-  "windowsTemporaryTasksRemaining": []
+  "windowsTemporaryTasksRemaining": [],
+  "ci": {
+    "headSha": "f852ddc871ae1a5cf943718a2343b6b8d04ad5bb",
+    "runID": 43548039959,
+    "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43548039959",
+    "status": "success",
+    "mode": "lightweight",
+    "verifiedAt": "2026-11-14T10:50:41.118047+08:00",
+    "scope": "Python/Node core, geometry and six-package launcher contracts; not native Zotero or complete-engine acceptance",
+    "jobs": [
+      {
+        "id": 132303821029,
+        "name": "Core offline (macos-latest)",
+        "conclusion": "success",
+        "html_url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43548039959/job/132303821029"
+      },
+      {
+        "id": 132303821285,
+        "name": "Core offline (windows-latest)",
+        "conclusion": "success",
+        "html_url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43548039959/job/132303821285"
+      },
+      {
+        "id": 132303821362,
+        "name": "Core offline (ubuntu-latest)",
+        "conclusion": "success",
+        "html_url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43548039959/job/132303821362"
+      }
+    ]
+  }
 }
