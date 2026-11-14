@@ -5,6 +5,7 @@ import re
 import sqlite3
 import threading
 from collections import Counter
+from contextlib import closing
 from pathlib import Path
 
 from usage import MeteredTranslator, ResultQuality
@@ -28,7 +29,8 @@ class ParagraphCache:
         self.path = path
         self.namespace = namespace
         self.document_key = document_key
-        with sqlite3.connect(path) as db:
+        # SQLite's transaction context does not close Windows file handles by itself.
+        with closing(sqlite3.connect(path)) as db, db:
             db.execute("PRAGMA journal_mode=WAL")
             add_document_column(db)
 
@@ -38,7 +40,7 @@ class ParagraphCache:
 
     def get(self, text):
         """Read only the current namespace; unidentified legacy provider rows stay unused."""
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             row = db.execute("SELECT translation FROM paragraphs WHERE key=?", (self.key(text),)).fetchone()
             if row:
                 db.execute("UPDATE paragraphs SET document_key=? WHERE key=?", (self.document_key,self.key(text)))
@@ -46,7 +48,7 @@ class ParagraphCache:
 
     def put(self, text, translation):
         """Persist one validated paragraph with its document owner."""
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute("INSERT OR REPLACE INTO paragraphs (key,translation,document_key) VALUES (?,?,?)",
                        (self.key(text), translation, self.document_key))
 

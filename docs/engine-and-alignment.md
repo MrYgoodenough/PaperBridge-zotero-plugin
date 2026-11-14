@@ -1,7 +1,7 @@
-<!-- Developer entry points and boundaries for engine probes, providers, and alignment. -->
+<!-- Developer entry points and boundaries for probes, production traces, and reader alignment. -->
 # 引擎接口、provider 验证与可信定位
 
-生产依赖仍固定为 **BabelDOC 0.6.4 / PyMuPDF 1.26.7**（`pyproject.toml`）。接口探针、直接 provider 验证和片段定位原型是三个独立入口，不代表引擎升级或真实模型语义质量验收。任务、成果与恢复架构见 [tasks-and-results.md](tasks-and-results.md)。
+生产依赖仍固定为 **BabelDOC 0.6.4 / PyMuPDF 1.26.7**（`pyproject.toml`）。接口探针、直接 provider 验证和生产片段映射是独立入口，不代表引擎升级或真实模型语义质量验收。任务、成果与恢复架构见 [tasks-and-results.md](tasks-and-results.md)。
 
 以下命令从项目根目录执行，`python` 必须指向项目自己的环境：Linux/macOS 使用 `.venv/bin/python`，Windows 使用 `.venv\Scripts\python.exe`。不要为研究探针修改生产环境的依赖版本。
 
@@ -14,7 +14,7 @@ python -I -B scripts/probe_engine.py
 python -I -B scripts/probe_engine.py --official-fonts
 ```
 
-- 0.6.4 走 `pinned_capture`：临时观察同一翻译单元在翻译前及最终写出后的对象，生成 `captured-candidates.json`，经 `backend/alignment.py` 验证后写入 `pinned_capture/alignment.json`。这是原型脚本产出，不是正式流水线的新适配器。
+- 0.6.4 走 `pinned_capture`：临时观察同一翻译单元在翻译前及最终写出后的对象，生成研究用的 `captured-candidates.json`，经 `backend/alignment.py` 验证后写入 `pinned_capture/alignment.json`。生产采集使用下述自身适配器钩子，不依赖此探针。
 - 0.7.1 走发布版 public pipeline 和 `existing_protection_adapter` 两个独立模式。**正式 0.7.1 wheel 的 `stage_capture_enabled()` 为 `False`**，不能把接口名称或调试能力当作可用的生产阶段快照。
 - 迁移障碍包括：旧 `ILTranslatorLLMOnly` 已移除，而 `backend/batching.py` / `backend/engine.py` 仍依赖它；`backend/preserve.py` 的保护适配依赖可修改的 Python 页对象，与新版 `PageProjection` 不兼容；Rust 字体映射的系统字体 hash/profile 与当前 `backend/fonts.py` 覆写不兼容。探针中的字体 family / `sha3_256` 适配仅用于研究，不能视为生产迁移完成。
 - `--official-fonts` 使用官方思源宋体字面区分字体 profile 与解析问题；public pipeline 的成功仍只使用**模拟 response**，不表示保护适配可用、稳定快照可用或升级完成。
@@ -55,39 +55,49 @@ python scripts/verify_providers.py --run --max-tokens 128
 
 `write_mapping()` 原子写入 sidecar，不写 PDF。`load_mapping()` 复核 Schema、两份当前 PDF 的 SHA-256 和真实页几何；缺失、损坏、hash 变化或没有已验证单元时返回 `{available: false, reason}`。加载不重新猜配文本，也不触发翻译。
 
+### 生产片段采集
+
+- `backend/engine.py` 为现有 translator 挂接可选的 `FragmentTrace`（`backend/fragment_trace.py`）；`backend/batching.py` 在 worker 启动前记录原页、paragraph identity、文本和几何，保留同一可变对象供最终排版后读取。正常翻译和实际应用的段落缓存均走此路径，不改变请求数、模型配置或缓存身份，不修改 BabelDOC 本体。
+- 只接受 quality 中真实 `applied`、最终仍有稳定同一 paragraph identity 的单页请求片段，并以实际 PDF glyph 边界验证两侧文本与位置。`xobj_id=0` 是固定版本的普通页正文，可映射；受保护、未应用、移页、合并或无法可靠追踪的对象不映射，不拆成句词，也不保证跨页对应。
+- 最终 `restore_regions()` 和 `translated.pdf` 保存完成后，经 `build_mapping()` 验证，原子写入仅含 verified 单元的 Schema 1 `alignment.json`；候选全文只留在内存。源 hash 始终绑定原始 `source.pdf` 快照，不是可选的 `repaired.pdf`；目标 hash 绑定最终保存的译文。
+- 采集有界：最多 4,096 单元、每侧 1,000,000 字符、每单元 32,768 字符；超限只排除映射，不限制翻译。采集或映射失败仅警告，不丢失 PDF、质量记录或其他阅读功能。没有已验证单元时映射不可用，不自动重发请求。
+
 ### 父级集成与阅读器
 
-- `backend/server.py` 保留尝试目录中的 `alignment.json`，若文件存在则暴露 `alignment_path`；**正式 translation pipeline 目前不自动生成 mapping**。`POST /alignment/validate` 仅接收 `mapping_path`、`source_path`、`output_path` 做本地验证，不创建或重试 job。
+- `backend/server.py` 保留生产尝试目录中的 `alignment.json`，若文件存在则暴露 `alignment_path`。`POST /alignment/validate` 仅接收 `mapping_path`、`source_path`、`output_path` 做本地验证，不创建或重试 job。
 - `addon/content/library.js` 将 `alignment_path` 持久化为归属记录的 `alignmentPath`，重试保留旧归属并使用新尝试的路径。`paperbridge.js.loadAlignment()` 按原文/译文附件归属取 sidecar，用两份当前附件的实际路径交给后端验证；`bootstrap.js` 加载 `alignment.js`。
 - `addon/content/alignment.js` 只检查父级已验证 mapping 的内存形状。用户先点击译文，再显式按“定位原文片段”；通过对应页的 PDF.js viewport 换算，只有唯一矩形命中才导航到原文。重叠/歧义或未命中不猜配，不自动连续追踪。
-- 高亮是短暂 DOM overlay，不写 PDF 或 Zotero 批注；显式导航暂时抑制原有页同步回跳，不切换同步模式。关闭分屏会清理监听、定时器和待处理高亮。
+- 独立的“段落高亮”开关位于右下角，默认关闭。开启后，两侧的被动 `pointermove` 用各自页的 viewport 命中同一已验证单元，在两份 PDF 中高亮对应的原生文本项。**最小单位是可追溯请求片段**，不是按句子或单词重新切分；同单元的矩形重叠仍可悬停，不同单元的歧义、无映射或未验证区域不处理。
+- 悬停使用各 PDF 内的 **CSS Custom Highlights**：只为完全落入该单元矩形的原生文本项注册 Range，`priority=-1`，不抢占搜索等原生高亮。浅蓝背景经原生 `textLayer` opacity 柔化后约为 10%，不修改该 opacity、不增加页级 DOM overlay，也不修改 PDF、canvas、text span、批注或 selection。显式定位仍使用独立的短暂 DOM 高亮与页同步回跳抑制，原生批注保存机制不变。
+- 悬停不导航、不切换同步模式、不请求模型；离开、拖选、关闭开关或分屏会清理它。滚动重新命中鼠标下的区域，缩放/旋转后的悬停使用当前 viewport 和原生文本层；对应页不可见或尚未渲染时不强行滚动。缺少 CSS 高亮 API 只禁用悬停，有可信映射和定位接口时仍保留显式定位。
 
-旧成果没有 mapping、sidecar 丢失/损坏或 PDF hash 改变时，界面显示定位不可用或页级同步降级原因，仍保留附件与普通阅读；**不为补 mapping 自动重发**。页级同步不等于片段对齐，sidecar 也不保证随 Zotero PDF 跨设备同步。
+旧成果没有 mapping、sidecar 丢失/损坏或 PDF hash 改变时，映射控件显示不可用原因，仍保留附件、普通阅读和页级同步；**不为补 mapping 自动重译，也不回推文本猜配**。页级同步不等于片段对齐，sidecar 也不保证随 Zotero PDF 跨设备同步。
 
 ### 打开译文与片段定位的区别
 
 - 阅读器右键的“PaperBridge：打开已有译文”和工具菜单的“打开已有译文分屏”调用 `paperbridge.js` 的 `openExisting()` / `split()`，只打开已保存的译文分屏，不做片段跳转。
 - 同一阅读器、原文和译文的重复打开复用现有分屏（初始化中也共享 `state.ready`），不重读译文 PDF，不重置页码、缩放、分屏宽度或同步模式；选择不同译文或关闭分屏后才重新创建。`loadSplit()` 负责初始化，过期初始化不得关闭替代分屏。
-- 当前仅有译文→原文的“定位原文片段”原型，控件位于右侧译文底部；没有原文→译文定位、双向划选或悬停高亮。正式翻译流程尚不自动生成 mapping，普通译文的片段定位按钮会禁用并显示原因。
+- 当前支持译文→原文的显式定位，以及原文↔译文的双向悬停高亮；两者独立，悬停不等于导航或双向批注复制。无 sidecar 的旧译文仍可打开，但映射控件不可用。
 
 ## 静态测试与原生套件入口
 
 离线单元/静态入口（provider 测试使用临时模拟输入，不使用项目真实凭据）：
 
 ```text
-python -m pytest tests/test_alignment.py tests/test_verify_providers.py -q
+python -m pytest tests/test_fragment_trace.py tests/test_alignment.py tests/test_verify_providers.py -q
 node tests/test_alignment.cjs
 node tests/test_library.cjs
 node tests/test_sync.cjs
 node tests/test_packaged_startup.cjs
 ```
 
-原生阅读器入口是 `tests/alignment_packaged.js`，使用已重建的当前平台 XPI：
+原生阅读器入口是 `tests/alignment_packaged.js`（显式定位）和 `tests/hover_packaged.js`（双向悬停及原生批注叠加），使用已重建的当前平台 XPI：
 
 ```text
 python scripts/prepare_packaged_test.py --suite alignment
+python scripts/prepare_packaged_test.py --suite hover --run-id check
 ```
 
-运行 Zotero 时指定返回的 `.runtime/alignment-profile`（`-no-remote -profile <绝对路径>`）；数据仅使用 `.runtime/alignment-data`，不运行在日常 profile。测试前在 **`.runtime/alignment-fixture/`** 准备同次原型捕获的 `source.pdf`、`translated.pdf`、`alignment.json`，保持 PDF 字节不变；准备脚本不生成这些 fixture，缺失时套件不代为翻译。
+运行 Zotero 时指定准备脚本返回的独立 profile（`-no-remote -profile <绝对路径>`），仅使用其对应的测试 data，不运行在日常 profile。测试前在 **`.runtime/alignment-fixture/`** 准备同次可信采集的 `source.pdf`、`translated.pdf`、`alignment.json`，保持 PDF 字节不变；准备脚本不生成这些 fixture，缺失时套件不代为翻译。悬停套件只在测试 profile 关闭首次启动欢迎页，避免系统浏览器遮住 Zotero 后触发原生绘制节流。
 
-套件测试真实附件归属、后端验证和阅读器显式导航/高亮及降级，禁止 `POST /jobs` 和重试，**不调用 providers**，结果入口为 `.runtime/alignment-test.json`。默认 `--suite packaged` 是另一套可能调用付费 API 的测试，不能用它替代 alignment 套件。静态测试和使用模拟 response 的原型都不是正式 mapping 生产或真实翻译质量验收。
+套件测试真实附件归属、后端验证和阅读器映射/批注及降级，禁止 `POST /jobs` 和重试，**不调用 providers**。显式定位结果为 `.runtime/alignment-test.json`；命名悬停套件的 profile/data 为 `.runtime/hover-<run-id>-profile` / `-data`，结果为 `.runtime/hover-<run-id>-result.json`。默认 `--suite packaged` 是另一套可能调用付费 API 的测试，不能用它替代这两套。Linux / Windows 的两种 Python 包已在 Zotero 10.0.8 隔离验证，范围见 [verification](paragraph-hover-verification-2026-11-14.json)。小型夹具和生产 sidecar 输出不等于代表性论文对齐准确率或全平台原生验收；本次 macOS 原生兼容性尚未认证。

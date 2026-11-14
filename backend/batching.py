@@ -83,6 +83,9 @@ class CostAwareILTranslator(ILTranslatorLLMOnly):
             for paragraph in page.pdf_paragraph:
                 quality.register(id(paragraph), paragraph.unicode, page.page_number + 1)
         quality.write(inventory_observed=True)
+        trace = getattr(self.translate_engine, "fragment_trace", None)
+        if trace is not None:
+            trace.inventory(docs)
         try:
             super().translate(docs)
         except Exception:

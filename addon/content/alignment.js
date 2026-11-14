@@ -1,4 +1,4 @@
-/** Explicit translated-fragment localization using parent-validated PDF mappings. */
+/** Explicit localization and opt-in bilateral hover of parent-validated request units. */
 /* global Components */
 var FragmentAlignment = class FragmentAlignment {
   // Highlight lifetime is cosmetic, not a page-render readiness deadline.
@@ -7,6 +7,14 @@ var FragmentAlignment = class FragmentAlignment {
   static NAVIGATION_GRACE_MS = 3000;
   // PDF.js RenderingStates.FINISHED means the page-specific viewport has been rendered.
   static RENDERING_FINISHED = 3;
+  // Zotero's translucent text layer softens this tint to approximately 10% on the PDF.
+  static HOVER_BACKGROUND = "rgba(96,165,250,.5)";
+  // Own one namespaced CSS highlight per PDF document, never a native annotation or selection.
+  static HOVER_NAME = "paperbridge-paragraph-hover";
+  // Native/search custom highlights take priority over this cosmetic reading aid.
+  static HOVER_PRIORITY = -1;
+  // Native font line boxes slightly overhang painted glyph bounds; allow two CSS pixels.
+  static TEXT_RECT_TOLERANCE = 2;
 
   /** Create one controller per split; loading and hash validation belong to the parent. */
   constructor({ loadMapping } = {}) {
@@ -43,14 +51,14 @@ var FragmentAlignment = class FragmentAlignment {
         && rect.every(Number.isFinite) && rect[0] < rect[2] && rect[1] < rect[3]);
   }
 
-  /** Require exactly one target rectangle hit, including overlaps within the same unit. */
-  static hitTest(mapping, page, point) {
+  /** Resolve either side; hover groups rectangles of one request without guessing across units. */
+  static hitTest(mapping, page, point, side = "target", wholeUnit = false) {
     let hit = null;
     for (const unit of mapping.units) {
-      if (unit.target.page !== page) continue;
-      for (const rect of unit.target.rects) {
+      if (unit[side].page !== page) continue;
+      for (const rect of unit[side].rects) {
         if (point[0] < rect[0] || point[0] > rect[2] || point[1] < rect[1] || point[1] > rect[3]) continue;
-        if (hit) return { status: "ambiguous", unit: null };
+        if (hit && (!wholeUnit || hit !== unit)) return { status: "ambiguous", unit: null };
         hit = unit;
       }
     }
@@ -89,6 +97,12 @@ var FragmentAlignment = class FragmentAlignment {
       Math.max(converted[0], converted[2]), Math.max(converted[1], converted[3])];
   }
 
+  /** Accept PDF content, not native annotation editors, handles, or overlaid controls. */
+  static contentPage(target) {
+    if (target?.closest?.(".customAnnotationLayer, .annotation-popup, .toolbar, button, input, textarea, [contenteditable]")) return null;
+    return target?.closest?.(".page[data-page-number]") || null;
+  }
+
   /** Return a splitControls-compatible control; omitted mapping uses loadMapping(state). */
   attach(state, mapping, reason = "") {
     this.dispose();
@@ -97,6 +111,12 @@ var FragmentAlignment = class FragmentAlignment {
     this.mapping = null;
     this.point = null;
     this.pending = null;
+    this.hoverEnabled = false;
+    this.hoverPointer = null;
+    this.hoverUnit = null;
+    this.hoverHighlights = [null, null];
+    this.hoverFrameRequest = null;
+    this.hoverRepaint = false;
     const leftFrame = state.reader?._internalReader?._primaryView?._iframeWindow;
     const rightFrame = state.right?._primaryView?._iframeWindow;
     this.frames = [leftFrame, rightFrame];
@@ -104,7 +124,7 @@ var FragmentAlignment = class FragmentAlignment {
     const doc = state.browser?.contentDocument || rightFrame?.document || state.reader?._iframeWindow?.document;
     this.control = doc.createElement("div");
     this.control.className = "paperbridge-fragment-alignment";
-    this.control.style.cssText = "display:flex;align-items:center;gap:5px;max-width:330px";
+    this.control.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;gap:5px;max-width:330px";
     this.button = doc.createElement("button");
     this.button.textContent = "定位原文片段";
     this.button.style.cssText = "font:inherit;padding:5px 8px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer;white-space:nowrap";
@@ -112,22 +132,33 @@ var FragmentAlignment = class FragmentAlignment {
     this.status.setAttribute("role", "status");
     this.status.setAttribute("aria-live", "polite");
     this.status.style.cssText = "font-size:12px;overflow-wrap:anywhere";
-    this.control.append(this.button, this.status);
+    this.hoverButton = doc.createElement("button");
+    this.hoverButton.className = "paperbridge-paragraph-hover-toggle";
+    this.hoverButton.setAttribute("aria-label", "原译文段落双向高亮");
+    this.hoverButton.style.cssText = this.button.style.cssText;
+    this.control.append(this.button, this.status, this.hoverButton);
     const control = this.control;
     state.cleanups.push(() => {
       if (this.control === control) this.dispose();
     });
     this.listen(this.button, "click", () => this.localize());
+    this.listen(this.hoverButton, "click", () => this.toggleHover());
 
-    if (!this.apps.every(app => typeof app?.pdfViewer?.getPageView === "function"
-      && typeof app?.eventBus?.on === "function" && typeof app?.eventBus?.off === "function")
-      || typeof this.apps[0].pdfViewer.scrollPageIntoView !== "function") {
+    this.pagesAvailable = this.apps.every(app => typeof app?.pdfViewer?.getPageView === "function"
+      && typeof app?.eventBus?.on === "function" && typeof app?.eventBus?.off === "function");
+    this.hoverAvailable = this.pagesAvailable && this.frames.every(frame =>
+      typeof frame.Highlight === "function" && frame.CSS?.highlights);
+    this.localizeAvailable = this.pagesAvailable && typeof this.apps[0].pdfViewer.scrollPageIntoView === "function";
+    this.updateHoverButton("正在读取片段映射…");
+    if (!this.pagesAvailable) {
       this.setStatus("片段定位接口不可用；仍可正常阅读。", true);
+      this.updateHoverButton("段落高亮接口不可用；仍可正常阅读。");
       return control;
     }
     // Observe before native selection handlers stop bubbling, without cancelling their behavior.
     this.listen(rightFrame.document, "pointerup", event => this.rememberPoint(event), { capture: true, passive: true });
     this.bindPageEvents();
+    this.bindHoverEvents();
     if (arguments.length >= 2) {
       this.setMapping(mapping, reason);
     } else if (this.loadMapping) {
@@ -157,6 +188,10 @@ var FragmentAlignment = class FragmentAlignment {
     this.apps.forEach((app, index) => {
       for (const type of ["scalechanging", "rotationchanging", "pagesdestroy", "pagechanging", "pagerendered"]) {
         const handler = event => {
+          // Geometry changes invalidate the cached hit; wait for the next actual hover input.
+          if (type !== "pagerendered") this.hoverPointer = null;
+          // Release stale native ranges after this layout callback, including pagesdestroy.
+          this.scheduleHover(true);
           if (type === "pagerendered") {
             if (index === 1 && event?.pageNumber !== this.point?.page + 1) return;
             if (index === 0 && event?.pageNumber !== (this.pending || this.highlightSource)?.page + 1) return;
@@ -180,15 +215,224 @@ var FragmentAlignment = class FragmentAlignment {
   /** Apply the parent's mapping or its visible, nonfatal unavailability reason. */
   setMapping(mapping, reason = "") {
     const checked = FragmentAlignment.checkMapping(mapping);
+    this.clearHighlight();
+    this.pending = null;
+    this.clearHover();
     this.mapping = checked.mapping;
-    this.setStatus(this.mapping ? "点击译文片段，再按定位按钮。" : reason || checked.reason, !this.mapping);
+    if (!this.mapping) {
+      this.hoverEnabled = false;
+      this.hoverPointer = null;
+    }
+    const unavailable = reason || checked.reason;
+    this.setStatus(this.mapping ? (this.localizeAvailable ? "点击译文片段，再按定位按钮。"
+      : "片段定位接口不可用；悬停高亮仍可使用。") : unavailable, !this.mapping);
+    this.updateHoverButton(this.mapping ? "" : unavailable);
+    this.scheduleHover();
   }
 
   /** Display status without alerts or changes to ordinary reading behavior. */
   setStatus(message, disabled = false) {
     this.status.textContent = message;
-    this.button.disabled = disabled;
+    this.button.disabled = disabled || !this.localizeAvailable;
     this.button.title = message;
+  }
+
+  /** Show an independent per-split switch and a nonfatal mapping availability reason. */
+  updateHoverButton(reason = "") {
+    this.hoverButton.textContent = this.hoverEnabled ? "⇄ 段落高亮开启" : "⇄ 段落高亮关闭";
+    this.hoverButton.setAttribute("aria-pressed", String(this.hoverEnabled));
+    this.hoverButton.disabled = !this.mapping || !this.hoverAvailable;
+    this.hoverButton.title = reason || (this.hoverAvailable ? "悬停高亮已验证的原译文片段；不跳页、不创建批注。"
+      : "当前 Zotero 的文本高亮接口不可用；仍可正常阅读和批注。");
+    this.hoverButton.style.background = this.hoverEnabled ? "rgba(96,165,250,.16)" : "transparent";
+  }
+
+  /** Toggle only hover; page sync, explicit localization, and annotations stay independent. */
+  toggleHover() {
+    if (this.disposed || this.hoverButton.disabled) return;
+    this.hoverEnabled = !this.hoverEnabled;
+    this.hoverPointer = null;
+    this.clearHover();
+    this.updateHoverButton();
+  }
+
+  /** Observe both documents without intercepting native links, selection, or annotation drags. */
+  bindHoverEvents() {
+    this.frames.forEach((frame, index) => {
+      const doc = frame.document;
+      const style = doc.createElement("style");
+      // CSS Highlights paint within the native text layer without adding PDFPageView children.
+      style.textContent = `::highlight(${FragmentAlignment.HOVER_NAME}){background-color:${FragmentAlignment.HOVER_BACKGROUND};color:transparent}`;
+      doc.head.append(style);
+      this.removers.push(() => style.remove());
+      const rendered = () => this.scheduleHover(true);
+      this.apps[index].eventBus.on("textlayerrendered", rendered);
+      this.removers.push(() => this.apps[index].eventBus.off("textlayerrendered", rendered));
+      const options = { capture: true, passive: true };
+      this.listen(doc, "pointermove", event => this.rememberHover(event, index), options);
+      this.listen(doc, "pointerdown", () => {
+        this.hoverPointer = null;
+        this.clearHover();
+      }, options);
+      this.listen(doc, "pointerout", event => {
+        if (event.relatedTarget?.closest?.(".page[data-page-number]")) return;
+        this.hoverPointer = null;
+        this.clearHover();
+      }, options);
+      // Scrolling changes the PDF point under a stationary mouse, even without pointermove.
+      this.listen(doc, "scroll", () => this.scheduleHover(true), options);
+      if (typeof frame.addEventListener === "function") {
+        this.listen(frame, "resize", () => this.scheduleHover(true), options);
+        this.listen(frame, "blur", () => {
+          this.hoverPointer = null;
+          this.clearHover();
+        }, options);
+      }
+    });
+  }
+
+  /** Retain plain screen coordinates only while an unpressed primary mouse is over the PDF. */
+  rememberHover(event, index) {
+    if (this.disposed || !this.hoverEnabled) return;
+    if (event.isPrimary === false || event.pointerType === "touch" || event.buttons > 0 || event.button > 0
+      || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)
+      || !FragmentAlignment.contentPage(event.target)) {
+      this.hoverPointer = null;
+      this.clearHover();
+      return;
+    }
+    this.hoverPointer = { index, x: event.clientX, y: event.clientY };
+    this.scheduleHover(false, event.target);
+  }
+
+  /** Coalesce hover work after native rendering/annotation callbacks finish, not inside them. */
+  scheduleHover(repaint = false, target = null) {
+    if (this.disposed || !this.hoverEnabled || !this.mapping) return this.clearHover();
+    this.hoverRepaint ||= repaint;
+    if (this.hoverFrameRequest) return;
+    const frame = this.frames[this.hoverPointer?.index ?? 0];
+    if (typeof frame.requestAnimationFrame !== "function") {
+      // Lightweight reader mocks may lack animation frames; normal Gecko windows provide them.
+      const redraw = this.hoverRepaint;
+      this.hoverRepaint = false;
+      return this.refreshHover(target, redraw);
+    }
+    const request = { frame, id: null };
+    this.hoverFrameRequest = request;
+    request.id = frame.requestAnimationFrame(() => {
+      if (this.hoverFrameRequest !== request) return;
+      this.hoverFrameRequest = null;
+      const redraw = this.hoverRepaint;
+      this.hoverRepaint = false;
+      // Wait for native render/layout callbacks before reading fresh hit geometry.
+      this.refreshHover(null, redraw);
+    });
+  }
+
+  /** Highlight one traceable request on both sides, without bringing offscreen pages into view. */
+  refreshHover(target = null, repaint = false) {
+    if (this.disposed || !this.hoverEnabled || !this.mapping || !this.hoverPointer) return this.clearHover();
+    const { index, x, y } = this.hoverPointer;
+    try {
+      target ||= this.frames[index].document.elementFromPoint?.(x, y);
+      const page = FragmentAlignment.contentPage(target);
+      const pageIndex = Number(page?.getAttribute("data-page-number")) - 1;
+      if (!page || !Number.isSafeInteger(pageIndex) || pageIndex < 0) return this.clearHover();
+      const pageView = this.apps[index].pdfViewer.getPageView(pageIndex);
+      if (!pageView?.viewport?.convertToPdfPoint || pageView.div?.isConnected === false
+        || (pageView.div !== page && !pageView.div?.isSameNode?.(page))
+        || (pageView.renderingState != null && pageView.renderingState !== FragmentAlignment.RENDERING_FINISHED)) {
+        return this.clearHover();
+      }
+      const point = FragmentAlignment.pdfPoint(pageView, x, y);
+      if (!point) return this.clearHover();
+      const hit = FragmentAlignment.hitTest(this.mapping, pageIndex, point, index === 0 ? "source" : "target", true);
+      if (!hit.unit || hit.unit.source.page >= this.apps[0].pdfViewer.pagesCount
+        || hit.unit.target.page >= this.apps[1].pdfViewer.pagesCount) return this.clearHover();
+      if (!repaint && this.hoverUnit === hit.unit
+        && this.hoverHighlights.every(overlay => !overlay || overlay.isConnected !== false)) return;
+      this.clearHover();
+      this.hoverUnit = hit.unit;
+      for (const [pane, side] of [hit.unit.source, hit.unit.target].entries()) {
+        // Retain each layer immediately so a later viewport failure cannot leave an orphan.
+        this.hoverHighlights[pane] = this.createHoverHighlight(side, pane, hit.unit.id);
+      }
+    } catch (error) {
+      this.clearHover();
+      this.hoverButton.title = "当前页面无法显示段落高亮；仍可正常阅读。";
+    }
+  }
+
+  /** Remove only our cosmetic hover layers, leaving the native PDF and annotation DOM intact. */
+  clearHover() {
+    this.cancelHoverFrame();
+    for (const overlay of this.hoverHighlights || []) overlay?.remove();
+    this.hoverHighlights = [null, null];
+    this.hoverUnit = null;
+  }
+
+  /** Cancel queued work without changing native text paints in the middle of a geometry update. */
+  cancelHoverFrame() {
+    if (this.hoverFrameRequest) {
+      this.hoverFrameRequest.frame.cancelAnimationFrame(this.hoverFrameRequest.id);
+      this.hoverFrameRequest = null;
+    }
+    this.hoverRepaint = false;
+  }
+
+  /** Paint whole native text items wholly inside one verified request, never guessed word pairs. */
+  createHoverHighlight(side, index, unitID) {
+    const pageView = this.apps[index].pdfViewer.getPageView(side.page);
+    if (!pageView?.viewport || pageView.div?.isConnected === false
+      || (pageView.renderingState != null && pageView.renderingState !== FragmentAlignment.RENDERING_FINISHED)) return null;
+    const { div, viewport } = pageView;
+    const layer = div.querySelector(".textLayer");
+    if (!layer) return null;
+    const bounds = div.getBoundingClientRect();
+    const width = div.clientWidth || viewport.width;
+    const height = div.clientHeight || viewport.height;
+    const cssX = bounds.width / (div.offsetWidth || width);
+    const cssY = bounds.height / (div.offsetHeight || height);
+    const left = bounds.left + (div.clientLeft || 0) * cssX;
+    const top = bounds.top + (div.clientTop || 0) * cssY;
+    const sx = width / viewport.width * cssX;
+    const sy = height / viewport.height * cssY;
+    const boxes = side.rects.map(rect => {
+      const box = FragmentAlignment.viewportRect(viewport, rect);
+      return [left + box[0] * sx, top + box[1] * sy, left + box[2] * sx, top + box[3] * sy];
+    });
+    const ranges = [];
+    const tolerance = FragmentAlignment.TEXT_RECT_TOLERANCE;
+    for (const span of layer.querySelectorAll("span")) {
+      const parent = span.parentElement?.closest("span");
+      // Search markup belongs to its complete PDF text item; do not split it into words.
+      if ((parent && !parent.classList.contains("markedContent"))
+        || span.classList.contains("markedContent") || !span.textContent?.trim()) continue;
+      const range = div.ownerDocument.createRange();
+      range.selectNodeContents(span);
+      const rects = [...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0);
+      if (rects.length && rects.every(rect => boxes.some(box => rect.left >= box[0] - tolerance
+        && rect.top >= box[1] - tolerance && rect.right <= box[2] + tolerance && rect.bottom <= box[3] + tolerance))) {
+        ranges.push(range);
+      }
+    }
+    if (!ranges.length) return null;
+    const frame = this.frames[index];
+    const highlight = new frame.Highlight(...ranges);
+    highlight.priority = FragmentAlignment.HOVER_PRIORITY;
+    const registry = frame.CSS.highlights;
+    registry.set(FragmentAlignment.HOVER_NAME, highlight);
+    return { unitID, page: side.page, ranges, highlight,
+      /** Native rerendered text items cannot keep a stale request visibly active. */
+      get isConnected() {
+        return registry.get(FragmentAlignment.HOVER_NAME) === highlight
+          && ranges.every(range => range.startContainer.isConnected);
+      },
+      /** Delete only our exact registry entry, preserving search, selection, and other plugins. */
+      remove() {
+        if (registry.get(FragmentAlignment.HOVER_NAME) === highlight) registry.delete(FragmentAlignment.HOVER_NAME);
+      }
+    };
   }
 
   /** Remember ordinary primary pointer releases without cancelling native selection or links. */
@@ -217,7 +461,7 @@ var FragmentAlignment = class FragmentAlignment {
 
   /** Navigate only after the explicit action resolves exactly one verified rectangle. */
   localize() {
-    if (this.disposed || !this.mapping) return;
+    if (this.disposed || !this.mapping || !this.localizeAvailable) return;
     this.clearHighlight();
     this.pending = null;
     if (!this.point) return this.setStatus("请先点击译文 PDF 中的片段。");
@@ -252,33 +496,42 @@ var FragmentAlignment = class FragmentAlignment {
     this.state.alignmentNavigationUntil = this.navigationUntil;
   }
 
-  /** Paint transient DOM rectangles with the original page's viewport, never annotations. */
+  /** Keep the existing explicit-localization overlay separate from hover's native text paint. */
+  createHighlight(side, index, className, markStyle, unitID = "") {
+    const pageView = this.apps[index].pdfViewer.getPageView(side.page);
+    if (!pageView?.viewport || !pageView.div || pageView.div.isConnected === false) return null;
+    // Unrendered placeholders may still carry another page's default viewport.
+    if (pageView.renderingState != null && pageView.renderingState !== FragmentAlignment.RENDERING_FINISHED) return null;
+    const { div, viewport } = pageView;
+    const overlay = div.ownerDocument.createElement("div");
+    overlay.className = className;
+    overlay.setAttribute("aria-hidden", "true");
+    if (unitID) overlay.setAttribute("data-unit-id", unitID);
+    overlay.style.cssText = "position:absolute;inset:0;pointer-events:none;user-select:none;z-index:30";
+    const scaleX = (div.clientWidth || viewport.width) / viewport.width;
+    const scaleY = (div.clientHeight || viewport.height) / viewport.height;
+    for (const rect of side.rects) {
+      const box = FragmentAlignment.viewportRect(viewport, rect);
+      const mark = div.ownerDocument.createElement("div");
+      mark.style.cssText = "position:absolute;pointer-events:none;user-select:none;box-sizing:border-box;" + markStyle;
+      mark.style.left = box[0] * scaleX + "px";
+      mark.style.top = box[1] * scaleY + "px";
+      mark.style.width = (box[2] - box[0]) * scaleX + "px";
+      mark.style.height = (box[3] - box[1]) * scaleY + "px";
+      overlay.append(mark);
+    }
+    div.append(overlay);
+    return overlay;
+  }
+
+  /** Paint an explicitly localized source fragment with a separate cosmetic expiration timer. */
   showHighlight() {
     if (!this.pending || this.disposed) return;
-    const pageView = this.apps[0].pdfViewer.getPageView(this.pending.page);
-    if (!pageView?.viewport || !pageView.div || pageView.div.isConnected === false) return;
-    // Unrendered placeholders may still carry another page's default viewport.
-    if (pageView.renderingState != null && pageView.renderingState !== FragmentAlignment.RENDERING_FINISHED) return;
-    const { div, viewport } = pageView;
     try {
-      const overlay = div.ownerDocument.createElement("div");
-      overlay.className = "paperbridge-fragment-highlight";
-      overlay.setAttribute("aria-hidden", "true");
-      overlay.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:30";
-      const scaleX = (div.clientWidth || viewport.width) / viewport.width;
-      const scaleY = (div.clientHeight || viewport.height) / viewport.height;
-      for (const rect of this.pending.rects) {
-        const box = FragmentAlignment.viewportRect(viewport, rect);
-        const mark = div.ownerDocument.createElement("div");
-        mark.style.cssText = "position:absolute;pointer-events:none;box-sizing:border-box;background:rgba(255,210,0,.28);border:2px solid #e5a900";
-        mark.style.left = box[0] * scaleX + "px";
-        mark.style.top = box[1] * scaleY + "px";
-        mark.style.width = (box[2] - box[0]) * scaleX + "px";
-        mark.style.height = (box[3] - box[1]) * scaleY + "px";
-        overlay.append(mark);
-      }
+      const overlay = this.createHighlight(this.pending, 0, "paperbridge-fragment-highlight",
+        "background:rgba(255,210,0,.28);border:2px solid #e5a900");
+      if (!overlay) return;
       this.clearHighlight();
-      div.append(overlay);
       this.highlight = overlay;
       this.highlightSource = this.pending;
       this.pending = null;
@@ -305,6 +558,9 @@ var FragmentAlignment = class FragmentAlignment {
     if (this.disposed) return;
     this.disposed = true;
     this.clearHighlight();
+    this.clearHover();
+    this.hoverEnabled = false;
+    this.hoverPointer = null;
     this.pending = null;
     this.point = null;
     this.mapping = null;

@@ -1,8 +1,9 @@
+<!-- Current baseline, maintenance entry points, and unresolved compatibility limits. -->
 # 当前开发基线
 
-- 源码版本为 PaperBridge 0.3.2，主分支为 `master`；可靠任务、串行批量、双配置与 Windows 草稿已整合，当前另含本地成果恢复、PDF 链接修正、独立原生译文批注和脱敏诊断。尚未创建 0.3.2 Release。后端固定 BabelDOC 0.6.4 / PyMuPDF 1.26.7，默认 DeepSeek `deepseek-flash`。
+- 源码版本为 PaperBridge 0.3.2，主分支为 `master`；可靠任务、串行批量、双配置与 Windows 草稿已整合，当前另含本地成果恢复、PDF 链接修正、独立原生译文批注、脱敏诊断和可追溯请求片段的双向悬停高亮。尚未创建 0.3.2 Release。后端固定 BabelDOC 0.6.4 / PyMuPDF 1.26.7，默认 DeepSeek `deepseek-flash`。
 - Windows 历史 0.3.1 包的真实翻译/分屏证据见 `docs/windows-compatibility-0.3.1.json`。定位原型基线 0.3.2 在 Linux / Win11 + Zotero 10.0.8 的自带/本地 Python 四种 XPI，各通过 17 项任务/批量和 54 项定位原型隔离检查，数据库完整性为 `ok`，测试进程退出。证据见 `docs/next-stage-verification-2026-11-13.json`；禁网成功/响应丢失及字体基线见 `docs/recovery-verification-2026-11-13.json`。定位样本只有一页两单元，不能当作论文对齐准确率验收。
-- 改动生产 addon/backend 后必须重建各平台 XPI；同名旧包不会跟随源码更新。当前 Linux/Windows 四种 0.3.2 包均与 28 个发货源码文件一致，并完成限定的 Zotero 10.0.8 原生验收；macOS 未重建。Windows 是复用历史原生运行时重打包后在实机验证，不是交叉编译。证据见 `.runtime/p0-p1-artifact-verification.json`、`.runtime/p0-p1-windows-native-verification-20261114.json`。`build.py --platform` 只选择已有原生 stage。
+- 改动生产 addon/backend 后必须重建各平台 XPI；同名旧包不会跟随源码更新。当前 Linux/Windows 四种 0.3.2 包均与 29 个发货源码文件一致，各通过 Zotero 10.0.8 的 112 项原生悬停/批注/降级检查，正常退出、数据库完整性 `ok`、无测试引擎残留；macOS 未重建。Windows 是复用历史原生运行时重打包后在 `desktop-hz` 实机验证，不是交叉编译。当前包 hash、真实安装核验及范围见 `docs/paragraph-hover-verification-2026-11-14.json`。`build.py --platform` 只选择已有原生 stage。
 - 更新 URL 按平台/Python 模式独立；`dist/updates/` 是草稿，根目录 `updates/` 的四条 Linux/Windows 通道使用合法空列表表示暂无已发布更新。2026-11-14 已逐个核验精确公开 URL 为 HTTP 200，返回体与提交一致，无查询串绕过缓存。必须先上传匹配的 XPI/校验文件，才能发布非空清单；空清单不等于 0.3.2 发布或自动送达，`verify_release.py --online` 对 0.3.2 非空草稿仍正确返回发布不一致。不要把仓库级 `releases/latest` 当作平台回退，它只有 macOS 0.4.2；旧安装包的 `example.invalid` 仍需手动安装一次，macOS 通道未改动。
 - `.github/workflows/ci.yml` 是 Linux/Windows/macOS 的轻量矩阵，Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx；运行 `scripts/check_offline.py --mode lightweight`。2026-11-14 GitHub run `43528230775` 已实际核验源码 `d1ccc229`：三平台全部 success，各 187 passed / 1 skipped / 1 deselected，7 个 Node 脚本、23 个语法检查和六种模拟启动契约通过。默认 `full` 另检查已安装的引擎依赖。CI 不调用服务商、不构建大型 runtime，不验收 macOS 0.4.2 或原生 Zotero 功能；setup-uv 使用确实存在的 `v10.3.3` 完整 tag，而非不存在的 `v10` 别名。
 - 运行时按 `macos-arm64`、`windows-x64`、`linux-x64` 独立构建。Linux amd64 自带 CPython 3.12，解释器路径 `python/bin/python3.12`；当前 Linux 包的原生库要求 glibc ≥ 2.34。Ubuntu 24.04 + Zotero 10.0.8 已实测，其他发行版尚未实机验证。
@@ -31,15 +32,19 @@
 
 - `backend/preserve.py` 在现有最终写出步骤修正链接：保护区/未选页保留源链接，译文页剔除已识别的正文旧坐标热点，保留生产者已移动的链接；无法确认的正文目的地使用真正的页级 `/Fit`，不猜测精确坐标。真实禁网 BabelDOC 两页管线覆盖成功与响应丢失，未选页链接保留；该模拟结果不是付费语义验收。维护入口见 `docs/pdf-links.md`。
 - `addon/content/annotations.js` 使用 Zotero 原生附件批注 API，独立于不可取得的 macOS 0.4.2 源码。批注只属于译文附件；写入串行化、关闭先快照并等待持久化、重开等待旧写入；权限变化才调用原生 `setReadOnly`，已销毁 iframe 不再接收保存回调。不可写时只降级批注，不阻断 PDF 阅读，不做原译双向批注复制或完整标签/QuickCopy/公式功能。维护入口见 `docs/annotations.md`。
-- 当前 Linux / Win11 Zotero 10.0.8 的自带/本地 Python XPI，各完成 21+8 项原生批注、16 项当前升级/阅读/链接和 17 项任务/设置检查；最终进程退出 0、每个平台六个最终测试库完整性为 `ok`。实际安装 XPI 哈希及解包后端源码匹配，索引见 `.runtime/p0-p1-native-verification.json` 和 `.runtime/p0-p1-windows-native-verification-20261114.json`。升级使用保留的本地 0.3.1 包手动替换为 0.3.2，并非公开同名资产或自动更新；任务模型结果显式模拟，不是真实论文语义验收。
+- 此前 P0/P1 基线包在 Linux / Win11 Zotero 10.0.8 的自带/本地 Python 模式，各完成 21+8 项原生批注、16 项升级/阅读/链接和 17 项任务/设置检查，正常退出、库完整性 `ok`；索引见 `.runtime/p0-p1-native-verification.json` 和 `.runtime/p0-p1-windows-native-verification-20261114.json`。这些不是当前悬停包对旧套件的再次验收。升级使用保留的本地 0.3.1 包手动替换为 0.3.2，并非自动更新；任务模型结果显式模拟，不是真实论文语义验收。
 
-## 引擎研究与片段定位
+## 引擎、片段映射与悬停高亮
 
-- `scripts/probe_engine.py` 在独立环境研究发布 wheel。0.6.4 可通过临时观察同一单元的翻译前/排版后对象生成映射；这是研究脚本，不是正式引擎适配。0.7.1 正式 wheel 的 `stage_capture_enabled=False`；官方字体下公开管线成功，但旧保护适配与 `PageProjection` 不兼容，系统宋体 hash/profile 也被 Rust 拒绝。生产依赖没有升级，不维护自定义 Rust 分支。
+- `scripts/probe_engine.py` 在独立环境研究发布 wheel，不是生产采集入口。0.7.1 正式 wheel 的 `stage_capture_enabled=False`；官方字体下公开管线成功，但旧保护适配与 `PageProjection` 不兼容，系统宋体 hash/profile 也被 Rust 拒绝。生产依赖没有升级，不维护自定义 Rust 分支。
+- 正常 0.6.4 翻译及段落缓存应用由 `backend/fragment_trace.py`、`batching.py` 的自身 adapter 和 `engine.py` 最终保存钩子生成 sidecar。仅保留真实 quality `applied`、同一 paragraph identity 的单页请求片段；受保护、未应用、移页/合并、无法可靠追踪的对象不映射。固定版本的普通页文本 `xobj_id=0` 不能误当 form XObject 排除。源 hash 绑定原始 `source.pdf`，目标绑定 `restore_regions()` 后的最终译文；不保存捕获全文，不增加请求或改变缓存身份。
 - `backend/alignment.py` 只接受已应用、同单元捕获的候选，并核对两份实际 PDF 的可见字面文本/几何；不做双语语义猜配。Schema 1 使用 PDF user space、0-based page、双方 SHA-256。`POST /alignment/validate` 是认证后的只读校验，失败只停用映射，既不删除 PDF，也不提交模型任务。
-- `addon/content/alignment.js` 是可选分屏控制器：正常 pointerup 只记位置，显式“定位原文片段”才导航并显示临时 DOM 高亮。两侧各用自己的 viewport；捕获阶段 passive listener 和 native node identity 处理 Zotero 的选区/Gecko wrapper。XUL 分隔条同时调整整数 `flex` 属性，关闭恢复原属性和样式。
-- “打开已有译文”只打开分屏，不是片段跳转；当前没有原文→译文、双向划选或悬停定位。`paperbridge.js` 的 `split()` 对同一阅读器及原/译附件复用现有状态，初始化中的重复命令共享 `state.ready`；`loadSplit()` 只初始化当前归属，旧异步任务不能关闭替代分屏。不同译文或关闭后仍重新创建。
-- `library.js` 保存 `alignmentPath`，新重试不继承旧映射；尝试目录清理保留 sidecar。正式翻译流水线目前**不自动生成映射**，旧成果显示页级降级，不自动重译。维护入口、研究环境与原生套件见 `docs/engine-and-alignment.md`。
+- `addon/content/alignment.js` 保留显式译文→原文定位，并新增右下角独立、默认关闭的段落高亮开关。两侧用各自当前 viewport 命中已验证请求片段，不导航、不切换同步、不改 PDF/canvas/text span/批注/selection；同单元矩形重叠可命中，不同单元歧义不猜配。最小单位是请求片段，不是句词；未渲染的对应页不强行滚动。
+- 悬停只注册原生文本项 Range 的 CSS Custom Highlights，命名 `paperbridge-paragraph-hover`、`priority=-1`，浅蓝色经过 Zotero 原生文本层约为 10% 可见透明度。不要修改 textLayer opacity 或新增页级 DOM overlay；显式定位的旧 DOM 高亮另行保留。几何事件在下一 RAF 撤销旧范围，包括没有后续 render 的 pagesdestroy；清理只删除精确匹配的自有 registry entry。缺 API 只禁用该功能，不能阻断普通阅读/批注。
+- “打开已有译文”只打开分屏，不是片段跳转；悬停不等于双向导航、句词对齐或批注复制。`paperbridge.js` 的 `split()` 对同一阅读器及原/译附件复用现有状态，初始化中的重复命令共享 `state.ready`；`loadSplit()` 只初始化当前归属，旧异步任务不能关闭替代分屏。不同译文或关闭后仍重新创建。
+- `library.js` 保存 `alignmentPath`，新重试不继承旧映射；尝试目录清理保留 sidecar。旧成果无映射仍可读，不为补 sidecar 自动重译，不做双语字面猜配。采集上限或失败仅影响映射、警告后继续保存译文；维护入口和原生套件见 `docs/engine-and-alignment.md`。
+- 当前实际禁网生产管线通过成功/缓存/失败三种模拟：分别生成 2/2/0 个 verified 单元，缓存路径无请求尝试。原生验收仍使用一页、两请求片段的同次可信采集夹具；并非全文语义、代表性论文、跨栏跨页或进程重启验收。
+- `backend/deepseek.py` 的 ParagraphCache 每次连接均显式关闭，同时保留事务提交/回滚；单独使用 `with sqlite3.connect()` 不会关闭连接，可能使 Windows 隔离临时数据库无法清理。
 - `scripts/verify_providers.py` 默认 inspect，显式 `--run` 每个 ready profile 最多一次短请求，SDK 重试/回退关闭，输出上限 512 tokens。DeepSeek 默认 `deepseek-flash` 的 JSON / thinking-disabled 请求已实测接受；兼容服务仍需独立的 endpoint/model/key。该验证脚本不配置日常 Zotero 凭据；本机日常凭据存储情况见下节。
 
 ## Linux 接续验证
@@ -51,7 +56,7 @@
 - SSH 别名 `nvidia` / `703nvidia` 使用本机专用 `703nvidia` 密钥。远端工程位于 `/home/nvidia/scq/ZoteroPlugin/PaperBridge-zotero-plugin`；Zotero 位于 `~/.local/opt/Zotero_linux-x86_64`，用户启动器 `~/.local/bin/zotero`。不得改变该主机的 ROS2 和其他项目环境。
 - `scripts/prepare_packaged_test.py` 使用隔离 profile/data，实际 XPI 验证入口是 `tests/packaged.js`。首轮保存临时 Key，重启后从测试 `.env` 输入真实 Key；正式插件仍从 Zotero 登录管理器读取。不要将真实 Key 或密钥数据库提交到仓库。
 - `--suite queue` 使用独立 queue-profile/data，入口 `tests/queue_packaged.js`。已在 Linux Zotero 10.0.8 验证真实设置、凭据隔离、后端启动、批量/任务界面、附件导入与保守删除；模型结果显式模拟，不是付费模型翻译验收。实际 BabelDOC 管线另经禁网合成 PDF 验证成功与响应丢失两条路径。
-- Linux 当前离线基线为 Python `218 passed, 1 skipped`（缺少 `.cache/references/pi0-v3.pdf`），另有 7 个 Node 套件及语法/轻量构建检查。统一入口 `scripts/check_offline.py` 与 `.github/workflows/ci.yml` 不调用服务商、不构建大型运行时；远程 CI 尚未运行。使用项目 Python，清除继承的 Python/原生库路径并设置 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`，不改系统环境。不要从根目录收集独立测试脚本；`tests/offline_quality_pipeline.py` 用预置 `.cache` 资源运行禁网管线。
+- 当前 Linux 和 Windows 完整离线基线为 Python `229 passed, 1 skipped`（缺少 `.cache/references/pi0-v3.pdf`），另有 7 个 Node 套件和语法检查，片段控制器 26 项通过。统一入口 `scripts/check_offline.py` 不调用服务商、不构建大型运行时；已运行远程 CI 的提交及限定范围见本文件开头，不应当作未提交变更的验证。使用项目 Python，清除继承的 Python/原生库路径并设置 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`，不改系统环境。不要从根目录收集独立测试脚本；`tests/offline_quality_pipeline.py` 用预置 `.cache` 资源运行禁网管线。
 - 2026-11-07 Linux 实测通过：真实三页翻译、字体嵌入、未选页保留、双向同步、独立阅读、全文缓存复用、10 项文献生命周期检查、公式/参考文献保护、运行中取消、退出后停止引擎。证据在 `docs/linux-verification-0.3.1.json`，使用说明在 `docs/linux.md`。
 - `agent/codex`、`agent/grok`、`agent/dsh` 是忽略的本地过程目录；不要默认读取。`agent/report` 保存任务简报，`agent/task` 只放用户提供的任务文件。
 
@@ -59,15 +64,17 @@
 
 - `ssh desktop-hz` 已配置独立公钥登录，别名使用专用 IdentityFile 和 `IdentitiesOnly yes`；密码和私钥不在仓库内。Windows 验证使用 `D:\Zotero\zotero.exe`，工程为 `E:\ZoteroPlugin\PaperBridge-zotero-plugin`。原 Windows 草稿已按 `docs/update-0.3.2.md` 合并；远端备份 `.runtime/windows-wip-before-takeover-20261113.zip` 及 stash `1585dab3ddd69ff0d22c8a2a787914b1fc717d85` 不要盲目重套。本地原 Windows 包另保存在 `.runtime/windows-package-before-p1`。
 - 本轮 Windows P0/P1 包在 `.runtime\windows-p1-validation-20261114` 的隔离源码、Python、profile/data 验证，没有安装到日常 profile；新包在该目录的 `dist/`，原 Windows 工程根 `dist/` 的同名旧包没有被覆盖。测试 Python 是该目录 `.venv\Scripts\python.exe`，不要依赖其他产品的 Python/Node。Windows 现有 Git 凭据可经 Git Credential Manager 使用，切勿输出或保存 token。
+- 当前段落高亮验收使用新目录 `E:\PBHover-1114`，自带/本地 Python 的最终 run ID 为 `wb5` / `wl1`；测试源、XPI、profile/data 与日常工程分开。复用上述项目 Python / `.tools\node.exe`，未安装到日常 profile，也未覆盖日常工程的 dist。
 - 2026-11-13 的旧定位/任务基线使用 `.runtime\windows-validation-20261113` 隔离源码、Python、profile/data，未安装到日常 profile；两种包退出后无测试引擎残留，库完整性为 `ok`。当时原 `.venv` 不可直接使用，隔离环境复制已有 Windows 原生运行时建立。该证据不接受本轮变更后的包。
-- OpenSSH 进程在 session 0，Zotero UI 要在已登录的交互 session 启动。测试任务只属于隔离运行；Gecko 文件接口使用 `PathUtils.join`，避免混用路径分隔符。原生拖选需越过末尾字形以包含标点，链接点击需实际焦点、已稳定的视口和先行鼠标移动；不要注入批注或直接设置目标页冒充点击。
+- OpenSSH 进程在 session 0，Zotero UI 要在已登录的交互 session 启动；Windows 启动器 PID 不一定是 UI PID，取 `Services.appinfo.processID` 并核对隔离 profile。悬停测试 profile 设 `firstRun2=false`，否则欢迎网页可能遮住 Zotero、使原生渲染被节流。退出检查应等待现有 3 秒父进程 watcher，自然终止而非强杀后算通过；本次临时任务均已删除。
+- Gecko 文件接口使用 `PathUtils.join`。原生拖选需越过末尾字形以包含标点，PDF.js 会按 NFKD 及其特殊规则规范化选中文字；验收保留实际文本与 PDF 位置，不注入批注。缩放/旋转需分别等待对应页和文本层完成；链接点击需实际焦点与稳定视口，不直接设置目标页冒充点击。
 - Windows 引擎含较长的原生依赖路径，过深数据目录可让 Gecko 解包报 `NS_ERROR_FILE_NOT_FOUND`；使用较短的隔离 run ID/数据路径。当前验收没有认证极深路径，也没有修改系统长路径设置。开发 launcher 的 `-I -S` 检查需要依赖实际位于所选 `.venv` 中，不能只依赖 `--system-site-packages` 的全局包。
 
 ## 仍需注意
 
 - GitHub 已发布 macOS `v0.4.2`（原生译文批注、公式 LaTeX 与缓存），但发布说明明确其源码待同步，该 tag 中 manifest 仍为 0.3.1。本分支 0.3.2 不含这些专属源码，不要冒充 0.4.2 或用本分支重建包覆盖该 macOS 发布产物；需另行取得对应开发源码再合并。
 - Linux / Win11 自带和本地 Python 0.3.2 包已在 Zotero 10.0.8 实测；Zotero 9、其他 Linux 发行版和 macOS 未重复实机验证。三平台轻量 CI 不替代这些原生/完整引擎验收。
-- BabelDOC 0.6.4 的已披露解析安全问题仍未修复；隔离不是安全回移。0.7.1 的捕获、保护和字体路线已有明确迁移障碍，需先决定受支持的升级接口，再开启正式自动映射，不能用本轮 public probe 冒充迁移完成。
+- BabelDOC 0.6.4 的已披露解析安全问题仍未修复；隔离不是安全回移。当前生产映射仅基于固定 0.6.4 自身 adapter；0.7.1 的捕获、保护和字体路线仍有明确迁移障碍，不能将此功能或 public probe 冒充引擎升级完成。
 - 固定论文工具为 `scripts/review_quality.py` / `docs/quality-corpus.json`。用户授权的真实 DeepSeek 检查仅翻译 sklearn 第 2 页、LIBLINEAR 第 1 页；4 次 `deepseek-flash` 请求、2,295 输入/1,693 输出 tokens，无 SDK 重试。八个未选页文本及 144-dpi 像素保留；两份账本仍为 partial，6/10 个已应用但未变化条目仍 unknown。证据在 `.runtime/quality-p1-20261114/summary.json`；不能擅自补跑付费探测/全文或把助手抽查当人工验收。
 - 真实样本的字体/复制/搜索与双语排版人工验收尚未完成，存在机构名断行、版权符号重构等问题；两份源 PDF 没有链接批注，不能借空比较声称链接通过。兼容服务、代表性论文/人工对齐核对、跨栏跨页及缓存命中定位仍未验收。裁剪/UserUnit 有合成坐标检查，但无新增 macOS 或裁剪 PDF 原生验收；对齐 sidecar 不保证随 Zotero PDF 同步。
 - Linux 隔离测试中出现过一次 Zotero 原生异常退出，未定位；最终两种 XPI 的定位/任务套件均正常退出、数据库为 `ok`。发布前仍需复核退出稳定性。

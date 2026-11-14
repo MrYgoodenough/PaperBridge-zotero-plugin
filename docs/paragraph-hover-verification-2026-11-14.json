@@ -1,0 +1,280 @@
+{
+  "_comment": "Bounded paragraph-hover acceptance and current package identities, not semantic or full-platform certification.",
+  "schema_version": 1,
+  "verified_at": "2026-11-14T10:41:18.379152+08:00",
+  "ok": true,
+  "scope": {
+    "nativeFixture": "one synthetic page, two traceable translation-request fragments; same capture on both platforms",
+    "realProviderRequests": 0,
+    "sentenceOrWordMapping": false,
+    "representativePaperAccuracy": false,
+    "nativeCrossPageOrColumnAcceptance": false,
+    "coldProcessRestartAcceptance": false,
+    "macOSNativeAcceptance": false,
+    "windowsHost": "desktop-hz",
+    "windowsIsolationDirectory": "E:\\PBHover-1114",
+    "dailyProfilesModified": false,
+    "dependenciesChanged": false,
+    "nativeStagesRepackaged": true
+  },
+  "offline": {
+    "linux": {
+      "python": "3.12.16",
+      "passed": 229,
+      "skipped": 1,
+      "nodeSuites": 7,
+      "javascriptSyntaxChecks": 24
+    },
+    "windows": {
+      "python": "3.12.13",
+      "passed": 229,
+      "skipped": 1,
+      "nodeSuites": 7,
+      "javascriptSyntaxChecks": 24
+    },
+    "skipReason": "optional .cache/references/pi0-v3.pdf unavailable",
+    "alignmentControllerTestsPassed": 26
+  },
+  "productionCapture": {
+    "normalPipelineHook": true,
+    "realProviderRequests": 0,
+    "networkAttempts": [],
+    "scenarios": [
+      {
+        "scenario": "success",
+        "quality": "complete",
+        "verifiedUnits": 2,
+        "simulatedRequestAttempts": 1,
+        "realProviderRequests": 0
+      },
+      {
+        "scenario": "timeout",
+        "quality": "unusable",
+        "verifiedUnits": 0,
+        "simulatedRequestAttempts": 1,
+        "realProviderRequests": 0
+      },
+      {
+        "scenario": "cached",
+        "quality": "complete",
+        "verifiedUnits": 2,
+        "simulatedRequestAttempts": 0,
+        "realProviderRequests": 0
+      }
+    ],
+    "evidence": "agent/codex/fragment-trace-20261114-090400/production-final/verification.json"
+  },
+  "packages": [
+    {
+      "platform": "linux-x64",
+      "pythonMode": "bundled",
+      "sha256": "576735b6935625f5a17b127b1725d0b4fc70dbc04f93a62099a1fba5114cda45",
+      "bytes": 286130335,
+      "buildID": "3cb5eef781cf8775bde97cb9ed0078b43817e41957029e62678b08fa3a82f289",
+      "checkedSourceFiles": 29
+    },
+    {
+      "platform": "linux-x64",
+      "pythonMode": "local",
+      "sha256": "d45ae4720e76c840e27ee6540c9aadabbf42a6802d98f15d429215f7cf3f834d",
+      "bytes": 248212095,
+      "buildID": "5ba4432ea0f3854bdfbce4c4f47d7107efd1c161c8baa32fe7106e39958da3cc",
+      "checkedSourceFiles": 29
+    },
+    {
+      "platform": "windows-x64",
+      "pythonMode": "bundled",
+      "sha256": "5a4e7c6c8d3a51697a1e044648abb4ab301b0b41716317a0b43a667fe14f34aa",
+      "bytes": 198909642,
+      "buildID": "e9cc40df220739e3520b61e9465e481dfb383af55f72cd88da89a527fba3603f",
+      "checkedSourceFiles": 29
+    },
+    {
+      "platform": "windows-x64",
+      "pythonMode": "local",
+      "sha256": "9199e0bb6123a7d74a041d50dec1ae7517154787bebc5f430062accb051501ff",
+      "bytes": 186976178,
+      "buildID": "a161805e46a99807f54b417a0be704682c5f1bfe78d19fc7d3bfa9b4143a3307",
+      "checkedSourceFiles": 29
+    }
+  ],
+  "native": [
+    {
+      "platform": "linux-x64",
+      "pythonMode": "bundled",
+      "runID": "lc14",
+      "zoteroVersion": "10.0.8",
+      "checksPassed": 112,
+      "exitCode": 0,
+      "databaseIntegrity": "ok",
+      "enginePIDsRemaining": [],
+      "installedXpiSha256": "576735b6935625f5a17b127b1725d0b4fc70dbc04f93a62099a1fba5114cda45",
+      "jobsSubmitted": 0,
+      "nativeRendererExceptionsObserved": 0,
+      "nativeAnnotationInput": "trusted Gecko mouse drag, real native toolbar and database; no injected selection",
+      "selectedTextComparison": "complete native line; NFKD normalization verified against public PDF.js",
+      "nativeAnnotationPosition": {
+        "pageIndex": 0,
+        "rects": [
+          [
+            50.168,
+            705.499,
+            503.446,
+            716.066
+          ]
+        ]
+      },
+      "nativeReport": ".runtime/hover-lc14-result.json",
+      "driverReport": "agent/codex/paragraph-hover-20261114-075855/hover-lc14-driver.json",
+      "engineExitObservedSeconds": null,
+      "screenshots": [
+        {
+          "path": ".runtime/hover-lc14-native-window.png",
+          "sha256": "4f3d4768947c0fd72312627b78ff70bc092cd049243fa6e22122a3f8e83bd258",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        },
+        {
+          "path": ".runtime/hover-lc14-native-window-unannotated.png",
+          "sha256": "c23fcc6fe1e6cc3814f5f4f13622df0fe645ee4bd130e99f122511cca52baaa8",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        }
+      ],
+      "ok": true
+    },
+    {
+      "platform": "linux-x64",
+      "pythonMode": "local",
+      "runID": "ll6",
+      "zoteroVersion": "10.0.8",
+      "checksPassed": 112,
+      "exitCode": 0,
+      "databaseIntegrity": "ok",
+      "enginePIDsRemaining": [],
+      "installedXpiSha256": "d45ae4720e76c840e27ee6540c9aadabbf42a6802d98f15d429215f7cf3f834d",
+      "jobsSubmitted": 0,
+      "nativeRendererExceptionsObserved": 0,
+      "nativeAnnotationInput": "trusted Gecko mouse drag, real native toolbar and database; no injected selection",
+      "selectedTextComparison": "complete native line; NFKD normalization verified against public PDF.js",
+      "nativeAnnotationPosition": {
+        "pageIndex": 0,
+        "rects": [
+          [
+            50.168,
+            705.499,
+            503.446,
+            716.066
+          ]
+        ]
+      },
+      "nativeReport": ".runtime/hover-ll6-result.json",
+      "driverReport": "agent/codex/paragraph-hover-20261114-075855/hover-ll6-driver.json",
+      "engineExitObservedSeconds": null,
+      "screenshots": [
+        {
+          "path": ".runtime/hover-ll6-native-window.png",
+          "sha256": "4f3d4768947c0fd72312627b78ff70bc092cd049243fa6e22122a3f8e83bd258",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        },
+        {
+          "path": ".runtime/hover-ll6-native-window-unannotated.png",
+          "sha256": "7e650c0d1318e7e4723c900d62d73c560c9324a4b14b5a86217c862a4ae45d8e",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        }
+      ],
+      "ok": true
+    },
+    {
+      "platform": "windows-x64",
+      "pythonMode": "bundled",
+      "runID": "wb5",
+      "zoteroVersion": "10.0.8",
+      "checksPassed": 112,
+      "exitCode": 0,
+      "databaseIntegrity": "ok",
+      "enginePIDsRemaining": [],
+      "installedXpiSha256": "5a4e7c6c8d3a51697a1e044648abb4ab301b0b41716317a0b43a667fe14f34aa",
+      "jobsSubmitted": 0,
+      "nativeRendererExceptionsObserved": 0,
+      "nativeAnnotationInput": "trusted Gecko mouse drag, real native toolbar and database; no injected selection",
+      "selectedTextComparison": "complete native line; NFKD normalization verified against public PDF.js",
+      "nativeAnnotationPosition": {
+        "pageIndex": 0,
+        "rects": [
+          [
+            50.168,
+            705.499,
+            503.446,
+            716.066
+          ]
+        ]
+      },
+      "nativeReport": "agent/codex/paragraph-hover-20261114-075855/hover-wb5-result.json",
+      "driverReport": "agent/codex/paragraph-hover-20261114-075855/hover-wb5-driver.json",
+      "engineExitObservedSeconds": 3.0312167,
+      "screenshots": [
+        {
+          "path": "agent/codex/paragraph-hover-20261114-075855/hover-wb5-native-window.png",
+          "sha256": "05e625e99f024f3587905962330f766ca84504b262447daa7b9c6033f3610f6b",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        },
+        {
+          "path": "agent/codex/paragraph-hover-20261114-075855/hover-wb5-native-window-unannotated.png",
+          "sha256": "9e4da4bfd8056437aa8fa3ecb1a6f22a29132225cb027200723f8f4bd4a7c990",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        }
+      ],
+      "ok": true
+    },
+    {
+      "platform": "windows-x64",
+      "pythonMode": "local",
+      "runID": "wl1",
+      "zoteroVersion": "10.0.8",
+      "checksPassed": 112,
+      "exitCode": 0,
+      "databaseIntegrity": "ok",
+      "enginePIDsRemaining": [],
+      "installedXpiSha256": "9199e0bb6123a7d74a041d50dec1ae7517154787bebc5f430062accb051501ff",
+      "jobsSubmitted": 0,
+      "nativeRendererExceptionsObserved": 0,
+      "nativeAnnotationInput": "trusted Gecko mouse drag, real native toolbar and database; no injected selection",
+      "selectedTextComparison": "complete native line; NFKD normalization verified against public PDF.js",
+      "nativeAnnotationPosition": {
+        "pageIndex": 0,
+        "rects": [
+          [
+            50.168,
+            705.499,
+            503.446,
+            716.066
+          ]
+        ]
+      },
+      "nativeReport": "agent/codex/paragraph-hover-20261114-075855/hover-wl1-result.json",
+      "driverReport": "agent/codex/paragraph-hover-20261114-075855/hover-wl1-driver.json",
+      "engineExitObservedSeconds": 3.6242855,
+      "screenshots": [
+        {
+          "path": "agent/codex/paragraph-hover-20261114-075855/hover-wl1-native-window.png",
+          "sha256": "05e625e99f024f3587905962330f766ca84504b262447daa7b9c6033f3610f6b",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        },
+        {
+          "path": "agent/codex/paragraph-hover-20261114-075855/hover-wl1-native-window-unannotated.png",
+          "sha256": "928cab57d791e6ffb7c95d867952945f7aaa78205f39c9b6bfb11ae7e2fa1b74",
+          "capture": "WindowGlobalParent.drawSnapshot; real isolated reader composition",
+          "visualReview": "inspected; pale bilateral request tint and native yellow annotations visible"
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "windowsTemporaryTasksRemaining": []
+}

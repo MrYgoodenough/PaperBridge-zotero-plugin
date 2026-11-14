@@ -484,7 +484,8 @@ var PaperBridge = {
       state.cleanups.push(() => style.remove());
     }
     const controls = doc.createElement("div");
-    controls.style.cssText = "position:fixed;bottom:14px;right:18px;z-index:1000;display:flex;gap:5px;padding:5px;border:1px solid #ccc;border-radius:7px;background:var(--material-background,#fff);box-shadow:0 2px 12px #0002";
+    controls.className = "paperbridge-split-controls";
+    controls.style.cssText = "position:fixed;bottom:14px;right:18px;z-index:1000;display:flex;flex-wrap:wrap;align-items:center;max-width:calc(100vw - 36px);gap:5px;padding:5px;border:1px solid #ccc;border-radius:7px;background:var(--material-background,#fff);box-shadow:0 2px 12px #0002";
     const sync = doc.createElement("button");
     sync.textContent = "⇄ 同步开启";
     sync.setAttribute("aria-pressed", "true");
@@ -499,7 +500,7 @@ var PaperBridge = {
     close.addEventListener("click", () => this.closeSplit(state.reader.tabID));
     for (const button of [sync, close]) button.style.cssText = "font:13px 'Songti SC','SimSun',serif;padding:5px 8px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer";
     controls.append(sync, close);
-    // Missing maps disable only explicit localization; ordinary reading remains unchanged.
+    // Missing maps disable only localization/hover; ordinary reading and annotations remain usable.
     state.alignment = new FragmentAlignment({ loadMapping: split => this.loadAlignment(split) });
     controls.append(state.alignment.attach(state));
     doc.body.append(controls);

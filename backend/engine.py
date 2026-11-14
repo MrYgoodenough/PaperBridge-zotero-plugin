@@ -178,11 +178,14 @@ async def _translate(request, quality):
     import onnxruntime
     onnxruntime.disable_telemetry_events()
     from preserve import ProtectedLayoutModel, restore_regions
+    from fragment_trace import FragmentTrace
     from references import reference_regions
     import pymupdf
 
     folder = Path(request["folder"])
     source = folder / "source.pdf"
+    # Mapping always hashes the original snapshot, never the optional repaired working input.
+    original_source = source
     document_key = request.get("document_key") or hashlib.sha256(source.read_bytes()).hexdigest()
     with pymupdf.open(source) as document:
         blocks = document[0].get_text("dict")["blocks"]
@@ -203,6 +206,7 @@ async def _translate(request, quality):
                                   api_key=request["api_key"], profile=request["profile"],
                                   capabilities=request["capabilities"])
     translator.quality = quality
+    translator.fragment_trace = FragmentTrace(original_source)
     translator.write_usage()
     with pymupdf.open(source) as document:
         references = reference_regions(document)
@@ -231,6 +235,7 @@ async def _translate(request, quality):
             progress.restoring()
             restore_regions(source, output, temporary, layout_model.regions)
             temporary.replace(folder / "translated.pdf")
+            translator.fragment_trace.write(folder / "translated.pdf", folder / "alignment.json", quality)
             quality.write(artifact_exists=True)
             translator.write_usage(excluded_graphic_characters=layout_model.excluded_characters,
                                    excluded_reference_characters=layout_model.excluded_reference_characters)

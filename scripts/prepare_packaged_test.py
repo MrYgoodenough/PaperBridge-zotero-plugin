@@ -28,19 +28,23 @@ addon_manifest=json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf
 version=addon_manifest["version"]
 parser = argparse.ArgumentParser()
 parser.add_argument("--local-python", default="", help="Existing Python 3.12 interpreter to test")
-parser.add_argument("--suite", choices=["packaged", "queue", "alignment", "annotations", "upgrade"], default="packaged",
-                    help="Queue/alignment/annotations/upgrade smoke uses isolated profiles")
+parser.add_argument("--suite", choices=["packaged", "queue", "alignment", "hover", "annotations", "upgrade"], default="packaged",
+                    help="Queue/alignment/hover/annotations/upgrade smoke uses isolated profiles")
 parser.add_argument("--phase", choices=["create", "reopen"], default="create", help="Annotation persistence phase")
 parser.add_argument("--run-id", default="", help="Optional isolated profile suffix, retained across restart phases")
 parser.add_argument("--xpi", type=Path, help="Explicit historical XPI for an isolated upgrade baseline")
 parser.add_argument("--reader-pdf", action="append", nargs=2, default=[], metavar=("PDF", "PAGE"),
                     help="Optional translated PDF and one-based page to open during upgrade reopen")
 parser.add_argument("--link-pdf", type=Path, help="Optional two-page synthetic PDF for a native internal-link click")
+parser.add_argument("--capture-pause-ms", type=int, default=0,
+                    help="Optional short hover-suite pause for capturing the native reader")
 options = parser.parse_args()
 if options.run_id and (not options.run_id.replace("-", "").replace("_", "").isalnum() or len(options.run_id) > 64):
     parser.error("run-id must contain only letters, numbers, '-' or '_'")
 if any(not page.isdigit() or int(page) < 1 for _, page in options.reader_pdf):
     parser.error("reader-pdf PAGE must be a positive one-based page number")
+if options.capture_pause_ms < 0:
+    parser.error("capture-pause-ms must be nonnegative")
 # A named run does not overwrite an earlier suite's profile or cached test credentials.
 run_name = options.suite + ("-" + options.run_id if options.run_id else "")
 # Each suite owns its profile and data, never the user's normal Zotero library.
@@ -77,11 +81,18 @@ async function runTests(){
   if(!Zotero.PaperBridge) throw new Error("PaperBridge did not start within 10 seconds");
   Services.scriptloader.loadSubScript(TEST_URI, {Zotero,Services,IOUtils,PathUtils,Cc,Ci,Components,ChromeUtils,PAPERBRIDGE_TEST_ROOT:PROJECT_ROOT_LITERAL});
 }'''.replace("TEST_URI",json.dumps((ROOT / ("tests/" + {"packaged": "packaged.js", "queue": "queue_packaged.js",
-    "alignment": "alignment_packaged.js", "annotations": "annotations_packaged.js",
+    "alignment": "alignment_packaged.js", "hover": "hover_packaged.js", "annotations": "annotations_packaged.js",
     "upgrade": "upgrade_packaged.js"}[options.suite])).as_uri())).replace("PROJECT_ROOT_LITERAL",json.dumps(str(ROOT)))
 if options.suite != "packaged":
     bootstrap = bootstrap.replace("packaged-test.json", options.suite + "-test.json")
-if options.suite == "annotations":
+if options.suite == "hover":
+    hover_options = {"isolated": True, "expectedProfileDirectory": str(PROFILE),
+        "expectedDataDirectory": str(DATA), "fixtureDirectory": str(ROOT / ".runtime/alignment-fixture"),
+        "reportPath": str(ROOT / f".runtime/{run_name}-result.json"),
+        "capturePauseMS": options.capture_pause_ms}
+    bootstrap = bootstrap.replace("PAPERBRIDGE_TEST_ROOT:" + json.dumps(str(ROOT)),
+        "PAPERBRIDGE_HOVER_TEST:" + json.dumps(hover_options) + ",PAPERBRIDGE_TEST_ROOT:" + json.dumps(str(ROOT)))
+elif options.suite == "annotations":
     annotation_options = {"isolated": True, "expectedProfileDirectory": str(PROFILE),
         "expectedDataDirectory": str(DATA), "phase": options.phase,
         "sourcePDF": str(ROOT / ".runtime/annotations-fixture/source.pdf"),
@@ -108,6 +119,9 @@ prefs = {"extensions.zotero.dataDir":str(DATA),"extensions.zotero.useDataDir":Tr
     "extensions.paperbridge.pythonPath": options.local_python,
     "extensions.autoDisableScopes":0,"extensions.enabledScopes":15,"extensions.startupScanScopes":15,
     "xpinstall.signatures.required":False,"browser.shell.checkDefaultBrowser":False}
+if options.suite == "hover":
+    # First-run guidance opens the system browser, occluding the native test renderer on Windows.
+    prefs["extensions.zotero.firstRun2"] = False
 DATA.mkdir(exist_ok=True)
 (PROFILE / "user.js").write_text("\n".join(f"user_pref({json.dumps(k)}, {json.dumps(v)});" for k,v in prefs.items()))
 for name in ["addonStartup.json.lz4","extensions.json"]:
