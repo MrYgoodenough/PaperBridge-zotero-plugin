@@ -1,7 +1,19 @@
 {
   "addons": {
     "paperbridge@local.dev": {
-      "updates": []
+      "updates": [
+        {
+          "version": "0.3.3",
+          "update_link": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-windows-x64.xpi",
+          "update_hash": "sha256:96b2c53b53b13438760370489137bddf85e05bc3e43df7fc09dde5a4c466d11b",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "9.0",
+              "strict_max_version": "10.*"
+            }
+          }
+        }
+      ]
     }
   }
 }

@@ -1,3 +1,4 @@
+<!-- Artifact-bound packaging, native acceptance, and independent update channel rules. -->
 # Packaging and update channels
 
 `scripts/build.py` is the packaging entry point. It produces an XPI, its
@@ -7,7 +8,7 @@ installs, uploads, changes versions or writes public feeds.
 
 ## Platform and source scope
 
-Shared source is **0.3.2**. The independently released macOS 0.4.2 implementation
+Shared source is **0.3.3**. The independently released macOS 0.4.2 implementation
 has not been merged, so do not rebuild or replace that release using this branch.
 Linux/Windows acceptance does not certify macOS or translation semantics.
 The lightweight three-platform CI checks shared-source contracts, not native
@@ -36,8 +37,8 @@ Use the project interpreter and the actual target/version filenames:
 
 ```sh
 .venv/bin/python scripts/verify_release.py \
-  --xpi dist/paperbridge-0.3.2-linux-x64.xpi \
-  --sha256 dist/paperbridge-0.3.2-linux-x64.xpi.sha256 \
+  --xpi dist/paperbridge-0.3.3-linux-x64.xpi \
+  --sha256 dist/paperbridge-0.3.3-linux-x64.xpi.sha256 \
   --feed dist/updates/linux-x64.json
 ```
 
@@ -73,6 +74,13 @@ and checksums without echoing signed redirects or response bodies.
    for unbuilt or unmerged platforms.
 4. Run the public check and then test native Zotero update delivery separately.
 
+For a non-macOS release, keep `make_latest=false`: the repository-wide latest
+pointer must not replace the independent macOS release. Give an already installed
+development build a distinct newer version so its real update path can be tested.
+`scripts/prepare_nonmac_test.py --suite update` and `tests/update_packaged.js`
+exercise `AddonManager.findUpdates`, its returned installer, and a cold process
+restart with the same profile/data; a manually copied XPI is not automatic delivery.
+
 Never use `releases/latest/download` as a platform fallback: `latest` is
 repository-wide, and a newer macOS-only release does not contain Windows/Linux
 assets. Same-name historical local packages may differ from published XPIs;
@@ -84,11 +92,10 @@ The build writes `dist/updates/`, but installed XPIs request
 `master/updates/<platform>[-local-python].json` from the public repository.
 Building or syncing source alone cannot publish those files or release assets.
 
-The four Linux/Windows source channels intentionally contain `updates: []` until
-an installer is separately approved and published. Once pushed, these are valid
-**no-update** responses, not evidence of a released 0.3.2 or automatic delivery.
-Consequently, verifying a 0.3.2 draft with `--online` still reports a deliberate
-public/draft mismatch while the channels are empty.
+Before an installer is approved and published, a channel may contain `updates: []`.
+This is a valid **no-update** response, not a released package or automatic-delivery
+result. The four Linux/Windows channels are independent by Python mode; enable
+only the exact matching draft after its version-tagged assets are public.
 
 macOS channels and the 0.4.2 asset are not replaced here. Old installations whose
 manifest used `example.invalid` need a manual newer installation once; creating

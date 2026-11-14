@@ -1,8 +1,13 @@
+<!-- Windows installation, runtime portability, and native verification entry points. -->
 # Windows 适配说明
 
 原工程只面向 macOS Apple Silicon：插件拒绝在其它平台解包运行时，内置解释器路径、
 依赖目录、字体来源和构建脚本也都是 macOS 专用的。本目录的代码已改为按平台分发，
-同一套源码可分别构建 macOS 与 Windows 安装包。
+共享源码按平台构建安装包；独立发布的 macOS 0.4.2 源码尚未合入，不应使用本分支覆盖该包。
+
+Windows x64 安装 `paperbridge-0.3.3-windows-x64.xpi`。一般用户使用自带 Python 版；
+本地 Python 版需在高级设置指定 x64 CPython 3.12。右下角「段落高亮」默认关闭，
+只映射可追溯的翻译请求片段，不修改 PDF 或批注。
 
 ## 支持范围
 
@@ -31,7 +36,7 @@ XPI 内按 `runtime/<平台>/` 存放运行时；插件启动时按 `Services.ap
 | `scripts/prepare_packaged_test.py` | 测试用 XPI 名称与提示按平台生成 |
 | `scripts/setup.ps1`、`scripts/serve.ps1` | Windows 下等价于 `setup.sh`、`serve.sh` |
 
-两平台使用同一套任务与附件归属实现。当前 0.3.2 新增的持久化任务、质量证据与
+各平台使用同一套任务与附件归属实现。持久化任务、质量证据与
 进度接口见 [任务与成果架构](tasks-and-results.md)；历史格式继续读取，不要求迁移译文附件。
 
 ## 在 Windows 上开发与构建
@@ -43,8 +48,8 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 # 2. 打包运行时（.cache/package/windows-x64，约 450 MB）
 .\.venv\Scripts\python.exe scripts\stage_runtime.py
 
-# 3. 生成安装包（dist\paperbridge-0.3.2-windows-x64.xpi）
-.\.venv\Scripts\python.exe scripts\build.py            # 自带 Python，约 221 MB
+# 3. 生成安装包（dist\paperbridge-0.3.3-windows-x64.xpi）
+.\.venv\Scripts\python.exe scripts\build.py            # 自带 Python
 .\.venv\Scripts\python.exe scripts\build.py --python local   # 仅依赖，需自备 Python 3.12
 ```
 
@@ -61,12 +66,20 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 Zotero 10 兼容范围由 `addon/manifest.json` 的 `strict_max_version: 10.*` 声明。
 已有 Windows XPI 若仍声明 `9.*`，需要从当前源码重新运行 `scripts/build.py` 并安装新包；
 仅更新源码不会改变已安装的 XPI。旧版占位更新地址需先从文件安装新版。
-0.3.2 构建包使用 Windows/Python 模式独立更新地址，草稿清单在 `dist/updates/`；
+0.3.3 构建包使用 Windows/Python 模式独立更新地址，草稿清单在 `dist/updates/`；
 对应安装包发布后再发布清单，构建或同步源码不会自动启用更新。
 
 新任务尝试目录不再重复嵌套指纹与 UUID，避免常规数据路径触发 Windows MAX_PATH。
-旧目录仍可读取；测试根路径不需要人为缩短，也不要求修改系统注册表。
+旧目录仍可读取；Gecko 解包仍受很深的数据路径影响，不承诺所有极端长路径可用，
+也不要求修改系统注册表。测试用较短的独立目录，不覆盖日常工程或文献库。
 Gecko 文件接口使用 `PathUtils.join(root, "folder", "file")`，不要拼接混合分隔符路径。
+
+真实论文和冷启动检查使用 `scripts/prepare_nonmac_test.py --suite reading` 与
+`tests/reading_packaged.js`；原生更新使用 `--suite update` 与 `tests/update_packaged.js`。
+`--phase reopen` 保留原 profile、数据、插件和缓存，仅更新外部测试参数。
+OpenSSH 的 Session 0 不适合原生 UI 验收，应在已登录交互会话运行 Zotero。
+
+以下为历史 0.3.1 的验证范围，不替代当前安装包的验收。
 
 2026-11-07 使用独立 Zotero 10.0.6 程序副本、profile 和文献库验证重建的自带 Python 包：
 插件菜单、设置保存、内置引擎解包与启动、选页翻译、译文附件、双向同步、独立阅读及关闭清理均通过。

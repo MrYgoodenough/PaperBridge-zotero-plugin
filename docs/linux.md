@@ -1,6 +1,7 @@
+<!-- Linux installation requirements and native development entry points. -->
 # Linux 安装与开发
 
-Linux amd64 使用 `paperbridge-0.3.1-linux-x64.xpi`，支持 Zotero 9 / 10，实测环境为 Ubuntu 24.04 amd64、Zotero 10.0.8。安装包包含独立 CPython 3.12、CPU 版面引擎、模型和 tokenizer，运行时不依赖系统 Python、CUDA 或 ROS2。当前预编译包的 ELF 依赖要求 **glibc ≥ 2.34**，不使用 Ubuntu 24.04 专用接口；满足该基线的其他发行版尚未逐一实机验证。未提供 musl/Alpine 和 ARM64 安装包。
+Linux amd64 使用 `paperbridge-0.3.3-linux-x64.xpi`，支持 Zotero 9 / 10，实测环境为 Ubuntu 24.04 amd64、Zotero 10.0.8。安装包包含独立 CPython 3.12、CPU 版面引擎、模型和 tokenizer，运行时不依赖系统 Python、CUDA 或 ROS2。当前预编译包的 ELF 依赖要求 **glibc ≥ 2.34**，不使用 Ubuntu 24.04 专用接口；满足该基线的其他发行版尚未逐一实机验证。未提供 musl/Alpine 和 ARM64 安装包。
 
 ## 使用
 
@@ -32,6 +33,7 @@ sh scripts/setup.sh
 - 平台标识 `linux-x64`、解释器 `python/bin/python3.12`：`addon/content/runtime.js`、`scripts/stage_runtime.py`、`scripts/build.py`。
 - 字体发现、简体字面提取：`backend/fonts.py`。通过 fontconfig 查询真实已安装的字体，避免将缺失字体的无关替代字面当作中文字体。
 - 隔离 Zotero 配置和数据目录：`scripts/prepare_packaged_test.py`；真实 XPI 的设置、重启、翻译、阅读和缓存验证：`tests/packaged.js`；文献生命周期：`tests/lifecycle.js`。
+- 真实论文/跨栏几何与冷启动：`scripts/prepare_nonmac_test.py --suite reading`、`tests/reading_packaged.js`；原生更新与冷启动持久化：同一 helper 的 `--suite update`、`tests/update_packaged.js`。`--phase reopen` 只更新外部测试参数，不替换插件或清空缓存。
 
 ```sh
 .venv/bin/python -m pytest tests --basetemp=.runtime/pytest-linux -q
@@ -42,4 +44,4 @@ xvfb-run -a /path/to/zotero -no-remote -profile "$PWD/.runtime/packaged-profile"
 
 图形测试使用独立的 `.runtime/packaged-profile` 和 `.runtime/packaged-data`，不会读取或修改日常文献库。首次测试保存临时 Key 并返回 `restart-required`；再次启动从忽略的 `.env` 读取测试用 `DEEPSEEK_API_KEY`，翻译真实论文第 2–4 页。测试辅助插件不会进入正式安装包。
 
-Ubuntu 24.04 / Zotero 10.0.8 的实际 XPI 已验证：设置及 Key 重启持久化、三页真实翻译、中文常规/粗体嵌入、页面尺寸及未选页原文保留、双向同步与独立阅读、附件保存、全文缓存复用、文献删除与共享缓存清理、运行中取消及宿主退出后引擎停止。现有 Python 测试 36 项通过，分屏同步测试通过；公式和参考文献保护均通过离线验证。详细数据见 [linux-verification-0.3.1.json](linux-verification-0.3.1.json)。
+历史 0.3.1 的翻译、字体、缓存与生命周期范围见 [linux-verification-0.3.1.json](linux-verification-0.3.1.json)，不能替代新包的原生或全文质量验收。段落高亮以可追溯翻译请求为单位；重排、跨页或多义区域不猜配，接口缺失只停用高亮。

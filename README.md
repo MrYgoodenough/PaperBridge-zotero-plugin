@@ -7,13 +7,15 @@ Zotero 9 / 10 的一体化论文翻译插件。默认使用 `deepseek-flash` 翻
 
 ## 安装
 
-请按平台选择已发布安装包。当前源码为 **0.3.2**：支持可靠任务、串行批量、双配置、脱敏诊断和独立的译文原生批注。Linux / Windows 的四种开发 XPI 已完成基础原生功能隔离验收，仍是未发布的本地草稿；更新通道的空列表表示暂无已发布新版本。源码更新不等于已发布安装包或语义质量验收。
+请按平台选择安装包。当前共享源码为 **0.3.3**：支持可靠任务、串行批量、双配置、脱敏诊断、独立的译文原生批注和段落双向高亮。各平台的发布范围独立，源码更新不等于其他平台安装包或全文翻译质量已验收。
 
 | 平台 | 已发布安装包 |
 |---|---|
 | macOS Apple Silicon（arm64） | [0.4.2 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.4.2/paperbridge-0.4.2-macos-arm64.xpi) |
-| Windows x64 | [0.3.1 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.1/paperbridge-0.3.1-windows-x64.xpi) |
-| Linux amd64（glibc ≥ 2.34；Ubuntu 24.04 已验证） | [0.3.1 安装与构建说明](docs/linux.md) |
+| Windows x64 | [0.3.3 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-windows-x64.xpi) |
+| Linux amd64（glibc ≥ 2.34；Ubuntu 24.04 已验证） | [0.3.3 自带 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-linux-x64.xpi) |
+
+已有独立 Python 3.12 的用户可选择 [Windows 本地 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-windows-x64-local-python.xpi) 或 [Linux 本地 Python 版](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.3/paperbridge-0.3.3-linux-x64-local-python.xpi)，并在高级设置中指定解释器。一般用户推荐自带 Python 版。
 
 **源码与发布包范围不同**：macOS 0.4.2 发布包另有译文原生批注、长公式 LaTeX 复制与持久公式缓存，详见 [发布说明](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)。对应源码尚未合入本分支；当前源码独立接入基础译文批注，不包含该公式实现，不应覆盖该 macOS 发布包。
 
@@ -40,7 +42,7 @@ Zotero 9 / 10 的一体化论文翻译插件。默认使用 `deepseek-flash` 翻
 - 右侧译文支持 Zotero 原生高亮、下划线与笔记，批注保存为译文附件的子条目，重开或独立阅读器也能查看。没有原文↔译文批注复制，权限或接口不可用时该侧只读降级，详见 [批注说明](docs/annotations.md)。
 - **工具 → PaperBridge → 取消当前论文翻译** 可终止任务。
 
-段落高亮仅覆盖当前结构可追溯的单页片段，不保证跨页对应；代表性论文效果及本次 macOS 原生兼容性尚未认证。
+段落高亮仅覆盖当前结构可追溯的单页片段，不保证跨页对应；跨页、移动、合并或多义的区域不猜配，全文翻译质量仍需人工核对。macOS 0.4.2 发布包不包含本分支新增的段落高亮实现。
 
 ## 排版与宋体
 
@@ -89,7 +91,7 @@ macOS 在打包前运行 `curl -L --fail --output .cache/opencv-4.12.0.tar.gz ht
 
 `stage_runtime.py` 从 `uv.lock` 收集本平台运行依赖及公开模型资源，`build.py` 将运行时与插件合并到单个 XPI。引擎运行时加载所需的 `.pyi` 类型资源一并保留；开发测试库不打入运行时。
 
-构建还会在 `dist/updates/` 生成分平台、分 Python 模式的 Zotero 更新草稿。先上传匹配的 XPI，再发布对应清单至仓库 `updates/`；公开通道的空列表表示暂无已发布更新，不是下载故障。单纯构建或同步源码不会发布安装包，旧版占位更新地址仍需手动安装新版一次。
+构建还会在 `dist/updates/` 生成分平台、分 Python 模式的 Zotero 更新草稿。先上传匹配的 XPI，再发布对应清单至仓库 `updates/`。Linux / Windows 通道分别提供对应模式的更新；旧版占位更新地址仍需手动安装新版一次，不能依赖仓库级「最新版本」寻找其他平台安装包。
 
 ```sh
 .venv/bin/python scripts/check_offline.py
@@ -124,4 +126,4 @@ macOS 在打包前运行 `curl -L --fail --output .cache/opencv-4.12.0.tar.gz ht
 
 参考文献章节保留原 PDF 字体与排版，不发送翻译 API；正文引用编号保留。支持常规 References、Bibliography、参考文献等标题，按单双栏阅读顺序跨页保护，遇到附录等后续章节恢复正常翻译。旧译文仍可打开；按新规则翻译时不复用旧规则的全文结果。
 
-开发边界及修改入口见 [任务与成果架构](docs/tasks-and-results.md)。目前仍固定 BabelDOC 0.6.4；上游已披露旧版解析安全问题，勿将本地任务隔离视为修复，建议只处理可信来源的 PDF。段落精确对齐与引擎大版本迁移不在当前功能范围。
+开发边界及修改入口见 [任务与成果架构](docs/tasks-and-results.md)。目前仍固定 BabelDOC 0.6.4；上游已披露旧版解析安全问题，勿将本地任务隔离视为修复，建议只处理可信来源的 PDF。句子／单词精确对齐与引擎大版本迁移不在当前功能范围。
