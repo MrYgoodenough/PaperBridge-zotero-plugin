@@ -727,8 +727,9 @@
     const annotation = await until(() => split.translated.getAnnotations().find(item =>
       !previousKeys.has(item.key) && item.annotationType === "highlight"), "Trusted native highlight was not persisted");
     await split.annotations.pending;
+    const annotationJSON = await Zotero.Annotations.toJSON(annotation);
     // Native annotation text uses NFKC (including full-width punctuation); keep both observed strings.
-    check(annotation.parentID === split.translated.id && annotation.annotationPosition.pageIndex === pageIndex
+    check(annotation.parentID === split.translated.id && annotationJSON.position.pageIndex === pageIndex
       && annotation.annotationText.trim().normalize("NFKC") === highlight.spanText.trim().normalize("NFKC"),
     "Summary fixture is an actual native translated highlight", {
       actualText: annotation.annotationText, pdfText: highlight.spanText, annotationKey: annotation.key });
