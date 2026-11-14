@@ -1,0 +1,200 @@
+{
+  "_comment": "Bounded Linux/Windows native acceptance and public delivery; not whole-paper semantic or macOS certification.",
+  "schema_version": 1,
+  "version": "0.3.4",
+  "source_commit": "8b2cd663288621dec2e0026be4632b4887e20c15",
+  "public_feed_commit": "0c4a7a8de44ce5128331c8ce209d275996704eea",
+  "all_requested_nonmac_checks_complete": false,
+  "scope": {
+    "zotero_version": "10.0.8",
+    "native_platforms": ["Ubuntu 24.04 x64", "Windows 11 x64 (desktop-hz)"],
+    "python_modes": ["bundled", "local"],
+    "hover_directions": "source-to-translation and translation-to-source",
+    "minimum_unit": "individually traceable translation-request fragment",
+    "toggle": "independent, bottom-right, default off",
+    "annotation_coexistence": "Native text ranges use CSS Custom Highlights with priority -1; PDF, canvas, text spans, annotations and selection are not rewritten.",
+    "new_provider_requests": 0,
+    "whole_paper_semantic_acceptance": false,
+    "sentence_or_word_mapping": false,
+    "production_cross_page_fragment_mapping": false,
+    "macos_native_acceptance": false,
+    "new_runtime_dependencies": false
+  },
+  "representative_inputs": {
+    "historical_translations_replayed_through_production_cache": true,
+    "papers": [
+      {"corpus_id": "scikit-learn-2011", "selected_pages_one_based": [2], "verified_request_units": 16},
+      {"corpus_id": "liblinear-2008", "selected_pages_one_based": [1], "verified_request_units": 22}
+    ],
+    "verified_real_units": 38,
+    "abstracts_covered": 2,
+    "long_body_request_fragments_covered": 4,
+    "paragraph_cache_hits": 39,
+    "cache_misses": 0,
+    "provider_http_or_socket_attempts": 0,
+    "unselected_pages_with_preserved_text_and_pixels": 8,
+    "historical_quality_status": "partial",
+    "known_unresolved_quality_issues": ["affiliation wrapping", "copyright glyph reconstruction", "author font hierarchy"],
+    "human_semantic_or_whole_paper_quality_approval": false
+  },
+  "geometry_acceptance": {
+    "synthetic_pages": 2,
+    "synthetic_verified_units": 2,
+    "production_rectangles_per_side": 1,
+    "same_page_disjoint_rectangles": "fixture-only glyph geometry using the same verified identities; not production FragmentTrace output",
+    "visible_excluded_glyph_probes": 12,
+    "excluded_probes": "Two real copyright probes and ten geometry probes; cross-page, moved, merged or otherwise unverified identities do not highlight.",
+    "native_hover_and_annotation_ranges_verified": true,
+    "source_and_target_canvas_annotation_state_unchanged_by_hover": true
+  },
+  "offline": {
+    "linux": {"mode": "full", "python_passed": 231, "python_skipped": 1, "node_suites": 7, "javascript_syntax_checks": 26},
+    "windows": {"mode": "full", "python_passed": 231, "python_skipped": 1, "node_suites": 7, "javascript_syntax_checks": 26},
+    "skip_reason": "Optional local scientific reference PDF is unavailable.",
+    "external_network_guarded": true
+  },
+  "ci": {
+    "run_id": 43613934143,
+    "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43613934143",
+    "source_commit": "8b2cd663288621dec2e0026be4632b4887e20c15",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs_and_all_steps_passed": ["ubuntu-latest", "windows-latest", "macos-latest"],
+    "scope": "Lightweight shared-source tests and startup contracts; no native macOS Zotero or full runtime acceptance."
+  },
+  "packages": [
+    {
+      "platform": "linux-x64", "python_mode": "bundled",
+      "asset": "paperbridge-0.3.4-linux-x64.xpi",
+      "bytes": 286130568,
+      "sha256": "077ee68e74bed3fa91e7b0cff0008f904fa141b966c6db795c32c7b1909bf865",
+      "build_id": "7c1e5aead8464916dcd544e91c0e4da97c1de242c4049b703586a7b8c4f279a2",
+      "checked_shipped_source_files": 29
+    },
+    {
+      "platform": "linux-x64", "python_mode": "local",
+      "asset": "paperbridge-0.3.4-linux-x64-local-python.xpi",
+      "bytes": 248212325,
+      "sha256": "f2a12d6d9277f2cb9f8d46caccf9b077a387a652f74383899fcf3b18f86c617c",
+      "build_id": "394faf9ed48db8e1d971f44026eab20f37c300e95a598ee26a840e2f02f2a374",
+      "checked_shipped_source_files": 29
+    },
+    {
+      "platform": "windows-x64", "python_mode": "bundled",
+      "asset": "paperbridge-0.3.4-windows-x64.xpi",
+      "bytes": 198909872,
+      "sha256": "b4dfdf905c705dfd43d4361e9f3dd9842b5d13f1d904b1845af094f9c8d7d29f",
+      "build_id": "a9feb1ebe7017b7bbcb8ea06e62837de712b75248546cecc1c1fd06d0224fb51",
+      "checked_shipped_source_files": 29
+    },
+    {
+      "platform": "windows-x64", "python_mode": "local",
+      "asset": "paperbridge-0.3.4-windows-x64-local-python.xpi",
+      "bytes": 186976407,
+      "sha256": "453d9b48d6782d15ee3c57f045e5b965d530182cdb1043ac96cf32f3f3df4272",
+      "build_id": "f70768d3ea690a04d4e0048f3ee955f401ce8c872189ee11d40bb541c2b2ca54",
+      "checked_shipped_source_files": 29
+    }
+  ],
+  "native_acceptance": [
+    {"platform": "linux-x64", "python_mode": "bundled", "reading_create_checks": 290, "reading_cold_reopen_checks": 304, "hover_checks": 112, "actual_stopped_xpi_hash_verified": true, "normal_exit_code": 0, "database_integrity": "ok", "isolated_engine_cleanup": true},
+    {"platform": "linux-x64", "python_mode": "local", "reading_create_checks": 290, "reading_cold_reopen_checks": 304, "hover_checks": 112, "actual_stopped_xpi_hash_verified": true, "normal_exit_code": 0, "database_integrity": "ok", "isolated_engine_cleanup": true},
+    {"platform": "windows-x64", "python_mode": "bundled", "reading_create_checks": 290, "reading_cold_reopen_checks": 304, "hover_checks": 112, "actual_stopped_xpi_hash_verified": true, "normal_exit_code": 0, "database_integrity": "ok", "isolated_engine_cleanup": true},
+    {"platform": "windows-x64", "python_mode": "local", "reading_create_checks": 290, "reading_cold_reopen_checks": 304, "hover_checks": 112, "actual_stopped_xpi_hash_verified": true, "normal_exit_code": 0, "database_integrity": "ok", "isolated_engine_cleanup": true}
+  ],
+  "automatic_updates": {
+    "baseline_version": "0.3.2",
+    "target_version": "0.3.4",
+    "method": "Native AddonManager.findUpdates on the exact public platform/mode URL, returned installer, actual download and install events, then true same-profile process restart without reinstallation.",
+    "all_four_platform_mode_pairs_verified": true,
+    "checks_per_pair": {"download_and_install": 18, "cold_reopen": 14},
+    "downloaded_xpi_hashes_match_public_assets": true,
+    "active_addon_engine_health_and_marker_version": "0.3.4",
+    "settings_credentials_library_and_annotations_preserved_in_isolated_fixture": true,
+    "model_or_translation_jobs_created": 0,
+    "scope": "Synthetic isolated preservation fixture; not daily-profile credentials or paid translation quality."
+  },
+  "daily_installation": {
+    "linux": {
+      "installed_and_same_profile_cold_reopened": true,
+      "native_method": "Zotero Plugins Manager Check for Updates followed by native installation",
+      "active_version": "0.3.4",
+      "bundled_published_xpi_hash_verified": true,
+      "engine_health_and_build_id_match_package": true,
+      "original_backup_retained": true,
+      "plugin_settings_and_credentials_unchanged": true,
+      "library_integrity": "ok",
+      "document_attachment_annotation_tag_and_referenced_metadata_content_preserved": true,
+      "all_raw_library_table_hashes_unchanged": false,
+      "proven_raw_differences": "Native attachment lastRead/item client metadata changes and removal of one unreferenced metadata value; no content or ownership difference.",
+      "verification_scripts_wrote_library": false,
+      "test_helper_installed": false,
+      "new_translation_requests": 0,
+      "left_running_for_user": true
+    },
+    "windows": {
+      "installed_and_same_profile_cold_reopened": true,
+      "status": "Native installation/cold health/library checks passed; daily credential preservation FAILED and repair awaits user authorization.",
+      "native_method": "Zotero native Install Add-on From File; the old installation used a placeholder update URL",
+      "active_version": "0.3.4",
+      "bundled_published_xpi_hash_verified": true,
+      "accepted_cold_engine_health_and_build_id_match_package": true,
+      "cold_engine_actual_parent_is_reopened_native_process": true,
+      "current_left_running_engine": "lazy, not started; earlier cold health is not represented as a current live service",
+      "original_encrypted_backup_binding_verified": true,
+      "original_backup_retained": true,
+      "plugin_settings_unchanged": true,
+      "job_records_unchanged": true,
+      "library_integrity": "ok",
+      "original_annotations_preserved": 19,
+      "six_core_document_annotation_tag_and_metadata_tables_exactly_preserved": true,
+      "all_raw_sqlite_tables_unchanged": false,
+      "all_preferences_file_bytes_unchanged": false,
+      "all_credential_file_bytes_unchanged": false,
+      "all_real_credential_values_unchanged": false,
+      "paperbridge_real_key_unchanged_after_cold_restart": false,
+      "unintended_native_save_settings_during_verification": true,
+      "paperbridge_key_change": "A recorded acceptance click unintentionally saved settings and changed the stored key; not a whitespace-only change. This is an acceptance-operation failure, not a PASS.",
+      "other_native_credential_change": "One Zotero API-like realm also changed. The actual account identity/current API-key getter record remained consistent; the cause of this other change is unresolved.",
+      "credentials_restored_or_baseline_replaced_to_hide_failure": false,
+      "repair_status": "Awaiting authorization to restore only the PaperBridge key from the original encrypted baseline, leaving other Zotero credentials untouched, then repeat cold verification.",
+      "test_helper_installed": false,
+      "new_translation_requests": 0,
+      "normal_native_exit_codes": [0, 0],
+      "forced_daily_process_terminations": 0,
+      "owned_temporary_tasks_remaining": 0,
+      "left_running_for_user": true
+    }
+  },
+  "publication": {
+    "release_tag": "v0.3.4",
+    "release_id": 445420839,
+    "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.3.4",
+    "assets": "Four accepted XPIs and their four SHA256 sidecars",
+    "public_asset_metadata_sizes_digests_and_sidecar_bytes_verified": true,
+    "public_feed_urls": [
+      "https://raw.githubusercontent.com/MrYgoodenough/PaperBridge-zotero-plugin/master/updates/linux-x64.json",
+      "https://raw.githubusercontent.com/MrYgoodenough/PaperBridge-zotero-plugin/master/updates/linux-x64-local-python.json",
+      "https://raw.githubusercontent.com/MrYgoodenough/PaperBridge-zotero-plugin/master/updates/windows-x64.json",
+      "https://raw.githubusercontent.com/MrYgoodenough/PaperBridge-zotero-plugin/master/updates/windows-x64-local-python.json"
+    ],
+    "public_feeds_exact_url_http_200_and_exact_bytes": true,
+    "query_cache_busting_used": false,
+    "assets_public_before_nonempty_feed_publication": true,
+    "all_four_online_release_checks": "PUBLISHED-METADATA-VERIFIED",
+    "native_automatic_update_acceptance": true,
+    "macos_release_tag_assets_and_feeds_unchanged": true,
+    "repository_latest_remains": "v0.4.2",
+    "historical_0_3_3_assets_unchanged": true
+  },
+  "evidence_integrity": {
+    "final_native_reports_independently_rechecked": 20,
+    "native_assertions_report_driver_hashes_and_native_screenshots_rechecked": true,
+    "host_namespaced_originals_used": true,
+    "flat_collection_collision": "Linux reports and drivers were recovered from unchanged native .runtime originals and original console output; mixed flat Linux/Windows filenames are not acceptance inputs.",
+    "failed_or_interrupted_runs_counted_as_passes": false,
+    "windows_reboot_interrupted_run_retained_but_excluded": true,
+    "version_contract_failure": "Published 0.3.3 failed real target-health acceptance (health remained 0.3.2). A distinct 0.3.4 fixes and tests backend/addon/project/lock version consistency; no 0.3.3 asset was replaced.",
+    "private_backups_credentials_or_paper_text_distributed": false
+  }
+}

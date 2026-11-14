@@ -59,6 +59,7 @@ python scripts/verify_providers.py --run --max-tokens 128
 
 - `backend/engine.py` 为现有 translator 挂接可选的 `FragmentTrace`（`backend/fragment_trace.py`）；`backend/batching.py` 在 worker 启动前记录原页、paragraph identity、文本和几何，保留同一可变对象供最终排版后读取。正常翻译和实际应用的段落缓存均走此路径，不改变请求数、模型配置或缓存身份，不修改 BabelDOC 本体。
 - 只接受 quality 中真实 `applied`、最终仍有稳定同一 paragraph identity 的单页请求片段，并以实际 PDF glyph 边界验证两侧文本与位置。`xobj_id=0` 是固定版本的普通页正文，可映射；受保护、未应用、移页、合并或无法可靠追踪的对象不映射，不拆成句词，也不保证跨页对应。
+- 当前生产 `FragmentTrace` 每侧只输出一个 bounding rectangle；Schema 的矩形列表并不表示生产已经分解跨栏多岛区域。同页分离矩形只在几何夹具中用同一已验证身份检查命中，不能用该结果承诺生产跨页/跨栏段落拆分。
 - 最终 `restore_regions()` 和 `translated.pdf` 保存完成后，经 `build_mapping()` 验证，原子写入仅含 verified 单元的 Schema 1 `alignment.json`；候选全文只留在内存。源 hash 始终绑定原始 `source.pdf` 快照，不是可选的 `repaired.pdf`；目标 hash 绑定最终保存的译文。
 - 采集有界：最多 4,096 单元、每侧 1,000,000 字符、每单元 32,768 字符；超限只排除映射，不限制翻译。采集或映射失败仅警告，不丢失 PDF、质量记录或其他阅读功能。没有已验证单元时映射不可用，不自动重发请求。
 
@@ -100,4 +101,8 @@ python scripts/prepare_packaged_test.py --suite hover --run-id check
 
 运行 Zotero 时指定准备脚本返回的独立 profile（`-no-remote -profile <绝对路径>`），仅使用其对应的测试 data，不运行在日常 profile。测试前在 **`.runtime/alignment-fixture/`** 准备同次可信采集的 `source.pdf`、`translated.pdf`、`alignment.json`，保持 PDF 字节不变；准备脚本不生成这些 fixture，缺失时套件不代为翻译。悬停套件只在测试 profile 关闭首次启动欢迎页，避免系统浏览器遮住 Zotero 后触发原生绘制节流。
 
-套件测试真实附件归属、后端验证和阅读器映射/批注及降级，禁止 `POST /jobs` 和重试，**不调用 providers**。显式定位结果为 `.runtime/alignment-test.json`；命名悬停套件的 profile/data 为 `.runtime/hover-<run-id>-profile` / `-data`，结果为 `.runtime/hover-<run-id>-result.json`。默认 `--suite packaged` 是另一套可能调用付费 API 的测试，不能用它替代这两套。Linux / Windows 的两种 Python 包已在 Zotero 10.0.8 隔离验证，范围见 [verification](paragraph-hover-verification-2026-11-14.json)。小型夹具和生产 sidecar 输出不等于代表性论文对齐准确率或全平台原生验收；本次 macOS 原生兼容性尚未认证。
+套件测试真实附件归属、后端验证和阅读器映射/批注及降级，禁止 `POST /jobs` 和重试，**不调用 providers**。显式定位结果为 `.runtime/alignment-test.json`；命名悬停套件的 profile/data 为 `.runtime/hover-<run-id>-profile` / `-data`，结果为 `.runtime/hover-<run-id>-result.json`。默认 `--suite packaged` 是另一套可能调用付费 API 的测试，不能用它替代这两套。
+
+代表性缓存片段和冷进程重开的独立入口是 `scripts/prepare_nonmac_test.py --suite reading` / `tests/reading_packaged.js`。`--phase create` 指定确切 XPI 与 `--case-manifest`；`--phase reopen` 复用同一 run ID 的 profile/data，不重装插件或重置设置。实际公共自动更新使用该准备器的 `--suite update` / `tests/update_packaged.js`，不是用文件替换模拟，发布前后步骤见 [releasing.md](releasing.md)。两套均禁止提交翻译任务。
+
+`scripts/prepare_representative_hover.py` 从已授权历史译文的段落缓存经生产管线准备真实片段，缺缓存时不转为付费请求；`scripts/create_hover_geometry_fixture.py` 只准备明确标记的合成几何夹具。Linux / Windows 0.3.4 两种 Python 包的当前原生、冷启动、公开交付和日常安装范围见 [verification](nonmac-verification-2026-11-15.json)。所选页片段通过不等于整篇语义、生产跨页映射或全平台原生验收；macOS 原生兼容性未认证。
