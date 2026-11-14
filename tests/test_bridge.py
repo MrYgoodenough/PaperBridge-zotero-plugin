@@ -6,6 +6,7 @@ import threading
 import sys
 import subprocess
 import time
+import tomllib
 import urllib.error
 import urllib.request
 import zipfile
@@ -231,6 +232,16 @@ def test_loopback_auth_and_origin(store):
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_public_version_matches_package_metadata():
+    """Keep the health version consistent with the addon and Python package."""
+    root = Path(__file__).resolve().parents[1]
+    manifest = json.loads((root / "addon/manifest.json").read_text(encoding="utf-8"))
+    project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+    locked = tomllib.loads((root / "uv.lock").read_text(encoding="utf-8"))
+    package = next(item for item in locked["package"] if item["name"] == "paperbridge")
+    assert bridge.VERSION == manifest["version"] == project["project"]["version"] == package["version"]
 
 
 def test_authenticated_local_recovery_and_diagnostics(store, tmp_path, monkeypatch):

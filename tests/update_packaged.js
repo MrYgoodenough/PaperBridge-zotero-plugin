@@ -410,9 +410,9 @@ var PAPERBRIDGE_UPDATE_TEST_PROMISE = (async () => {
     Zotero.paperbridgeUpdateTestRuns.add(runKey);
     ownsRun = true;
     check(["create", "reopen"].includes(config.phase) && config.baselineVersion === "0.3.2"
-      && config.expectedVersion === "0.3.3" && /^[a-f0-9]{64}$/.test(config.baselineXpiSha256)
+      && config.expectedVersion === "0.3.4" && /^[a-f0-9]{64}$/.test(config.baselineXpiSha256)
       && /^[a-f0-9]{64}$/.test(config.expectedXpiSha256),
-    "The isolated test requires explicit accepted 0.3.2 and target 0.3.3 XPI hashes");
+    "The isolated test requires explicit accepted 0.3.2 and target 0.3.4 XPI hashes");
     ({ AddonManager: manager } = ChromeUtils.importESModule("resource://gre/modules/AddonManager.sys.mjs"));
     await bounded(Zotero.initializationPromise, "Zotero initialization did not settle");
     bridge = await until(() => Zotero.PaperBridge, "Baseline PaperBridge did not start");
