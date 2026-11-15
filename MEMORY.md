@@ -33,7 +33,7 @@
 - `build.py` 每次重建 payload，支持独立 `--stage-dir` / `--output-dir`；改 addon/backend/资源后四包重建并核 SHA，prepare 必须在构建结束后执行，避免同名 XPI hash race。marker/build ID 只绑定 payload/backend，不证明 addon 字节；还要核真实落盘 XPI 和全部发货源码。
 - Windows stage 继续用官方 OpenCV wheel、CPython 3.12.13；Linux CPython 实际为 3.12.16。完整原始许可补充材料、303 个固定源码归档及四包绑定生成器已准备；**licenseCompliance 仍 unknown、对应源码闭环 partial**。AGPL/GPL/Berkeley DB 源码交付义务仍待确认；普通原工具链/字节重建不确定性不是自动法律门槛。
 - MSVC 三 DLL 已匹配微软原始发布字节且签名有效；用户明确确认合法使用 Community 2026 18.9.2 及第 8 条分发责任（含应用相关索赔补偿/辩护及其例外），不重复索取。Windows 两模式的 DLL 专属条款/拒绝/设置接受/冷重开已在实际 150% 原生窗口核验，Linux 两模式保持豁免。`runtime-terms.js` / `Microsoft-Runtime-Terms.txt` 只保存身份 `msvc-community-2026-v1`，不因插件升级重复；后台迁移/轮询/清理/诊断不弹窗，拒绝只停用引擎，设置可重开。读取用 ZIP UTF-8 输入流（Zotero URI overload 返回 XHR），关闭用 `domwindowclosed`，不把初始 about:blank unload 当拒绝。原始 2026 文档/DLL 保持原字节，条款不限制 AGPL 插件整体；普通用户无需额外安装软件。Runtime 使用 EULA/免费 Build Tools 使用权不独立授予再分发；见 `docs/windows-msvc-redistribution.md`、evidence 和 runtime-terms acceptance。既有引擎 20s 启动等待未改，快速连续重启的普遍可靠性不在本次验收范围。
-- `scripts/package_sources.py` 生成独立源码 ZIP、manifest 和 SHA；缓存及生成包位置见当前 delivery 文档。发布前保持源码 membership 与实际 XPI hash 绑定，不借旧包结论，不改归档内容；原始第三方许可的尾部空格/换行须保留，不为 diff whitespace 检查修改原文。
+- `scripts/package_sources.py` 生成独立源码 ZIP、manifest 和 SHA；当前四包绑定源码在 `dist/candidate-20261116-msvc`，303 归档缓存为 `agent/codex/licensing-p0-1-20261116-003659/source-cache`，身份见 delivery 文档。发货源码快照 commit 为 `0082d6f874b61dd65a661ac2a0ab8047649142bf`；24,408 文件重核通过，四包 source/notice 缺失/变化及项目源码不匹配均为 0，不代表整体许可清零或公开交付。发布前保持实际 XPI hash 绑定，不借旧包结论，不改归档内容；原始第三方许可的尾部空格/换行须保留，不为 diff whitespace 检查修改原文。
 - `.github/workflows/ci.yml` 为三平台 lightweight 合约；`release-candidate.yml` 手动构建 Linux/Windows，不构建 macOS、不发布 feed。runner-native OpenCV 可比发布基线新，构建 CI 不替代兼容工具链和原生 Zotero。
 
 ## 安全接续与原生验收
