@@ -16,6 +16,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 # Linux and macOS share this CPython dependency layout.
 SITE_PACKAGES = "python/lib/python3.12/site-packages"
+# Initialize the real interpreter ABI before tests simulate another sys.platform.
+INTERPRETER_ABI = sysconfig.get_config_var("SOABI")
 
 
 def load_stager(monkeypatch, root, host="linux", machine="x86_64"):
@@ -39,7 +41,7 @@ def image_only_install(path, stager):
     (path / "cv2/config.py").write_text("BINARIES_PATHS = ['/old/build']\n")
     provenance = {
         "version": stager.OPENCV_VERSION, "platform": "linux-x64",
-        "modules": stager.OPENCV_MODULES, "pythonAbi": sysconfig.get_config_var("SOABI"),
+        "modules": stager.OPENCV_MODULES, "pythonAbi": INTERPRETER_ABI,
         "sourceArchiveSha256": "fixture-source",
         "extensionSha256": hashlib.sha256(extension.read_bytes()).hexdigest(),
     }
