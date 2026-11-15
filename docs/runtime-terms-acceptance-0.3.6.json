@@ -1,0 +1,225 @@
+{
+  "_comment": "Exact private candidate native runtime-consent/exemption evidence, not upgrade/translation/account/whole-license acceptance.",
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "version": "0.3.6",
+  "scope": "Actual Zotero AddonManager file installation, production terms UI, local health and an explicitly synthetic saved PDF; all daily profiles are excluded.",
+  "agreement": {
+    "identity": "msvc-community-2026-v1",
+    "path": "licenses/supplemental/msvc/Microsoft-Runtime-Terms.txt",
+    "bytes": 6546,
+    "sha256": "f034f11c2072f5e6d03c276cc97687796a5223eef8743b945c5af975fa0ab402",
+    "platform": "Windows only; both Python modes",
+    "persistedData": "Agreement identity only, in the local Zotero preference; not uploaded"
+  },
+  "input": {
+    "method": "windowUtils.sendMouseEvent",
+    "trusted": true,
+    "scope": "Real native Gecko production-window input; not DOM dispatch/click or direct preference assignment; external OS mouse injection is not claimed"
+  },
+  "offline": {
+    "pythonPassed": 304,
+    "pythonSkipped": 1,
+    "jsSyntaxChecks": 43,
+    "nodeSuiteCommands": 13,
+    "failures": 0
+  },
+  "windowsFlow": [
+    "No engine extraction or consent preference before agreement; background health never prompts.",
+    "First active request displays full offline terms; native refusal rejects the request.",
+    "Same-session active retry does not reprompt; the saved synthetic PDF renders while the engine remains absent.",
+    "Production settings reopen the agreement; only the trusted accept button records its identity.",
+    "Accepting in a fresh library remains lazy: no engine extraction or unnecessary job-monitoring loop.",
+    "Actual health matches version/platform/mode/build ID and BabelDOC 0.6.4; the job store is empty.",
+    "Different-PID cold reopen retains agreement and starts health without prompting; explicitly requested read-only review hides the accept button."
+  ],
+  "runs": [
+    {
+      "platform": "linux-x64",
+      "pythonMode": "bundled",
+      "runID": "msvc-lb4-16",
+      "xpiName": "paperbridge-0.3.6-linux-x64.xpi",
+      "xpiSha256": "22d89e944502b1fdf8f5c1d6445b17791cd6de837732c75c5af44a223689968e",
+      "runtimeBuildId": "626cfb9c691e1a87879607a77d217fc502d833f97a82418337e68043083e8432",
+      "nativeInstall": "AddonManager.getInstallForFile/install with onInstallEnded",
+      "displayScalePercent": null,
+      "screenshotDevicePixelRatio": 1,
+      "agreementAccepted": false,
+      "phases": [
+        {
+          "phase": "create",
+          "processID": 2309492,
+          "checks": 33,
+          "reportFile": ".runtime/runtime-terms-msvc-lb4-16-create.json",
+          "reportSha256": "8ef9fe982e4310cdace3468de49497ce29652f4e5eb7b0e29c528ee69b9117f2",
+          "termsWindowOpens": 0,
+          "nativeExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "processID": 2309998,
+          "checks": 25,
+          "reportFile": ".runtime/runtime-terms-msvc-lb4-16-reopen.json",
+          "reportSha256": "b69fee30b64adb255a582405ee878a08de102f28f2ed5e715195c1e9c58e6e69",
+          "termsWindowOpens": 0,
+          "nativeExitCode": 0
+        }
+      ],
+      "reviewedSnapshots": [
+        {
+          "file": ".runtime/runtime-terms-msvc-lb4-16-create-synthetic-pdf.png",
+          "sha256": "9095a20e7c5b834b16b1245486814e29dfe7dc2604b9de074aa74a74e9c0e5b7"
+        }
+      ],
+      "stoppedSQLiteIntegrity": "ok",
+      "termsWindowCountMeaning": "No Windows terms window or Windows acceptance preference on Linux."
+    },
+    {
+      "platform": "linux-x64",
+      "pythonMode": "local",
+      "runID": "msvc-ll4-16",
+      "xpiName": "paperbridge-0.3.6-linux-x64-local-python.xpi",
+      "xpiSha256": "96f2498d39c61ad71877d1600475bdaec2f12142e03091c8fc5038ce30bec57a",
+      "runtimeBuildId": "f2a5f0fdaf7fd03fdd36a2daead578e0c407a5524bebb9c5b19de36d8be36697",
+      "nativeInstall": "AddonManager.getInstallForFile/install with onInstallEnded",
+      "displayScalePercent": null,
+      "screenshotDevicePixelRatio": 1,
+      "agreementAccepted": false,
+      "phases": [
+        {
+          "phase": "create",
+          "processID": 2310171,
+          "checks": 33,
+          "reportFile": ".runtime/runtime-terms-msvc-ll4-16-create.json",
+          "reportSha256": "c0fd4bdb0187eb22a2c2e2015794ea850faa3da03c861b5f06150f4c7a30c9b6",
+          "termsWindowOpens": 0,
+          "nativeExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "processID": 2315858,
+          "checks": 25,
+          "reportFile": ".runtime/runtime-terms-msvc-ll4-16-reopen-cold2.json",
+          "reportSha256": "f956a000c220d610a8abb4f8dc89fada2459eb544b5deab315f54e5d082163bd",
+          "termsWindowOpens": 0,
+          "nativeExitCode": 0
+        }
+      ],
+      "reviewedSnapshots": [
+        {
+          "file": ".runtime/runtime-terms-msvc-ll4-16-create-synthetic-pdf.png",
+          "sha256": "9095a20e7c5b834b16b1245486814e29dfe7dc2604b9de074aa74a74e9c0e5b7"
+        }
+      ],
+      "stoppedSQLiteIntegrity": "ok",
+      "termsWindowCountMeaning": "No Windows terms window or Windows acceptance preference on Linux."
+    },
+    {
+      "platform": "windows-x64",
+      "pythonMode": "bundled",
+      "runID": "msvc-wb6-16",
+      "xpiName": "paperbridge-0.3.6-windows-x64.xpi",
+      "xpiSha256": "7dae26ed67b72a201cb4ec3e99696771d96a01d2c26f149c96514d7995c1c9c9",
+      "runtimeBuildId": "0e2c7f3837a5951d00acbe593d8fd773e0cd87150d646904c5c53f4c1f86363f",
+      "nativeInstall": "AddonManager.getInstallForFile/install with onInstallEnded",
+      "displayScalePercent": 150,
+      "agreementAccepted": true,
+      "phases": [
+        {
+          "phase": "create",
+          "processID": 46088,
+          "checks": 85,
+          "reportFile": ".runtime/runtime-terms-msvc-wb6-16-create.json",
+          "reportSha256": "b985d6abb62d87b8d147afdc53ac05885390334cfd34d2f96666a30e65fdc31d",
+          "termsWindowOpens": 2,
+          "nativeProcessAbsentAfterNormalQuit": true
+        },
+        {
+          "phase": "reopen",
+          "processID": 31076,
+          "checks": 51,
+          "reportFile": ".runtime/runtime-terms-msvc-wb6-16-reopen.json",
+          "reportSha256": "642f487265f48a1c5ab5a0930cf89f418df682df65bf91b9e35e4c581158e544",
+          "termsWindowOpens": 1,
+          "nativeProcessAbsentAfterNormalQuit": true
+        }
+      ],
+      "reviewedSnapshots": [
+        {
+          "file": ".runtime/runtime-terms-msvc-wb6-16-create-terms-decline.png",
+          "sha256": "f229e649728600dff8c064249e617c16c0397c547096bfa3ae6c04fd832051f1"
+        },
+        {
+          "file": ".runtime/runtime-terms-msvc-wb6-16-create-synthetic-pdf.png",
+          "sha256": "2c2fc06891b7b549ea00d82bfaed095658cd27b3ea71d7562c73ce20f7120596"
+        },
+        {
+          "file": ".runtime/runtime-terms-msvc-wb6-16-reopen-accepted-review.png",
+          "sha256": "d7f2eb2e37bc649871341c151ff0083780e54549c40a416acef06ab1e22192d3"
+        }
+      ],
+      "stoppedSQLiteIntegrity": "ok",
+      "termsWindowCountMeaning": "Create: first active request plus explicit settings acceptance; reopen: explicit read-only settings review only."
+    },
+    {
+      "platform": "windows-x64",
+      "pythonMode": "local",
+      "runID": "msvc-wl6-16",
+      "xpiName": "paperbridge-0.3.6-windows-x64-local-python.xpi",
+      "xpiSha256": "50a0720625938d5bffc7f0ba57594e8577c876e2bf042d7b72d4fa46f599ab85",
+      "runtimeBuildId": "1212e1d1b4843322cc600ad14b37344cc670195df6483d63a2623ab0ac49976e",
+      "nativeInstall": "AddonManager.getInstallForFile/install with onInstallEnded",
+      "displayScalePercent": 150,
+      "agreementAccepted": true,
+      "phases": [
+        {
+          "phase": "create",
+          "processID": 53824,
+          "checks": 85,
+          "reportFile": ".runtime/runtime-terms-msvc-wl6-16-create.json",
+          "reportSha256": "bf8c43217acc7e4b7edcfe00bcc2c739f2b746f0208015ae8cc10ae70a4353ed",
+          "termsWindowOpens": 2,
+          "nativeProcessAbsentAfterNormalQuit": true
+        },
+        {
+          "phase": "reopen",
+          "processID": 41076,
+          "checks": 51,
+          "reportFile": ".runtime/runtime-terms-msvc-wl6-16-reopen.json",
+          "reportSha256": "a07732a3e3de49a554d3335a0c525be87cf2940554dedf8eccf5c2a9ddf46139",
+          "termsWindowOpens": 1,
+          "nativeProcessAbsentAfterNormalQuit": true
+        }
+      ],
+      "reviewedSnapshots": [
+        {
+          "file": ".runtime/runtime-terms-msvc-wl6-16-create-terms-decline.png",
+          "sha256": "f229e649728600dff8c064249e617c16c0397c547096bfa3ae6c04fd832051f1"
+        },
+        {
+          "file": ".runtime/runtime-terms-msvc-wl6-16-create-synthetic-pdf.png",
+          "sha256": "2c2fc06891b7b549ea00d82bfaed095658cd27b3ea71d7562c73ce20f7120596"
+        },
+        {
+          "file": ".runtime/runtime-terms-msvc-wl6-16-reopen-accepted-review.png",
+          "sha256": "d7f2eb2e37bc649871341c151ff0083780e54549c40a416acef06ab1e22192d3"
+        }
+      ],
+      "stoppedSQLiteIntegrity": "ok",
+      "termsWindowCountMeaning": "Create: first active request plus explicit settings acceptance; reopen: explicit read-only settings review only."
+    }
+  ],
+  "retainedFailure": {
+    "reportFile": ".runtime/runtime-terms-msvc-ll4-16-reopen.json",
+    "reportSha256": "633631e8eae234d07729e274efbd15e085b8db08ffa1b99618752bcbe03e3c90",
+    "scope": "One immediate Linux local-Python reopen timed out in the existing engine startup wait, not in consent. A new-labelled cold reopen passed without changing production timeouts; broad rapid-restart reliability is not established."
+  },
+  "exclusions": [
+    "No provider/translation requests or real account synchronization.",
+    "Only a synthetic saved PDF was exercised; not new prior-reading, note, annotation or upgrade acceptance.",
+    "Prior 100%-scale and upgrade/notes/privacy tests retain their original pre-MSVC package identities.",
+    "Existing-job reconciliation after consent was not seeded or claimed natively tested.",
+    "No macOS build, integration, inspection of independent source or public-asset/feed/Latest modification.",
+    "Distributor declaration and protective terms are not independent legal clearance; licenseCompliance remains unknown and corresponding-source closure partial."
+  ]
+}

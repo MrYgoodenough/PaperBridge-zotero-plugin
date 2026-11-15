@@ -1,10 +1,11 @@
 /** Unpack and launch the platform-specific engine inside the Zotero data directory. */
-/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils */
+/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, MicrosoftRuntimeTerms */
 var BundledRuntime = class {
   /** Keep engine state separate from Zotero attachments and credentials. */
   constructor(rootURI, version) {
     this.rootURI = rootURI;
     this.version = version;
+    this.terms = new MicrosoftRuntimeTerms(rootURI);
     this.base = PathUtils.join(Zotero.DataDirectory.dir, "paperbridge");
     this.home = PathUtils.join(this.base, "engine");
     this.state = PathUtils.join(this.base, ".runtime");
@@ -36,7 +37,9 @@ var BundledRuntime = class {
   }
 
   /** Reuse one launch and report actionable failures without exposing raw output. */
-  async ensure() {
+  async ensure(options) {
+    // Consent precedes shared launch state so background reads cannot open a window.
+    await this.terms.ensure(options);
     if (this.connection) return this.connection;
     this.pending ||= this.launch().catch(error => {
       this.pending = null;
@@ -166,6 +169,8 @@ var BundledRuntime = class {
 
   /** Start the isolated engine and wait for its loopback service to become ready. */
   async launch() {
+    // Even a direct launch cannot unpack or execute Microsoft code before agreement.
+    await this.terms.ensure({ interactive: false });
     this.diagnosticEvent("starting");
     this.diagnosticEvent("unpacking");
     await this.unpack();
@@ -308,6 +313,7 @@ var BundledRuntime = class {
 
   /** Stop only this runtime's child process and reset its connection. */
   async stop() {
+    this.terms.window?.close();
     const process = this.process;
     this.connection = null;
     this.pending = null;

@@ -324,8 +324,10 @@ async function main() {
   const restart = setup();
   const interrupted = { sourceID: 9, jobID: "lost", state: "running" };
   restart.library.records.push(interrupted);
-  restart.bridge.request = async (url, method) => {
-    assert.equal(url, "/jobs"); assert.equal(method, undefined, "recovery must never resubmit"); return [];
+  restart.bridge.request = async (url, method, data, options) => {
+    assert.equal(url, "/jobs"); assert.equal(method, "GET", "recovery must never resubmit");
+    assert.equal(options.interactive, false, "background recovery cannot prompt for runtime terms");
+    return [];
   };
   await restart.tasks.refresh();
   assert.equal(interrupted.state, "interrupted");

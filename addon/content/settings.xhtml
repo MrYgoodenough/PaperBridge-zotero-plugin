@@ -64,6 +64,10 @@
     <html:input id="pythonPath" placeholder="例如 /opt/homebrew/bin/python3.12 或 C:\Python312\python.exe"/>
     <html:small>本机版需要与系统架构一致的 Python 3.12，留空检测常见位置；第三方依赖随 XPI 提供。</html:small></html:div>
     <html:small>排版依赖随安装包提供，插件不自动下载资源。</html:small>
+    <html:div id="runtime-terms" hidden="hidden">
+      <html:div class="actions"><html:button id="runtime-terms-view">Windows 运行库条款</html:button></html:div>
+      <html:small id="runtime-terms-status" role="status"/>
+    </html:div>
     <html:small>任务入队时冻结所选配置、密钥、目标语言与页码；之后保存或切换配置不会改变已排队或运行中的任务。</html:small>
     <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">检查本地引擎</html:button><html:button id="service-check">检查服务（短请求）</html:button><html:button id="data">数据目录</html:button><html:button id="close">关闭</html:button></html:div>
     <html:small>两种检查都不保存设置。引擎检查使用已保存的 Python 配置，不调用服务商；服务检查使用当前配置草稿，确认后仅发送一条公开样例请求（输出上限 512 tokens、无自动重试），可能收费，不验证真实论文语义质量。</html:small>

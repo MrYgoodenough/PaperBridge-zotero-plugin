@@ -12,6 +12,8 @@ const bootstrap = source.match(/bootstrap = '''([\s\S]*?)'''\.replace/)[1];
 const turn = () => new Promise(resolve => setImmediate(resolve));
 // Evaluate shipped launch code with native-path semantics for every supported platform.
 const runtimeSource = fs.readFileSync(path.join(__dirname, "../addon/content/runtime.js"), "utf8");
+// Interpreter-option fixtures assume prior consent; dedicated tests exercise refusal and the real UI controller.
+const termsSource = fs.readFileSync(path.join(__dirname, "../addon/content/runtime-terms.js"), "utf8");
 // These are layout/API contracts, not native OS or macOS v0.4.2 acceptance results.
 const platforms = [
   { os: "Linux", abi: "x86_64-gcc3", id: "linux-x64", machine: "x86_64", python: "python/bin/python3.12" },
@@ -26,7 +28,10 @@ async function checkRuntime(platform, mode) {
   const calls = [];
   const captured = new Error("Offline subprocess capture");
   const scope = {
-    Zotero: { DataDirectory: { dir: root }, Prefs: { get: () => "" }, debug: () => {} },
+    Zotero: { DataDirectory: { dir: root }, Prefs: {
+      /** Model prior agreement only in these non-native launch-option fixtures. */
+      get: name => name === scope.MICROSOFT_RUNTIME_TERMS.preference ? scope.MICROSOFT_RUNTIME_TERMS.id : ""
+    }, debug: () => {} },
     Services: { appinfo: { OS: platform.os, XPCOMABI: platform.abi, processID: 42 },
       dirsvc: { get: key => ({ path: paths.join(root, key) }) } },
     Ci: { nsIFile: {} },
@@ -51,6 +56,7 @@ async function checkRuntime(platform, mode) {
     } }) },
   };
   vm.createContext(scope);
+  vm.runInContext(termsSource, scope);
   vm.runInContext(runtimeSource, scope);
   const runtime = new scope.BundledRuntime("jar:file:///offline.xpi!/", "0.3.2");
   const description = runtime.platform();

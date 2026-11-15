@@ -3,6 +3,8 @@
 
 本页对应路线图 **P1-3** 的隔离升级/UI 专项，不代表日常账号 metadata、文件同步、公开更新或完整发布验收。宿主为 Windows、Zotero **10.0.8**，交互 Session **1**；BabelDOC **0.6.4** / PyMuPDF **1.26.7** 未升级。本文只核实既有证据，没有再次启动 Windows UI 或改变系统缩放。
 
+本页“最终候选”指下表所列的 **MSVC 明确同意机制整合前**冻结包。后续许可整合重打包不改变本文旧 hash 或原生结论；新包身份见 [candidate-delivery-0.3.6.json](candidate-delivery-0.3.6.json)，不借本页旧字节验收证明新包的全部升级/UI 范围。
+
 ## 精确包身份
 
 | 模式 / 证据 | XPI SHA-256 | 实际 extracted engine build ID |

@@ -19,7 +19,7 @@ function deferred() {
 }
 
 /** Provide only control values/events and fake bridge calls; no DOM tree is required. */
-function fixture() {
+function fixture(os = 'Linux') {
   const controls = Object.fromEntries([...markup.matchAll(/<(?:html:)?([\w-]+)\b[^>]*\bid="([^"]+)"/g)]
     .map(([, tag, id]) => [id, { id, tag, value: '', checked: false, disabled: false, hidden: false,
       textContent: '', listeners: {},
@@ -28,11 +28,20 @@ function fixture() {
     }]));
   const locked = Object.values(controls).filter(control => ['input', 'select'].includes(control.tag)
     || ['save', 'test', 'service-check'].includes(control.id));
-  const calls = { keys: [], prefs: [], requests: [], confirmations: [], stops: 0, exports: 0, reveals: [] };
+  const calls = { keys: [], prefs: [], requests: [], confirmations: [], stops: 0, exports: 0, reveals: [], terms: 0 };
   const prefs = { profile: 'deepseek', language: 'zh-CN', pages: '1-3', pythonPath: '/fixture/saved-python', lastUsage: '' };
   const bridge = {
     storageRoot: '/fixture/storage', library: {},
     runtime: { base: '/fixture/runtime', build: { pythonMode: 'local' },
+      terms: {
+        agreed: false,
+        /** Show controls only on the synthetic Windows platform. */
+        required() { return os === 'WINNT'; },
+        /** Model UI state without writing a real preference. */
+        accepted() { return this.agreed; },
+        /** Record the independent agreement action, without starting a backend. */
+        async show() { calls.terms++; this.agreed = true; return true; },
+      },
       /** Record local engine invalidation without spawning a process. */
       async stop() { calls.stops++; },
       /** Record only explicit reveal, never open a native file manager. */
@@ -234,4 +243,18 @@ test('diagnostic export has its own lock and displays addon-only startup fallbac
   assert.equal(f.controls['diagnostics-export'].disabled, false);
   assert.match(f.controls['diagnostics-status'].textContent, /诊断包未生成.*synthetic ZIP failure/);
   assert.equal(f.calls.requests.length + f.calls.keys.length + f.calls.prefs.length, 0);
+});
+
+test('Windows terms are independent of provider drafts and hidden on other platforms', async () => {
+  assert.equal(fixture().controls['runtime-terms'].hidden, true);
+  const f = fixture('WINNT');
+  assert.equal(f.controls['runtime-terms'].hidden, false);
+  assert.match(f.controls['runtime-terms-status'].textContent, /首次/);
+  for (const id of ['key', 'compatibleKey', 'baseURL', 'model', 'pythonPath']) {
+    Object.defineProperty(f.controls[id], 'value', { get() { throw new Error('Terms read a provider draft'); } });
+  }
+  await f.fire('runtime-terms-view');
+  assert.equal(f.calls.terms, 1);
+  assert.match(f.controls['runtime-terms-status'].textContent, /已同意/);
+  assert.equal(f.calls.requests.length + f.calls.keys.length + f.calls.prefs.length + f.calls.stops, 0);
 });

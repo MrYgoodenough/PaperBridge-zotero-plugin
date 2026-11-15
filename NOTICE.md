@@ -39,11 +39,15 @@ in the XPI (`addon/licenses/` in the source tree).
   recovered original-wheel graph. Keep actual OpenCV codec notices.
 - **Microsoft Windows runtimes:** exact DLL versions/hashes/copyright are in
   `licenses/supplemental/MSVC-runtime-attribution.txt`. Attribution is **not**
-  a redistribution grant. Official Runtime use terms, VS2022 Community terms
-  and REDIST list are retained in `licenses/supplemental/msvc/`. The Runtime
-  use terms do not permit redistribution; the separate VS2022 REDIST grant is
-  conditional. This distributor's applicable license/exact DLL-release basis
-  remains unconfirmed.
+  a redistribution grant. Original Runtime/Visual Studio documents and REDIST
+  lists are retained in `licenses/supplemental/msvc/`. The distributor has
+  confirmed the Community 2026 section 8 route and its distribution obligations;
+  all three shipped DLLs match original Microsoft bytes. Windows engine use
+  requires explicit agreement to `Microsoft-Runtime-Terms.txt` in that folder,
+  limited to Microsoft DLLs, including protective terms for downstream
+  distributors. No Visual Studio installation is required of ordinary users.
+  Runtime use EULAs do not independently grant redistribution, and these terms
+  do not change the AGPL project or other open-source licenses.
 
 This software uses the FreeType Project. This software is based in part on the
 work of the Independent JPEG Group. OpenSSL is developed by the OpenSSL Project.

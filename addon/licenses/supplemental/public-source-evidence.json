@@ -31,12 +31,42 @@
         "bytes": 62996,
         "sha256": "3b483f10fd87af08f808b2d5ccbf82bb397daae8113d144bc13fbdb06cd2fbdb",
         "retention": "original_bytes"
+      },
+      {
+        "path": "licenses/supplemental/msvc/Visual_Studio_2026-License-Community_ENU.docx",
+        "url": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual_Studio_2026-License-Community_ENU.docx",
+        "bytes": 69066,
+        "sha256": "02ac07637f4a513a807cd3721c7620433fc483bc049d25784b0c10c54b05e1fb",
+        "retention": "original_bytes"
+      },
+      {
+        "path": "licenses/supplemental/msvc/Visual-Studio-2026-REDIST.html",
+        "url": "https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution",
+        "bytes": 48465,
+        "sha256": "0a6dd952d5f9041384d9b8b9391c9e6ef1be9c67f4d466646a07937a27383708",
+        "retention": "original_bytes"
+      },
+      {
+        "path": "licenses/supplemental/msvc/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+        "url": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+        "bytes": 39553,
+        "sha256": "08651651a7602fc7c0e2763de0fde1ff9f868df2780597cd1775ee9d6441c783",
+        "retention": "original_bytes"
       }
     ],
     "runtimeUseTermsGrantRedistribution": false,
     "visualStudioRedistGrant": "conditional_on_valid_license_and_distribution_requirements",
-    "exactDllReleaseOriginAndDistributorLicenseConfirmed": false,
-    "scope": "The public VS2022 family terms do not identify individual DLL hashes or establish this distributor's license. No Microsoft runtime source requirement is inferred."
+    "exactOriginalDllBytesConfirmed": true,
+    "windowsAuthenticode": "All three shipped files were Valid; see docs/windows-msvc-evidence-0.3.6.json for bounded origin evidence.",
+    "distributorLicenseAndAssent": "Community 2026 lawful use and section 8 responsibilities explicitly confirmed by the user; not independently audited.",
+    "protectiveAgreement": {
+      "path": "licenses/supplemental/msvc/Microsoft-Runtime-Terms.txt",
+      "id": "msvc-community-2026-v1",
+      "bytes": 6546,
+      "sha256": "f034f11c2072f5e6d03c276cc97687796a5223eef8743b945c5af975fa0ab402",
+      "scope": "Explicit Windows engine consent and downstream-distributor terms for Microsoft DLLs only, not restrictions on the AGPL application."
+    },
+    "scope": "Community 2026 section 8 is the user-confirmed conditional route. Original bytes and protective consent do not independently prove general legal clearance. No Microsoft runtime source requirement is inferred."
   },
   "tiktoken": {
     "version": "0.14.0",

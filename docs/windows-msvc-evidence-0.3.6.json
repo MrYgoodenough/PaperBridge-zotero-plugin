@@ -1,13 +1,38 @@
 {
-  "_comment": "Exact Windows MSVC byte provenance and conditional redistribution evidence; not distributor assent or legal clearance.",
+  "_comment": "Exact Windows MSVC byte provenance, user-declared distributor assent and bounded native consent verification; not independent legal clearance.",
   "schemaVersion": 1,
   "checkedDate": "2026-11-16",
-  "scope": "The unchanged private 0.3.6 Windows bundled/local candidates recorded in candidate-delivery-0.3.6.json.",
+  "scope": "The final private 0.3.6 Windows bundled/local candidates recorded in candidate-delivery-0.3.6.json; Microsoft DLL bytes are unchanged.",
   "licenseCompliance": "unknown",
-  "microsoftRedistributionStatus": "distribution_conditions_pending",
+  "microsoftRedistributionStatus": "community_2026_section_8_user_confirmed_protective_terms_integrated_native_verified",
   "exactOriginalDllBytesConfirmed": true,
-  "distributorEligibilityAndAssent": "not_confirmed",
-  "externalDistributorAndEndUserAgreement": "not_established_by_current_shipping_materials",
+  "distributorEligibilityAndAssent": "user_confirmed_not_independently_audited",
+  "distributorConfirmation": {
+    "date": "2026-11-16",
+    "basis": "Explicit affirmative user reply confirming lawful use of the installed Community 2026 and agreement to proceed under its section 8 distribution conditions.",
+    "responsibility": "Distributor accepts responsibility for the applicable conditions, including application-related indemnity/defense/hold-harmless with the exception for claims based solely on Distributable Code.",
+    "scope": "User declaration, not an agent's acceptance on the user's behalf, independent legal audit or general legal clearance; no repeat request for the same distributor decision is needed."
+  },
+  "externalDistributorAndEndUserAgreement": {
+    "status": "implemented_in_final_private_candidates",
+    "identity": "msvc-community-2026-v1",
+    "path": "licenses/supplemental/msvc/Microsoft-Runtime-Terms.txt",
+    "bytes": 6546,
+    "sha256": "f034f11c2072f5e6d03c276cc97687796a5223eef8743b945c5af975fa0ab402",
+    "nativeEvidence": "runtime-terms-acceptance-0.3.6.json",
+    "scope": "Microsoft DLLs and downstream distribution only; not restrictions on the AGPL application or a requirement for end users to install/license Visual Studio."
+  },
+  "endUserAcceptancePlan": {
+    "status": "implemented_final_package_native_verified",
+    "platform": "Windows only",
+    "pythonModes": ["bundled", "local"],
+    "termsScope": "Shared offline terms limited to shipped Microsoft MSVC DLLs, not restrictions on the AGPL plugin or other open-source code.",
+    "promptTrigger": "First active action needing the backend, or explicit click in settings; no repeated prompts from background monitoring/cleanup.",
+    "persistence": "Acceptance persists for the same terms identity, independently of plugin version changes.",
+    "declineEffect": "Disable only the backend; ordinary Zotero use and reading already saved PDFs remain available.",
+    "installationImpact": "Consent adds no installation steps: no Visual Studio, Microsoft account, purchased license or separate redistributable installer; existing backend setup requirements are unchanged.",
+    "deliveryFollowUp": "All four private packages are rebuilt and locally verified; Windows consent and Linux exemption are natively verified. Retained original VS/Runtime documents and DLL bytes are unchanged. Hash-bound source delivery is recorded separately in candidate-delivery-0.3.6.json; no public assets or feeds are changed."
+  },
   "observedVisualStudio": {
     "productId": "Microsoft.VisualStudio.Product.Community",
     "displayName": "Visual Studio Community 2026",
@@ -127,11 +152,11 @@
     }
   ],
   "evidenceLimits": [
-    "Installation metadata and original-byte matches do not prove the distributor's eligibility, contractual authority or assent.",
+    "Installation metadata and original-byte matches do not prove the distributor's eligibility, contractual authority or assent; the recorded confirmation is the user's declaration, not an independent legal audit.",
     "No complete channel-to-catalog integrity claim: downloaded catalog hashes/sizes and some CRT payload sizes differ from declarations; mismatches are retained in the local source report.",
     "The distinct 14.40.33816 VSIX does not match the shipped MSVCP; the matching source is the 14.40.33810 EXE/CAB.",
     "Windows Authenticode Valid includes timestamp-aware validation; a separate present-time offline certificate check can report NotTimeValid and is not substituted for Authenticode.",
-    "Existing runtime use EULAs/attribution files do not establish external distributor/end-user agreement. No agreement was accepted or new software installed in this review.",
-    "This documentation supplement is not inside the unchanged XPI/source ZIP; applicable shipping notices and acceptance behavior still need integration after the distributor decision."
+    "Existing runtime use EULAs/attribution files are not an independent redistribution grant. The implemented protective agreement operates under the user-confirmed Community 2026 section 8 route; original VS/Runtime documents remain unchanged.",
+    "Native evidence covers explicit runtime consent/exemption, synthetic saved-PDF reading and local health only. Earlier upgrade/notes/privacy/100%-scale reports keep their own old XPI identities and do not certify these rebuilt bytes. Overall licenseCompliance remains unknown and corresponding-source closure remains partial."
   ]
 }

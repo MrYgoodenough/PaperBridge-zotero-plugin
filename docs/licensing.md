@@ -29,7 +29,7 @@ remain separate; a warning there is not silently converted into clearance.
 | OpenCV | Linux image-only 4.12.0 source, CMake cache/toolchain/provenance/build JSON; Windows official headless 5.0.0.93 source and observed 5.0.0 build information | Preserve actual codec notices. Linux path-sanitization hashes differ from pre-sanitization build hashes; see `docs/linux-package-size.md`. No byte-identical wheel rebuild is claimed. |
 | Rust/native notices | All 243 Cargo.lock registry candidates, including checksum-matched crossbeam-deque 0.8.7; orjson's populated vendor tree; original notices | Optional/test/build/other-target crates remain a conservative superset, not shipped-linkage evidence. No prior locked registry candidate remains missing. |
 | tiktoken 0.14.0 | Public tag/sdist, build workflow and both PyPI cp312 wheels; native wheel bytes exactly match the old Linux/Windows baseline; MIT license retained | No public wheel build lock/third-party graph. Additional fancy-regex 0.19.0, bstr 1.13.1 and rustc-hash 2.1.3 sources/notices are declaration/range candidates, not confirmed original-wheel dependency versions. |
-| Microsoft runtimes | VCRuntime 14.44.35211.0 and Hyperscan-private MSVCP140 14.40.33810.0 now match original Microsoft release bytes; all three Windows files have valid signatures; Community 2026 installation identified | Conditional Visual Studio grant route identified, not accepted on the distributor's behalf. Confirm eligibility/assent (including Community 2026 indemnity) and protective distributor/end-user agreements; see `windows-msvc-redistribution.md`. Frozen shipping notices remain unchanged. |
+| Microsoft runtimes | VCRuntime 14.44.35211.0 and Hyperscan-private MSVCP140 14.40.33810.0 match original Microsoft release bytes; all three Windows files have valid signatures; Community 2026 installation identified | Distributor explicitly confirmed lawful use and section 8 distribution responsibility (including indemnity); this is a user declaration, not independent legal clearance. Microsoft-only offline agreement is implemented and final-package consent/exemption is natively verified; original Community 2026/Runtime/REDIST materials and DLLs are unchanged. See `windows-msvc-redistribution.md` and `runtime-terms-acceptance-0.3.6.json`. |
 
 Both original install/full archive digests and selected native-file hashes are
 in `buildEvidence`; no publisher-reported digest is passed off as a local hash.
@@ -100,18 +100,32 @@ hashes; prior-package hashes cannot be borrowed.
 
 ## Delivery obligations and remaining evidence limits
 
-1. **Microsoft redistribution conditions — user decision needed:** exact
+1. **Microsoft redistribution — distributor confirmed; protective agreement implemented:** exact
    original DLL bytes and the installed Community 2026 product are now identified
    in `windows-msvc-evidence-0.3.6.json`. The retained Runtime use/VS2022 documents
    remain unchanged shipping evidence, not proof that the 2022 agreement applies
    to a 2026 installation. The actual Community 2026 section 8 route requires
    licensed-use eligibility/assent, protective distributor/end-user agreements,
-   and application-related indemnity/defense with its stated exception. Confirm
-   the distributor's decision and integrate the applicable agreement/acceptance
-   path before public delivery; see `windows-msvc-redistribution.md`. Neither
+   and application-related indemnity/defense with its stated exception. The user
+   explicitly confirmed lawful Community 2026 use and responsibility for these
+   conditions; do not request the same decision again. This declaration is not
+   an independent legal audit. The Windows-only offline MSVC-DLL-only agreement
+   shared by bundled/local modes is implemented and its final-package native
+   consent/exemption checks passed. Confirmation appears on first active backend use or an explicit
+   settings click, not repeatedly during background monitoring/cleanup; consent
+   persists for the same terms identity regardless of plugin version. Declining
+   disables only the backend, preserving ordinary Zotero use and saved-PDF
+   reading. Consent adds no installation steps: no Visual Studio, Microsoft
+   account, purchased license or extra redist installer; existing backend setup
+   requirements are unchanged. Original VS/Runtime documents stay unmodified,
+   and DLL terms must not restrict the AGPL plugin or other open-source code.
+   The four packages are rebuilt and verified; this bounded check does not
+   reaccept prior upgrade/notes/privacy evidence under their new hashes. Source
+   bindings are separately documented in `candidate-delivery-0.3.6.json`. Neither
    Runtime use EULAs nor free Build Tools dependency-build rights independently
-   grant redistribution. No runtime replacement or dependency change is required
-   by the original-byte finding or authorized by this documentation review.
+   grant redistribution; retaining terms or end-user consent is likewise not an
+   independent redistribution grant. No runtime replacement or dependency change
+   is required by the original-byte finding or authorized by this documentation review.
 2. **Source delivery:** retain the AGPLv3 project and the supplied AGPL/GPL
    dependency sources, modifications and build/install inputs alongside the
    executable. Berkeley DB's actual clause 3 extends

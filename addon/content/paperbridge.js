@@ -24,6 +24,15 @@ var PaperBridge = {
     this.alive = true;
     await this.library.load();
     this.tasks = new TranslationTasks(this);
+    /** Resume retained local work without submitting a new translation. */
+    this.runtime.terms.onAccepted = () => {
+      if (!this.alive) return;
+      // Merely accepting from settings need not start an engine in a fresh library.
+      if (this.library.records.some(record => record.retryPendingSince || record.fingerprint && record.saveState !== "imported")) {
+        this.tasks.monitor();
+      }
+      this.library.schedule();
+    };
     await this.tasks.resume();
     this.toolbarHandler = event => this.toolbar(event);
     this.contextHandler = ({ reader, append }) => {
@@ -61,6 +70,8 @@ var PaperBridge = {
   /** Release readers and leave backend interruptions available for explicit recovery. */
   async stop() {
     this.alive = false;
+    this.runtime.terms.onAccepted = null;
+    this.runtime.terms.window?.close();
     this.taskWindow?.close();
     // The backend records interrupted work on shutdown; never silently resubmit it.
     if (this.tasks?.refreshing) await this.tasks.refreshing.catch(error => Zotero.logError(error));
@@ -193,7 +204,7 @@ var PaperBridge = {
     try {
       const result = await this.request("/diagnostics", "POST", {
         startup: this.LocalDiagnostics.startup(this.runtime.diagnosticEvents)
-      });
+      }, { interactive: false });
       return { ...result, source: "bridge" };
     } catch (_) {
       // The fallback exports no exception text and never resubmits a translation.
@@ -229,8 +240,8 @@ var PaperBridge = {
   },
 
   /** Call the authenticated loopback backend, starting it lazily if needed. */
-  async request(path, method = "GET", data) {
-    const {port, token} = await this.runtime.ensure();
+  async request(path, method = "GET", data, options) {
+    const {port, token} = await this.runtime.ensure(options);
     const response = await fetch(`http://127.0.0.1:${port}${path}`, {
       method, headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
       body: data === undefined ? undefined : JSON.stringify(data),

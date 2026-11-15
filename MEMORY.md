@@ -4,7 +4,7 @@
 - 主分支 `master`；共享源码 **0.3.6 候选**。版本同步 addon manifest、`backend/server.py VERSION`、pyproject 和 uv.lock。Linux/Windows 四条稳定公开通道及资产仍为 **0.3.4**；源码推送不代表新 XPI 发布或通道启用。
 - BabelDOC 固定 **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。新版迁移低优先级，不列 TODO；不以升级替代直接维护现有翻译、保护、字体、缓存和阅读链路。
 - 独立 macOS **0.4.2** 专属源码尚未取得，发布 tag 内共享 manifest 与独立发布物并不对应。不要合流、反向提取、重建覆盖或改变仓库 Latest；共享实现仍保持跨平台兼容。
-- 当前四包交付身份见 `docs/candidate-delivery-0.3.6.json`；最终 Windows 升级/notes/诊断/冷重开见 `docs/windows-acceptance-0.3.6.md`。`docs/nonmac-verification-0.3.6.json` 保留许可重打包前的阅读/清理原生身份，不回填新 hash；稳定 0.3.4 投递历史与 0.3.5 质量证据仍独立。验收只覆盖注明范围，不借用同名旧包、mocks、CI 或缓存重放的结论。
+- 当前四包交付身份见 `docs/candidate-delivery-0.3.6.json`；MSVC 整合后精确四包的条款/豁免、synthetic PDF 阅读、health 与冷重开见 `docs/runtime-terms-acceptance-0.3.6.json`。`docs/windows-acceptance-0.3.6.md` 的升级/notes/诊断及 `docs/nonmac-verification-0.3.6.json` 的阅读/清理均保留各自整合前 hash，不回填新身份；稳定 0.3.4 投递历史与 0.3.5 质量证据仍独立。验收只覆盖注明范围，不借用同名旧包、mocks、CI 或缓存重放的结论。
 - GitHub TODO #1 为范围化待办；下一步见 `docs/product-roadmap-0.3.6.md`。根 TODO 未获授权不修改。`agent/report` 只放每次新的任务简报；`agent/task` 只放用户给出的任务文件；普通任务不扫描 `agent/codex`、`agent/grok`。
 
 ## 存储、任务与费用
@@ -31,7 +31,8 @@
 - Linux x64 默认已验收 stage 为 `.cache/package/linux-x64`；保留 CPython/libpython、其他 wheel `.libs`、模型和词表。OpenCV 4.12 只含 `core/imgproc/imgcodecs/python3`，与既有 macOS scope 相同，暂不进一步精简，不做 XZ/别名恢复/后置 strip/运行期补下载。
 - Linux 原生基线 glibc ≥ 2.34；兼容 OpenCV 实际最高需 glibc 2.30 / GLIBCXX 3.4.26。Ubuntu 24.04 默认工具链会引入 2.38，不能直接作为该基线发布包。源码 build/install 入口为 `scripts/build_opencv_linux.sh`、`.cache/opencv-linux-x64/install`，本机兼容 sysroot/toolchain 在该目录的 `tools/`；旧 wheel stage 仅保留一份于 `.cache/package-baselines/linux-x64-before-image-only-20261115`。构建输入与路径净化前后 hash 的区别见 `docs/linux-package-size.md`。
 - `build.py` 每次重建 payload，支持独立 `--stage-dir` / `--output-dir`；改 addon/backend/资源后四包重建并核 SHA，prepare 必须在构建结束后执行，避免同名 XPI hash race。marker/build ID 只绑定 payload/backend，不证明 addon 字节；还要核真实落盘 XPI 和全部发货源码。
-- Windows stage 继续用官方 OpenCV wheel、CPython 3.12.13；Linux CPython 实际为 3.12.16。完整原始许可补充材料、303 个固定源码归档及四包绑定生成器已准备；**licenseCompliance 仍 unknown、对应源码闭环 partial**。MSVC 三 DLL 已匹配微软原始发布字节且签名有效；Windows 只有 Community 2026 18.9.2 实例，不能把已保留 2022 协议当作其实际许可。仍须用户确认合法分发者身份/许可接受与 Community 2026 第 8 条义务（含应用相关索赔的补偿/辩护及其例外），并补保护微软代码的分发者/终端用户同意路径；见 `docs/windows-msvc-redistribution.md` 及 evidence JSON。此为文档补充，四 XPI/源码 ZIP 未变。AGPL/GPL/Berkeley DB 源码交付义务仍待确认；Runtime 使用 EULA/免费 Build Tools 使用权不独立授予再分发，普通原工具链/字节重建不确定性不是自动法律门槛。
+- Windows stage 继续用官方 OpenCV wheel、CPython 3.12.13；Linux CPython 实际为 3.12.16。完整原始许可补充材料、303 个固定源码归档及四包绑定生成器已准备；**licenseCompliance 仍 unknown、对应源码闭环 partial**。AGPL/GPL/Berkeley DB 源码交付义务仍待确认；普通原工具链/字节重建不确定性不是自动法律门槛。
+- MSVC 三 DLL 已匹配微软原始发布字节且签名有效；用户明确确认合法使用 Community 2026 18.9.2 及第 8 条分发责任（含应用相关索赔补偿/辩护及其例外），不重复索取。Windows 两模式的 DLL 专属条款/拒绝/设置接受/冷重开已在实际 150% 原生窗口核验，Linux 两模式保持豁免。`runtime-terms.js` / `Microsoft-Runtime-Terms.txt` 只保存身份 `msvc-community-2026-v1`，不因插件升级重复；后台迁移/轮询/清理/诊断不弹窗，拒绝只停用引擎，设置可重开。读取用 ZIP UTF-8 输入流（Zotero URI overload 返回 XHR），关闭用 `domwindowclosed`，不把初始 about:blank unload 当拒绝。原始 2026 文档/DLL 保持原字节，条款不限制 AGPL 插件整体；普通用户无需额外安装软件。Runtime 使用 EULA/免费 Build Tools 使用权不独立授予再分发；见 `docs/windows-msvc-redistribution.md`、evidence 和 runtime-terms acceptance。既有引擎 20s 启动等待未改，快速连续重启的普遍可靠性不在本次验收范围。
 - `scripts/package_sources.py` 生成独立源码 ZIP、manifest 和 SHA；缓存及生成包位置见当前 delivery 文档。发布前保持源码 membership 与实际 XPI hash 绑定，不借旧包结论，不改归档内容；原始第三方许可的尾部空格/换行须保留，不为 diff whitespace 检查修改原文。
 - `.github/workflows/ci.yml` 为三平台 lightweight 合约；`release-candidate.yml` 手动构建 Linux/Windows，不构建 macOS、不发布 feed。runner-native OpenCV 可比发布基线新，构建 CI 不替代兼容工具链和原生 Zotero。
 
@@ -40,7 +41,7 @@
 - 日常 Linux Zotero：`/home/scq/.local/opt/zotero/zotero`，profile `/home/scq/.zotero/zotero/ylkmnjtn.default`，数据 `/home/scq/Zotero`。不要与 `.runtime/*-profile/*-data` 混淆；不强杀日常进程、不改锁/SQLite/NSS 来制造通过。升级日常环境前保留停机备份。
 - Windows SSH 为 `desktop-hz`，Zotero `D:\Zotero\zotero.exe`，原工程 `E:\ZoteroPlugin\PaperBridge-zotero-plugin`；本轮隔离目录 `E:\PBAssets-1115`。PowerShell 操作，项目解释器/Node 复用原工程 `.runtime\windows-p1-validation-20261114\.venv\Scripts\python.exe` / `.tools\node.exe`。不要改原工程 HEAD/工作文件，也不要清除既有 stash、`windows-wip-before-takeover-20261113.zip`、`.runtime/windows-package-before-p1` 或日常凭据备份。
 - Windows UI 需登录交互 Session；OpenSSH Session 0 不适合。启动器常先退出，须等 helper 产生真实 `Services.appinfo.processID`，再等该 UI 正常退出后准备下一项/冷重开。只清理本轮自有进程与临时计划任务，不外部强杀制造退出成功。
-- Windows 最终两模式 0.3.4→0.3.6 在 150% 下完成原生文件安装、新 note/汇总、保存 URI 路由、三场景诊断隐私与新 PID 冷重开。旧候选有实际 100% 证据，但不是最终 hash 的 100% 重跑；物理 NSS/NTFS 写失败、long path/file busy/真实缺资源、编辑器链接鼠标点击仍未验，不把注入失败或原生 NUL 拒绝当作全部权限通过。
+- MSVC 整合前的 Windows 两模式 0.3.4→0.3.6 在 150% 下完成原生文件安装、新 note/汇总、保存 URI 路由、三场景诊断隐私与新 PID 冷重开；新四包只新增条款范围的精确原生验证，不借用旧 hash。更早候选有实际 100% 证据，但不是当前 hash 的 100% 重跑；物理 NSS/NTFS 写失败、long path/file busy/真实缺资源、编辑器链接鼠标点击仍未验，不把注入失败或原生 NUL 拒绝当作全部权限通过。
 - 合并原生 suite：`prepare_nonmac_test.py --suite assets --phase create|reopen|receive`、`assets_packaged.js`、`lifecycle_asset_packaged.js`。原生输入先等待实际页/textLayer 并滚到可见行；viewport placeholder 或屏幕外坐标不是有效点击。`PathUtils.normalize()` 解析 inode，已删除路径需解析其存活父目录。
 - A→B 隔离检查仅种子化停机 metadata、保持 keys；B storage 为空、不复制原/译 PDF、JSON、NSS 或 PaperBridge 状态，`reading_asset_webdav.js` 经官方 WebDAV `Storage.Request.start()` 下载、校验 native 路径/MD5/size/in_sync，再核 PDF SHA。此处不使用账号 API key，也不代表云 metadata sync/group 已验收。
 - 真实账号两端均 LostPatrol；Windows 文件同步仍关闭，日常插件仍 0.3.4，账号助手未注册，启动临时 autoSync/user.js 已恢复；停机 SQLite integrity 为 ok。真实两设备 metadata 尚未通过，更不代表文件/多译本/group。免费 300 MB 空间不足以全库上传，绝不为验收开启文件同步；实际附件流程需明确授权方案。

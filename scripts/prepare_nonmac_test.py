@@ -28,6 +28,14 @@ def platform_id():
 
 def prepare(options):
     """Install once; subsequent phases only update the external helper configuration."""
+    runtime_terms = options.suite == "runtime-terms"
+    if runtime_terms and options.phase not in {"create", "reopen"}:
+        raise ValueError("Runtime terms support only create and cold reopen")
+    if runtime_terms and (options.case_manifest or options.upgrade_xpi or options.paragraph_cache):
+        raise ValueError("Runtime terms use only their exact candidate and optional synthetic --source-pdf")
+    source_pdf = getattr(options, "source_pdf", None)
+    if source_pdf and not runtime_terms:
+        raise ValueError("--source-pdf is reserved for the isolated runtime-terms suite")
     if options.phase == "install" and (options.suite != "upgrade" or not options.upgrade_xpi):
         raise ValueError("The install phase requires the upgrade suite and an exact candidate XPI")
     if options.windows_supplement and (options.suite != "upgrade" or options.phase != "reopen"
@@ -43,6 +51,24 @@ def prepare(options):
     source_manifest = json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))
     suffix = "-local-python" if options.local_python else ""
     package = options.xpi or ROOT / "dist" / f"paperbridge-{source_manifest['version']}-{platform_id()}{suffix}.xpi"
+    if runtime_terms:
+        # Inspect the candidate before creating directories; the native helper performs installation.
+        if options.phase == "reopen":
+            retained = json.loads((ROOT / ".runtime" / (name + "-options.json")).read_text(encoding="utf-8"))
+            package = options.xpi or Path(retained["candidateXpi"])
+        with zipfile.ZipFile(package) as archive:
+            candidate = json.loads(archive.read("manifest.json"))
+            build = json.loads(archive.read(f"runtime/{platform_id()}/runtime.json"))
+        if candidate["applications"]["zotero"]["id"] != ADDON_ID or build["platform"] != platform_id():
+            raise ValueError("Runtime terms need the actual native PaperBridge candidate")
+        if build["pythonMode"] not in {"bundled", "local"}:
+            raise ValueError("Unknown candidate Python mode")
+        if options.expected_version and options.expected_version != candidate["version"]:
+            raise ValueError("Expected version does not match the selected candidate")
+        if source_pdf:
+            with source_pdf.open("rb") as stream:
+                if stream.read(5) != b"%PDF-":
+                    raise ValueError("--source-pdf must be an explicitly supplied synthetic PDF")
     config_path = ROOT / ".runtime" / (name + "-options.json")
     if options.report_label and (len(options.report_label) > 32 or not options.report_label.replace("-", "").isalnum()):
         raise ValueError("Use a short alphanumeric/hyphen report label")
@@ -56,10 +82,11 @@ def prepare(options):
             raise ValueError("A create phase requires a new isolated profile/data pair")
         extensions.mkdir(parents=True)
         data.mkdir()
-        shutil.copyfile(package, addon)
+        if not runtime_terms:
+            shutil.copyfile(package, addon)
     elif not all(path.exists() for path in (profile, data, addon, helper, config_path)):
         raise ValueError("Reopen requires the retained create profile, data and installed add-ons")
-    with zipfile.ZipFile(addon) as archive:
+    with zipfile.ZipFile(package if runtime_terms else addon) as archive:
         installed = json.loads(archive.read("manifest.json"))
     config = {"isolated": True, "phase": options.phase,
               "expectedProfileDirectory": str(profile), "expectedDataDirectory": str(data),
@@ -68,11 +95,27 @@ def prepare(options):
               "pythonPath": options.local_python, "quit": True}
     if create_profile:
         config["baselineVersion"] = installed["version"]
-        with addon.open("rb") as stream:
+        with (package if runtime_terms else addon).open("rb") as stream:
             config["baselineXpiSha256"] = hashlib.file_digest(stream, "sha256").hexdigest()
     else:
         previous = json.loads(config_path.read_text(encoding="utf-8"))
         config.update({key: previous[key] for key in ("baselineVersion", "baselineXpiSha256")})
+    if runtime_terms:
+        candidate_hash = config["baselineXpiSha256"]
+        if not create_profile:
+            with package.open("rb") as stream:
+                candidate_hash = hashlib.file_digest(stream, "sha256").hexdigest()
+        if not create_profile and (previous.get("suite") != "runtime-terms"
+                                   or previous.get("candidateSha256") != candidate_hash):
+            raise ValueError("Cold runtime-terms reopen must retain the same exact candidate")
+        config.update(suite="runtime-terms", runID=options.run_id,
+                      candidateXpi=str(package.resolve()), candidateSha256=candidate_hash,
+                      expectedPlatform=platform_id(), expectedMode=build["pythonMode"],
+                      expectedBuildId=build["buildId"])
+        if source_pdf:
+            config["sourcePDF"] = str(source_pdf.resolve())
+        elif not create_profile and previous.get("sourcePDF"):
+            config["sourcePDF"] = previous["sourcePDF"]
     if options.case_manifest:
         config["caseManifest"] = str(options.case_manifest.resolve())
         if options.suite == "upgrade":
@@ -127,6 +170,7 @@ function startup() {
 /** Report helper failures only inside the explicitly prepared test profile. */
 async function failed(error) {
   Zotero.logError(error);
+  if (testConfig?.suite === "runtime-terms" && !testConfig.runtimeTermsHelperSafe) return;
   if (!testConfig?.isolated || PathUtils.normalize(Services.dirsvc.get("ProfD", Ci.nsIFile).path)
       !== PathUtils.normalize(testConfig.expectedProfileDirectory)) return;
   const report = {ok: false, phase: testConfig.phase, stage: "helper-error", checks: [],
@@ -137,12 +181,43 @@ async function failed(error) {
 /** Load the caller-owned configuration after native startup. */
 async function runTests() {
   const config = testConfig = JSON.parse(await IOUtils.readUTF8(CONFIG_PATH));
+  if (config.suite === "runtime-terms") {
+    // No report writes, native installation or quit outside this exact disposable suite.
+    await Zotero.initializationPromise;
+    /** Resolve new report/state names through their existing native parent directory. */
+    const normalize = path => {
+      let result;
+      try { result = PathUtils.normalize(path); }
+      catch (error) {
+        if (!String(error).includes("NS_ERROR_FILE_NOT_FOUND")) throw error;
+        result = PathUtils.join(PathUtils.normalize(PathUtils.parent(path)), PathUtils.filename(path));
+      }
+      return Services.appinfo.OS === "WINNT" ? result.toLowerCase() : result;
+    };
+    const base = "runtime-terms-" + config.runID;
+    const directory = PathUtils.join(ROOT_PATH, ".runtime");
+    // Compare canonical parents plus literal suite names; symlinked daily profiles are not allowed.
+    const suiteName = Services.appinfo.OS === "WINNT" ? base.toLowerCase() : base;
+    if (!config.isolated || !/^[a-z0-9-]{1,32}$/i.test(config.runID)
+        || normalize(config.expectedProfileDirectory) !== PathUtils.join(normalize(directory), suiteName + "-profile")
+        || normalize(config.expectedDataDirectory) !== PathUtils.join(normalize(directory), suiteName + "-data")
+        || normalize(Services.dirsvc.get("ProfD", Ci.nsIFile).path) !== normalize(config.expectedProfileDirectory)
+        || normalize(Zotero.DataDirectory.dir) !== normalize(config.expectedDataDirectory)
+        || normalize(PathUtils.parent(config.reportPath)) !== normalize(directory)
+        || !new RegExp("^" + base + "-" + config.phase + "(?:-[a-z0-9-]{1,32})?\\\\.json$", "i")
+          .test(PathUtils.filename(config.reportPath))
+        || normalize(config.statePath) !== normalize(PathUtils.join(directory, base + "-state.json"))
+        || await IOUtils.exists(config.reportPath)) throw new Error("Unsafe runtime-terms profile/data or existing evidence");
+    config.runtimeTermsHelperSafe = true;
+  }
   await helperCheckpoint("helper-initialization");
   await Zotero.initializationPromise;
   await helperCheckpoint("helper-ui-ready");
   await Zotero.uiReadyPromise;
   await helperCheckpoint("helper-script-loading");
-  for (let attempt = 0; attempt < 300 && !Zotero.PaperBridge; attempt++) await Zotero.Promise.delay(100);
+  if (!(config.suite === "runtime-terms" && config.phase === "create")) {
+    for (let attempt = 0; attempt < 300 && !Zotero.PaperBridge; attempt++) await Zotero.Promise.delay(100);
+  }
   const scope = {Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils,
     PAPERBRIDGE_TEST_ROOT: ROOT_PATH, TEST_GLOBAL: config};
   if (config.supplementPhase) {
@@ -152,6 +227,7 @@ async function runTests() {
   if (scope.PAPERBRIDGE_UPDATE_TEST_PROMISE) await scope.PAPERBRIDGE_UPDATE_TEST_PROMISE;
   if (scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE) await scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE;
   if (scope.PAPERBRIDGE_ASSETS_TEST_PROMISE) await scope.PAPERBRIDGE_ASSETS_TEST_PROMISE;
+  if (scope.PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE) await scope.PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE;
 }
 /** Retain actual helper progress before the acceptance script owns its own report. */
 async function helperCheckpoint(stage) {
@@ -165,6 +241,7 @@ async function helperCheckpoint(stage) {
             "alignment": ("alignment_packaged.js", "PAPERBRIDGE_ALIGNMENT_TEST"),
             "upgrade": ("upgrade_packaged.js", "PAPERBRIDGE_UPGRADE_TEST"),
             "assets": ("assets_packaged.js", "PAPERBRIDGE_ASSETS_TEST"),
+            "runtime-terms": ("runtime_terms_packaged.js", "PAPERBRIDGE_RUNTIME_TERMS_TEST"),
         }[options.suite]
         for key, value in {"CONFIG_PATH": json.dumps(str(config_path)),
                            "SUPPLEMENT_URI": json.dumps((ROOT / "tests/windows_supplement_packaged.js").as_uri()),
@@ -185,6 +262,9 @@ async function helperCheckpoint(stage) {
                  "extensions.zotero.firstRun2": False, "extensions.autoDisableScopes": 0,
                  "extensions.enabledScopes": 15, "extensions.startupScanScopes": 15,
                  "xpinstall.signatures.required": False, "browser.shell.checkDefaultBrowser": False}
+        if runtime_terms:
+            # This fresh profile must never attempt account sync during the consent exercise.
+            prefs["extensions.zotero.sync.autoSync"] = False
         (profile / "user.js").write_text("\n".join(
             f"user_pref({json.dumps(key)}, {json.dumps(value)});" for key, value in prefs.items()), encoding="utf-8")
     return {"profile": str(profile), "data": str(data), "report": str(report_path), "config": str(config_path)}
@@ -193,11 +273,13 @@ async function helperCheckpoint(stage) {
 def main():
     """Expose explicit artifacts and cold phases without guessing or modifying public feeds."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade", "assets"), required=True)
+    parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade", "assets", "runtime-terms"), required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--phase", choices=("create", "install", "reopen", "receive"), default="create")
     parser.add_argument("--xpi", type=Path, help="Exact baseline/test XPI, installed only during create")
     parser.add_argument("--local-python", default="")
+    parser.add_argument("--source-pdf", type=Path,
+                        help="Runtime-terms only: explicit synthetic PDF fixture, never a user library/cache")
     parser.add_argument("--case-manifest", type=Path)
     parser.add_argument("--expected-version", default="")
     parser.add_argument("--expected-xpi", type=Path)

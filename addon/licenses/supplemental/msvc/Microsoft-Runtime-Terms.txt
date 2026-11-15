@@ -1,0 +1,32 @@
+PaperBridge — Microsoft runtime agreement
+Agreement identity: msvc-community-2026-v1 (16 November 2026)
+
+1. Scope and acceptance
+This agreement is between you and the PaperBridge distributor. It applies only to the Microsoft object-code runtime files shipped with the Windows PaperBridge application: vcruntime140.dll and vcruntime140_1.dll (bundled-Python mode), and msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll (both Python modes). These files are referred to below as “Microsoft Code”. Their versions, copyright and SHA-256 hashes are in the accompanying MSVC-runtime-attribution.txt.
+
+By choosing “同意并继续” (“Agree and continue”), you agree to these terms before enabling the Windows engine that uses Microsoft Code. Closing this window or choosing “暂不接受” (“Not now”) does not constitute acceptance. No Microsoft account, Visual Studio installation, purchased license or separate runtime installer is required to use PaperBridge. This agreement does not change the AGPL license of PaperBridge or the separate licenses of any other open-source components. Restrictions below apply only to Microsoft Code, not to the application's open-source code, your PDFs or translated output.
+
+2. Runtime use and reserved rights
+Microsoft Code is licensed, not sold. Microsoft and its suppliers retain ownership and all rights not expressly granted. You may install and use Microsoft Code as supplied with PaperBridge, solely to run this application. You may keep a backup copy for reinstalling this application. You must comply with its technical limitations. Unless applicable law gives you additional rights, you may not work around those limitations; reverse engineer, decompile, disassemble or attempt to derive source code from Microsoft Code; remove, minimize, block or modify Microsoft's or its suppliers' notices; use Microsoft Code unlawfully; or share, publish, rent, lease, lend, transfer or provide it as a stand-alone offering. Exceptions required by applicable third-party open-source license terms remain unaffected. Redistribution as part of PaperBridge is permitted only as described in section 3 below or under your own separate applicable Microsoft grant.
+
+3. Downstream distributors, not ordinary application users
+The PaperBridge distributor relies on section 8, Distributable Code, of the Microsoft Visual Studio Community 2026 agreement and permits downstream distributors to copy and distribute unmodified Microsoft Code only as part of PaperBridge, with its significant primary application functionality. A downstream distributor must agree to and fulfill the applicable section 8 distribution conditions, including requiring further distributors and external end users to agree to terms protecting Microsoft Code at least as much as that agreement. You must not modify the Microsoft binaries, distribute unreleased components or applications developed with Insiders Channel Software or dependent on unreleased components, misuse Microsoft trademarks to imply origin or endorsement, or modify/distribute Microsoft Code's source so that it becomes subject to an Excluded License as defined in that agreement. Microsoft Code is not relicensed under the application's AGPL license.
+
+If you act as a downstream distributor, you must indemnify, defend and hold Microsoft harmless from claims, including attorneys' fees, related to the distribution or use of the application, except to the extent a claim is based solely on the Distributable Code. This distributor-specific obligation is not imposed on an ordinary user who only runs PaperBridge. Downloading a runtime file or retaining these terms does not independently grant rights to redistribute Microsoft software outside this permitted application distribution. The original Community 2026 agreement and official REDIST list are included alongside this agreement for the applicable distribution conditions; installing or using Visual Studio itself is not required of an application end user.
+
+4. Trade laws
+You must comply with applicable import/export, sanctions, end-user, end-use and destination restrictions, including applicable U.S., EU and UK Trade Laws, and must not cause Microsoft to violate them. Relevant Microsoft global use restrictions and legal compliance standards apply to Microsoft Code. Microsoft's trade-law information is at https://www.microsoft.com/exporting.
+
+5. Warranty, support and damages
+Microsoft Code is licensed “as-is”. You bear the risk of its use. Microsoft gives no express warranties, guarantees or conditions and, to the extent permitted under local law, excludes implied warranties of merchantability, fitness for a particular purpose and non-infringement. Microsoft may provide no support. To the extent permitted by law, you may recover from Microsoft and its suppliers only direct damages up to U.S. $5.00, not consequential damages, lost profits, special, indirect or incidental damages. These limitations apply to claims related to Microsoft Code, including breach of contract, warranty, guarantee or condition, strict liability, negligence or other tort, even if Microsoft knew or should have known of the possibility of damage. Mandatory consumer rights and any regional limitations on exclusions are not waived; in particular, statutory guarantees under Australian consumer law and the protections applicable to Germany and Austria remain unaffected.
+
+6. Applicable law and retained originals
+If acquired in the United States, Washington state law governs interpretation and breach-of-contract claims relating to Microsoft Code, and the laws of your state govern other claims. If acquired elsewhere, the laws of that country apply. Mandatory local and consumer rights prevail where these terms cannot lawfully limit them. The retained Microsoft documents are reference originals, not a requirement to accept the Visual Studio developer license in order to run this application.
+
+Official Community 2026 terms: https://visualstudio.microsoft.com/license-terms/vs2026-ga-community/
+Official VS2026 REDIST list: https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution
+Deployment guidance: https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files
+Retained original: Visual_Studio_2026-License-Community_ENU.docx
+Retained original: Visual-Studio-2026-REDIST.html
+
+The ordinary-user runtime consent is stored locally only as this agreement's identity. It is not uploaded and does not contain your name, account details, credentials or document content.

@@ -8,7 +8,6 @@
     "levenshtein"
   ],
   "blockers": [
-    "Microsoft VS2022 REDIST terms are retained, but the applicable distributor license and exact unmodified release-DLL basis for 14.44.35211.0/14.40.33810.0 remain unconfirmed. The Runtime use EULA does not grant redistribution.",
     "Finalize AGPLv3 project/dependency source and build-input delivery against the rebuilt XPIs, including Berkeley DB clause-3 accompanying executable sources and any applicable modified-service source access. Full-source delivery is used, not a written offer."
   ],
   "fontEvidence": [
@@ -8909,6 +8908,26 @@
           "path": "licenses/supplemental/msvc/Visual-Studio-2022-REDIST.html",
           "bytes": 62996,
           "sha256": "3b483f10fd87af08f808b2d5ccbf82bb397daae8113d144bc13fbdb06cd2fbdb"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Visual_Studio_2026-License-Community_ENU.docx",
+          "bytes": 69066,
+          "sha256": "02ac07637f4a513a807cd3721c7620433fc483bc049d25784b0c10c54b05e1fb"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Visual-Studio-2026-REDIST.html",
+          "bytes": 48465,
+          "sha256": "0a6dd952d5f9041384d9b8b9391c9e6ef1be9c67f4d466646a07937a27383708"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+          "bytes": 39553,
+          "sha256": "08651651a7602fc7c0e2763de0fde1ff9f868df2780597cd1775ee9d6441c783"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Microsoft-Runtime-Terms.txt",
+          "bytes": 6546,
+          "sha256": "f034f11c2072f5e6d03c276cc97687796a5223eef8743b945c5af975fa0ab402"
         }
       ],
       "versionEvidence": [
@@ -8926,9 +8945,10 @@
         }
       ],
       "sourceIds": [],
-      "scope": "Matched native bytes and retained original notices/build declarations, not license clearance or a link audit.",
-      "redistributionGrant": "not_established",
-      "bundledPythonOnly": true
+      "scope": "Exact original Microsoft bytes and valid Windows Authenticode confirmed; original Community 2026/Runtime documents and Microsoft-only protective agreement retained. Not general license clearance.",
+      "redistributionGrant": "community_2026_section_8_user_confirmed_conditional",
+      "bundledPythonOnly": true,
+      "protectiveAgreement": "msvc-community-2026-v1; explicit Windows engine consent and downstream-distributor protection, not AGPL application restrictions"
     },
     {
       "id": "windows-wheel-msvc-runtimes",
@@ -8962,6 +8982,26 @@
           "path": "licenses/supplemental/msvc/Visual-Studio-2022-REDIST.html",
           "bytes": 62996,
           "sha256": "3b483f10fd87af08f808b2d5ccbf82bb397daae8113d144bc13fbdb06cd2fbdb"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Visual_Studio_2026-License-Community_ENU.docx",
+          "bytes": 69066,
+          "sha256": "02ac07637f4a513a807cd3721c7620433fc483bc049d25784b0c10c54b05e1fb"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Visual-Studio-2026-REDIST.html",
+          "bytes": 48465,
+          "sha256": "0a6dd952d5f9041384d9b8b9391c9e6ef1be9c67f4d466646a07937a27383708"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+          "bytes": 39553,
+          "sha256": "08651651a7602fc7c0e2763de0fde1ff9f868df2780597cd1775ee9d6441c783"
+        },
+        {
+          "path": "licenses/supplemental/msvc/Microsoft-Runtime-Terms.txt",
+          "bytes": 6546,
+          "sha256": "f034f11c2072f5e6d03c276cc97687796a5223eef8743b945c5af975fa0ab402"
         }
       ],
       "versionEvidence": [
@@ -8973,18 +9013,19 @@
         }
       ],
       "sourceIds": [],
-      "scope": "Matched native bytes and retained original notices/build declarations, not license clearance or a link audit.",
+      "scope": "Exact original Microsoft bytes and valid Windows Authenticode confirmed; original Community 2026/Runtime documents and Microsoft-only protective agreement retained. Not general license clearance.",
       "dependency": {
         "name": "hyperscan",
         "version": "0.9.1"
       },
-      "redistributionGrant": "not_established"
+      "redistributionGrant": "community_2026_section_8_user_confirmed_conditional",
+      "protectiveAgreement": "msvc-community-2026-v1; explicit Windows engine consent and downstream-distributor protection, not AGPL application restrictions"
     }
   ],
   "releaseObligations": [
     "Finalize source membership (including scripts/package_sources.py and addon/licenses/supplemental), rebuild all four XPIs, complete native acceptance and regenerate the source bundle against those completed exact bytes. Provisional old-hash bundles cannot certify rebuilt packages.",
     "Publish the verified source ZIP, its manifest and SHA256 beside the exact Linux/Windows XPIs at the same download location and without an extra source charge; retain upstream licenses, populated native/font trees, modifications, configuration and build/install scripts. Do not replace this delivery with repository links or an unspecified offer.",
-    "Retain the AGPLv3 project and dependency licenses/full sources/build instructions and confirm the Microsoft redistribution basis. Resolve specifically identified required source/notices; do not demand an original compiler or byte-identical wheel as a substitute for this review.",
+    "Retain the AGPLv3 project and dependency licenses/full sources/build instructions and comply with the user-confirmed Community 2026 section 8 distribution conditions. Resolve specifically identified required source/notices; do not demand an original compiler or byte-identical wheel as a substitute for this review.",
     "If distributing a modified AGPL network-facing service, provide the applicable corresponding-source access to interacting users; assess the actual shipped/operated scope instead of asserting private use waives obligations.",
     "Do not add local Songti/Noto/Source Han cache fonts to a public package based only on filename, OS/2 fsType or a generic OFL copy. Bind any added font/derivative to its actual upstream grant and reserved-name/modification conditions; PDF embedding is a separate applicable-license question."
   ],

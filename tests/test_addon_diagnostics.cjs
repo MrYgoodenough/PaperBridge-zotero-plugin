@@ -194,7 +194,7 @@ test('real parent export falls back after one startup-failed request, without ex
   assert.equal(result.source, 'addon_only');
   assert.deepEqual(f.calls.requests, [['/diagnostics', 'POST', {
     startup: [{ at: '2026-11-15T00:00:00.000Z', stage: 'failed', code: 'startup' }],
-  }]]);
+  }, { interactive: false }]]);
   const payload = JSON.parse(f.archives.get(result.path).get('diagnostics.json'));
   assertPrivateDataAbsent(payload);
   assert.equal(payload.versions.python, 'unknown');

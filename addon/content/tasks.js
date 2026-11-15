@@ -152,7 +152,12 @@ var TranslationTasks = class {
       try {
         while (this.bridge.alive) {
           try { await this.refresh(); }
-          catch (error) { this.lastError = error.message; Zotero.logError(error); }
+          catch (error) {
+            this.lastError = error.message;
+            // A consent refusal pauses polling until an explicit accept action resumes it.
+            if (error.paperbridgeTerms) break;
+            Zotero.logError(error);
+          }
           const pending = this.bridge.library.records.some(record => record.retryPendingSince || record.jobID && !record.detached &&
             (!this.terminal(record.state) || (record.state === "done" && record.saveState === "produced")));
           if (!pending) break;
@@ -173,7 +178,7 @@ var TranslationTasks = class {
 
   /** Reconcile backend execution with each owner's independent save outcome. */
   async refreshOnce() {
-    const response = await this.bridge.request("/jobs");
+    const response = await this.bridge.request("/jobs", "GET", undefined, { interactive: false });
     const jobs = Array.isArray(response) ? response : response.jobs;
     if (!Array.isArray(jobs)) throw new Error("任务列表响应无效，请重启 PaperBridge 引擎。");
     this.statuses = new Map(jobs.map(job => [job.id, job]));

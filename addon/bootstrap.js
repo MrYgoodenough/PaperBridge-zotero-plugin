@@ -15,6 +15,7 @@ async function startup({ id, version, rootURI }) {
     ["content", "paperbridge", "content/"]
   ]);
   scope = { Zotero, Services, Cc, Ci, Components, ChromeUtils, IOUtils, PathUtils, rootURI, version, fetch };
+  Services.scriptloader.loadSubScript(rootURI + "content/runtime-terms.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/runtime.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/library.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/tasks.js", scope);

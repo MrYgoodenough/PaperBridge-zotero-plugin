@@ -17,6 +17,8 @@ Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容�
 
 自带版包含解释器、依赖、版面模型和 tokenizer，安装后不联网补引擎资源。本地版仅借用同架构 CPython **3.12**，依赖和模型仍随包提供，不修改系统 Python。Linux 需要 glibc ≥ 2.34，并安装思源宋体等简体中文衬线字体。
 
+**0.3.6 候选 Windows 包**首次启用排版引擎时需同意随包提供的 Microsoft DLL 条款；相同条款只确认一次，无需安装 Visual Studio、注册微软账号或另装运行库。暂不接受仍可阅读原文和已有译文。
+
 更新前备份 Zotero profile/数据目录，正常退出后操作。Linux/Windows 使用独立的平台/模式更新通道，不以仓库 Latest 判断适用版本。
 
 ## 翻译与阅读

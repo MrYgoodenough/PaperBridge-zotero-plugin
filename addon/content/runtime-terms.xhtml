@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Offline agreement for Microsoft DLLs only, with no default acceptance. -->
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge · Windows 运行库条款" width="740" height="680">
+  <html:style>
+    :root { color-scheme:light dark; background:Canvas; color:CanvasText; }
+    body { box-sizing:border-box; height:100vh; margin:0; padding:20px; display:flex; flex-direction:column; gap:12px; font:14px system-ui,sans-serif; }
+    [hidden] { display:none !important; }
+    h1 { font-size:20px; margin:0; } p { margin:0; line-height:1.5; overflow-wrap:anywhere; }
+    pre { flex:1; min-height:80px; margin:0; padding:14px; border:1px solid #8886; border-radius:6px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; line-height:1.5; user-select:text; }
+    .actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; }
+    button { max-width:100%; padding:9px 14px; font:inherit; border:1px solid #8886; border-radius:6px; cursor:pointer; }
+    #terms-accept { background:#2963d8; color:white; border-color:#2963d8; }
+    #terms-status { font-size:13px; }
+  </html:style>
+  <html:body>
+    <html:h1>Windows 运行库条款</html:h1>
+    <html:p>只适用于安装包内的 Microsoft DLL，不改变 PaperBridge 或其他开源代码的许可。无需安装 Visual Studio、注册微软账号、付费或另装运行库。</html:p>
+    <html:p>首次启用 Windows 排版引擎需明确同意。相同条款只确认一次；暂不接受不影响 Zotero 和原文、已有译文阅读。</html:p>
+    <html:pre id="terms-text" tabindex="0" aria-label="Microsoft 运行库完整条款"/>
+    <html:p id="terms-status" role="status"/>
+    <html:div class="actions">
+      <html:button id="terms-decline">暂不接受</html:button>
+      <html:button id="terms-accept" disabled="disabled">同意并继续</html:button>
+    </html:div>
+  </html:body>
+  <html:script src="runtime-terms-window.js"/>
+</window>

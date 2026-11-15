@@ -229,6 +229,19 @@ window.addEventListener("load", function initializeSettings() {
   }
   for (const name of globalFields) get(name).value = bridge.pref(name);
   get("python-settings").hidden = bridge.runtime.build?.pythonMode === "bundled";
+  const terms = bridge.runtime.terms;
+  get("runtime-terms").hidden = !terms.required();
+  /** Show consent state without starting the engine or saving provider drafts. */
+  function showTermsState() {
+    get("runtime-terms-status").textContent = terms.accepted()
+      ? "当前 Microsoft 运行库条款已同意；相同条款不重复确认。"
+      : "首次启用 Windows 排版引擎需同意 Microsoft DLL 条款；无需额外安装软件。不接受不影响已有 PDF 阅读。";
+  }
+  showTermsState();
+  get("runtime-terms-view").addEventListener("click", async function viewRuntimeTerms() {
+    try { await terms.show(window); showTermsState(); }
+    catch (error) { get("runtime-terms-status").textContent = error.message; }
+  });
   showProfile();
   get("profile").addEventListener("change", showProfile);
   get("save").addEventListener("click", handleSave);

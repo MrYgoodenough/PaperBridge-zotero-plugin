@@ -99,13 +99,13 @@ var TranslationLibrary = class {
   }
 
   /** Describe legacy cache identities using only public configuration. */
-  async describe(source, attachment, config) {
+  async describe(source, attachment, config, options) {
     return this.bridge.request("/cache/describe", "POST", {
       source_path:source && await source.fileExists() ? await source.getFilePathAsync() : "",
       translated_path:attachment && await attachment.fileExists() ? await attachment.getFilePathAsync() : "",
       model:config.model, base_url:config.baseURL, lang_out:config.language, pages:config.pages,
       profile:config.profile, capabilities:config.capabilities
-    });
+    }, options);
   }
 
   /** Upgrade known fields without guessing that an unfinished legacy task succeeded. */
@@ -172,7 +172,7 @@ var TranslationLibrary = class {
           attachment?.parentID ? await Zotero.Items.getAsync(attachment.parentID) : source;
         const config = this.configSnapshot({...old, language});
         let cache = {};
-        try { cache = await this.describe(source, attachment, config); }
+        try { cache = await this.describe(source, attachment, config, { interactive: false }); }
         catch (error) { this.warn(error); }
         this.records.push(this.restoreRecord({
           libraryID:Number(library), sourceKey:key, sourceID:source?.id,
@@ -451,7 +451,7 @@ var TranslationLibrary = class {
       if (!remove.length) return;
       this.lastCleanup = await this.bridge.request("/cache/prune", "POST", {
         remove, keep:[...this.records.map(record => this.ref(record)), ...retained], sweep:false
-      });
+      }, { interactive: false });
       this.pending = this.pending.filter(ref => !remove.includes(ref));
       await this.save();
     }

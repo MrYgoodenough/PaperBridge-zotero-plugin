@@ -18,57 +18,51 @@
       "platform": "linux-x64",
       "pythonMode": "bundled",
       "name": "paperbridge-0.3.6-linux-x64.xpi",
-      "bytes": 228894239,
-      "sha256": "3c916fab733f419210c0ae131d9505fc7042a65bd7cb9edba5019d6816961fd3",
+      "bytes": 229012590,
+      "sha256": "22d89e944502b1fdf8f5c1d6445b17791cd6de837732c75c5af44a223689968e",
       "runtimeBuildId": "626cfb9c691e1a87879607a77d217fc502d833f97a82418337e68043083e8432",
       "localReleaseVerification": "consistent",
-      "nativeEvidence": "Historical reading/assets/cleanup evidence uses the prior XPI; the runtime and non-license addon content are unchanged. Do not relabel that test as an exact-byte test of this XPI."
+      "nativeEvidence": "Exact candidate AddonManager file install, Windows native refusal/settings acceptance or Linux exemption, synthetic saved-PDF rendering, real local health and different-PID cold reopen. Windows uses actual 150% trusted Gecko input; external OS input is not claimed. Prior upgrade/notes/privacy/100%-scale evidence remains frozen under its own old hashes.",
+      "nativeEvidenceDocument": "runtime-terms-acceptance-0.3.6.json"
     },
     {
       "platform": "linux-x64",
       "pythonMode": "local",
       "name": "paperbridge-0.3.6-linux-x64-local-python.xpi",
-      "bytes": 190976001,
-      "sha256": "054dbe61c9a9c22d32bce0c1a6556775dd807b5be750e75449c73b2dc2c74258",
+      "bytes": 191094352,
+      "sha256": "96f2498d39c61ad71877d1600475bdaec2f12142e03091c8fc5038ce30bec57a",
       "runtimeBuildId": "f2a5f0fdaf7fd03fdd36a2daead578e0c407a5524bebb9c5b19de36d8be36697",
       "localReleaseVerification": "consistent",
-      "nativeEvidence": "Historical reading/assets/cleanup evidence uses the prior XPI; the runtime and non-license addon content are unchanged. Do not relabel that test as an exact-byte test of this XPI."
+      "nativeEvidence": "Exact candidate AddonManager file install, Windows native refusal/settings acceptance or Linux exemption, synthetic saved-PDF rendering, real local health and different-PID cold reopen. Windows uses actual 150% trusted Gecko input; external OS input is not claimed. Prior upgrade/notes/privacy/100%-scale evidence remains frozen under its own old hashes.",
+      "nativeEvidenceDocument": "runtime-terms-acceptance-0.3.6.json"
     },
     {
       "platform": "windows-x64",
       "pythonMode": "bundled",
       "name": "paperbridge-0.3.6-windows-x64.xpi",
-      "bytes": 199609604,
-      "sha256": "b13d1a0a795ad80a5677ad1707962a4a1defbf2195fc46f94aa683437752dfba",
+      "bytes": 199727955,
+      "sha256": "7dae26ed67b72a201cb4ec3e99696771d96a01d2c26f149c96514d7995c1c9c9",
       "runtimeBuildId": "0e2c7f3837a5951d00acbe593d8fd773e0cd87150d646904c5c53f4c1f86363f",
       "localReleaseVerification": "consistent",
-      "nativeEvidence": "Final exact-byte 0.3.4-to-0.3.6 native install, new notes, diagnostic/privacy checks and cold reopen; run wp13fb16. See windows-acceptance-0.3.6.md for scope and separate older 100% scale evidence."
+      "nativeEvidence": "Exact candidate AddonManager file install, Windows native refusal/settings acceptance or Linux exemption, synthetic saved-PDF rendering, real local health and different-PID cold reopen. Windows uses actual 150% trusted Gecko input; external OS input is not claimed. Prior upgrade/notes/privacy/100%-scale evidence remains frozen under its own old hashes.",
+      "nativeEvidenceDocument": "runtime-terms-acceptance-0.3.6.json"
     },
     {
       "platform": "windows-x64",
       "pythonMode": "local",
       "name": "paperbridge-0.3.6-windows-x64-local-python.xpi",
-      "bytes": 187676140,
-      "sha256": "c56598415f55b6e0789f723b2ce6b02692b035fee45ccdca36ffd005f3af80c0",
+      "bytes": 187794491,
+      "sha256": "50a0720625938d5bffc7f0ba57594e8577c876e2bf042d7b72d4fa46f599ab85",
       "runtimeBuildId": "1212e1d1b4843322cc600ad14b37344cc670195df6483d63a2623ab0ac49976e",
       "localReleaseVerification": "consistent",
-      "nativeEvidence": "Final exact-byte 0.3.4-to-0.3.6 native install, new notes, diagnostic/privacy checks and cold reopen; run wp13fl16. See windows-acceptance-0.3.6.md for scope and separate older 100% scale evidence."
+      "nativeEvidence": "Exact candidate AddonManager file install, Windows native refusal/settings acceptance or Linux exemption, synthetic saved-PDF rendering, real local health and different-PID cold reopen. Windows uses actual 150% trusted Gecko input; external OS input is not claimed. Prior upgrade/notes/privacy/100%-scale evidence remains frozen under its own old hashes.",
+      "nativeEvidenceDocument": "runtime-terms-acceptance-0.3.6.json"
     }
   ],
   "sourceDelivery": {
     "archiveName": "paperbridge-0.3.6-linux-windows-source.zip",
-    "bytes": 887263096,
-    "sha256": "838ad271f4179fae3cce09dc28fcc4349247360affd7a917401f33fc5decaa77",
-    "manifestSidecar": "paperbridge-0.3.6-linux-windows-source.zip.manifest.json",
-    "sha256Sidecar": "paperbridge-0.3.6-linux-windows-source.zip.sha256",
-    "status": "Verified archived sources and exact shipped source/notice bindings; local only, not public distribution or legal clearance.",
-    "projectSnapshotCommit": "d637701b862184b66c49e995059aa08c388b7f8d",
-    "projectSourceFromCommitOnly": true,
-    "pinnedArchives": 303,
-    "indexedFilesVerified": 24373,
-    "xpiDeliveryFilesMissingOrChanged": 0,
-    "xpiProjectSourceSnapshotMismatches": 0,
-    "localDirectory": "dist/candidate-20261116",
+    "status": "Regeneration pending for these exact final XPI identities; no prior source ZIP hash is claimed current.",
+    "localDirectory": "dist/candidate-20261116-msvc",
     "licenseCompliance": "unknown",
     "correspondingSourceStatus": "partial",
     "documentation": "licensing.md"
@@ -86,12 +80,13 @@
     "document": "windows-msvc-redistribution.md",
     "evidence": "windows-msvc-evidence-0.3.6.json",
     "exactOriginalDllBytesConfirmed": true,
-    "observedVisualStudio": "Community 2026 18.9.2; installation identity only, not distributor eligibility/assent",
-    "redistributionConditions": "pending distributor decision and protective distributor/end-user agreements",
-    "shippingMaterials": "Unchanged XPI/source ZIP identities; the review is a separate documentation supplement, not new shipping notices."
+    "observedVisualStudio": "Community 2026 18.9.2; lawful use and section 8 responsibility explicitly confirmed by the user, not independently legally audited",
+    "redistributionConditions": "User-confirmed conditional Community 2026 section 8 route, original DLL bytes and integrated Microsoft-only protective agreement; bounded final native consent verification passed.",
+    "shippingMaterials": "All four private XPI identities rebuilt with original VS/Runtime documents and Microsoft-only terms; DLL bytes unchanged. Source delivery is bound separately; no public assets or feeds changed.",
+    "nativeEvidence": "runtime-terms-acceptance-0.3.6.json",
+    "termsIdentity": "msvc-community-2026-v1"
   },
   "releaseOpenItems": [
-    "MSVC original DLL bytes are now confirmed. Before public Windows delivery, confirm the lawful distributor route and its conditions (including Community 2026 indemnity) and integrate protective distributor/end-user agreements; see windows-msvc-redistribution.md. Runtime use EULAs are not independent redistribution grants.",
     "Review corresponding-source sufficiency and deliver AGPL/GPL/Berkeley DB sources and applicable build/service-source obligations with the approved executable distribution.",
     "Complete the authorized real two-device flow without enabling whole-library attachment upload; metadata alone does not validate file download, multiple translations or groups.",
     "Obtain the outstanding human bilingual/visual acceptance and release authorization; then publish exact approved assets before enabling their matching feeds."
