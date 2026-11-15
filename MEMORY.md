@@ -27,7 +27,7 @@
 
 ## 构建与平台
 
-- 实际宿主 Linux，使用项目 `.venv/bin/python`；离线入口 `scripts/check_offline.py --mode full`，清除继承 `PYTHONPATH` 并禁 pytest 外部插件。开发/插件子进程清理 Python/native 环境，不改系统 Python、ROS2 或 shell 配置。
+- 实际宿主 Linux，使用项目 `.venv/bin/python`；离线入口 `scripts/check_offline.py --mode full`，清除继承 `PYTHONPATH` 并禁 pytest 外部插件。跨宿主 staging 测试先取得真实解释器 ABI，再模拟 `sys.platform`，不把模拟 OS 当成真实 Python 构建。开发/插件子进程清理 Python/native 环境，不改系统 Python、ROS2 或 shell 配置。
 - Linux x64 默认已验收 stage 为 `.cache/package/linux-x64`；保留 CPython/libpython、其他 wheel `.libs`、模型和词表。OpenCV 4.12 只含 `core/imgproc/imgcodecs/python3`，与既有 macOS scope 相同，暂不进一步精简，不做 XZ/别名恢复/后置 strip/运行期补下载。
 - Linux 原生基线 glibc ≥ 2.34；兼容 OpenCV 实际最高需 glibc 2.30 / GLIBCXX 3.4.26。Ubuntu 24.04 默认工具链会引入 2.38，不能直接作为该基线发布包。源码 build/install 入口为 `scripts/build_opencv_linux.sh`、`.cache/opencv-linux-x64/install`，本机兼容 sysroot/toolchain 在该目录的 `tools/`；旧 wheel stage 仅保留一份于 `.cache/package-baselines/linux-x64-before-image-only-20261115`。构建输入与路径净化前后 hash 的区别见 `docs/linux-package-size.md`。
 - `build.py` 每次重建 payload，支持独立 `--stage-dir` / `--output-dir`；改 addon/backend/资源后四包重建并核 SHA，prepare 必须在构建结束后执行，避免同名 XPI hash race。marker/build ID 只绑定 payload/backend，不证明 addon 字节；还要核真实落盘 XPI 和全部发货源码。

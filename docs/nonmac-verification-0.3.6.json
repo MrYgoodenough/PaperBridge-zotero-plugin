@@ -251,7 +251,7 @@
       "javascript_syntax_checks": 37,
       "node_suites": 12,
       "failures": 0,
-      "evidence": "agent/codex/reading-assets-20261115/offline-post-cleanup-linux.log"
+      "evidence": "agent/codex/reading-assets-20261115/offline-ci-fix-linux.log"
     },
     "windows": {
       "status": "passed",
@@ -262,11 +262,32 @@
       "javascript_syntax_checks": 37,
       "node_suites": 12,
       "failures": 0,
-      "evidence": "agent/codex/reading-assets-20261115/windows-final/offline-post-cleanup-windows.log",
+      "evidence": "agent/codex/reading-assets-20261115/windows-final/offline-ci-fix-windows.log",
       "encoding": "UTF-8 normalized from the retained original UTF-16 PowerShell log; no result content changed."
     },
     "skip_reason": "tests/test_references.py skips its optional scientific reference PDF when that local fixture is absent; final logs have one skip.",
     "scope_limit": "Offline source contracts do not replace exact-XPI native acceptance, cloud sync, public update delivery or human translation review."
+  },
+  "shared_lightweight_ci": {
+    "scope": "Shared-source portability contracts only; not native macOS, runtime building or whole-paper quality acceptance.",
+    "tested_source_commit": "45f75d9d5bf40d93e164952f28cbfc55e22b115c",
+    "run_id": 43675453766,
+    "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43675453766",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs_and_steps_passed": ["ubuntu-latest", "windows-latest", "macos-latest"],
+    "earlier_failure": {
+      "run_id": 43675051703,
+      "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43675051703",
+      "failed_job": "Core offline (macos-latest)",
+      "failed_test": "test_native_opencv_policy[linux-x86_64-True]",
+      "cause": "The fixture read a lazy interpreter sysconfig ABI after simulating sys.platform, requesting nonexistent _sysconfigdata__linux_darwin.",
+      "resolution": "Capture the actual interpreter ABI before simulating another host; fix the existing test without skipping or weakening provenance checks.",
+      "relabelled_as_pass": false
+    },
+    "followup_changes_only_nonshipping_test": true,
+    "accepted_xpi_bytes_unchanged": true,
+    "evidence": "agent/codex/reading-assets-20261115/ci-test-fix-jobs.json"
   },
   "linux_package_size": {
     "evidence": "docs/linux-package-size-analysis-0.3.6.json",
