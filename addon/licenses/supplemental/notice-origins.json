@@ -1,0 +1,752 @@
+{
+  "_comment": "Original source/archive hashes and normalized retained notice hashes; data is attribution evidence, not a license grant.",
+  "notices": [
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/resources/fonts/droid/NOTICE",
+      "sha256": "38751245389e1e23f73e6f5384b5cbe7fa972cc4410c5adc9c04b082a0b9561a",
+      "bytes": 10695,
+      "originalSha256": "38751245389e1e23f73e6f5384b5cbe7fa972cc4410c5adc9c04b082a0b9561a",
+      "originalBytes": 10695,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/resources/fonts/droid/NOTICE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/resources/fonts/han/LICENSE.txt",
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "bytes": 4301,
+      "originalSha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "originalBytes": 4301,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/resources/fonts/han/LICENSE.txt"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/resources/fonts/noto/COPYING",
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "bytes": 4301,
+      "originalSha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "originalBytes": 4301,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/resources/fonts/noto/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/brotli/LICENSE",
+      "sha256": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94",
+      "bytes": 1084,
+      "originalSha256": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94",
+      "originalBytes": 1084,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/brotli/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/curl/COPYING",
+      "sha256": "8c8824f50e73a021f5dde1fccbf69685939247399a33a32abab1fa448c9ddabb",
+      "bytes": 1088,
+      "originalSha256": "8c8824f50e73a021f5dde1fccbf69685939247399a33a32abab1fa448c9ddabb",
+      "originalBytes": 1088,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/curl/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/extract/COPYING",
+      "sha256": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+      "bytes": 34520,
+      "originalSha256": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+      "originalBytes": 34520,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/extract/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/freeglut/COPYING",
+      "sha256": "b6593d5ec4c113a274abb85b10e8615895cb0ddb89f7912af5fe5aa8df38a275",
+      "bytes": 1439,
+      "originalSha256": "b6593d5ec4c113a274abb85b10e8615895cb0ddb89f7912af5fe5aa8df38a275",
+      "originalBytes": 1439,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/freeglut/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/freetype/LICENSE.TXT",
+      "sha256": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b",
+      "bytes": 2074,
+      "originalSha256": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b",
+      "originalBytes": 2074,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/freetype/LICENSE.TXT"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/freetype/docs/FTL.TXT",
+      "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+      "bytes": 6743,
+      "originalSha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+      "originalBytes": 6743,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/freetype/docs/FTL.TXT"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/freetype/src/bdf/README",
+      "sha256": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+      "bytes": 5972,
+      "originalSha256": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+      "originalBytes": 5972,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/freetype/src/bdf/README"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/freetype/src/pcf/README",
+      "sha256": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b",
+      "bytes": 3311,
+      "originalSha256": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b",
+      "originalBytes": 3311,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/freetype/src/pcf/README"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/gumbo-parser/COPYING",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "originalSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "originalBytes": 11357,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/gumbo-parser/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/harfbuzz/COPYING",
+      "sha256": "4345e1735f8bc6d812fed5180cabb5a5e88a4109d332652f2a45c13cfa5ee692",
+      "bytes": 1829,
+      "originalSha256": "4345e1735f8bc6d812fed5180cabb5a5e88a4109d332652f2a45c13cfa5ee692",
+      "originalBytes": 1829,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/harfbuzz/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/harfbuzz/src/ms-use/COPYING",
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "bytes": 1141,
+      "originalSha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalBytes": 1141,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/harfbuzz/src/ms-use/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/jbig2dec/COPYING",
+      "sha256": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+      "bytes": 34520,
+      "originalSha256": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+      "originalBytes": 34520,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/jbig2dec/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/jbig2dec/LICENSE",
+      "sha256": "1bf5258afe453934484fd0cea97508b72301633a6a78b0ae8a9ee44ac78f26d9",
+      "bytes": 1170,
+      "originalSha256": "1bf5258afe453934484fd0cea97508b72301633a6a78b0ae8a9ee44ac78f26d9",
+      "originalBytes": 1170,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/jbig2dec/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/lcms2/LICENSE",
+      "sha256": "74fe8934cee0e63e8368d4a6b3a703b603e753a62b75b75273572e98a57ebf75",
+      "bytes": 1075,
+      "originalSha256": "74fe8934cee0e63e8368d4a6b3a703b603e753a62b75b75273572e98a57ebf75",
+      "originalBytes": 1075,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/lcms2/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/libjpeg/README",
+      "sha256": "7c25493a9f64fed34d01445467341bda77bc1cdbeccbe33558659ef173fb9ff2",
+      "bytes": 18719,
+      "originalSha256": "7c25493a9f64fed34d01445467341bda77bc1cdbeccbe33558659ef173fb9ff2",
+      "originalBytes": 18719,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/libjpeg/README"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/mujs/COPYING",
+      "sha256": "0ca9b4fbfbcab8ac7d32475890d866efc02f4cffb6b6da5c0e9a0615cc3d82fe",
+      "bytes": 759,
+      "originalSha256": "0ca9b4fbfbcab8ac7d32475890d866efc02f4cffb6b6da5c0e9a0615cc3d82fe",
+      "originalBytes": 759,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/mujs/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/openjpeg/LICENSE",
+      "sha256": "a6af136f3e15038a666b61f376612a07d9a4e48cb7c01adbf3e33b3f14ab49b6",
+      "bytes": 2112,
+      "originalSha256": "a6af136f3e15038a666b61f376612a07d9a4e48cb7c01adbf3e33b3f14ab49b6",
+      "originalBytes": 2112,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/openjpeg/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/tesseract/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "originalSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "originalBytes": 11358,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/tesseract/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/zint/LICENSE",
+      "sha256": "d69af7f2442fcde1c3372cbbb43907fa1f4b3a91ef3899be69dd3a726dc255a4",
+      "bytes": 909,
+      "originalSha256": "d69af7f2442fcde1c3372cbbb43907fa1f4b3a91ef3899be69dd3a726dc255a4",
+      "originalBytes": 909,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/zint/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/zlib/LICENSE",
+      "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
+      "bytes": 1002,
+      "originalSha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
+      "originalBytes": 1002,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/zlib/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/mupdf-1.26.12/thirdparty/zxing-cpp/LICENSE",
+      "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+      "bytes": 11358,
+      "originalSha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+      "originalBytes": 11358,
+      "sourceId": "mupdf",
+      "archiveMember": "mupdf-1.26.12-source/thirdparty/zxing-cpp/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/freetype-2.13.2/docs/FTL.TXT",
+      "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+      "bytes": 6743,
+      "originalSha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+      "originalBytes": 6743,
+      "sourceId": "freetype-native",
+      "archiveMember": "freetype-2.13.2/docs/FTL.TXT"
+    },
+    {
+      "path": "licenses/supplemental/freetype-2.13.2/src/pcf/README",
+      "sha256": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b",
+      "bytes": 3311,
+      "originalSha256": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b",
+      "originalBytes": 3311,
+      "sourceId": "freetype-native",
+      "archiveMember": "freetype-2.13.2/src/pcf/README"
+    },
+    {
+      "path": "licenses/supplemental/freetype-2.13.2/src/bdf/README",
+      "sha256": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+      "bytes": 5972,
+      "originalSha256": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+      "originalBytes": 5972,
+      "sourceId": "freetype-native",
+      "archiveMember": "freetype-2.13.2/src/bdf/README"
+    },
+    {
+      "path": "licenses/supplemental/freetype-harfbuzz/COPYING",
+      "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+      "bytes": 1971,
+      "originalSha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+      "originalBytes": 1971,
+      "sourceId": "freetype-harfbuzz",
+      "archiveMember": "harfbuzz-8.3.0/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/intel-hyperscan/COPYING",
+      "sha256": "cad07d35860e91606cf704740b2de0c12a3007f74178aec8d35bccf3474ac0b9",
+      "bytes": 1478,
+      "originalSha256": "cad07d35860e91606cf704740b2de0c12a3007f74178aec8d35bccf3474ac0b9",
+      "originalBytes": 1478,
+      "sourceId": "intel-hyperscan",
+      "archiveMember": "hyperscan-5.4.2/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/intel-hyperscan/LICENSE",
+      "sha256": "2977f329afc50e6586657059ee25ab38bb1dd6eee1837ccc2f31a3660436ac70",
+      "bytes": 6013,
+      "originalSha256": "2977f329afc50e6586657059ee25ab38bb1dd6eee1837ccc2f31a3660436ac70",
+      "originalBytes": 6013,
+      "sourceId": "intel-hyperscan",
+      "archiveMember": "hyperscan-5.4.2/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/hyperscan-pcre/LICENCE",
+      "sha256": "51b3dea44f63338b84b9c97b3d793826a8397309068cf9379a423216ab8ea5b2",
+      "bytes": 3190,
+      "originalSha256": "51b3dea44f63338b84b9c97b3d793826a8397309068cf9379a423216ab8ea5b2",
+      "originalBytes": 3190,
+      "sourceId": "hyperscan-pcre",
+      "archiveMember": "pcre-8.45/LICENCE"
+    },
+    {
+      "path": "licenses/supplemental/hyperscan-pcre/COPYING",
+      "sha256": "17abe1dbb92b21ab173cf9757dd57b0b15cd8d863b2ccdef635fdbef03077fb0",
+      "bytes": 95,
+      "originalSha256": "17abe1dbb92b21ab173cf9757dd57b0b15cd8d863b2ccdef635fdbef03077fb0",
+      "originalBytes": 95,
+      "sourceId": "hyperscan-pcre",
+      "archiveMember": "pcre-8.45/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/libspatialindex/COPYING",
+      "sha256": "b63ebfaca9d7ce582580f3e11acabc9d2e37c46ce234533f7fa8a6c7278898a0",
+      "bytes": 2484,
+      "originalSha256": "b63ebfaca9d7ce582580f3e11acabc9d2e37c46ce234533f7fa8a6c7278898a0",
+      "originalBytes": 2484,
+      "sourceId": "libspatialindex",
+      "archiveMember": "libspatialindex-2.1.0/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/uharfbuzz-0.57.0/harfbuzz/COPYING",
+      "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+      "bytes": 1971,
+      "originalSha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+      "originalBytes": 1971,
+      "sourceId": "uharfbuzz-native-source",
+      "archiveMember": "uharfbuzz-0.57.0/harfbuzz/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/uharfbuzz-0.57.0/harfbuzz/src/ms-use/COPYING",
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "bytes": 1141,
+      "originalSha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalBytes": 1141,
+      "sourceId": "uharfbuzz-native-source",
+      "archiveMember": "uharfbuzz-0.57.0/harfbuzz/src/ms-use/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/levenshtein-0.27.5/rapidfuzz-cpp-LICENSE.txt",
+      "sha256": "529ac8f069bd6aa633a2da2bea8de4299f43dec428aa407585f2b460dd98944f",
+      "bytes": 1084,
+      "originalSha256": "529ac8f069bd6aa633a2da2bea8de4299f43dec428aa407585f2b460dd98944f",
+      "originalBytes": 1084,
+      "sourceId": "levenshtein",
+      "archiveMember": "levenshtein-0.27.5/extern/rapidfuzz-cpp/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.bdb.txt",
+      "sha256": "3bdff06e69991c94664f2ef5c5f8096f60b7dbec071756ea6cc26b445e06ec5b",
+      "bytes": 7293,
+      "originalSha256": "3bdff06e69991c94664f2ef5c5f8096f60b7dbec071756ea6cc26b445e06ec5b",
+      "originalBytes": 7293,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.bdb.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.bzip2.txt",
+      "sha256": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441",
+      "bytes": 1743,
+      "originalSha256": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441",
+      "originalBytes": 1743,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.bzip2.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.cpython.txt",
+      "sha256": "86e61415828a8b5b06ec8d024e6f086ce155a8b85fd0c419c0ba4dc004e74fdd",
+      "bytes": 36164,
+      "originalSha256": "86e61415828a8b5b06ec8d024e6f086ce155a8b85fd0c419c0ba4dc004e74fdd",
+      "originalBytes": 36164,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.cpython.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.expat.txt",
+      "sha256": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534",
+      "bytes": 1144,
+      "originalSha256": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534",
+      "originalBytes": 1144,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.expat.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.libX11.txt",
+      "sha256": "2daec087a88e7c9b8082557cdeebad5bbb8155a4137472f0b22e269cd99d0c1e",
+      "bytes": 47018,
+      "originalSha256": "2daec087a88e7c9b8082557cdeebad5bbb8155a4137472f0b22e269cd99d0c1e",
+      "originalBytes": 47018,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.libX11.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.libXau.txt",
+      "sha256": "56abe29bb1d9806a9e04fa9f80fed2c0f18027594df3f098148d814aef6bddfa",
+      "bytes": 1148,
+      "originalSha256": "56abe29bb1d9806a9e04fa9f80fed2c0f18027594df3f098148d814aef6bddfa",
+      "originalBytes": 1148,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.libXau.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.libedit.txt",
+      "sha256": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1",
+      "bytes": 1614,
+      "originalSha256": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1",
+      "originalBytes": 1614,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.libedit.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.libffi.txt",
+      "sha256": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0",
+      "bytes": 1132,
+      "originalSha256": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0",
+      "originalBytes": 1132,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.libffi.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.liblzma.txt",
+      "sha256": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02",
+      "bytes": 660,
+      "originalSha256": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02",
+      "originalBytes": 660,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.liblzma.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.libuuid.txt",
+      "sha256": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b",
+      "bytes": 1432,
+      "originalSha256": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b",
+      "originalBytes": 1432,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.libuuid.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.libxcb.txt",
+      "sha256": "c5ffbfeaa501071ceeb97b7de2c0d703fdaa35de01c0fb6cbac1c28453a3e9fd",
+      "bytes": 1337,
+      "originalSha256": "c5ffbfeaa501071ceeb97b7de2c0d703fdaa35de01c0fb6cbac1c28453a3e9fd",
+      "originalBytes": 1337,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.libxcb.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.mpdecimal.txt",
+      "sha256": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b",
+      "bytes": 1284,
+      "originalSha256": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b",
+      "originalBytes": 1284,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.mpdecimal.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.ncurses.txt",
+      "sha256": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c",
+      "bytes": 1447,
+      "originalSha256": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c",
+      "originalBytes": 1447,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.ncurses.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.openssl-3.txt",
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+      "bytes": 10175,
+      "originalSha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+      "originalBytes": 10175,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.openssl-3.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.sqlite.txt",
+      "sha256": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719",
+      "bytes": 1481,
+      "originalSha256": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719",
+      "originalBytes": 1481,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.sqlite.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.tcl.txt",
+      "sha256": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16",
+      "bytes": 2255,
+      "originalSha256": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16",
+      "originalBytes": 2255,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.tcl.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.tix.txt",
+      "sha256": "3ac5cdd0bef6c43ce34c6a7ced452081d9e5a0bf94082b9f9147d23ec9e214f5",
+      "bytes": 2826,
+      "originalSha256": "3ac5cdd0bef6c43ce34c6a7ced452081d9e5a0bf94082b9f9147d23ec9e214f5",
+      "originalBytes": 2826,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.tix.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.zlib-ng.txt",
+      "sha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee",
+      "bytes": 867,
+      "originalSha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee",
+      "originalBytes": 867,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.zlib-ng.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.zlib.txt",
+      "sha256": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c",
+      "bytes": 995,
+      "originalSha256": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c",
+      "originalBytes": 995,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.zlib.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/linux/LICENSE.zstd.txt",
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+      "bytes": 1549,
+      "originalSha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+      "originalBytes": 1549,
+      "fullBuildArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+      "archiveMember": "python/licenses/LICENSE.zstd.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.bdb.txt",
+      "sha256": "3bdff06e69991c94664f2ef5c5f8096f60b7dbec071756ea6cc26b445e06ec5b",
+      "bytes": 7293,
+      "originalSha256": "8f2d533ab34899499d5b07f209854b101b17dba2c69f3251860aecf3e4005faa",
+      "originalBytes": 7419,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.bdb.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.bzip2.txt",
+      "sha256": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441",
+      "bytes": 1743,
+      "originalSha256": "bd5628cc76fb0ebf9c657d1dd4d1a240a1a7b216c31663e7bbf1131c0b70a910",
+      "originalBytes": 1780,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.bzip2.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.cpython.txt",
+      "sha256": "86e61415828a8b5b06ec8d024e6f086ce155a8b85fd0c419c0ba4dc004e74fdd",
+      "bytes": 36164,
+      "originalSha256": "8fe98bf9822926d854f56ffd8d97877d8b942617aa44eb7ea77fd99e22f2537e",
+      "originalBytes": 36935,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.cpython.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.expat.txt",
+      "sha256": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534",
+      "bytes": 1144,
+      "originalSha256": "8a9cfe4b5924f4b25881aa0c9f5e4561c5f31065d0c4a13cdcdbcf917edf39aa",
+      "originalBytes": 1165,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.expat.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.libX11.txt",
+      "sha256": "2daec087a88e7c9b8082557cdeebad5bbb8155a4137472f0b22e269cd99d0c1e",
+      "bytes": 47018,
+      "originalSha256": "f353accfe2976df31ea297a77d1d454bd51ef6be8c3df39bd6aca95901579357",
+      "originalBytes": 47960,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.libX11.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.libXau.txt",
+      "sha256": "56abe29bb1d9806a9e04fa9f80fed2c0f18027594df3f098148d814aef6bddfa",
+      "bytes": 1148,
+      "originalSha256": "cec808cd2163fccdc8de4a91d526490777afbaeea060e1168c40a804694b7444",
+      "originalBytes": 1169,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.libXau.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.libedit.txt",
+      "sha256": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1",
+      "bytes": 1614,
+      "originalSha256": "d9932ccdd42eccf6cdded7bcb35b088e64cfc7c24d355af2cc0d02edb6b637d3",
+      "originalBytes": 1643,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.libedit.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.libffi.txt",
+      "sha256": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0",
+      "bytes": 1132,
+      "originalSha256": "9afb8970cd29fc1031fa647278e4bef613399e2e3468a1e3a397f4d158c6101c",
+      "originalBytes": 1153,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.libffi.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.liblzma.txt",
+      "sha256": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02",
+      "bytes": 660,
+      "originalSha256": "d87d218dd908b3243ec4cbc72af400e5b7437513ea9d9229291d0812b8464fec",
+      "originalBytes": 673,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.liblzma.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.libuuid.txt",
+      "sha256": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b",
+      "bytes": 1432,
+      "originalSha256": "cbccaa3efe07a9a602751375085be572d4410a250b996716fbe8c5255c7ec6f2",
+      "originalBytes": 1459,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.libuuid.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.libxcb.txt",
+      "sha256": "c5ffbfeaa501071ceeb97b7de2c0d703fdaa35de01c0fb6cbac1c28453a3e9fd",
+      "bytes": 1337,
+      "originalSha256": "29a9539190e6de1af5fd06a9139c7103137cd1f9290b08c7b11bce89c01c14d2",
+      "originalBytes": 1367,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.libxcb.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.mpdecimal.txt",
+      "sha256": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b",
+      "bytes": 1284,
+      "originalSha256": "f094277cd46e1f6e4d87916cc4b51e22f613d45eb81f48231c3cb7caf8fc8a6a",
+      "originalBytes": 1308,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.mpdecimal.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.ncurses.txt",
+      "sha256": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c",
+      "bytes": 1447,
+      "originalSha256": "4f571cad3ea6c888bf0a7092e5b215dddb3142e9e3f1857fd5fac6cf13d345d7",
+      "originalBytes": 1476,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.ncurses.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.openssl-1.1.txt",
+      "sha256": "9c04cce50c4989d5601dd8b07f6ab922c40388b66ac736c9007cb1ed9d9dd560",
+      "bytes": 6120,
+      "originalSha256": "ad89e3fed746413af1d34d5353978ee1520cedd361c853f8022e7bb210ac6b31",
+      "originalBytes": 6244,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.openssl-1.1.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.openssl-3.txt",
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+      "bytes": 10175,
+      "originalSha256": "ed72ce2b51ee58f117e5a021e2e04af158857f40269fbc03491f0b2a99dbcc96",
+      "originalBytes": 10352,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.openssl-3.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.sqlite.txt",
+      "sha256": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719",
+      "bytes": 1481,
+      "originalSha256": "d8eb9aba7ef6b5ed06cb3ec19a7242316af2e5933c638eb67fb781c13884e01d",
+      "originalBytes": 1504,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.sqlite.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.tcl.txt",
+      "sha256": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16",
+      "bytes": 2255,
+      "originalSha256": "41613eabfc08921a7da9c4bfd7f3ce5d5406f55214b253d89f392ed86eebeb8f",
+      "originalBytes": 2295,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.tcl.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.tix.txt",
+      "sha256": "3ac5cdd0bef6c43ce34c6a7ced452081d9e5a0bf94082b9f9147d23ec9e214f5",
+      "bytes": 2826,
+      "originalSha256": "8cdff3addb9e9eb108c78e2cf5e05f26b216c098304945733bbec382b2eaef66",
+      "originalBytes": 2880,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.tix.txt"
+    },
+    {
+      "path": "licenses/supplemental/python-build-standalone/windows/LICENSE.zlib.txt",
+      "sha256": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c",
+      "bytes": 995,
+      "originalSha256": "365e36720db366054863235aea5d6f440142ab968834bfaf81fa9d187c99b9b8",
+      "originalBytes": 1016,
+      "fullBuildArchiveSha256": "00de77fbc37588bc89d2f47df14f400c35e201afa2a3d7ffb495eab0945da2db",
+      "archiveMember": "python/licenses/LICENSE.zlib.txt"
+    },
+    {
+      "path": "licenses/supplemental/rust/crossbeam-deque-0.8.7/LICENSE-APACHE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "bytes": 10847,
+      "originalSha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "originalBytes": 10847,
+      "sourceId": "rust-crate-crossbeam-deque-0.8.7",
+      "archiveMember": "crossbeam-deque-0.8.7/LICENSE-APACHE"
+    },
+    {
+      "path": "licenses/supplemental/rust/crossbeam-deque-0.8.7/LICENSE-MIT",
+      "sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab",
+      "bytes": 1099,
+      "originalSha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab",
+      "originalBytes": 1099,
+      "sourceId": "rust-crate-crossbeam-deque-0.8.7",
+      "archiveMember": "crossbeam-deque-0.8.7/LICENSE-MIT"
+    },
+    {
+      "path": "licenses/supplemental/rust/fancy-regex-0.19.0/LICENSE",
+      "sha256": "3bc70e239e91272782006c638fc0452a714d384224f11f0923036b7be07cf9b5",
+      "bytes": 1081,
+      "originalSha256": "3bc70e239e91272782006c638fc0452a714d384224f11f0923036b7be07cf9b5",
+      "originalBytes": 1081,
+      "sourceId": "rust-crate-fancy-regex-0.19.0",
+      "archiveMember": "fancy-regex-0.19.0/LICENSE"
+    },
+    {
+      "path": "licenses/supplemental/rust/bstr-1.13.1/COPYING",
+      "sha256": "68653aaa727a2bfa31b7a751e31701ce33c49d695c12dd291a07d1c54da4c14b",
+      "bytes": 262,
+      "originalSha256": "68653aaa727a2bfa31b7a751e31701ce33c49d695c12dd291a07d1c54da4c14b",
+      "originalBytes": 262,
+      "sourceId": "rust-crate-bstr-1.13.1",
+      "archiveMember": "bstr-1.13.1/COPYING"
+    },
+    {
+      "path": "licenses/supplemental/rust/bstr-1.13.1/LICENSE-APACHE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "bytes": 10847,
+      "originalSha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "originalBytes": 10847,
+      "sourceId": "rust-crate-bstr-1.13.1",
+      "archiveMember": "bstr-1.13.1/LICENSE-APACHE"
+    },
+    {
+      "path": "licenses/supplemental/rust/bstr-1.13.1/LICENSE-MIT",
+      "sha256": "6b7374c39a57e57fc2c38eb529c4c88340152b10f51dd5ae2d819dfa67f61715",
+      "bytes": 1086,
+      "originalSha256": "6b7374c39a57e57fc2c38eb529c4c88340152b10f51dd5ae2d819dfa67f61715",
+      "originalBytes": 1086,
+      "sourceId": "rust-crate-bstr-1.13.1",
+      "archiveMember": "bstr-1.13.1/LICENSE-MIT"
+    },
+    {
+      "path": "licenses/supplemental/rust/rustc-hash-2.1.3/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "bytes": 9723,
+      "originalSha256": "95bd3988beee069fa2848f648dab43cc6e0b2add2ad6bcb17360caf749802bcc",
+      "originalBytes": 9722,
+      "sourceId": "rust-crate-rustc-hash-2.1.3",
+      "archiveMember": "rustc-hash-2.1.3/LICENSE-APACHE"
+    },
+    {
+      "path": "licenses/supplemental/rust/rustc-hash-2.1.3/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "bytes": 1023,
+      "originalSha256": "30fefc3a7d6a0041541858293bcbea2dde4caa4c0a5802f996a7f7e8c0085652",
+      "originalBytes": 1022,
+      "sourceId": "rust-crate-rustc-hash-2.1.3",
+      "archiveMember": "rustc-hash-2.1.3/LICENSE-MIT"
+    }
+  ]
+}

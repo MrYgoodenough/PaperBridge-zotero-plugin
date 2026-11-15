@@ -1,0 +1,21 @@
+{
+  "version": "4.12.0",
+  "platform": "linux-x64",
+  "modules": [
+    "core",
+    "imgproc",
+    "imgcodecs",
+    "python3"
+  ],
+  "sourceArchiveSha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
+  "python": "3.12.16",
+  "pythonAbi": "cpython-312-x86_64-linux-gnu",
+  "numpy": "2.5.4",
+  "cmake": "4.4.4",
+  "buildType": "MinSizeRel",
+  "minimumGlibc": "2.30",
+  "extensionSha256": "9229a787f40d818ae95fc83ef1192544e7de0b4ddae458139f675e38d12a68c0",
+  "extensionBytes": 10064816,
+  "cmakeCacheSha256": "101492b064557d14c811a28b7e8fce2584611545bf343bcfbb242aa6ebe7e7f9",
+  "toolchainFileSha256": "d1990f8654914c87ea493b43d5d830c07a2a5874f5697b4cfd13e86921280279"
+}

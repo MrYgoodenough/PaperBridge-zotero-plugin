@@ -1,4 +1,4 @@
-"""Prepare isolated reading/update checks without replacing installed add-ons on reopen."""
+"""Prepare isolated native suites; upgrade installs and cold reopens stay separate."""
 
 import argparse
 import hashlib
@@ -28,6 +28,11 @@ def platform_id():
 
 def prepare(options):
     """Install once; subsequent phases only update the external helper configuration."""
+    if options.phase == "install" and (options.suite != "upgrade" or not options.upgrade_xpi):
+        raise ValueError("The install phase requires the upgrade suite and an exact candidate XPI")
+    if options.windows_supplement and (options.suite != "upgrade" or options.phase != "reopen"
+                                      or sys.platform != "win32"):
+        raise ValueError("Windows notes require the native Windows upgrade reopen phase")
     if not options.run_id or len(options.run_id) > 32 or not options.run_id.replace("-", "").isalnum():
         raise ValueError("Use a short alphanumeric/hyphen run ID")
     name = options.suite + "-" + options.run_id
@@ -44,7 +49,7 @@ def prepare(options):
     label = "-" + options.report_label if options.report_label else ""
     report_path = ROOT / ".runtime" / (name + "-" + options.phase + label + ".json")
     if report_path.exists():
-        raise ValueError("This phase already has evidence; choose a new run ID")
+        raise ValueError("This phase already has evidence; choose a new run ID or report label")
     create_profile = options.phase == "create" or options.phase == "receive"
     if create_profile:
         if profile.exists() or data.exists():
@@ -73,6 +78,9 @@ def prepare(options):
         if options.suite == "upgrade":
             cases = json.loads(options.case_manifest.read_text(encoding="utf-8"))["cases"]
             config.update(sourcePDF=cases[0]["source_pdf"], translatedPDF=cases[0]["translated_pdf"],
+                          notePageIndex=cases[0]["selected_pages_one_based"][0] - 1,
+                          notePaperTitle=cases[0].get("title"),
+                          noteSelectionText=cases[0].get("selection_text"),
                           readerPDFs=[{"path": case["translated_pdf"], "page": page,
                                        "searchTerm": "机器学习" if case["id"] == "scikit-learn-2011" else "600,000"}
                                       for case in cases for page in case["selected_pages_one_based"]])
@@ -89,6 +97,16 @@ def prepare(options):
         config["expectedXpiPath"] = str(options.expected_xpi.resolve())
         with options.expected_xpi.open("rb") as stream:
             config["expectedXpiSha256"] = hashlib.file_digest(stream, "sha256").hexdigest()
+    if options.windows_supplement:
+        # Independent view runs must not discard the note identity needed by a later cold reopen.
+        supplement_state = (previous.get("supplementStatePath")
+                            if options.windows_supplement in {"reopen", "views"} else None)
+        if not supplement_state and options.windows_supplement != "reopen":
+            supplement_state = str(ROOT / ".runtime" / (name + "-windows-notes" + label + ".json"))
+        if not supplement_state:
+            raise ValueError("Cold Windows notes need the previous exercise's explicit state path")
+        config.update(supplementPhase=options.windows_supplement,
+                      supplementStatePath=supplement_state)
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
     if create_profile:
         # Reading external options at startup keeps the installed helper unchanged across cold restarts.
@@ -127,6 +145,9 @@ async function runTests() {
   for (let attempt = 0; attempt < 300 && !Zotero.PaperBridge; attempt++) await Zotero.Promise.delay(100);
   const scope = {Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils,
     PAPERBRIDGE_TEST_ROOT: ROOT_PATH, TEST_GLOBAL: config};
+  if (config.supplementPhase) {
+    Services.scriptloader.loadSubScript(SUPPLEMENT_URI, scope);
+  }
   Services.scriptloader.loadSubScript(TEST_URI, scope);
   if (scope.PAPERBRIDGE_UPDATE_TEST_PROMISE) await scope.PAPERBRIDGE_UPDATE_TEST_PROMISE;
   if (scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE) await scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE;
@@ -146,6 +167,7 @@ async function helperCheckpoint(stage) {
             "assets": ("assets_packaged.js", "PAPERBRIDGE_ASSETS_TEST"),
         }[options.suite]
         for key, value in {"CONFIG_PATH": json.dumps(str(config_path)),
+                           "SUPPLEMENT_URI": json.dumps((ROOT / "tests/windows_supplement_packaged.js").as_uri()),
                            "TEST_URI": json.dumps((ROOT / "tests" / script).as_uri()),
                            "ROOT_PATH": json.dumps(str(ROOT)), "TEST_GLOBAL": global_name}.items():
             bootstrap = bootstrap.replace(key, value)
@@ -173,14 +195,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade", "assets"), required=True)
     parser.add_argument("--run-id", required=True)
-    parser.add_argument("--phase", choices=("create", "reopen", "receive"), default="create")
+    parser.add_argument("--phase", choices=("create", "install", "reopen", "receive"), default="create")
     parser.add_argument("--xpi", type=Path, help="Exact baseline/test XPI, installed only during create")
     parser.add_argument("--local-python", default="")
     parser.add_argument("--case-manifest", type=Path)
     parser.add_argument("--expected-version", default="")
     parser.add_argument("--expected-xpi", type=Path)
     parser.add_argument("--upgrade-xpi", type=Path, help="Native file-install candidate, never a public update claim")
-    parser.add_argument("--paragraph-cache", type=Path, help="Explicit historical cache clone for preservation checks")
+    parser.add_argument("--paragraph-cache", type=Path, help="Explicit cache database for byte-preservation checks")
+    parser.add_argument("--windows-supplement", choices=("exercise", "notes", "reopen", "views"),
+                        help="Full native exercise, note-only exercise, cold notes, or independent DPI views")
     parser.add_argument("--report-label", default="", help="Retain a failed phase report while retrying the same isolated profile")
     print(json.dumps(prepare(parser.parse_args()), ensure_ascii=False))
 

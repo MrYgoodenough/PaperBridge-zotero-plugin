@@ -1,0 +1,115 @@
+{
+  "_comment": "Official/public evidence; declaration candidates and end-user terms are not original-wheel closure or redistribution clearance.",
+  "crossbeamDeque": {
+    "version": "0.8.7",
+    "sha256": "5181e0de7b61eb03a81e347d6dd8797bae9da5146707b51077e2d71a54ec0ceb",
+    "lockedChecksumMatches": true
+  },
+  "msvc": {
+    "fileVersions": [
+      "14.44.35211.0",
+      "14.40.33810.0"
+    ],
+    "retainedOfficialDocuments": [
+      {
+        "path": "licenses/supplemental/msvc/Visual-C-Runtime-2015-2022-License.docx",
+        "url": "https://visualstudio.microsoft.com/wp-content/uploads/2021/09/Visual-C-Runtime-2015-2022-License-1.docx",
+        "bytes": 39644,
+        "sha256": "f1e3d56ceb2ad68aae0711b910375009e651ac5530fa0760f0dea6e81e54fae1",
+        "retention": "original_bytes"
+      },
+      {
+        "path": "licenses/supplemental/msvc/Visual-Studio-2022-Community-License-EN.docx",
+        "url": "https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Visual-Studio-2022-Community-License-EN.docx",
+        "bytes": 62859,
+        "sha256": "41a207b10c8ab91d0d2f10a854715f73dca54509581692d2fe179aa3ffcb8540",
+        "retention": "original_bytes"
+      },
+      {
+        "path": "licenses/supplemental/msvc/Visual-Studio-2022-REDIST.html",
+        "url": "https://learn.microsoft.com/en-us/visualstudio/releases/2022/redistribution",
+        "bytes": 62996,
+        "sha256": "3b483f10fd87af08f808b2d5ccbf82bb397daae8113d144bc13fbdb06cd2fbdb",
+        "retention": "original_bytes"
+      }
+    ],
+    "runtimeUseTermsGrantRedistribution": false,
+    "visualStudioRedistGrant": "conditional_on_valid_license_and_distribution_requirements",
+    "exactDllReleaseOriginAndDistributorLicenseConfirmed": false,
+    "scope": "The public VS2022 family terms do not identify individual DLL hashes or establish this distributor's license. No Microsoft runtime source requirement is inferred."
+  },
+  "tiktoken": {
+    "version": "0.14.0",
+    "publicTagCommit": "4e71bbe0c078468e00fefbf94b39849389f346e5",
+    "wheels": [
+      {
+        "filename": "tiktoken-0.14.0-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "url": "https://files.pythonhosted.org/packages/51/11/9976ad86980a00cdef05e730a0127a2578a1bc6d11644d8d47246de2eb26/tiktoken-0.14.0-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "status": 200,
+        "bytes": 1204197,
+        "sha256": "7896eea257fe497a2b7134474d909156c6744ce8da35bce88011a960e008aa0d",
+        "platform": "linux-x64",
+        "nativeArtifact": {
+          "path": "tiktoken/_tiktoken.cpython-312-x86_64-linux-gnu.so",
+          "bytes": 3728512,
+          "sha256": "889c237c20a61bb52155821a8184989920850905f2dc1716245fd222f498e8c5"
+        },
+        "matchesBaselineNativeBytes": true,
+        "licenseMembers": [
+          {
+            "path": "tiktoken-0.14.0.dist-info/licenses/LICENSE",
+            "bytes": 1078,
+            "sha256": "418cb499b436128d653d79941333a5437b7be2ea9213dcc2f04d15d5d2c51d86"
+          }
+        ],
+        "buildLockOrThirdPartyManifestInWheel": false
+      },
+      {
+        "filename": "tiktoken-0.14.0-cp312-cp312-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/bd/bd/a2e884fb1402cba5be08836590320012b2d8ada0e2eef9911a64df4bcd2d/tiktoken-0.14.0-cp312-cp312-win_amd64.whl",
+        "status": 200,
+        "bytes": 941208,
+        "sha256": "087538c080e5ff421abd3a0785ed63c5111d06af98e6cd0d374dbe5969147ca3",
+        "platform": "windows-x64",
+        "nativeArtifact": {
+          "path": "tiktoken/_tiktoken.cp312-win_amd64.pyd",
+          "bytes": 2450944,
+          "sha256": "4819f4517aa091644f574d607a8d2308b9700dcccd1708397951fa94abbe8697"
+        },
+        "matchesBaselineNativeBytes": true,
+        "licenseMembers": [
+          {
+            "path": "tiktoken-0.14.0.dist-info/licenses/LICENSE",
+            "bytes": 1099,
+            "sha256": "258463fc3788f1f9b6a3f1820d8a87481ac24018d53167597e25d3e9031851ca"
+          }
+        ],
+        "buildLockOrThirdPartyManifestInWheel": false
+      }
+    ],
+    "tagAndSdistHaveCargoLock": false,
+    "workflowPath": "licenses/supplemental/tiktoken-0.14.0/build_wheels.yml",
+    "workflowSha256": "abcda456c1feab6ce8a079bf17d79feb3068f9fc55ba19afc83b4225afd05a39",
+    "publicTagBuildRun": "https://github.com/openai/tiktoken/actions/runs/31997879940",
+    "unauthenticatedBuildLogStatus": 403,
+    "pypiProvenanceStatus": 404,
+    "declaredDependencyCandidates": [
+      {
+        "sourceId": "rust-crate-fancy-regex-0.19.0",
+        "selectionBasis": "declared_minimum",
+        "wheelVersionConfirmed": false
+      },
+      {
+        "sourceId": "rust-crate-bstr-1.13.1",
+        "selectionBasis": "declared_minimum",
+        "wheelVersionConfirmed": false
+      },
+      {
+        "sourceId": "rust-crate-rustc-hash-2.1.3",
+        "selectionBasis": "major_2_public_candidate_before_tag_build",
+        "wheelVersionConfirmed": false
+      }
+    ],
+    "scope": "Unchanged native wheel bytes and public MIT license are identified. Added direct-dependency notices are conservative public candidates, not a recovered transitive build graph. No byte-identical rebuild is required or claimed."
+  }
+}
