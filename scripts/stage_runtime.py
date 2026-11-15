@@ -1,4 +1,6 @@
 """Stage a relocatable runtime for the build platform, without a venv or host site-packages."""
+import argparse
+import hashlib
 import importlib.metadata
 import json
 import os
@@ -7,6 +9,7 @@ import re
 import shutil
 import subprocess
 import sys
+import sysconfig
 from pathlib import Path
 from packaging.requirements import Requirement
 from sanitize_runtime import sanitize_runtime
@@ -33,11 +36,14 @@ PLATFORM, PYTHON_EXECUTABLE, SITE_PACKAGES = build_platform()
 STAGE = ROOT / f".cache/package/{PLATFORM}"
 # The pinned engine uses only line clustering and grayscale SSIM from these
 # toolkits. compact_math supplies those operations; model-hub clients are unused.
-# Linux and Windows keep the official wheel; the minimal OpenCV build is macOS-only.
+# Windows keeps the official wheel; Linux and macOS use image-only source builds.
 OMIT = {"ruff", "scipy", "scikit-learn", "scikit-image", "huggingface-hub", "hf-xet",
         "networkx", "narwhals", "joblib", "threadpoolctl", "imageio", "tifffile", "lazy-loader"}
-if sys.platform == "darwin":
+if sys.platform in {"darwin", "linux"}:
     OMIT.add("opencv-python-headless")
+# Both source builds use the existing macOS version and module scope.
+OPENCV_VERSION = "4.12.0"
+OPENCV_MODULES = ["core", "imgproc", "imgcodecs", "python3"]
 
 
 def copy(source, target):
@@ -55,7 +61,7 @@ def uv():
 def stage_interpreter():
     """Copy the base interpreter and its standard library into the bundle."""
     base = Path(sys.base_prefix)
-    if os.name == "nt":
+    if sys.platform == "win32":
         python = STAGE / "python"
         python.mkdir(parents=True, exist_ok=True)
         for item in base.iterdir():
@@ -107,23 +113,55 @@ def stage_packages(destination):
     return packages
 
 
-def stage():
+def compact_opencv(install=None):
+    """Locate the native image-only build before replacing any staged runtime."""
+    if sys.platform not in {"darwin", "linux"}:
+        return None
+    default = ".cache/opencv-install" if sys.platform == "darwin" else ".cache/opencv-linux-x64/install"
+    compact = Path(install) if install else ROOT / default
+    script = "build_opencv.sh" if sys.platform == "darwin" else "build_opencv_linux.sh"
+    if not (compact / "cv2").is_dir():
+        raise SystemExit(f"Run scripts/{script} to build the image-only OpenCV module first")
+    if sys.platform == "linux":
+        provenance_path = compact / "opencv-build.json"
+        if not provenance_path.is_file():
+            raise SystemExit(f"Missing Linux OpenCV build provenance; rerun scripts/{script}")
+        provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+        extensions = list((compact / "cv2").rglob("cv2*.so"))
+        if (provenance.get("platform") != PLATFORM or provenance.get("version") != OPENCV_VERSION
+                or provenance.get("modules") != OPENCV_MODULES
+                or provenance.get("pythonAbi") != sysconfig.get_config_var("SOABI")
+                or len(extensions) != 1):
+            raise SystemExit(f"Linux OpenCV build does not match this runtime; rerun scripts/{script}")
+        if hashlib.sha256(extensions[0].read_bytes()).hexdigest() != provenance.get("extensionSha256"):
+            raise SystemExit(f"Linux OpenCV extension changed since its build; rerun scripts/{script}")
+    return compact
+
+
+def stage_opencv(destination, compact):
+    """Copy only the native image-only module and make its loader relocatable."""
+    shutil.copytree(compact / "cv2", destination / "cv2", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (destination / "cv2/config.py").write_text("BINARIES_PATHS = []\n", encoding="utf-8")
+    (destination / "cv2/config-3.12.py").write_text(
+        "PYTHON_EXTENSIONS_PATHS = [os.path.join(LOADER_DIR, 'python-3.12')] + PYTHON_EXTENSIONS_PATHS\n",
+        encoding="utf-8")
+    package = {"name": "opencv-image-only", "version": OPENCV_VERSION, "modules": OPENCV_MODULES}
+    if sys.platform == "linux":
+        package["build"] = json.loads((compact / "opencv-build.json").read_text(encoding="utf-8"))
+    return package
+
+
+def stage(opencv_install=None):
     """Assemble the interpreter, backend, model and tokenizer runtime."""
+    compact_cv = compact_opencv(opencv_install)
     if STAGE.exists():
         shutil.rmtree(STAGE)
     STAGE.mkdir(parents=True, exist_ok=True)
     stage_interpreter()
     destination = STAGE / SITE_PACKAGES
     packages = stage_packages(destination)
-    if sys.platform == "darwin":
-        compact_cv = ROOT / ".cache/opencv-install"
-        if not (compact_cv / "cv2").exists():
-            raise SystemExit("Run scripts/build_opencv.sh to build the image-only OpenCV module first")
-        shutil.copytree(compact_cv / "cv2", destination / "cv2", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-        (destination / "cv2/config.py").write_text("BINARIES_PATHS = []\n")
-        (destination / "cv2/config-3.12.py").write_text(
-            "PYTHON_EXTENSIONS_PATHS = [os.path.join(LOADER_DIR, 'python-3.12')] + PYTHON_EXTENSIONS_PATHS\n")
-        packages.append({"name":"opencv-image-only", "version":"4.12.0", "modules":["core","imgproc","imgcodecs","python3"]})
+    if compact_cv:
+        packages.append(stage_opencv(destination, compact_cv))
     replacements = {
         "babeldoc/format/pdf/document_il/utils/extract_char.py": (
             "from sklearn.cluster import DBSCAN", "from compact_math import LineClusters as DBSCAN"),
@@ -157,10 +195,16 @@ def stage():
     (STAGE / "runtime.json").write_text(json.dumps({"version":version,"platform":PLATFORM,
         "python":sys.version.split()[0],"packages":packages},indent=2), encoding="utf-8")
     sanitize_runtime(STAGE)
-    for path in STAGE.parent.glob("runtime-payload*.zip"):
+    for path in STAGE.parent.glob(f"runtime-payload-{PLATFORM}-*.zip"):
         path.unlink()
     print(STAGE)
 
 
 if __name__ == "__main__":
-    stage()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--stage-dir", type=Path, help="Use a separate candidate stage instead of the default platform tree")
+    parser.add_argument("--opencv-install", type=Path, help="Use an existing native image-only OpenCV installation")
+    options = parser.parse_args()
+    if options.stage_dir:
+        STAGE = options.stage_dir.resolve()
+    stage(options.opencv_install)

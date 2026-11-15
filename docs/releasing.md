@@ -8,11 +8,11 @@ installs, uploads, changes versions or writes public feeds.
 
 ## Platform and source scope
 
-Shared source **0.3.5** is this round's **Linux candidate**, not an all-platform
-release. Windows stable remains **0.3.4**; no new Windows package publication or
-Zotero acceptance is claimed. The independently released macOS 0.4.2 implementation
-has not been merged; no macOS real build or release replacement is included here.
-Prior 0.3.4 acceptance does not transfer to rebuilt 0.3.5 bytes. Offline/cache replay
+Shared source **0.3.6** is a **Linux/Windows candidate**, not a public stable
+release. All four stable Linux/Windows channels remain **0.3.4**. The independently
+released macOS 0.4.2 implementation has not been merged; no macOS build or release
+replacement is included here. Target-OS acceptance is scoped to its exact XPI hash.
+Prior 0.3.4 acceptance does not transfer to rebuilt 0.3.6 bytes. Offline/cache replay
 of quality changes (including metadata source-vector protection) does not certify
 semantics, provider compatibility, font extraction/search or native reading.
 The lightweight three-platform CI checks shared-source contracts, not native
@@ -57,11 +57,12 @@ Dependency versions come from packaged `.dist-info/METADATA`, with the runtime's
 declared versions alongside them. License fields/classifiers, located notice files
 and their hashes are evidence only; `RECORD` also associates module-local notices
 with their distribution. Missing metadata/files, empty files and uncertain evidence
-are `unknown` or advisory warnings. Addon notices are unassigned: a named CPython
-notice alone does not establish coverage of the shipped interpreter version.
-`licenseCompliance` stays **unknown**; vendored native libraries, model/tokenizer
-redistribution terms and complete legal obligations are not audited. Review these
-before distribution; filenames or successful builds are not permission to ship.
+are `unknown` or advisory warnings. `addon/licenses/provenance.json` binds the
+minimum notices to actual CPython/native/model/tokenizer hashes and upstream
+evidence; see [NOTICE](../NOTICE.md) and [licensing.md](licensing.md). It does not
+establish exhaustive static/vendored composition or corresponding-source delivery.
+`licenseCompliance` stays **unknown**. Review remaining obligations before public
+distribution; filenames or successful builds are not permission to ship.
 
 Both build and verifier accept `--previous-inventory PATH`. A same-platform/mode
 baseline yields byte/percentage deltas; growth, missing or mismatched baselines
@@ -73,10 +74,10 @@ Use the project interpreter and the actual target/version filenames:
 
 ```sh
 .venv/bin/python scripts/verify_release.py \
-  --xpi dist/paperbridge-0.3.5-linux-x64.xpi \
-  --sha256 dist/paperbridge-0.3.5-linux-x64.xpi.sha256 \
+  --xpi dist/paperbridge-0.3.6-linux-x64.xpi \
+  --sha256 dist/paperbridge-0.3.6-linux-x64.xpi.sha256 \
   --feed dist/updates/linux-x64.json \
-  --report dist/paperbridge-0.3.5-linux-x64.xpi.verification.json
+  --report dist/paperbridge-0.3.6-linux-x64.xpi.verification.json
 ```
 
 Remove inherited `PYTHONHOME`, `PYTHONPATH`, and platform native-library overrides
@@ -149,7 +150,7 @@ claim a summary-only artifact contains a saved real package.
    this unpublished candidate was automatically delivered.
 3. Only after target-OS approval, upload the exact XPI and sidecar to its **version
    tag**, then enable only its matching public feed after assets are reachable.
-   For a Linux-only 0.3.5 release, preserve Windows 0.3.4 and macOS channels/assets.
+   For any target-only release, preserve every other platform/mode channel and macOS assets.
    Run `--online` and then native Zotero update delivery as separate checks.
 4. If a problem emerges, stop direct distribution and, with release approval,
    pause only the affected channel using `updates: []`. Keep evidence and historical

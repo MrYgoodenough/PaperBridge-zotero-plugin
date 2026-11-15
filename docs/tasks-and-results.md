@@ -3,7 +3,7 @@
 
 PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译独立的引擎进程，不引入外部队列服务。
 
-生产依赖仍为 BabelDOC 0.6.4 / PyMuPDF 1.26.7。引擎接口研究、直接 provider 验证 CLI 与可信定位原型的入口及限制见 [engine-and-alignment.md](engine-and-alignment.md)。
+生产依赖固定 BabelDOC 0.6.4 / PyMuPDF 1.26.7。生产映射、逐行高亮与无引擎阅读的契约见 [engine-and-alignment.md](engine-and-alignment.md)，不以引擎迁移替代维护当前链路。
 
 ## 修改入口
 
@@ -17,14 +17,14 @@ PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译�
 - `addon/content/settings.*`、`prefs.js`：默认 DeepSeek 加一个可选兼容 profile；凭据分别保存在 Zotero 登录管理器。切换设置只影响后续入队任务。
 - `backend/errors.py`、`diagnostics.py`、`addon/content/runtime.js`：固定错误分类与安全指引、鉴权 `POST /diagnostics` 的本地 allowlist ZIP；设置页显示加载警告数量并提供导出，不采集原始日志、路径、密钥或文档内容。
 - `addon/content/annotations.js`：译文附件的原生批注读写、通知和关闭前持久化；只接入现有右侧 reader，不复制原文批注，见 [annotations.md](annotations.md)。
-- `backend/alignment.py`、`addon/content/alignment.js`：Schema 1 sidecar 的本地证据验证与显式片段定位。后端 `POST /alignment/validate` 核对当前两份 PDF 的 SHA-256 与几何，不提交或重试任务；前端只消费父级验证结果。
+- `backend/alignment.py`、`addon/content/alignment.js`：schema 2 逐行几何及双向显式定位，兼容旧矩形。`reading-assets.js` 将可信映射作为 JSON 附件同步；阅读用 Gecko 校验当前 PDF SHA-256 与 PDF.js 页边界，不启动后端或重试任务。
 - `addon/content/paperbridge.js`：单篇入口、原有页级分屏同步与 `loadAlignment()` 父级加载入口。私有 Zotero/PDF.js 接口仍局限于阅读路径，保存失败和阅读失败不会混为同一执行状态。
 
 进度通过引擎 `PB:` 事件传递 `progress`、`phase`、`counts`，计数沿用 `quality.json` 的字段；服务端仅接受这些非生命周期字段。任务窗口共用后台任务状态，不维护第二套临时任务系统；用尝试时间戳计算用时，已结束任务停止计时。阶段缺少百分比时不重置进度，BabelDOC 的小数百分比按 0–100 解释。
 
 ## 数据与恢复边界
 
-任务记录、尝试目录及清单位于插件 `.runtime/jobs/`；译文附件在 Zotero `storage/`。失败尝试不能覆盖先前可用 PDF。根结果与尝试的清单、质量、用量均保留；`alignment.json` 若存在也不应被当作临时文件删掉，服务端暴露其 `alignment_path`。正式翻译流水线目前不自动生成 mapping，原型由 `scripts/probe_engine.py` 捕获同单元并验证实际文本/几何后产出，不做语义猜配；没有跨设备 sidecar 同步。
+任务记录、尝试目录及清单位于插件 `.runtime/jobs/`；译文附件在 Zotero `storage/`。失败尝试不能覆盖先前可用 PDF。根结果与尝试的清单、质量、用量均保留；`alignment.json` 若存在不当作临时文件删除。正式流水线在最终 PDF 保存后自动生成可核验的映射，可信部分另存为 imported JSON 附件随 Zotero 文件同步；sidecar 保留为本地工作结果。映射/导出失败只降级精确阅读，不使成功保存的 PDF 变成失败，也不触发重译。
 
 损坏的单条任务记录保留在磁盘上，加入加载警告，不阻止其他任务启动。中断尝试已有 `translated.pdf` 与完整/部分 `quality.json` 时，服务核对已有校验值和归属后复用正常 `finish()` 完成元数据；启动和显式 `POST /jobs/{id}/recover` 均不重新调用引擎。
 
@@ -46,10 +46,10 @@ PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译�
 
 完整 XPI 构建后，`scripts/prepare_packaged_test.py --suite queue` 创建独立 `queue-profile` / `queue-data`。`tests/queue_packaged.js` 检查真实 Zotero 设置、登录管理器、后端启动、批量入口和附件导入；模型结果显式模拟，不调用服务商、不验证翻译质量。测试需要在 `.runtime/queue-fixture.pdf` 放一份非敏感 PDF。默认 `packaged` 套件保持原有真实翻译测试，可能调用付费 API。
 
-`--suite alignment` 使用独立 `.runtime/alignment-profile` / `.runtime/alignment-data`，只允许隔离 profile，由 `tests/alignment_packaged.js` 测试真实阅读器及本地 mapping 验证，不调用 providers、不提交或重试任务。fixture 需预先置于 `.runtime/alignment-fixture/`：`source.pdf`、`translated.pdf`、同次原型产出的 `alignment.json`；准备脚本不生成 mapping。启动方式与静态测试边界见 [engine-and-alignment.md](engine-and-alignment.md)。
+`prepare_nonmac_test.py --suite assets` 合并原生映射、逐行高亮、删除清理及真进程重开。生产输出由真实旧缓存禁网重排，测试删除/清理使用隔离条目及明确合成的归属，不制造模型任务。A→B 文件下载 helper 使用原生 WebDAV Request，B 没有本地记录/sidecar/引擎；原生下载回执不等于账号云 metadata 同步验收。
 
 `tests/offline_quality_pipeline.py` 使用项目 Python 和已准备的 `.cache` 资源，禁网运行真实 BabelDOC 解析、排版与 PDF 输出；仅替换服务商响应，检查成功与响应丢失两条路径的质量、用量、字体嵌入和链接。合成两页样本只翻译第一页：删除重排正文的旧热点、保留未选页外链，将未验证的正文目标降为真实页级 `/Fit`。运行 `python -I -B tests/offline_quality_pipeline.py`，结果写入 `.runtime/offline-quality-report.json`；不代表真实模型语义质量或原生点击验收。
 
 `--suite annotations --run-id <名称> --phase create|reopen` 在同一隔离环境的两次真实进程中检查批注。`--suite upgrade --run-id <名称> --phase create --xpi <旧包>` 保存非敏感合成附件、原生批注、配置及缓存；进程退出后，用 `--phase reopen` 准备当前包并再次启动同一 profile，核对字节哈希、归属、凭据持久化及设置页诊断 ZIP。两套入口不调用模型，详情见 [annotations.md](annotations.md)、[releasing.md](releasing.md)。
 
-正式 0.7.1 wheel 的 `stage_capture_enabled=False`，旧 `ILTranslatorLLMOnly` 移除、保护适配与 `PageProjection` 不兼容，以及系统字体 hash/profile 均阻碍迁移，不能只改依赖版本号。`--official-fonts` 的 public pipeline 成功只使用模拟 response，不表示升级完成；当前可信定位是原型，不能将页级同步宣称为段落对齐。
+旧 prototype/probe 是历史研究，不是当前发货入口。新功能优先演进固定引擎的生产 capture、附件存储与阅读链路；页同步不是句词语义对齐，结构完整不是人类接受。

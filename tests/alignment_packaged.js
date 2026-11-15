@@ -387,7 +387,7 @@
     return overlay;
   }
 
-  /** Open through the parent integration and await a map loaded by the real validation endpoint. */
+  /** Open through the parent and require local native validation without another backend call. */
   async function openMapped(source, target) {
     const previousCalls = validationCalls;
     await bridge.split(source, target);
@@ -395,8 +395,8 @@
     check(!!state?.alignment?.control && !!state.apps?.[1], "Parent exposes initialized split.alignment controller");
     await until(() => state.alignment.mapping && !state.alignment.button.disabled && !state.alignment.targetButton.disabled,
       () => "Integrated map unavailable: " + state.alignment.status.textContent);
-    check(validationCalls > previousCalls && state.alignment.mapping.schema_version === 1,
-      "Integrated control receives an actual backend-validated mapping", { validationCalls });
+    check(validationCalls === previousCalls && [1,2].includes(state.alignment.mapping.schema_version),
+      "Integrated control receives a native hash-validated mapping without backend startup", { validationCalls });
     return { sourceCalls: observeNavigation(state, 0), targetCalls: observeNavigation(state, 1) };
   }
 

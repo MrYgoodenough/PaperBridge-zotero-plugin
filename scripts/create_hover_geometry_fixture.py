@@ -294,7 +294,7 @@ def generate(directory, node, poppler):
             evidence["case"] = unit["case"]
             evidence["captured_id"] = captured[name]["id"] if captured[name] else None
             excluded.append(evidence)
-    # Fixture-only decomposition: the unchanged production trace currently emits one bounding rect.
+    # Keep the disjoint capture-input fixture separate from production's final line-quad extraction.
     mapping = build_mapping(source, target, candidates)
     assert [unit["id"] for unit in mapping["units"]] == ["p0-u0", "p1-u0"]
     assert mapping["metadata"]["excluded_count"] == 0
@@ -316,8 +316,8 @@ def generate(directory, node, poppler):
                                                      ROOT / "addon/content/alignment.js")}},
                 "files": {"source": "source.pdf", "target": "translated.pdf",
                           "native_geometry_mapping": "alignment.json", "production_mapping": "alignment-production.json"},
-                "mapping_boundary": "Production FragmentTrace emits one bounding rect per side. The fixture-only "
-                                    "disjoint glyph adapter retains only its verified IDs and calls build_mapping/write_mapping.",
+                "mapping_boundary": "Production FragmentTrace validates final per-line quads. This fixture's "
+                                    "disjoint capture inputs use the same build_mapping/write_mapping validator.",
                 "page_indexing": "page/pages: zero-based; page_number: one-based", "page_size_points": PAGE_SIZE,
                 "included": included, "excluded": excluded, "production_exclusion_reasons": dict(trace.excluded),
                 "production_metadata": production["metadata"], "geometry_metadata": mapping["metadata"],

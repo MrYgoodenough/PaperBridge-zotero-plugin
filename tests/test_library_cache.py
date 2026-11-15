@@ -17,25 +17,26 @@ def reference(letter):
 
 
 def seed(tmp_path, refs):
-    """Seed minimal cache and artifact records for cleanup tests."""
+    """Seed disposable source caches and document-owned paragraphs, not saved results."""
     cache, jobs = tmp_path / "cache", tmp_path / "jobs"
     cache.mkdir(); jobs.mkdir()
     with sqlite3.connect(cache / "paragraphs.sqlite") as db:
         add_document_column(db)
         for ref in refs:
             folder = jobs / ref["fingerprint"]; folder.mkdir()
-            (folder / "translated.pdf").write_text("fixture")
+            (folder / "source.pdf").write_bytes(b"disposable source fixture")
             db.execute("INSERT INTO paragraphs VALUES (?,?,?)",(ref["fingerprint"],"译文",ref["document_key"]))
     return cache,jobs
 
 
-def flat_attempt(jobs, ref, number=1):
-    """Seed a short attempt directory with the server's immutable ownership sidecar."""
+def flat_attempt(jobs, ref, number=1, output=True):
+    """Seed immutable attempt ownership with either a retained output or disposable input."""
     folder = jobs / "attempts" / f"{ref['fingerprint'][:32]}-{number}"
     folder.mkdir(parents=True)
     identity = {key: ref[key] for key in ("fingerprint", "document_key")}
     (folder / "identity.json").write_text(json.dumps(identity), encoding="utf-8")
-    (folder / "translated.pdf").write_bytes(ref["fingerprint"].encode("ascii"))
+    filename = "translated.pdf" if output else "source.pdf"
+    (folder / filename).write_bytes(ref["fingerprint"].encode("ascii"))
     return folder
 
 
@@ -117,8 +118,8 @@ def test_prune_flat_attempts_preserves_shared_and_active_fingerprints(tmp_path, 
     """Delete all unowned attempts once per fingerprint while retaining surviving owners."""
     removed, shared, active, orphan = [reference(letter) for letter in "abcd"]
     cache, jobs = seed(tmp_path, [removed, shared, active])
-    attempts = [flat_attempt(jobs, ref) for ref in (removed, shared, active, orphan)]
-    retry = flat_attempt(jobs, removed, number=2)
+    attempts = [flat_attempt(jobs, ref, output=False) for ref in (removed, shared, active, orphan)]
+    retry = flat_attempt(jobs, removed, number=2, output=False)
     result = prune(cache, jobs, [removed, shared, active], [shared], sweep=sweep,
                    active=[active["fingerprint"]])
     expected = {removed["fingerprint"]}
@@ -133,6 +134,76 @@ def test_prune_flat_attempts_preserves_shared_and_active_fingerprints(tmp_path, 
         assert (jobs / ref["fingerprint"]).is_dir()
     # The orphan has no legacy directory, so sweep must discover its flat sidecar.
     assert attempts[3].exists() == (not sweep)
+    with sqlite3.connect(cache / "paragraphs.sqlite") as db:
+        assert {row[0] for row in db.execute("SELECT document_key FROM paragraphs")} == {
+            shared["document_key"], active["document_key"]}
+
+
+@pytest.mark.parametrize("layout", ["legacy", "nested", "flat"])
+@pytest.mark.parametrize("sweep", [False, True])
+def test_stale_cleanup_refs_preserve_result_and_sidecars(tmp_path, layout, sweep):
+    """Old pending references cannot discard saved results or their recovery evidence."""
+    retained, disposable = reference("a"), reference("b")
+    cache, jobs = seed(tmp_path, [retained, disposable])
+    folder = jobs / retained["fingerprint"]
+    if layout == "nested":
+        folder = folder / "attempts" / "old-job" / "1"
+    if layout == "flat":
+        folder = flat_attempt(jobs, retained)
+    else:
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "translated.pdf").write_bytes(b"retained translated PDF")
+    for name in ("alignment.json", "manifest.json", "quality.json", "usage.json"):
+        (folder / name).write_text(json.dumps({"fixture": name}), encoding="utf-8")
+    expected = {path.name: path.read_bytes() for path in folder.iterdir() if path.is_file()}
+
+    result = prune(cache, jobs, [retained, disposable], [], sweep=sweep)
+
+    assert result["removed_jobs"] == [disposable["fingerprint"]]
+    assert not (jobs / disposable["fingerprint"]).exists()
+    assert (jobs / retained["fingerprint"]).is_dir()
+    assert {name: (folder / name).read_bytes() for name in expected} == expected
+    with sqlite3.connect(cache / "paragraphs.sqlite") as db:
+        assert db.execute("SELECT document_key FROM paragraphs").fetchall() == [(retained["document_key"],)]
+
+
+@pytest.mark.parametrize("sidecar", ["alignment.json", "manifest.json", "quality.json"])
+def test_prune_preserves_result_evidence_without_cached_pdf(tmp_path, sidecar):
+    """A Zotero-imported PDF can still depend on its otherwise orphaned result sidecar."""
+    ref = reference("a")
+    cache, jobs = seed(tmp_path, [ref])
+    folder = flat_attempt(jobs, ref, output=False)
+    path = folder / sidecar
+    path.write_bytes(b'{"fixture":"retained result evidence"}')
+
+    assert prune(cache, jobs, [ref], [], sweep=True)["removed_jobs"] == []
+    assert path.read_bytes() == b'{"fixture":"retained result evidence"}'
+    with sqlite3.connect(cache / "paragraphs.sqlite") as db:
+        assert db.execute("SELECT count(*) FROM paragraphs").fetchone()[0] == 1
+
+
+def test_retained_other_page_range_protects_shared_paragraphs(tmp_path):
+    """A retained flat result protects document paragraphs without a frontend keep entry."""
+    disposable, retained = reference("a"), reference("b")
+    retained["document_key"] = disposable["document_key"]
+    cache, jobs = seed(tmp_path, [disposable])
+    folder = flat_attempt(jobs, retained)
+
+    assert prune(cache, jobs, [disposable], [])["removed_jobs"] == [disposable["fingerprint"]]
+    assert (folder / "translated.pdf").is_file()
+    with sqlite3.connect(cache / "paragraphs.sqlite") as db:
+        assert db.execute("SELECT count(*) FROM paragraphs").fetchone()[0] == 1
+
+
+def test_unknown_disposable_attempt_is_not_guessed_unowned(tmp_path):
+    """Even a source-only attempt is not disposable when its identity is unreadable."""
+    cache, jobs = seed(tmp_path, [])
+    ref = reference("a")
+    folder = flat_attempt(jobs, ref, output=False)
+    (folder / "identity.json").write_bytes(b"{")
+
+    assert prune(cache, jobs, [ref], [], sweep=True)["removed_jobs"] == []
+    assert (folder / "source.pdf").is_file()
 
 
 def test_unknown_flat_identities_are_not_described_or_pruned(tmp_path):

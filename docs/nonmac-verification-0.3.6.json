@@ -1,0 +1,335 @@
+{
+  "_comment": "Bounded candidate acceptance from final local evidence; not publication, macOS certification, account sync or legal clearance.",
+  "schema_version": 1,
+  "version": "0.3.6",
+  "release_status": "candidate_not_published",
+  "source_baseline_head": "4963eb80af72f9c0ef6d768aedf38e7d13f6cfc5",
+  "all_requested_nonmac_checks_complete": true,
+  "completion_scope": "Final package-byte audits, declared native attachment/line-quad/lifecycle checks, both full offline logs and post-cleanup stopped-state audits pass. This completes the requested bounded 0.3.6 implementation/acceptance, not the explicitly excluded product, legal or release scopes.",
+  "scope": {
+    "native_platforms": ["linux-x64", "windows-x64"],
+    "python_modes": ["bundled", "local"],
+    "babeldoc": "0.6.4",
+    "pymupdf": "1.26.7",
+    "stable_feed_version": "0.3.4",
+    "new_provider_or_external_model_api_calls": 0,
+    "new_translation_runs_in_this_acceptance": 0,
+    "macos_native_acceptance": false,
+    "account_cloud_metadata_sync_tested": false,
+    "group_library_sync_tested": false,
+    "whole_paper_or_human_semantic_acceptance": false,
+    "public_0_3_6_delivery_or_updates_tested": false,
+    "windows_0_3_4_upgrade_scaling_and_new_note_checks_complete": false,
+    "licenseCompliance": "unknown",
+    "evidence": ["MEMORY.md", "docs/product-roadmap-0.3.6.md"]
+  },
+  "packages": [
+    {
+      "platform": "linux-x64",
+      "python_mode": "bundled",
+      "asset": "paperbridge-0.3.6-linux-x64.xpi",
+      "bytes": 228293495,
+      "sha256": "269649eeab243bbc4aa453098352671d9cc686fffe7b69746acf6baaff68cd90",
+      "build_id": "626cfb9c691e1a87879607a77d217fc502d833f97a82418337e68043083e8432",
+      "python": "3.12.16",
+      "checked_shipped_source_material_files": 70,
+      "all_source_bytes_match": true,
+      "zip_crc": "ok",
+      "licenseCompliance": "unknown",
+      "inventory_warning_count": 6,
+      "evidence": "agent/codex/reading-assets-20261115/linux-artifact-final-audit.json"
+    },
+    {
+      "platform": "linux-x64",
+      "python_mode": "local",
+      "asset": "paperbridge-0.3.6-linux-x64-local-python.xpi",
+      "bytes": 190375257,
+      "sha256": "9475d8b2e45d8f6f8b78c06c54cd099e8900e1334bc39071f8dbfd14f76b4b5f",
+      "build_id": "f2a5f0fdaf7fd03fdd36a2daead578e0c407a5524bebb9c5b19de36d8be36697",
+      "python": "3.12.16",
+      "checked_shipped_source_material_files": 70,
+      "all_source_bytes_match": true,
+      "zip_crc": "ok",
+      "licenseCompliance": "unknown",
+      "inventory_warning_count": 4,
+      "evidence": "agent/codex/reading-assets-20261115/linux-artifact-final-audit.json"
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "bundled",
+      "asset": "paperbridge-0.3.6-windows-x64.xpi",
+      "bytes": 199008856,
+      "sha256": "3b7ee5da05dab8c463f4264e6e43cf753c07a052f68929c64dcf07d7c700ad4c",
+      "build_id": "13cd8c309f8cd5d0b6535d251e26418ff05d4da5f8b759f148572e2759dea345",
+      "python": "3.12.13",
+      "checked_shipped_source_material_files": 70,
+      "all_source_bytes_match": true,
+      "zip_crc": "ok",
+      "licenseCompliance": "unknown",
+      "inventory_warning_count": 1,
+      "evidence": "agent/codex/reading-assets-20261115/windows-final/artifact-final-audit.json"
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "local",
+      "asset": "paperbridge-0.3.6-windows-x64-local-python.xpi",
+      "bytes": 187075395,
+      "sha256": "38dacab3f75e8db0367f845c588c72fec050e313a2405091bd2d4728229aa1d0",
+      "build_id": "15f2ff3324ee230a73497f3f41e19597c4d8f9d625558760bc66c20d94e94df7",
+      "python": "3.12.13",
+      "checked_shipped_source_material_files": 70,
+      "all_source_bytes_match": true,
+      "zip_crc": "ok",
+      "licenseCompliance": "unknown",
+      "inventory_warning_count": 0,
+      "evidence": "agent/codex/reading-assets-20261115/windows-final/artifact-final-audit.json"
+    }
+  ],
+  "reportcheck_counting": {
+    "definition": "Counts are final report.checks assertions, not unique features, documents or semantic quality scores. Disjoint attachment_identity_reader, line_quads and lifecycle counts sum to total.",
+    "line_quads_definition": "Inclusive range from 'Native reader loads production schema-two line geometry' through 'Native CSS highlights paint text without paragraph whitespace': 17 assertions per report.",
+    "lifecycle_definition": "Assertions from the first '[native prerequisite]' onward; mixed native Zotero, frontend, filesystem and actual backend checks, not all native-only.",
+    "attachment_identity_reader_definition": "Remaining installation/identity, attachment publication/download, reader, degradation and zero-request assertions; includes the Linux bundled ZIP-export assertion.",
+    "total": 715,
+    "passed": 715,
+    "failed": 0,
+    "attachment_identity_reader": 197,
+    "line_quads": 170,
+    "lifecycle": 348,
+    "stub_only_checks_within_lifecycle": 8
+  },
+  "native_acceptance": [
+    {
+      "platform": "linux-x64",
+      "python_mode": "bundled",
+      "package_sha256": "269649eeab243bbc4aa453098352671d9cc686fffe7b69746acf6baaff68cd90",
+      "line_polygons": {"source": 5, "translation": 8},
+      "create": {
+        "evidence": ".runtime/assets-lb8-create.json",
+        "status": "passed",
+        "zotero_pid": 1753474,
+        "lifecycle_backend_pid": 1753951,
+        "reportchecks": {"total": 90, "passed": 90, "failed": 0, "attachment_identity_reader": 9, "line_quads": 17, "lifecycle": 64}
+      },
+      "cold_reopen": {
+        "evidence": ".runtime/assets-lb8-reopen.json",
+        "status": "passed",
+        "zotero_pid": 1754586,
+        "same_profile_data_different_pid": true,
+        "retained_lifecycle_records": 3,
+        "reportchecks": {"total": 47, "passed": 47, "failed": 0, "attachment_identity_reader": 7, "line_quads": 17, "lifecycle": 23}
+      }
+    },
+    {
+      "platform": "linux-x64",
+      "python_mode": "local",
+      "package_sha256": "9475d8b2e45d8f6f8b78c06c54cd099e8900e1334bc39071f8dbfd14f76b4b5f",
+      "line_polygons": {"source": 3, "translation": 5},
+      "create": {
+        "evidence": ".runtime/assets-ll2-create.json",
+        "status": "passed",
+        "zotero_pid": 1754783,
+        "lifecycle_backend_pid": 1755296,
+        "reportchecks": {"total": 89, "passed": 89, "failed": 0, "attachment_identity_reader": 8, "line_quads": 17, "lifecycle": 64}
+      },
+      "cold_reopen": {
+        "evidence": ".runtime/assets-ll2-reopen.json",
+        "status": "passed",
+        "zotero_pid": 1756187,
+        "same_profile_data_different_pid": true,
+        "retained_lifecycle_records": 3,
+        "reportchecks": {"total": 47, "passed": 47, "failed": 0, "attachment_identity_reader": 7, "line_quads": 17, "lifecycle": 23}
+      }
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "bundled",
+      "package_sha256": "3b7ee5da05dab8c463f4264e6e43cf753c07a052f68929c64dcf07d7c700ad4c",
+      "line_polygons": {"source": 5, "translation": 8},
+      "create": {
+        "evidence": "agent/codex/reading-assets-20261115/windows-final/assets-wb2-create.json",
+        "status": "passed",
+        "zotero_pid": 472,
+        "lifecycle_backend_pid": 46776,
+        "reportchecks": {"total": 89, "passed": 89, "failed": 0, "attachment_identity_reader": 8, "line_quads": 17, "lifecycle": 64}
+      },
+      "cold_reopen": {
+        "evidence": "agent/codex/reading-assets-20261115/windows-final/assets-wb2-reopen.json",
+        "status": "passed",
+        "zotero_pid": 27076,
+        "same_profile_data_different_pid": true,
+        "retained_lifecycle_records": 3,
+        "reportchecks": {"total": 47, "passed": 47, "failed": 0, "attachment_identity_reader": 7, "line_quads": 17, "lifecycle": 23}
+      }
+    },
+    {
+      "platform": "windows-x64",
+      "python_mode": "local",
+      "package_sha256": "38dacab3f75e8db0367f845c588c72fec050e313a2405091bd2d4728229aa1d0",
+      "line_polygons": {"source": 3, "translation": 5},
+      "create": {
+        "evidence": "agent/codex/reading-assets-20261115/windows-final/assets-wl2-create.json",
+        "status": "passed",
+        "zotero_pid": 1552,
+        "lifecycle_backend_pid": 47472,
+        "reportchecks": {"total": 89, "passed": 89, "failed": 0, "attachment_identity_reader": 8, "line_quads": 17, "lifecycle": 64}
+      },
+      "cold_reopen": {
+        "evidence": "agent/codex/reading-assets-20261115/windows-final/assets-wl2-reopen.json",
+        "status": "passed",
+        "zotero_pid": 51776,
+        "same_profile_data_different_pid": true,
+        "retained_lifecycle_records": 3,
+        "reportchecks": {"total": 47, "passed": 47, "failed": 0, "attachment_identity_reader": 7, "line_quads": 17, "lifecycle": 23}
+      }
+    }
+  ],
+  "reading_and_lifecycle_limits": {
+    "trusted_asset": "Versioned native imported JSON attachment; exact attachment keys/owner/PDF bytes and schema-two geometry checked before precise reading, without local translation jobs.",
+    "line_geometry": "Trusted native pointer events, one polygon per verified line, CSS text highlights and no precise hit on interline or short-line trailing whitespace, on both PDFs.",
+    "lifecycle": "Native trash/restore/permanent erasure, translated PDF/note/annotation/map retention, independent shared owners, actual backend pruning of proven disposable cache and true-process cold reopen.",
+    "fixtures": "Lifecycle cache PDFs and sidecars are supplied fixtures; immutable identities and shared jobs are synthetic. lifecycle.engineOutcomes is 'not run', not a model-task acceptance.",
+    "stub_only": "Incomplete-index and active/unknown/job-reference safeguards are two frontend stub-only assertions per create report. Native publisher and actual backend prune checks are separately identified in the reports.",
+    "zero_request_counter_scope": "Every final reading report has engineStarts=0 and backendRequests=0 for reading/hash/navigation/hover. Lifecycle has its own actual backend PID/prune operations and providerCalls=0; these counters do not imply no backend ever started."
+  },
+  "webdav_a_to_b": {
+    "status": "passed_with_declared_limits",
+    "producer_evidence": ".runtime/assets-lb8-create.json",
+    "producer_package_sha256": "269649eeab243bbc4aa453098352671d9cc686fffe7b69746acf6baaff68cd90",
+    "metadata_transport": "Stopped-database seed preserving exact keys, not account cloud metadata sync.",
+    "file_transport": "Actual native WebDAV.downloadFile via Storage.Request.start; receiver starts with empty storage, no copied PDFs/JSON, no translation journal/sidecar/extracted Python engine.",
+    "receipt_checks": "Missing at Request.start, actual localChanges, exact native key/filename/path, producer MD5/size, in_sync and source/translated/mapping byte identity all pass.",
+    "ledger_directory": "agent/codex/reading-assets-20261115/webdav-run-20261115T033126Z-0b417a9e",
+    "ledger_evidence": [
+      "agent/codex/reading-assets-20261115/webdav-run-20261115T033126Z-0b417a9e/counts.json",
+      "agent/codex/reading-assets-20261115/webdav-run-20261115T033126Z-0b417a9e/downloads.jsonl",
+      "agent/codex/reading-assets-20261115/webdav-run-20261115T033126Z-0b417a9e/requests.jsonl"
+    ],
+    "manifest_status": "No separate manifest file exists in the allowed ledger directory; attachment inventory is taken only from the final producer export and receiver reports.",
+    "completed_archive_gets": 6,
+    "archive_bytes": 40283610,
+    "request_status_counts": {"200": 16, "201": 2, "204": 2, "207": 2, "401": 4, "404": 2},
+    "request_status_limit": "The ledger retains four 401 and two 404 responses; all six ZIP GETs completed with 200. Non-200 responses are not erased or counted as failed ZIP downloads; their cause is not inferred here.",
+    "attachments": [
+      {"role": "source_pdf", "key": "XCJL2WW9", "library_id": 1, "primary_bytes": 42310, "md5": "b9d50b11d4901b8fb7d5eaab473193dc", "zip_bytes": 37816, "zip_sha256": "b707d12f3cc2b351975edb0217494006bc0765dbce0f12178784c80245205703", "completed_gets": 2},
+      {"role": "translated_pdf", "key": "6SUQJMKM", "library_id": 1, "primary_bytes": 20105991, "md5": "8929759ddc6ebfed0e5c7ec4c26cacf1", "zip_bytes": 20100832, "zip_sha256": "fa9a5e21adf323a0698e32ccfd40238b633c482aa0614d4e64010dfe88f8c2ba", "completed_gets": 2},
+      {"role": "mapping_json", "key": "CLEBGUV5", "library_id": 1, "primary_bytes": 13801, "md5": "19d433bdeeee73a5f0430536a224ae39", "zip_bytes": 3157, "zip_sha256": "db7d69f636e0551071f6def8bec7220b082db70706ade548b11061849d9776d6", "completed_gets": 2}
+    ],
+    "receivers": [
+      {
+        "python_mode": "bundled",
+        "package_sha256": "3b7ee5da05dab8c463f4264e6e43cf753c07a052f68929c64dcf07d7c700ad4c",
+        "evidence": "agent/codex/reading-assets-20261115/windows-final/assets-wrb3-receive.json",
+        "status": "passed",
+        "zotero_pid": 49092,
+        "native_downloads": 3,
+        "line_polygons": {"source": 5, "translation": 8},
+        "reportchecks": {"total": 85, "passed": 85, "failed": 0, "attachment_identity_reader": 68, "line_quads": 17, "lifecycle": 0}
+      },
+      {
+        "python_mode": "local",
+        "package_sha256": "38dacab3f75e8db0367f845c588c72fec050e313a2405091bd2d4728229aa1d0",
+        "evidence": "agent/codex/reading-assets-20261115/windows-final/assets-wrl1-receive.json",
+        "status": "passed",
+        "zotero_pid": 39840,
+        "native_downloads": 3,
+        "line_polygons": {"source": 5, "translation": 8},
+        "reportchecks": {"total": 85, "passed": 85, "failed": 0, "attachment_identity_reader": 68, "line_quads": 17, "lifecycle": 0}
+      }
+    ],
+    "degradation": "Corrupt/undownloaded map, replaced PDF bytes, wrong source/owner/schema and deleted original disable precise controls only; ordinary reading/page sync and restored exact-pair reading remain available without retranslating.",
+    "account_metadata_sync_tested": false,
+    "group_library_tested": false
+  },
+  "offline": {
+    "linux": {
+      "status": "passed",
+      "mode": "full",
+      "python": "3.12.16",
+      "python_passed": 304,
+      "python_skipped": 1,
+      "javascript_syntax_checks": 37,
+      "node_suites": 12,
+      "failures": 0,
+      "evidence": "agent/codex/reading-assets-20261115/offline-post-cleanup-linux.log"
+    },
+    "windows": {
+      "status": "passed",
+      "mode": "full",
+      "python": "3.12.13",
+      "python_passed": 304,
+      "python_skipped": 1,
+      "javascript_syntax_checks": 37,
+      "node_suites": 12,
+      "failures": 0,
+      "evidence": "agent/codex/reading-assets-20261115/windows-final/offline-post-cleanup-windows.log",
+      "encoding": "UTF-8 normalized from the retained original UTF-16 PowerShell log; no result content changed."
+    },
+    "skip_reason": "tests/test_references.py skips its optional scientific reference PDF when that local fixture is absent; final logs have one skip.",
+    "scope_limit": "Offline source contracts do not replace exact-XPI native acceptance, cloud sync, public update delivery or human translation review."
+  },
+  "linux_package_size": {
+    "evidence": "docs/linux-package-size-analysis-0.3.6.json",
+    "scope": "OpenCV 4.12.0 core/imgproc/imgcodecs/python3 only, matching the existing macOS module scope without testing or changing macOS; Windows retains its official wheel.",
+    "same_source_measurement_saved_bytes": {"bundled": 57936119, "local": 57936118},
+    "full_runtime_glibc_floor": "2.34",
+    "opencv_maximum_required_glibc": "2.30",
+    "opencv_maximum_required_glibcxx": "3.4.26",
+    "limits": "Same-source before/after measurement archives are historical, pre-final NOTICE integration and not the accepted final XPIs. Native probe results and compiler-symbol checks do not certify native execution on every older distro."
+  },
+  "failure_history": {
+    "earlier_failed_or_interrupted_reports_counted_as_passes": false,
+    "current_round_early_failed_report_audit": "Earlier failures remain retained and are not counted as passes. Reader Xray page access, reopened reader reuse and native viewport/trash-restoration helper failures were fixed directly before distinct final reports; no original report was rewritten.",
+    "rejected_linux_toolchain_trial": {"evidence": "docs/linux-package-size-analysis-0.3.6.json", "result": "Ubuntu 24.04 GCC 13 output required glibc 2.38; rejected, not staged or shipped."},
+    "historical_stable_delivery": {
+      "evidence": "docs/nonmac-verification-2026-11-15.json",
+      "version_contract_failure": "Published 0.3.3 target health stayed 0.3.2; a distinct 0.3.4 fixed it, without replacing 0.3.3 assets.",
+      "windows_daily_credential_failure": "Original acceptance accidentally saved settings and changed PaperBridge's stored key. Authorized repair had a bounded logical-key pass, but original failure and strict stored-record false flags remain; not a 0.3.6 daily-upgrade pass."
+    }
+  },
+  "cleanup": {
+    "status": "complete",
+    "stopped_state_and_integrity": {
+      "linux_databases": 2,
+      "windows_databases": 4,
+      "integrity_check": "all ok before and after cleanup",
+      "owned_readers_and_backends_remaining": 0,
+      "processes_terminated_for_cleanup": 0,
+      "evidence": ["agent/codex/reading-assets-20261115/linux-shutdown-after-cleanup.json", "agent/codex/reading-assets-20261115/windows-final/shutdown-after-cleanup.json"]
+    },
+    "test_engine_copies_removed": {"linux": 90, "windows": 4, "identity_and_backend_source_snapshots_retained": true},
+    "filesystem_free_space_recovered_bytes": {"linux_engines": 53119811584, "linux_intermediates": 6123864064, "windows_engines": 1434103808},
+    "intermediates": {"duplicate_or_unused_build_directories": 12, "superseded_xpis": 12, "generated_font_pdf_probes_archived": 3},
+    "owned_windows_scheduled_tasks_removed": ["PaperBridge-Assets-wb1", "PaperBridge-Assets-batch1", "PaperBridge-Assets-final"],
+    "prior_failed_scheduled_run_relabelled_as_pass": false,
+    "default_linux_stage_promoted": ".cache/package/linux-x64",
+    "retained_old_stage": ".cache/package-baselines/linux-x64-before-image-only-20261115",
+    "shipped_stage_file_byte_audit_count": 6494,
+    "original_pdfs_translation_caches_profiles_and_failure_reports_deleted": 0,
+    "daily_environment_noninterference": "Daily Linux Zotero and its engine remain running; no daily profiles/NSS/databases, Windows original checkout or global settings changed.",
+    "evidence": ["agent/codex/reading-assets-20261115/engine-cleanup-delivery.json", "agent/codex/reading-assets-20261115/intermediate-cleanup-final.json", "agent/codex/reading-assets-20261115/default-stage-final-audit.json", "agent/codex/reading-assets-20261115/windows-final/engine-cleanup-delivery.json", "agent/codex/reading-assets-20261115/windows-final/scheduled-task-cleanup-final.json"],
+    "note": "Only explicit disposable builds or stopped installed-marker engine roots were removed; unknown ownership and native storage/cache/task results were retained. Removed engine source/marker identities and small build evidence were archived first."
+  },
+  "evidence_integrity": {
+    "evidence_labels": "Repository-relative labels are local, non-public evidence, not web links. Ignored .runtime/ and agent/codex/ materials are not claimed to be published or clickable online.",
+    "source_relationship": "The supplied baseline head is a reference, not a claim that it contains every final candidate edit. Each final audit records exact XPI SHA/CRC, matching bytes for 70 shipped source/material entries and model/tokenizer SHA. All four normalized source/material hash maps agree. Final native reports and lifecycle markers bind to those exact package SHA/build IDs, not to same-name older packages. No source commit is generated for this JSON.",
+    "build_id_limit": "Payload/backend build IDs alone do not prove addon bytes; final shipping-byte audits and installed-XPI SHA checks are both required and used.",
+    "final_native_reports_read": 10,
+    "report_errors": 0,
+    "package_sha_and_lifecycle_build_id_bindings_match": true,
+    "native_create_and_cold_reopen_pids_differ": true,
+    "webdav_counts_download_ledger_producer_and_receiver_receipts_match": true,
+    "delivery_confirmation": {
+      "evidence": "User-provided main-agent update in this chat",
+      "four_dist_sha256sum_results": "all OK, executed from dist with each package's checksum file",
+      "windows_final_screenshot_visual_review": "Three final screenshots reviewed; both representative paragraphs have per-line quads excluding interline and short-final-line whitespace."
+    },
+    "evidence_differences": [
+      "Historical size-analysis measurement after archives differ from final accepted Linux XPIs: final bundled and local archives are each 72205 bytes larger and have different SHA values. Do not substitute measurement hashes or treat their historical stage-unchanged fields as current promotion state.",
+      "Linux bundled create has 90 checks, versus 89 for the other create reports, because it also exports three native attachment ZIPs; this is not an extra geometry or lifecycle pass.",
+      "Windows local final audit has zero inventory warnings but still reports licenseCompliance=unknown; absence of warnings is not legal clearance.",
+      "The allowed WebDAV directory has counts/download/request ledgers but no separate manifest. Receipts and producer export inventory agree; no unseen manifest is claimed."
+    ],
+    "pending_fields": []
+  }
+}

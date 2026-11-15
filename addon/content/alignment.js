@@ -15,6 +15,8 @@ var FragmentAlignment = class FragmentAlignment {
   static HOVER_PRIORITY = -1;
   // Native font line boxes slightly overhang painted glyph bounds; allow two CSS pixels.
   static TEXT_RECT_TOLERANCE = 2;
+  // Permit only rounding noise between each quad and its compatibility bounding rectangle.
+  static GEOMETRY_EPSILON = 0.0001;
   // Share one lazily loaded native note module across split controllers.
   static Notes = null;
 
@@ -28,15 +30,17 @@ var FragmentAlignment = class FragmentAlignment {
   /** Check only the in-memory contract, never PDF files, hashes, or HTTP resources. */
   static checkMapping(mapping) {
     if (!mapping) return { mapping: null, reason: "没有可用的片段映射。" };
-    if (mapping.schema_version !== 1 || mapping.coordinate_space !== "pdf-user-space"
+    if (![1, 2].includes(mapping.schema_version) || mapping.coordinate_space !== "pdf-user-space"
       || typeof mapping.source_sha256 !== "string" || typeof mapping.output_sha256 !== "string"
+      || (mapping.schema_version === 2 && !/^[\w.-]{1,80}$/.test(mapping.generator_version || ""))
       || !Array.isArray(mapping.units)) {
       return { mapping: null, reason: "片段映射格式不受支持。" };
     }
     const ids = new Set();
     for (const unit of mapping.units) {
       if (!unit || typeof unit.id !== "string" || !unit.id || ids.has(unit.id)
-        || unit.status !== "verified" || !this.validSide(unit.source) || !this.validSide(unit.target)) {
+        || unit.status !== "verified" || !this.validSide(unit.source) || !this.validSide(unit.target)
+        || (mapping.schema_version === 2 && (!unit.source.quads || !unit.target.quads))) {
         return { mapping: null, reason: "片段映射损坏或包含未验证的片段。" };
       }
       ids.add(unit.id);
@@ -45,12 +49,52 @@ var FragmentAlignment = class FragmentAlignment {
       : { mapping: null, reason: "片段映射中没有已验证的片段。" };
   }
 
-  /** Accept nonempty canonical rectangles on one zero-based PDF page. */
+  /** Accept legacy rectangles or matching finite, convex per-line quads on one PDF page. */
   static validSide(side) {
-    return !!side && Number.isSafeInteger(side.page) && side.page >= 0
+    const rectangles = !!side && Number.isSafeInteger(side.page) && side.page >= 0
       && Array.isArray(side.rects) && side.rects.length > 0
       && side.rects.every(rect => Array.isArray(rect) && rect.length === 4
         && rect.every(Number.isFinite) && rect[0] < rect[2] && rect[1] < rect[3]);
+    if (!rectangles || side.quads == null) return rectangles;
+    return Array.isArray(side.quads) && side.quads.length === side.rects.length
+      && side.quads.every((quad, index) => this.validQuad(quad)
+        && this.quadBounds(quad).every((value, coordinate) =>
+          Math.abs(value - side.rects[index][coordinate]) <= this.GEOMETRY_EPSILON));
+  }
+
+  /** Reject bow ties, collinear edges and nonfinite coordinates instead of repairing a polygon. */
+  static validQuad(quad) {
+    if (!Array.isArray(quad) || quad.length !== 8 || !quad.every(Number.isFinite)) return false;
+    let orientation = 0;
+    for (let index = 0; index < 4; index++) {
+      const a = index * 2, b = ((index + 1) % 4) * 2, c = ((index + 2) % 4) * 2;
+      const cross = (quad[b] - quad[a]) * (quad[c + 1] - quad[b + 1])
+        - (quad[b + 1] - quad[a + 1]) * (quad[c] - quad[b]);
+      if (!Number.isFinite(cross) || cross === 0 || (orientation && Math.sign(cross) !== orientation)) return false;
+      orientation = Math.sign(cross);
+    }
+    return true;
+  }
+
+  /** Return a polygon's compatibility bounds, never its hit-testing area. */
+  static quadBounds(quad) {
+    return [Math.min(quad[0], quad[2], quad[4], quad[6]), Math.min(quad[1], quad[3], quad[5], quad[7]),
+      Math.max(quad[0], quad[2], quad[4], quad[6]), Math.max(quad[1], quad[3], quad[5], quad[7])];
+  }
+
+  /** Test a convex polygon; optional edge tolerance is cosmetic native text-box padding. */
+  static pointInQuad(quad, point, tolerance = 0) {
+    if (!Array.isArray(point) || point.length !== 2 || !point.every(Number.isFinite)) return false;
+    let orientation = 0;
+    for (let index = 0; index < 4; index++) {
+      const a = index * 2, b = ((index + 1) % 4) * 2;
+      const dx = quad[b] - quad[a], dy = quad[b + 1] - quad[a + 1];
+      const cross = dx * (point[1] - quad[a + 1]) - dy * (point[0] - quad[a]);
+      if (Math.abs(cross) <= tolerance * Math.hypot(dx, dy) + this.GEOMETRY_EPSILON) continue;
+      if (orientation && Math.sign(cross) !== orientation) return false;
+      orientation = Math.sign(cross);
+    }
+    return true;
   }
 
   /** Resolve either side; hover groups rectangles of one request without guessing across units. */
@@ -58,9 +102,12 @@ var FragmentAlignment = class FragmentAlignment {
     let hit = null;
     for (const unit of mapping.units) {
       if (unit[side].page !== page) continue;
-      for (const rect of unit[side].rects) {
-        if (point[0] < rect[0] || point[0] > rect[2] || point[1] < rect[1] || point[1] > rect[3]) continue;
-        if (hit && (!wholeUnit || hit !== unit)) return { status: "ambiguous", unit: null };
+      const quads = unit[side].quads;
+      for (const region of quads || unit[side].rects) {
+        const contains = quads ? this.pointInQuad(region, point)
+          : point[0] >= region[0] && point[0] <= region[2] && point[1] >= region[1] && point[1] <= region[3];
+        if (!contains) continue;
+        if (hit && (hit !== unit || (!wholeUnit && !quads))) return { status: "ambiguous", unit: null };
         hit = unit;
       }
     }
@@ -97,6 +144,17 @@ var FragmentAlignment = class FragmentAlignment {
     }
     return [Math.min(converted[0], converted[2]), Math.min(converted[1], converted[3]),
       Math.max(converted[0], converted[2]), Math.max(converted[1], converted[3])];
+  }
+
+  /** Convert all polygon vertices through the page's real rotation/crop-aware viewport. */
+  static viewportQuad(viewport, quad) {
+    const result = [];
+    for (let index = 0; index < quad.length; index += 2) {
+      const point = viewport.convertToViewportPoint(quad[index], quad[index + 1]);
+      if (!Number.isFinite(point?.[0]) || !Number.isFinite(point?.[1])) throw new Error("PDF viewport geometry unavailable");
+      result.push(point[0], point[1]);
+    }
+    return result;
   }
 
   /** Accept PDF content, not links, native annotation layers, or overlaid controls. */
@@ -586,6 +644,10 @@ var FragmentAlignment = class FragmentAlignment {
       const box = FragmentAlignment.viewportRect(viewport, rect);
       return [left + box[0] * sx, top + box[1] * sy, left + box[2] * sx, top + box[3] * sy];
     });
+    const polygons = side.quads?.map(quad => {
+      const polygon = FragmentAlignment.viewportQuad(viewport, quad);
+      return polygon.map((value, coordinate) => coordinate % 2 ? top + value * sy : left + value * sx);
+    });
     const ranges = [];
     const tolerance = FragmentAlignment.TEXT_RECT_TOLERANCE;
     for (const span of layer.querySelectorAll("span")) {
@@ -596,8 +658,10 @@ var FragmentAlignment = class FragmentAlignment {
       const range = div.ownerDocument.createRange();
       range.selectNodeContents(span);
       const rects = [...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0);
-      if (rects.length && rects.every(rect => boxes.some(box => rect.left >= box[0] - tolerance
-        && rect.top >= box[1] - tolerance && rect.right <= box[2] + tolerance && rect.bottom <= box[3] + tolerance))) {
+      if (rects.length && rects.every(rect => boxes.some((box, region) => rect.left >= box[0] - tolerance
+        && rect.top >= box[1] - tolerance && rect.right <= box[2] + tolerance && rect.bottom <= box[3] + tolerance
+        && (!polygons || [[rect.left, rect.top], [rect.right, rect.top], [rect.right, rect.bottom], [rect.left, rect.bottom]]
+          .every(point => FragmentAlignment.pointInQuad(polygons[region], point, tolerance)))))) {
         ranges.push(range);
       }
     }
@@ -652,7 +716,7 @@ var FragmentAlignment = class FragmentAlignment {
     }
   }
 
-  /** Navigate only after the explicit action resolves exactly one verified rectangle. */
+  /** Navigate only after the explicit action resolves one verified request-unit region. */
   localize(index = 1) {
     if (this.disposed || !this.mapping || ![0, 1].includes(index) || !this.navigationAvailable[1 - index]) return;
     this.clearHighlight();
@@ -662,7 +726,7 @@ var FragmentAlignment = class FragmentAlignment {
     const label = index === 0 ? "译文" : "原文";
     if (!point) return this.setStatus("请先点击或拖选" + (index === 0 ? "原文" : "译文") + " PDF 中的片段。");
     const hit = FragmentAlignment.hitTest(this.mapping, point.page, point.point, index === 0 ? "source" : "target");
-    if (hit.status === "ambiguous") return this.setStatus("此处映射矩形重叠，无法唯一定位" + label + "。");
+    if (hit.status === "ambiguous") return this.setStatus("此处可信片段重叠，无法唯一定位" + label + "。");
     if (!hit.unit) return this.setStatus("此处没有已验证的片段映射。");
     const destinationSide = index === 0 ? hit.unit.target : hit.unit.source;
     const destinationIndex = 1 - index;
@@ -709,14 +773,24 @@ var FragmentAlignment = class FragmentAlignment {
     overlay.style.cssText = "position:absolute;inset:0;pointer-events:none;user-select:none;z-index:30";
     const scaleX = (div.clientWidth || viewport.width) / viewport.width;
     const scaleY = (div.clientHeight || viewport.height) / viewport.height;
-    for (const rect of side.rects) {
-      const box = FragmentAlignment.viewportRect(viewport, rect);
+    for (const [region, rect] of side.rects.entries()) {
+      const polygon = side.quads ? FragmentAlignment.viewportQuad(viewport, side.quads[region]) : null;
+      const box = polygon ? FragmentAlignment.quadBounds(polygon) : FragmentAlignment.viewportRect(viewport, rect);
       const mark = div.ownerDocument.createElement("div");
       mark.style.cssText = "position:absolute;pointer-events:none;user-select:none;box-sizing:border-box;" + markStyle;
       mark.style.left = box[0] * scaleX + "px";
       mark.style.top = box[1] * scaleY + "px";
       mark.style.width = (box[2] - box[0]) * scaleX + "px";
       mark.style.height = (box[3] - box[1]) * scaleY + "px";
+      if (polygon) {
+        // Each line paints only its polygon; the paragraph's inter-line gaps remain untouched.
+        const points = [];
+        for (let coordinate = 0; coordinate < polygon.length; coordinate += 2) {
+          points.push((polygon[coordinate] - box[0]) / (box[2] - box[0]) * 100 + "% "
+            + (polygon[coordinate + 1] - box[1]) / (box[3] - box[1]) * 100 + "%");
+        }
+        mark.style.clipPath = "polygon(" + points.join(",") + ")";
+      }
       overlay.append(mark);
     }
     div.append(overlay);

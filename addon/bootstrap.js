@@ -19,9 +19,11 @@ async function startup({ id, version, rootURI }) {
   Services.scriptloader.loadSubScript(rootURI + "content/library.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/tasks.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/alignment.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/reading-assets.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/paperbridge.js", scope);
   scope.PaperBridge.runtime = new scope.BundledRuntime(rootURI, version);
   scope.PaperBridge.library = new scope.TranslationLibrary(scope.PaperBridge);
+  scope.PaperBridge.alignmentAssets = new scope.AlignmentAssets(scope.PaperBridge);
   Zotero.PaperBridge = scope.PaperBridge;
   Zotero.PaperBridge.ready = Zotero.PaperBridge.start(id);
   await Zotero.PaperBridge.ready;

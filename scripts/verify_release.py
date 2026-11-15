@@ -26,7 +26,7 @@ PLATFORMS = {
 REQUIRED_ADDON_FILES = (
     "manifest.json", "bootstrap.js", "content/runtime.js", "content/library.js",
     "content/tasks.js", "content/alignment.js", "content/paperbridge.js", "content/annotations.js",
-    "content/notes.js", "content/diagnostics.js",
+    "content/notes.js", "content/diagnostics.js", "content/reading-assets.js",
 )
 # The current backend requires these modules, including trace and provider diagnostics.
 REQUIRED_BACKEND_FILES = (

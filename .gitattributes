@@ -15,3 +15,7 @@
 *.ttf binary
 *.ttc binary
 *.sqlite binary
+
+# Preserve hash-bound upstream notice bytes instead of reformatting their original spaces.
+addon/licenses/native/libspatialindex-2.1.0-COPYING.txt whitespace=-blank-at-eol
+addon/licenses/native/libspatialindex-2.1.0-copyright.txt whitespace=-blank-at-eol

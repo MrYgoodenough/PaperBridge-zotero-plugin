@@ -55,7 +55,7 @@ def _translate_box(box, offset):
 
 
 def _painted_rectangle(document, page_number, captured, cache):
-    """Expand visual bounds to actual visible glyph extents, without text matching."""
+    """Keep full raw-glyph evidence clips; alignment later emits tighter active paint bounds."""
     page = document[page_number]
     matrix, bounds = _page_space(page, cache["spaces"])
     region = pymupdf.Rect(captured) * matrix
@@ -65,8 +65,10 @@ def _painted_rectangle(document, page_number, captured, cache):
         cache["page"] = page_number
     union = pymupdf.Rect()
     for line in _page_text(page, bounds, cache["texts"]):
-        for _, box, visible in line:
-            if visible and region.contains((box.tl + box.br) / 2):
+        for glyph in line["characters"]:
+            box = glyph["box"]
+            if (glyph["visible"] and not glyph["text"].isspace()
+                    and region.contains((box.tl + box.br) / 2)):
                 union |= box
     if union.is_empty:
         raise ValueError("no_visible_glyphs")
@@ -129,7 +131,7 @@ class FragmentTrace:
             raise ValueError("unsupported_source")
         key = id(paragraph)
         if key in self.rows:
-            # The same identity on multiple pages has no schema-v1 location.
+            # A repeated identity cannot supply a trustworthy single-page location.
             self.rows[key] = None
             self.excluded["duplicate_identity"] += 1
             return

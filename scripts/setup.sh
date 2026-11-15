@@ -38,6 +38,15 @@ if [ "$task_os" = "Linux" ]; then
   task_python=$("$UV" python find --managed-python --system 3.12)
   "$UV" sync --locked --managed-python --python "$task_python"
   .venv/bin/python scripts/warmup.py
+  # Fetch source only during developer setup, never from an installed runtime.
+  task_opencv_archive="${OPENCV_SOURCE_ARCHIVE:-$PWD/.cache/opencv-4.12.0.tar.gz}"
+  if [ ! -f "$task_opencv_archive" ]; then
+    mkdir -p "$(dirname "$task_opencv_archive")"
+    curl -fL https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.12.0 -o "$task_opencv_archive.tmp"
+    mv "$task_opencv_archive.tmp" "$task_opencv_archive"
+  fi
+  # Optional OPENCV_TOOLCHAIN_FILE selects an older-glibc native build environment.
+  OPENCV_SOURCE_ARCHIVE="$task_opencv_archive" sh scripts/build_opencv_linux.sh
 else
   "$UV" sync --python 3.12
   .venv/bin/python backend/fonts.py

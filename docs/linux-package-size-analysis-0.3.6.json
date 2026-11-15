@@ -1,0 +1,558 @@
+{
+  "schemaVersion": 1,
+  "task": "P1-6 Linux macOS-equivalent slimming",
+  "date": "2026-11-15",
+  "sourceVersion": "0.3.6",
+  "status": "image-only stage and final Linux packages natively verified; promoted to default stage; not published",
+  "scope": {
+    "opencvModules": [
+      "core",
+      "imgproc",
+      "imgcodecs",
+      "python3"
+    ],
+    "newSlimming": "Replace the Linux official cv2 wheel with the existing macOS image-only source scope",
+    "preexistingOmissions": [
+      "ruff",
+      "scipy",
+      "scikit-learn",
+      "scikit-image",
+      "huggingface-hub",
+      "hf-xet",
+      "networkx",
+      "narwhals",
+      "joblib",
+      "threadpoolctl",
+      "imageio",
+      "tifffile",
+      "lazy-loader"
+    ],
+    "stdlibPolicy": "Existing test/UI/development/bytecode exclusions unchanged",
+    "noCpythonStrip": true,
+    "noRuntimeDownloads": true,
+    "noModelOrTokenizerRemoval": true,
+    "noXzOrBootstrap": true,
+    "noMacosSourceOrReleaseChanges": true
+  },
+  "stage": {
+    "path": "/home/scq/PaperBridge-zotero-plugin/.cache/package/linux-x64",
+    "pathAtAcceptance": "/home/scq/PaperBridge-zotero-plugin/agent/codex/current-slimming-20261115/package/linux-x64",
+    "baselinePathAtMeasurement": "/home/scq/PaperBridge-zotero-plugin/.cache/package/linux-x64",
+    "recoverableBaselineCopy": "/home/scq/PaperBridge-zotero-plugin/.cache/package-baselines/linux-x64-before-image-only-20261115",
+    "nativeBuildInstall": "/home/scq/PaperBridge-zotero-plugin/.cache/opencv-linux-x64/install",
+    "compatibleToolchain": "/home/scq/PaperBridge-zotero-plugin/.cache/opencv-linux-x64/tools/opencv-native-gcc10.cmake",
+    "baselineMetadataVersion": "0.3.1",
+    "candidateMetadataVersion": "0.3.6",
+    "retainedInterpreterFilesByteIdentical": 613,
+    "oldUnshippedBytecodeFiles": 31,
+    "otherShippedDependenciesByteIdentical": true,
+    "resources": [
+      {
+        "path": ".cache/babeldoc/models/doclayout_yolo_docstructbench_imgsz1024.onnx",
+        "bytes": 75324598,
+        "sha256": "fece9af02f618b603ff7921ccec6861d13e7e1f9830e091dfb7e8ad9311e5b21"
+      },
+      {
+        "path": ".cache/babeldoc/tiktoken/fb374d419588a4632f3f557e76b4b70aebbca790",
+        "bytes": 3613922,
+        "sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d"
+      }
+    ],
+    "libpython": [
+      {
+        "path": "python/lib/libpython3.12.so",
+        "bytes": 32817872,
+        "sha256": "03a0af33071a152cb92274e07310c2988b4cd0ae548a416a490dfefa5661fbd6"
+      },
+      {
+        "path": "python/lib/libpython3.12.so.1.0",
+        "bytes": 32817872,
+        "sha256": "03a0af33071a152cb92274e07310c2988b4cd0ae548a416a490dfefa5661fbd6"
+      },
+      {
+        "path": "python/lib/libpython3.so",
+        "bytes": 8480,
+        "sha256": "9a40d50ee23c486a82a1611db4c1172dc07b07bbb1e42b08471317d472c702c3"
+      }
+    ],
+    "originalStageUnchangedDuringMeasurement": true,
+    "promotion": "After final acceptance the candidate was moved without byte changes; 6494 shipped stage files match the accepted bundled XPI",
+    "protectedExistingOutputsUnchanged": 46
+  },
+  "provenance": {
+    "sourceUrl": "https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.12.0",
+    "build": {
+      "version": "4.12.0",
+      "platform": "linux-x64",
+      "modules": [
+        "core",
+        "imgproc",
+        "imgcodecs",
+        "python3"
+      ],
+      "sourceArchiveSha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
+      "python": "3.12.16",
+      "pythonAbi": "cpython-312-x86_64-linux-gnu",
+      "numpy": "2.5.4",
+      "cmake": "4.4.4",
+      "buildType": "MinSizeRel",
+      "minimumGlibc": "2.30",
+      "extensionSha256": "9229a787f40d818ae95fc83ef1192544e7de0b4ddae458139f675e38d12a68c0",
+      "extensionBytes": 10064816,
+      "cmakeCacheSha256": "101492b064557d14c811a28b7e8fce2584611545bf343bcfbb242aa6ebe7e7f9",
+      "toolchainFileSha256": "d1990f8654914c87ea493b43d5d830c07a2a5874f5697b4cfd13e86921280279"
+    },
+    "compiler": "GCC/G++ 10.2.1 (Debian 10.2.1-6)",
+    "sysrootGlibc": "2.31",
+    "buildScriptSha256": "24235def75b3fd6a4d774fff4d236d79f6a0b654a7b5294f5fe2be50ccd9de28",
+    "sysrootPackages": {
+      "cpp-10": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/cpp-10_10.2.1-6_amd64.deb",
+        "SHA256": "ed2018b8c7ab7006826ccfcc6d306c3a5e1c6dc12595022e4e02913302fdc10e",
+        "Size": "8528068"
+      },
+      "g++-10": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/g++-10_10.2.1-6_amd64.deb",
+        "SHA256": "d25a7566c15c63c56eb34fa98e0663805ceb7cfd8054c2b6ae3f09be6982671c",
+        "Size": "9380108"
+      },
+      "gcc-10": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/gcc-10_10.2.1-6_amd64.deb",
+        "SHA256": "07af57b8d276f330830cf67ef144e461817e0ad99ac12c1e9e7e6b6882a4b42a",
+        "Size": "16990272"
+      },
+      "gcc-10-base": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/gcc-10-base_10.2.1-6_amd64.deb",
+        "SHA256": "be65535e94f95fbf04b104e8ab36790476f063374430f7dfc6c516cbe2d2cd1e",
+        "Size": "201332"
+      },
+      "libgcc-10-dev": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/libgcc-10-dev_10.2.1-6_amd64.deb",
+        "SHA256": "3b711374092b84e732c4e73cf33e02cff02e34a5f105eb6467de8d9038e4cd9d",
+        "Size": "2327620"
+      },
+      "libgcc-s1": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/libgcc-s1_10.2.1-6_amd64.deb",
+        "SHA256": "e478f2709d8474165bb664de42e16950c391f30eaa55bc9b3573281d83a29daf",
+        "Size": "41400"
+      },
+      "libstdc++-10-dev": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/libstdc++-10-dev_10.2.1-6_amd64.deb",
+        "SHA256": "20b1f56863dcc5f187d6cb53b2aa6149bd013be4ec67e10c2c31a22fda619a01",
+        "Size": "1741436"
+      },
+      "libstdc++6": {
+        "Version": "10.2.1-6",
+        "Filename": "pool/main/g/gcc-10/libstdc++6_10.2.1-6_amd64.deb",
+        "SHA256": "5c155c58935870bf3b4bfe769116841c0d286a74f59eccfd5645693ac23f06b1",
+        "Size": "492540"
+      },
+      "libc6": {
+        "Version": "2.31-13+deb11u11",
+        "Filename": "pool/main/g/glibc/libc6_2.31-13+deb11u11_amd64.deb",
+        "SHA256": "05f7264da867b37f4c5ce49266b558ea1e81e05a9464f623152fca70f3550282",
+        "Size": "2822708"
+      },
+      "libc6-dev": {
+        "Version": "2.31-13+deb11u11",
+        "Filename": "pool/main/g/glibc/libc6-dev_2.31-13+deb11u11_amd64.deb",
+        "SHA256": "e7f7b45d9c5cfcf37609f0b6efd3c645272c812144703af89dfd32218fcb0fd3",
+        "Size": "2361268"
+      },
+      "linux-libc-dev": {
+        "Version": "5.10.223-1",
+        "Filename": "pool/main/l/linux/linux-libc-dev_5.10.223-1_amd64.deb",
+        "SHA256": "e3be603bd12377bb90fcfb0f2048ca3a81c886e49d6f09945b82159d1c54f7b2",
+        "Size": "1755736"
+      }
+    },
+    "buildNetwork": "unshare -Urn: kernel network namespace disabled during compilation",
+    "postBuildStrip": false,
+    "stageExtensionSha256": "4d6448fc00a9e56741af0feead23ce036a1ffd96808a0d2e6e3ddd3798783106",
+    "elfDynamicSection": "\nDynamic section at offset 0x741ca8 contains 30 entries:\n  Tag        Type                         Name/Value\n 0x0000000000000001 (NEEDED)             Shared library: [libdl.so.2]\n 0x0000000000000001 (NEEDED)             Shared library: [libpthread.so.0]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN]\n 0x000000000000000c (INIT)               0x9c000\n 0x000000000000000d (FINI)               0x535a80\n 0x0000000000000019 (INIT_ARRAY)         0x7179e8\n 0x000000000000001b (INIT_ARRAYSZ)       400 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x717b78\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x260\n 0x0000000000000005 (STRTAB)             0x22e0\n 0x0000000000000006 (SYMTAB)             0x2d0\n 0x000000000000000a (STRSZ)              9225 (bytes)\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000003 (PLTGOT)             0x741fe8\n 0x0000000000000002 (PLTRELSZ)           7032 (bytes)\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000017 (JMPREL)             0x996d8\n 0x0000000000000007 (RELA)               0x4ba8\n 0x0000000000000008 (RELASZ)             609072 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000006ffffffe (VERNEED)            0x4998\n 0x000000006fffffff (VERNEEDNUM)         6\n 0x000000006ffffff0 (VERSYM)             0x46ea\n 0x000000006ffffff9 (RELACOUNT)          23559\n 0x0000000000000000 (NULL)               0x0\n",
+    "maximumGlibcRequiredByCv2": "2.30",
+    "maximumGlibcxxRequiredByCv2": "3.4.26",
+    "existingFullRuntimeGlibcFloor": "2.34",
+    "rejectedHostTrial": "Ubuntu 24.04 GCC 13 output required glibc 2.38; not staged or shipped"
+  },
+  "archives": {
+    "bundled": {
+      "before": {
+        "pathAtMeasurement": "agent/codex/current-slimming-20261115/before/xpi/paperbridge-0.3.6-linux-x64.xpi",
+        "localCopyStatus": "superseded comparison copy removed after retaining its hash and small evidence",
+        "bytes": 286157409,
+        "sha256": "553fdf764b7767fe5a17c93145f3909f7cfe6b2b622f90c2184c3a0aedb641f3",
+        "crc": "passed",
+        "zipMethods": [
+          8
+        ],
+        "groups": {
+          "model": {
+            "files": 1,
+            "rawBytes": 75324598,
+            "compressedBytes": 64827402
+          },
+          "tokenizer": {
+            "files": 1,
+            "rawBytes": 3613922,
+            "compressedBytes": 1694468
+          },
+          "interpreter": {
+            "files": 613,
+            "rawBytes": 111146805,
+            "compressedBytes": 37787241
+          },
+          "other_dependencies": {
+            "files": 5861,
+            "rawBytes": 334633749,
+            "compressedBytes": 118714972
+          },
+          "opencv": {
+            "files": 63,
+            "rawBytes": 159488206,
+            "compressedBytes": 61192195
+          },
+          "addon_and_license": {
+            "files": 18,
+            "rawBytes": 286909,
+            "compressedBytes": 92365
+          },
+          "backend_and_metadata": {
+            "files": 17,
+            "rawBytes": 182965,
+            "compressedBytes": 59438
+          }
+        },
+        "zipOverheadBytes": 1789328
+      },
+      "after": {
+        "pathAtMeasurement": "agent/codex/current-slimming-20261115/candidate/xpi/paperbridge-0.3.6-linux-x64.xpi",
+        "localCopyStatus": "superseded comparison copy removed; final accepted XPI is recorded separately",
+        "bytes": 228221290,
+        "sha256": "3f40838459a93b351d51a6f59a9b1d7d4d2294f095cd0d813a4cf77be48a7fd4",
+        "crc": "passed",
+        "zipMethods": [
+          8
+        ],
+        "groups": {
+          "model": {
+            "files": 1,
+            "rawBytes": 75324598,
+            "compressedBytes": 64827402
+          },
+          "tokenizer": {
+            "files": 1,
+            "rawBytes": 3613922,
+            "compressedBytes": 1694468
+          },
+          "interpreter": {
+            "files": 613,
+            "rawBytes": 111146805,
+            "compressedBytes": 37787241
+          },
+          "other_dependencies": {
+            "files": 5861,
+            "rawBytes": 334633749,
+            "compressedBytes": 118714972
+          },
+          "opencv": {
+            "files": 18,
+            "rawBytes": 10113320,
+            "compressedBytes": 3268378
+          },
+          "addon_and_license": {
+            "files": 18,
+            "rawBytes": 286909,
+            "compressedBytes": 92365
+          },
+          "backend_and_metadata": {
+            "files": 17,
+            "rawBytes": 183887,
+            "compressedBytes": 59810
+          }
+        },
+        "zipOverheadBytes": 1776654
+      },
+      "savedBytes": 57936119,
+      "savedPercent": 20.246241116895213
+    },
+    "local": {
+      "before": {
+        "pathAtMeasurement": "agent/codex/current-slimming-20261115/before/xpi/paperbridge-0.3.6-linux-x64-local-python.xpi",
+        "localCopyStatus": "superseded comparison copy removed after retaining its hash and small evidence",
+        "bytes": 248239170,
+        "sha256": "46daa870d37758388788b82d953f44c9cfe73523a3a1690848a289a256dfbbff",
+        "crc": "passed",
+        "zipMethods": [
+          8
+        ],
+        "groups": {
+          "model": {
+            "files": 1,
+            "rawBytes": 75324598,
+            "compressedBytes": 64827402
+          },
+          "tokenizer": {
+            "files": 1,
+            "rawBytes": 3613922,
+            "compressedBytes": 1694468
+          },
+          "other_dependencies": {
+            "files": 5861,
+            "rawBytes": 334633749,
+            "compressedBytes": 118714972
+          },
+          "opencv": {
+            "files": 63,
+            "rawBytes": 159488206,
+            "compressedBytes": 61192195
+          },
+          "addon_and_license": {
+            "files": 18,
+            "rawBytes": 286922,
+            "compressedBytes": 92373
+          },
+          "backend_and_metadata": {
+            "files": 17,
+            "rawBytes": 182963,
+            "compressedBytes": 59436
+          }
+        },
+        "zipOverheadBytes": 1658324
+      },
+      "after": {
+        "pathAtMeasurement": "agent/codex/current-slimming-20261115/candidate/xpi/paperbridge-0.3.6-linux-x64-local-python.xpi",
+        "localCopyStatus": "superseded comparison copy removed; final accepted XPI is recorded separately",
+        "bytes": 190303052,
+        "sha256": "eca2d5d4a48e47916e0f5972e842c442ee224ef88d52ecd75510fb42bb357035",
+        "crc": "passed",
+        "zipMethods": [
+          8
+        ],
+        "groups": {
+          "model": {
+            "files": 1,
+            "rawBytes": 75324598,
+            "compressedBytes": 64827402
+          },
+          "tokenizer": {
+            "files": 1,
+            "rawBytes": 3613922,
+            "compressedBytes": 1694468
+          },
+          "other_dependencies": {
+            "files": 5861,
+            "rawBytes": 334633749,
+            "compressedBytes": 118714972
+          },
+          "opencv": {
+            "files": 18,
+            "rawBytes": 10113320,
+            "compressedBytes": 3268378
+          },
+          "addon_and_license": {
+            "files": 18,
+            "rawBytes": 286922,
+            "compressedBytes": 92373
+          },
+          "backend_and_metadata": {
+            "files": 17,
+            "rawBytes": 183885,
+            "compressedBytes": 59809
+          }
+        },
+        "zipOverheadBytes": 1645650
+      },
+      "savedBytes": 57936118,
+      "savedPercent": 23.3388300484569
+    }
+  },
+  "measurement": {
+    "sourceSnapshot": "agent/codex/current-slimming-20261115/size-build",
+    "sourceSnapshotManifestSha256": "ed438125056e8a1da3cc7bfaabfb8e7dba67937bb49692ff256761f37e6d6db5",
+    "matchedAddonBackendSourceForBeforeAfter": true,
+    "freshPayloads": true,
+    "zipCompressionPolicyChanged": false,
+    "finalNoticeIntegrationIncluded": false,
+    "warning": "Measurement XPIs only: captured before main's final NOTICE.md/addon integration; not published or Zotero-accepted"
+  },
+  "excludedOldCv2OwnedNativeLibraries": [
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libaom-a0d22147.so.3.14.1",
+      "bytes": 8141337,
+      "sha256": "1158ff3dfd6b92bdf3f163c02c11c629baadba467604dcf5c579cf8daac071ea"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libavcodec-c4204469.so.62.28.101",
+      "bytes": 18439145,
+      "sha256": "94401ecabe5cd87f7db30af2843c8ff0674e57947d102f307ebed8788740cbb9"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libavformat-4762a711.so.62.12.101",
+      "bytes": 2991673,
+      "sha256": "150705d76b62a20a16cbb131ba5c9e25c086ccb7914bf0b50c084bc66c15c0e1"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libavif-43e630fc.so.16.4.2",
+      "bytes": 1165369,
+      "sha256": "08bd56025b1f665362a7ac4f1f2ac552e36803817a3637840a376242d38f30da"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libavutil-befbbc48.so.60.26.101",
+      "bytes": 1066369,
+      "sha256": "fe9258859653c19d0d4029bbb84622bc5c39707d7936372df757661e6b961b18"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libcrypto-5409cd36.so.1.1.1k",
+      "bytes": 3215921,
+      "sha256": "af6e7717a5384f73fd0c15d6472282f6b4106c58f55575fa33df7e798a0256c2"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libdrm-b0291a67.so.2.4.0",
+      "bytes": 96417,
+      "sha256": "2b8f19025340baf49d5fb8b6b68113c429baf3ceb0e04d7b2663f673c44cdbed"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libgfortran-83c28eba.so.5.0.0",
+      "bytes": 2751569,
+      "sha256": "468e71e59e1d784821a76702e5ecd1e0dbcfc024499f74a552d1bea4b26f27ad"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+      "bytes": 38982937,
+      "sha256": "c073ab726795e391fd4ee09ce941c7d9e23e71a3737a910367f03d89487542f5"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libpng16-529cb57a.so.16.58.0",
+      "bytes": 1076721,
+      "sha256": "e4d04733e75ffa81ab878c0ed628463ee4bba178120c32dc0372963680c6e768"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libquadmath-2284e583.so.0.0.0",
+      "bytes": 272193,
+      "sha256": "a9307bbaa353623fa014e8b682d50c4629f5e5c7d61daa9a8652f7d165cd421a"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libssl-81259c47.so.1.1.1k",
+      "bytes": 687353,
+      "sha256": "3b5222f85e27642d50b37dc42345a65d129b1fcc556f94eac56d008833bdafa4"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libswresample-2dfded3b.so.6.3.101",
+      "bytes": 150337,
+      "sha256": "45f1bbfcae84449e2293c07398376c478a9ea1c4190c23e1c9a414a055b46657"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libswscale-fe215b0b.so.9.5.101",
+      "bytes": 2017409,
+      "sha256": "146094fd188bf8e6585b21acb5946f298efbdbee88690f0134e1e8fa48c44a73"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/opencv_python_headless.libs/libvpx-4fb239ff.so.11.0.1",
+      "bytes": 3692569,
+      "sha256": "be3407f96ebd5fd5fde8eb91c9bf7d1e083916ddf856cf45784c67f1b2cb7f41"
+    }
+  ],
+  "retainedCv2LegalMaterials": [
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/COPYRIGHT-OpenCV.txt",
+      "bytes": 733,
+      "sha256": "bba849c98da85a2b27b86113284a90812c959b1c1fc4ed67de9355475d1e6831"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/LICENSE-OpenCV.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/NOTICE.txt",
+      "bytes": 74,
+      "sha256": "d903a69ab39425283b44e2ea355cbfaf79bcd738b69c2b1c3c700ce80f2d89f9"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/licenses/README.ijg",
+      "bytes": 12799,
+      "sha256": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/licenses/libjpeg-turbo.txt",
+      "bytes": 5620,
+      "sha256": "96f5b328adbb78eeaaec6980d73fd558cb1e4d62560ed615646bc3cf5e532430"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/licenses/libpng.txt",
+      "bytes": 5345,
+      "sha256": "7317e078e2d3b5d7ba5a6159e650945153262b44b76f6700f8e9edb261c5143e"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/licenses/softfloat-fdlibm.txt",
+      "bytes": 2853,
+      "sha256": "27adefc3d001216b8be5af628e3583575fedc22ea6f41917e3008c8ed8cb8ce2"
+    },
+    {
+      "path": "python/lib/python3.12/site-packages/cv2/licenses/zlib.txt",
+      "bytes": 1002,
+      "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+    }
+  ],
+  "verification": {
+    "nativeProbes": {
+      "bundled": {
+        "status": "passed",
+        "networkAttempts": 0,
+        "providerCalls": 0,
+        "checks": [
+          "isolated_dependencies_and_stdlib",
+          "retained_tokenizer_roundtrip",
+          "compact_math_and_png_jpeg_operations",
+          "font_discovery_child_subset_pdf_embedding_extraction_render",
+          "retained_layout_model_real_pdf_inference",
+          "macos_equivalent_scope_without_omitted_dependencies"
+        ],
+        "modelDetections": 29,
+        "modelDetectionsByteEquivalent": true,
+        "ssimEquivalent": true,
+        "tokenizerEquivalent": true,
+        "fontPdfPixelsEquivalent": true,
+        "record": "agent/codex/current-slimming-20261115/probe-bundled/probe.json"
+      },
+      "local": {
+        "status": "passed",
+        "networkAttempts": 0,
+        "providerCalls": 0,
+        "checks": [
+          "isolated_dependencies_and_stdlib",
+          "retained_tokenizer_roundtrip",
+          "compact_math_and_png_jpeg_operations",
+          "font_discovery_child_subset_pdf_embedding_extraction_render",
+          "retained_layout_model_real_pdf_inference",
+          "macos_equivalent_scope_without_omitted_dependencies"
+        ],
+        "modelDetections": 29,
+        "modelDetectionsByteEquivalent": true,
+        "ssimEquivalent": true,
+        "tokenizerEquivalent": true,
+        "fontPdfPixelsEquivalent": true,
+        "record": "agent/codex/current-slimming-20261115/probe-local/probe.json"
+      }
+    },
+    "stagingBuildFontTests": "16 passed",
+    "candidateAgainstMathReferences": "3 passed",
+    "zipCrc": "All four measurement XPIs passed",
+    "licenseStatus": "Actual retained OpenCV/codec notices supplied; final inventory/NOTICE integration is a separate worker"
+  },
+  "limits": [
+    "No final dist or public release built by this worker",
+    "No Zotero/addon acceptance claimed here",
+    "Native execution on Ubuntu 24.04 only; glibc floor checked via ELF, not older-distro acceptance",
+    "Windows retains the official wheel; macOS build method and exclusive releases untouched",
+    "Future rebuilds on a newer host must select a compatible native toolchain; script records and warns about an increased glibc requirement"
+  ]
+}

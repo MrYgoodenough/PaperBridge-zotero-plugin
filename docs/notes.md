@@ -114,4 +114,4 @@ PAPERBRIDGE_ALIGNMENT_TEST = {
 
 Linux 两种包已验证实际选区/高亮新建 note、正确 parent/library、原生引用元数据、页码/批注回链、编辑器打开、并发去重和新进程持久化，停机数据库完整性为 `ok`。详情集中在上述证据文件，不把小替身或 CI 产物核对当作原生通过。
 
-独立 PDF 根 note、真实 group 权限、图像/绘图和 citation preview 的 UI、复杂恶意模板/特殊文本等扩展场景仍须单独授权验证；现有核心测试不代替这些原生场景。Windows 由[独立清单](windows-acceptance-0.3.5.md)交接，macOS 暂不推进。任何缺接口/权限/缓存错误只影响该笔记动作，不阻断普通 PDF 阅读，不隐式收费或重试。
+独立 PDF 根 note、真实 group 权限、图像/绘图和 citation preview 的 UI、复杂恶意模板/特殊文本等扩展场景仍须单独授权验证；现有核心测试不代替这些原生场景。各候选包按精确 XPI hash 验收，macOS 专属源码暂不推进。任何缺接口/权限/缓存错误只影响该笔记动作，不阻断普通 PDF 阅读，不隐式收费或重试。

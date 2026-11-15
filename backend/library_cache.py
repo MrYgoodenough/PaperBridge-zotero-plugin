@@ -4,6 +4,7 @@ import json
 import re
 import shutil
 import sqlite3
+import warnings
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
@@ -19,6 +20,8 @@ DEFAULT_BASE_URL = "https://api.deepseek.com"
 DEFAULT_MODEL = "deepseek-flash"
 # The existing completion limit also provides the compatible-profile default.
 DEFAULT_MAX_TOKENS = 8192
+# Imported PDFs can still depend on orphaned alignment and result-evidence sidecars.
+RETAINED_ASSET_NAMES = {"translated.pdf", "alignment.json", "manifest.json", "quality.json"}
 
 
 def normalize_endpoint(value):
@@ -169,39 +172,65 @@ def migrate_paragraphs(cache, references):
             old.execute("VACUUM")
 
 
+def _has_retained_assets(folder):
+    """Protect result files/evidence, including nested legacy attempts and uncertain paths."""
+    if folder.is_symlink():
+        return True
+    try:
+        return any(path.name in RETAINED_ASSET_NAMES for path in folder.rglob("*"))
+    except OSError as error:
+        warnings.warn(f"Could not inspect cache assets; retaining {folder}: {error}")
+        return True
+
+
 def prune(cache, jobs, remove, keep, sweep=False, active=()):
-    """Remove unowned caches, preserving shared/active fingerprints and unknown attempts."""
-    for ref in [*remove,*keep]:
+    """Remove only disposable unowned cache; retain results, shared/active work and unknown attempts."""
+    references = [*remove, *keep]
+    for ref in references:
         for key in ["fingerprint","document_key"]:
             if ref.get(key) and not re.fullmatch(r"[a-f0-9]{64}",ref[key]):
                 raise ValueError("Invalid cache identity")
     keep_jobs = {r["fingerprint"] for r in keep if r.get("fingerprint")}
     keep_docs = {r["document_key"] for r in keep if r.get("document_key")}
-    active = set(active)
-    deleted_jobs = {r["fingerprint"] for r in remove if r.get("fingerprint")} - keep_jobs
+    protected_jobs = keep_jobs | set(active)
+    legacy = []
+    if jobs.is_dir():
+        legacy = [folder for folder in jobs.iterdir()
+                  if folder.is_dir() and re.fullmatch(r"[a-f0-9]{64}", folder.name)]
+    attempts = jobs / "attempts"
+    owned_attempts = []
+    if attempts.is_dir():
+        for folder in attempts.iterdir():
+            identity = _attempt_identity(folder)
+            # Unknown sidecars cannot authorize deletion or attribute document paragraphs.
+            if identity is not None:
+                owned_attempts.append((folder, identity))
+    # Stale frontend removal queues are not permission to erase recoverable assets.
+    protected_jobs.update(folder.name for folder in legacy if _has_retained_assets(folder))
+    protected_jobs.update(identity["fingerprint"] for folder, identity in owned_attempts
+                          if _has_retained_assets(folder))
+    keep_docs.update(ref["document_key"] for ref in references
+                     if ref.get("fingerprint") in protected_jobs and ref.get("document_key"))
+    keep_docs.update(identity["document_key"] for _, identity in owned_attempts
+                     if identity["fingerprint"] in protected_jobs)
+    deleted_jobs = {r["fingerprint"] for r in remove if r.get("fingerprint")} - protected_jobs
     deleted_docs = {r["document_key"] for r in remove if r.get("document_key")} - keep_docs
     if sweep:
-        migrate_paragraphs(cache,[*keep,*remove])
-        deleted_jobs.update(p.name for p in jobs.iterdir() if p.is_dir() and re.fullmatch(r"[a-f0-9]{64}",p.name) and p.name not in keep_jobs)
+        migrate_paragraphs(cache, references)
+        deleted_jobs.update(folder.name for folder in legacy if folder.name not in protected_jobs)
     removed = set()
-    for fingerprint in deleted_jobs - active:
+    for fingerprint in deleted_jobs:
         folder = jobs / fingerprint
         if folder.exists():
             shutil.rmtree(folder)
             removed.add(fingerprint)
-    attempts = jobs / "attempts"
-    if attempts.is_dir():
-        for folder in attempts.iterdir():
-            identity = _attempt_identity(folder)
-            # Missing or invalid sidecars never establish permission to delete an attempt.
-            if identity is None:
-                continue
-            fingerprint = identity["fingerprint"]
-            if fingerprint in keep_jobs or fingerprint in active:
-                continue
-            if sweep or fingerprint in deleted_jobs:
-                shutil.rmtree(folder)
-                removed.add(fingerprint)
+    for folder, identity in owned_attempts:
+        fingerprint = identity["fingerprint"]
+        if fingerprint in protected_jobs:
+            continue
+        if sweep or fingerprint in deleted_jobs:
+            shutil.rmtree(folder)
+            removed.add(fingerprint)
     path = cache / "paragraphs.sqlite"
     rows = 0
     if path.exists():

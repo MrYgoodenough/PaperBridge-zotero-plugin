@@ -114,7 +114,8 @@ var TranslationLibrary = class {
     const record = {version:TRANSLATION_VERSION, recordID:old.recordID || this.newID(), config, ...config};
     for (const key of ["libraryID", "sourceKey", "sourceID", "ownerKey", "ownerID", "parentKey",
       "attachmentKey", "attachmentID", "sourceURI", "title", "modified", "size", "rulesVersion",
-      "fingerprint", "documentKey", "importingAttachmentKey", "outputPath", "alignmentPath", "retryOf", "retryPendingSince",
+      "fingerprint", "documentKey", "importingAttachmentKey", "outputPath", "alignmentPath",
+      "mappingAttachmentKey", "mappingState", "mappingWarning", "retryOf", "retryPendingSince",
       "submissionState", "outputAvailable", "errorCode", "errorHint"]) {
       record[key] = this.publicValue(old[key] ?? null);
     }
@@ -245,6 +246,7 @@ var TranslationLibrary = class {
         saveState:status.state === "done" || status.output_path ? "produced" : null,
         lastError:status.error || "", attachmentID:null, attachmentKey:null, importingAttachmentKey:null,
         outputPath:status.output_path || null, alignmentPath:status.alignment_path || null,
+        mappingAttachmentKey:null, mappingState:null, mappingWarning:null,
         fingerprint:status.fingerprint ?? record.fingerprint,
         documentKey:status.document_key ?? record.documentKey});
       this.records.push(attempt);
@@ -264,6 +266,7 @@ var TranslationLibrary = class {
       if (from in changes && !(to in changes)) changes[to] = changes[from];
     }
     for (const key of ["jobID", "state", "quality", "saveState", "lastError", "outputPath", "alignmentPath",
+      "mappingAttachmentKey", "mappingState", "mappingWarning",
       "fingerprint", "documentKey", "importingAttachmentKey", "detached", "retryPendingSince", "submissionState", "outputAvailable",
       "errorCode", "errorHint"]) {
       if (key in changes && changes[key] !== undefined) record[key] = this.publicValue(changes[key]);
@@ -327,11 +330,27 @@ var TranslationLibrary = class {
       record.attachmentID = attachment.id;
       record.attachmentKey = attachment.key;
       await this.update(record, {saveState:"imported", importingAttachmentKey:null, lastError:""});
+      await this.publishMapping(record, attachment);
       return attachment;
     } catch (error) {
       try { await this.update(record, {saveState:"import_failed", lastError:error.message}); }
       catch (saveError) { this.warn(saveError); }
       throw error;
+    }
+  }
+
+  /** A mapping export failure never changes a successfully saved PDF into an import failure. */
+  async publishMapping(record, attachment) {
+    if (!this.bridge.alignmentAssets) return null;
+    try {
+      const asset = await this.bridge.alignmentAssets.publish(record, attachment);
+      if (asset && record.mappingWarning) await this.update(record, {mappingWarning:null});
+      return asset;
+    } catch (error) {
+      this.warn(error);
+      try { await this.update(record, {mappingState:"local-only", mappingWarning:"映射附件未保存；译文已保存：" + error.message}); }
+      catch (writeError) { this.warn(writeError); }
+      return null;
     }
   }
 
@@ -406,7 +425,8 @@ var TranslationLibrary = class {
         }
       }
       // Trash, unavailable files, all job references and uncertain states retain ownership.
-      if (source || attachment || importing || await this.item(record.libraryID, record.ownerKey) || record.jobID ||
+      if (source || attachment || importing || await this.item(record.libraryID, record.ownerKey) ||
+          await this.item(record.libraryID, record.mappingAttachmentKey) || record.jobID ||
           !["done", "failed", "cancelled"].includes(record.state) ||
           ["produced", "import_failed"].includes(record.saveState) ||
           (record.outputPath && await IOUtils.exists(record.outputPath)) || await this.cachedResult(this.ref(record)) ||

@@ -213,27 +213,45 @@ def worker(folder, network_events):
                     or observations["http_attempts"] or network_events))
 
 
+def contains_hit(location, point):
+    """Test a candidate against the same convex line polygons used by the reader."""
+    import pymupdf
+    from alignment import _GEOMETRY_EPSILON
+    if not location.get("quads"):
+        return any(pymupdf.Rect(rect).contains(point) for rect in location["rects"])
+    for quad in location["quads"]:
+        vertices = [pymupdf.Point(quad[index:index + 2]) for index in range(0, 8, 2)]
+        crosses = []
+        for first, second in zip(vertices, vertices[1:] + vertices[:1]):
+            crosses.append((second.x - first.x) * (point.y - first.y)
+                           - (second.y - first.y) * (point.x - first.x))
+        if (all(value >= -_GEOMETRY_EPSILON for value in crosses)
+                or all(value <= _GEOMETRY_EPSILON for value in crosses)):
+            return True
+    return False
+
+
 def location_evidence(document, unit, side, units):
     """Extract actual visible PDF text and a glyph midpoint with unambiguous native ownership."""
     import pymupdf
     from alignment import _clips, _contains, _normalize_text, _page_space, _page_text, _visible_text
     location = unit[side]
-    page, clips = _clips(document, location, {})
+    page, clips = _clips(document, {"page":location["page"], "rects":location["rects"]}, {})
     matrix, bounds = _page_space(page, {})
     text_cache = {}
     text = _visible_text(page, clips, bounds, text_cache)
     hit = None
     for line in _page_text(page, bounds, text_cache):
-        for character, box, visible in line:
+        for glyph in line["characters"]:
+            character, box, visible = glyph["text"], glyph["paint_box"] or glyph["box"], glyph["visible"]
             if not visible or character.isspace() or not any(_contains(clip, box) for clip in clips):
                 continue
             point = ((box.tl + box.br) / 2) * ~matrix
             owners = [candidate["id"] for candidate in units
-                      if candidate[side]["page"] == location["page"] and any(
-                          pymupdf.Rect(rectangle).contains(point) for rectangle in candidate[side]["rects"])]
+                      if candidate[side]["page"] == location["page"] and contains_hit(candidate[side], point)]
             if owners == [unit["id"]]:
                 hit = {"point": list(point), "glyph": character,
-                       "line_text": _normalize_text("".join(char for char, _, painted in line if painted))}
+                       "line_text": _normalize_text("".join(glyph["text"] for glyph in line["characters"] if glyph["visible"]))}
                 break
         if hit is not None:
             break

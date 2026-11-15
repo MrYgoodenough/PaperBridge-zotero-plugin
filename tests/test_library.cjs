@@ -393,3 +393,19 @@ test('legacy preference migration preserves source-less outcomes and failed pref
   assert(!f.files.get(restored.path).includes('old-secret'));
   assert(f.calls.every(call => call.url !== '/cache/prune'));
 });
+
+test('optional mapping export failure preserves imported PDF state and retry mappings do not leak', async () => {
+  const f = fixture(), record = await f.library.put(f.source, null, config, job, stat), pdf = f.item('TRANSLATED', f.owner);
+  f.library.bridge.alignmentAssets = {
+    /** Represent a denied file-write without bypassing the real import-success logic. */
+    async publish() { throw new Error('Mapping library is read-only'); },
+  };
+  await f.library.attach(record, pdf);
+  assert.equal(record.saveState, 'imported');
+  assert.equal(record.attachmentKey, pdf.key);
+  assert.match(record.mappingWarning, /译文已保存/);
+  await f.library.update(record, {mappingAttachmentKey:'OLD-MAP'});
+  const retry = await f.library.forkAttempt(record, {id:'mapping-retry', state:'queued'});
+  assert.equal(retry.mappingAttachmentKey, null);
+  assert.equal(retry.mappingWarning, null);
+});

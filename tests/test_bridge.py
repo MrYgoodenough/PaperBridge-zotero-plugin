@@ -174,21 +174,21 @@ def test_completed_jobs_keep_only_result_and_usage(tmp_path):
     assert original.read_text() == "original"
 
 
-def test_library_prune_cancels_only_unowned_queued_job(store,tmp_path):
-    """Explicit owner removal cancels only work with no remaining owner."""
+def test_library_prune_preserves_queued_work_without_owner_refs(store,tmp_path):
+    """Automatic cache cleanup cannot cancel queued tasks, even with stale ownership."""
     first = store.submit(request(tmp_path,pages="1"))
     second = store.submit(request(tmp_path,pages="2"))
     store.prune_library({"remove":[first],"keep":[second]})
-    assert store.snapshot(first["id"])["state"] == "cancelled"
-    assert not (bridge.JOBS / first["fingerprint"]).exists()
-    assert not store.attempt_folder(first).exists()
+    assert store.snapshot(first["id"])["state"] == "queued"
+    assert (bridge.JOBS / first["fingerprint"]).exists()
+    assert store.attempt_folder(first).exists()
     assert store.snapshot(second["id"])["state"] == "queued"
     assert (bridge.JOBS / second["fingerprint"]).exists()
     assert store.attempt_folder(second).exists()
 
 
-def test_library_prune_waits_for_running_process_before_cleanup(store,tmp_path):
-    """Never remove an attempt while its engine is still writing files."""
+def test_library_prune_never_cancels_running_process(store,tmp_path):
+    """A cleanup request preserves live workers; explicit cancellation remains separate."""
     job=store.submit(request(tmp_path))
     folder=store.attempt_folder(job)
     operations=[]
@@ -207,8 +207,10 @@ def test_library_prune_waits_for_running_process_before_cleanup(store,tmp_path):
     store.jobs[job["id"]].update(state="running")
     store.processes[job["id"]] = Process()
     store.prune_library({"remove":[job],"keep":[]})
-    assert operations==["terminate","wait"]
-    assert not folder.exists()
+    assert operations == []
+    assert folder.exists()
+    assert store.snapshot(job["id"])["state"] == "running"
+    store.processes.pop(job["id"])
 
 
 def test_loopback_auth_and_origin(store):
@@ -413,10 +415,13 @@ def test_failed_retry_keeps_prior_pdf_sidecars_and_all_usage(store, tmp_path):
     assert [attempt["usage"]["input_tokens"] for attempt in result["attempts"]] == [30, 7]
     assert (folder / "manifest.json").is_file()
     assert (bridge.JOBS / job["fingerprint"] / "translated.pdf").read_bytes() == b"%PDF-prior"
-    # Removing source/output caches must not erase observed historical charges.
+    # A stale cleanup request cannot erase retained outcomes or observed historical charges.
     store.prune_library({"remove": [result], "keep": []})
-    assert not folder.exists() and not second.exists()
+    assert folder.exists() and second.exists()
+    assert Path(result["output_path"]).read_bytes() == b"%PDF-prior"
     assert store.snapshot(retry["id"])["usage"]["input_tokens"] == 37
+    # Explicitly remove only this test snapshot to check the unavailable-source refusal.
+    (bridge.JOBS / job["fingerprint"] / "source.pdf").unlink()
     with pytest.raises(ValueError, match="快照"):
         store.retry(retry["id"], {"api_key": "new-key"})
 

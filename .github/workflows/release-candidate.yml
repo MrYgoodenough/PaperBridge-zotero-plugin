@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       target_os:
-        description: "Candidate target (Linux this round; Windows is opt-in, no macOS)"
+        description: "Native candidate target (no macOS build or public release)"
         type: choice
         required: true
         default: linux
@@ -62,8 +62,9 @@ jobs:
       - name: Linux fonts and existing setup
         if: matrix.target == 'linux'
         run: |
+          # Runner-native OpenCV may require newer glibc; release packaging needs a compatible toolchain.
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y fontconfig fonts-noto-cjk
+          sudo apt-get install --no-install-recommends -y fontconfig fonts-noto-cjk build-essential binutils
           sh scripts/setup.sh
       - name: Windows fonts and existing setup
         if: matrix.target == 'windows'

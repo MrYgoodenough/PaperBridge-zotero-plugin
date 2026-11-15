@@ -1,5 +1,5 @@
 {
-  "_comment": "Linux-versus-Windows 0.3.4 size feasibility study, 2026-11-15. Every source XPI entry was read with CRC validation and SHA-256; all byte totals come from ZipInfo. No production packaging changes were made.",
+  "_comment": "Historical Linux-versus-Windows 0.3.4 feasibility study, superseded by linux-package-size-analysis-0.3.6.json. Its further ZIP/XZ ideas are not current TODOs. Source XPIs were read with CRC/SHA checks; this historical study made no packaging changes.",
   "schema_version": 1,
   "analysis_date": "2026-11-15",
   "version": "0.3.4",

@@ -1,0 +1,602 @@
+{
+  "schemaVersion": 1,
+  "scope": "Exact staged-byte/notice evidence; not a legal opinion or exhaustive native audit. References are recorded offline; inventory performs no network calls.",
+  "entries": [
+    {
+      "id": "cpython-linux-3.12.16",
+      "component": "CPython interpreter/stdlib",
+      "platform": "linux-x64",
+      "python": "3.12.16",
+      "artifacts": {
+        "python/bin/python3.12": "23bc148d2b48964b621c5561ff2b81c1d9c7b717967a7491efbf12f4304882b5",
+        "python/lib/libpython3.12.so.1.0": "03a0af33071a152cb92274e07310c2988b4cd0ae548a416a490dfefa5661fbd6"
+      },
+      "files": {
+        "licenses/CPython-3.12.txt": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+        "licenses/CPython-3.12-third-party.rst": "341832873fd316a37927e79385093fbbfd40a467428480835fe435a80cadf4e5",
+        "licenses/python-build-standalone/LICENSE.bzip2.txt": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441",
+        "licenses/python-build-standalone/LICENSE.libffi.txt": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0",
+        "licenses/python-build-standalone/LICENSE.ncurses.txt": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c",
+        "licenses/python-build-standalone/LICENSE.mpdecimal.txt": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b",
+        "licenses/native/OpenSSL-LICENSE.txt": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+        "licenses/python-build-standalone/LICENSE.liblzma.txt": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02",
+        "licenses/python-build-standalone/LICENSE.sqlite.txt": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719",
+        "licenses/python-build-standalone/LICENSE.libuuid.txt": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b",
+        "licenses/python-build-standalone/LICENSE.zlib-ng.txt": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee",
+        "licenses/python-build-standalone/LICENSE.zlib.txt": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c",
+        "licenses/python-build-standalone/LICENSE.expat.txt": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534",
+        "licenses/python-build-standalone/LICENSE.libedit.txt": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1"
+      },
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/python/cpython/v3.12.16/LICENSE",
+          "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/python/cpython/v3.12.16/Doc/license.rst",
+          "sha256": "341832873fd316a37927e79385093fbbfd40a467428480835fe435a80cadf4e5"
+        },
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/releases/tag/20261026",
+          "sourceCommit": "fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "installArchive": "cpython-3.12.16+20261026-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+          "installArchiveSha256": "ce4f6d0a6cfdb3bed6e44c2f9affd85943c76a42e25ad3a259002f31d6fb8a20",
+          "installArchiveHashStatus": "locally_recomputed_and_publisher_matched",
+          "fullArchive": "cpython-3.12.16+20261026-x86_64-unknown-linux-gnu-pgo+lto-full.tar.zst",
+          "fullArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+          "fullArchiveHashStatus": "publisher_reported_not_locally_recomputed",
+          "metadataMember": "python/PYTHON.json",
+          "metadataMemberSha256": "9cf6e4ad8ae8d2f9d9c735be636db877d2abb39c3314f6ae021bf7f124bd1596",
+          "metadataMemberBytes": 121859
+        },
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/tree/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "role": "Original LICENSE.*.txt sources; OpenSSL text shared under native/OpenSSL-LICENSE.txt."
+        }
+      ],
+      "declarations": {
+        "source": "Original full-build PYTHON.json; labels below are publisher declarations, not inferred compliance.",
+        "extensions": [
+          {
+            "module": "_bz2",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "bzip2-1.0.6"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.bzip2.txt"
+            ]
+          },
+          {
+            "module": "_ctypes",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "MIT"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.libffi.txt"
+            ]
+          },
+          {
+            "module": "_curses",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "X11"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.ncurses.txt"
+            ]
+          },
+          {
+            "module": "_curses_panel",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "X11"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.ncurses.txt"
+            ]
+          },
+          {
+            "module": "_decimal",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "BSD-2-Clause"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.mpdecimal.txt"
+            ]
+          },
+          {
+            "module": "_hashlib",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "Apache-2.0"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.openssl-3.txt"
+            ]
+          },
+          {
+            "module": "_lzma",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "0BSD"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.liblzma.txt"
+            ]
+          },
+          {
+            "module": "_sqlite3",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [],
+            "licensePaths": [
+              "licenses/LICENSE.sqlite.txt"
+            ]
+          },
+          {
+            "module": "_ssl",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "Apache-2.0"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.openssl-3.txt"
+            ]
+          },
+          {
+            "module": "_uuid",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "BSD-3-Clause"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.libuuid.txt"
+            ]
+          },
+          {
+            "module": "binascii",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "Zlib"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.zlib-ng.txt",
+              "licenses/LICENSE.zlib.txt"
+            ]
+          },
+          {
+            "module": "pyexpat",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "MIT"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.expat.txt"
+            ]
+          },
+          {
+            "module": "readline",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "BSD-3-Clause",
+              "X11"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.libedit.txt",
+              "licenses/LICENSE.ncurses.txt"
+            ]
+          },
+          {
+            "module": "zlib",
+            "sharedLibrary": "install/lib/libpython3.12.so.1.0",
+            "reportedLicenses": [
+              "Zlib"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.zlib-ng.txt",
+              "licenses/LICENSE.zlib.txt"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "The standalone build compiler/linker runtime composition is not exhaustively audited."
+      ]
+    },
+    {
+      "id": "cpython-linux-3.12.16-_dbm",
+      "component": "CPython interpreter/stdlib",
+      "platform": "linux-x64",
+      "python": "3.12.16",
+      "artifacts": {
+        "python/lib/python3.12/lib-dynload/_dbm.cpython-312-x86_64-linux-gnu.so": "0a27289ed29ddccca2b5cfa8b3927a04a5a218ec9d33df50facb72adbfacd904"
+      },
+      "files": {
+        "licenses/python-build-standalone/LICENSE.bdb.txt": "3bdff06e69991c94664f2ef5c5f8096f60b7dbec071756ea6cc26b445e06ec5b"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/releases/tag/20261026",
+          "sourceCommit": "fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "installArchive": "cpython-3.12.16+20261026-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+          "installArchiveSha256": "ce4f6d0a6cfdb3bed6e44c2f9affd85943c76a42e25ad3a259002f31d6fb8a20",
+          "installArchiveHashStatus": "locally_recomputed_and_publisher_matched",
+          "fullArchive": "cpython-3.12.16+20261026-x86_64-unknown-linux-gnu-pgo+lto-full.tar.zst",
+          "fullArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+          "fullArchiveHashStatus": "publisher_reported_not_locally_recomputed",
+          "metadataMember": "python/PYTHON.json",
+          "metadataMemberSha256": "9cf6e4ad8ae8d2f9d9c735be636db877d2abb39c3314f6ae021bf7f124bd1596",
+          "metadataMemberBytes": 121859
+        },
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/tree/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "role": "Original LICENSE.*.txt sources; OpenSSL text shared under native/OpenSSL-LICENSE.txt."
+        }
+      ],
+      "declarations": {
+        "source": "Original full-build PYTHON.json",
+        "extensions": [
+          {
+            "module": "_dbm",
+            "sharedLibrary": "install/lib/python3.12/lib-dynload/_dbm.cpython-312-x86_64-linux-gnu.so",
+            "reportedLicenses": [
+              "Sleepycat"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.bdb.txt"
+            ]
+          }
+        ]
+      },
+      "limitations": [
+        "Bundled Berkeley DB has source-availability conditions; corresponding-source delivery has not been verified."
+      ]
+    },
+    {
+      "id": "cpython-linux-3.12.16-_tkinter",
+      "component": "CPython interpreter/stdlib",
+      "platform": "linux-x64",
+      "python": "3.12.16",
+      "artifacts": {
+        "python/lib/python3.12/lib-dynload/_tkinter.cpython-312-x86_64-linux-gnu.so": "4de501e3bee081bc8eeee6f6e0121de4ffc6e0aa9fc60a39fa2daf32be0e9e9b"
+      },
+      "files": {
+        "licenses/python-build-standalone/LICENSE.libX11.txt": "ebd542b775e774a0975160fd5b743ebbcc5fcd77bda2850c503f227cea4f6b51",
+        "licenses/python-build-standalone/LICENSE.libXau.txt": "56abe29bb1d9806a9e04fa9f80fed2c0f18027594df3f098148d814aef6bddfa",
+        "licenses/python-build-standalone/LICENSE.libxcb.txt": "c5ffbfeaa501071ceeb97b7de2c0d703fdaa35de01c0fb6cbac1c28453a3e9fd",
+        "licenses/python-build-standalone/LICENSE.tcl.txt": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16",
+        "licenses/python-build-standalone/LICENSE.zlib-ng.txt": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee",
+        "licenses/python-build-standalone/LICENSE.zlib.txt": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/releases/tag/20261026",
+          "sourceCommit": "fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "installArchive": "cpython-3.12.16+20261026-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+          "installArchiveSha256": "ce4f6d0a6cfdb3bed6e44c2f9affd85943c76a42e25ad3a259002f31d6fb8a20",
+          "installArchiveHashStatus": "locally_recomputed_and_publisher_matched",
+          "fullArchive": "cpython-3.12.16+20261026-x86_64-unknown-linux-gnu-pgo+lto-full.tar.zst",
+          "fullArchiveSha256": "789924432efcaaf05fec4bd3e4d8798733326c2ac0540eda33e84913c37a231e",
+          "fullArchiveHashStatus": "publisher_reported_not_locally_recomputed",
+          "metadataMember": "python/PYTHON.json",
+          "metadataMemberSha256": "9cf6e4ad8ae8d2f9d9c735be636db877d2abb39c3314f6ae021bf7f124bd1596",
+          "metadataMemberBytes": 121859
+        },
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/tree/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "role": "Original LICENSE.*.txt sources; OpenSSL text shared under native/OpenSSL-LICENSE.txt."
+        }
+      ],
+      "declarations": {
+        "source": "Original full-build PYTHON.json",
+        "extensions": [
+          {
+            "module": "_tkinter",
+            "sharedLibrary": "install/lib/python3.12/lib-dynload/_tkinter.cpython-312-x86_64-linux-gnu.so",
+            "reportedLicenses": [
+              "MIT",
+              "TCL",
+              "X11",
+              "Zlib"
+            ],
+            "licensePaths": [
+              "licenses/LICENSE.libX11.txt",
+              "licenses/LICENSE.libXau.txt",
+              "licenses/LICENSE.libxcb.txt",
+              "licenses/LICENSE.tcl.txt",
+              "licenses/LICENSE.zlib-ng.txt",
+              "licenses/LICENSE.zlib.txt"
+            ]
+          }
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "cpython-windows-3.12.13",
+      "component": "CPython interpreter/stdlib",
+      "platform": "windows-x64",
+      "python": "3.12.13",
+      "artifacts": {
+        "python/python.exe": "f598fb950a86a895d8f9b4755fc9b38c48adc7a15732a342e55c17a3c3499602",
+        "python/python312.dll": "70713cbbbcacd1ca70f802e87683d85aea185da1aae9bd31d6c02be51cfee819"
+      },
+      "files": {
+        "licenses/CPython-3.12.txt": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+        "licenses/CPython-3.12-third-party.rst": "341832873fd316a37927e79385093fbbfd40a467428480835fe435a80cadf4e5"
+      },
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/python/cpython/v3.12.13/LICENSE",
+          "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/python/cpython/v3.12.13/Doc/license.rst",
+          "sha256": "341832873fd316a37927e79385093fbbfd40a467428480835fe435a80cadf4e5"
+        }
+      ],
+      "declarations": {
+        "stage": "Readonly Windows clone E:\\PBAssets-1115\\.cache\\package\\windows-x64",
+        "observedPython": "3.12.13 from runtime.json and executable/DLL FileVersion",
+        "noticeScope": "Official CPython 3.12.13 PSF/historical and incorporated-code notices; no Linux native-build attribution."
+      },
+      "limitations": [
+        "The original Windows standalone full-build metadata and native DLL attribution/notices were not verified. Generic CPython notices do not establish complete Windows native notice coverage."
+      ]
+    },
+    {
+      "id": "doclayout-onnx-docstructbench",
+      "component": "Layout model assets",
+      "artifacts": {
+        ".cache/babeldoc/models/doclayout_yolo_docstructbench_imgsz1024.onnx": "fece9af02f618b603ff7921ccec6861d13e7e1f9830e091dfb7e8ad9311e5b21"
+      },
+      "files": {
+        "licenses/doclayout/Apache-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "licenses/doclayout/onnx-model-card.md": "2795168401a437231ffde70d8c53f9dee10a0fd0b37ddff07c16fa5569dab466",
+        "licenses/doclayout/base-model-card.md": "9a1e57428ceb08e1d564569778b3e3aecb6421df6c575f2dead5f6e0a529ddda"
+      },
+      "sources": [
+        {
+          "url": "https://huggingface.co/wybxc/DocLayout-YOLO-DocStructBench-onnx/raw/ee7c3d744e5c47c58e267044ac825f95abe69653/README.md",
+          "role": "Conversion model card declares apache-2.0; fixed-revision LFS object matches bundled model SHA256."
+        },
+        {
+          "url": "https://huggingface.co/juliozhao/DocLayout-YOLO-DocStructBench/raw/8c3299a30b8ff29a1503c4431b035b93220f7b11/README.md",
+          "role": "Base model card declares apache-2.0."
+        },
+        {
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "role": "Full Apache License 2.0 text."
+        }
+      ],
+      "declarations": {
+        "publisherLicense": "apache-2.0",
+        "expectedBabeldocSha3_256": "60be061226930524958b5465c8c04af3d7c03bcb0beb66454f5da9f792e3cf2a",
+        "scope": "Model weights, not the AGPL-licensed DocLayout-YOLO source-code repository."
+      },
+      "limitations": []
+    },
+    {
+      "id": "tiktoken-o200k-base",
+      "component": "Tokenizer assets",
+      "artifacts": {
+        ".cache/babeldoc/tiktoken/fb374d419588a4632f3f557e76b4b70aebbca790": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d"
+      },
+      "files": {
+        "licenses/tiktoken/MIT.txt": "418cb499b436128d653d79941333a5437b7be2ea9213dcc2f04d15d5d2c51d86",
+        "licenses/tiktoken/encoding-license.md": "61d83ae902e9296beb436c28c9be948aed9528482d457c304804f1cdc6ca3821"
+      },
+      "sources": [
+        {
+          "url": "https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken",
+          "role": "Source URL and expected SHA256 in actual tiktoken_ext/openai_public.py."
+        },
+        {
+          "url": "https://raw.githubusercontent.com/openai/tiktoken/0.14.0/LICENSE",
+          "sha256": "418cb499b436128d653d79941333a5437b7be2ea9213dcc2f04d15d5d2c51d86"
+        },
+        {
+          "url": "https://github.com/openai/tiktoken/issues/92#issuecomment-1497875652",
+          "role": "Upstream collaborator: The license in this repo applies to the encoding files as well."
+        }
+      ],
+      "declarations": {
+        "expectedBabeldocSha3_256": "cb04bcda5782cfbbe77f2f991d92c0ea785d9496ef1137c91dfc3c8c324528d6",
+        "noticeScope": "MIT repository notice plus explicit upstream clarification covering encoding files."
+      },
+      "limitations": []
+    },
+    {
+      "id": "freetype-py-linux-2.5.1",
+      "dependency": "freetype-py",
+      "version": "2.5.1",
+      "platform": "linux-x64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/freetype/libfreetype.so": "33f7bb37f65553ecc4d273d51a79fb152d4f0cd1cdd13b8477c76a90fce09b7d"
+      },
+      "files": {
+        "licenses/native/FreeType-2.13.2-LICENSE.txt": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b",
+        "licenses/native/FreeType-2.13.2-FTL.txt": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+        "licenses/native/FreeType-2.13.2-BDF.txt": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+        "licenses/native/FreeType-2.13.2-PCF.txt": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b",
+        "licenses/native/FreeType-2.13.2-zlib.txt": "ab234c46f13c0dd02f494a713ecb48b20afd435aa6d0b3418da7686b5b7fcdfe",
+        "licenses/native/HarfBuzz-COPYING.txt": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/rougier/freetype-py/blob/v2.5.1/setup-build-freetype.py",
+          "role": "Pinned FreeType/HarfBuzz build versions and disabled external codec libraries."
+        },
+        {
+          "url": "https://github.com/freetype/freetype/tree/VER-2-13-2",
+          "role": "docs/LICENSE.TXT, docs/FTL.TXT, src/bdf/README, src/pcf/README and src/gzip/zlib.h license header."
+        },
+        {
+          "url": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/8.3.0/COPYING"
+        }
+      ],
+      "declarations": {
+        "observedFreeType": "2.13.2 via FreeType version API",
+        "observedHarfBuzz": "8.3.0 via exported hb_version_string",
+        "scope": "Selected native constituent notices; binding license retained in wheel metadata."
+      },
+      "limitations": []
+    },
+    {
+      "id": "uharfbuzz-linux-0.57.0",
+      "dependency": "uharfbuzz",
+      "version": "0.57.0",
+      "platform": "linux-x64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/uharfbuzz/_harfbuzz.abi3.so": "4d0a59fa80a332b1f6b1bd808f3c48005c596699a0ec7fa1d2c4c69d22352848"
+      },
+      "files": {
+        "licenses/native/HarfBuzz-COPYING.txt": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/harfbuzz/uharfbuzz/tree/v0.57.0",
+          "harfbuzzSubmodule": "35f656a1a2bab548ea7f54a6dd3fba2b09680d14"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/15.0.0/COPYING"
+        }
+      ],
+      "declarations": {
+        "observedHarfBuzz": "15.0.0 via uharfbuzz.version_string()",
+        "scope": "HarfBuzz 8.3.0 and 15.0.0 COPYING are byte-identical; shared notice."
+      },
+      "limitations": []
+    },
+    {
+      "id": "hyperscan-linux-0.9.1",
+      "dependency": "hyperscan",
+      "version": "0.9.1",
+      "platform": "linux-x64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/hyperscan/_hs_ext.cpython-312-x86_64-linux-gnu.so": "6ea6a6f3e950dddad43810dfc036a8964f40d201f4b5b37c7941328c0764b77d"
+      },
+      "files": {
+        "licenses/native/Vectorscan-5.4.12-LICENSE.txt": "1f5a587000f0d1a451fdb2e2c169e70273750f8fd3b43c9ef2e7fc287c3abc00",
+        "licenses/native/PCRE-8.45-LICENCE.txt": "51b3dea44f63338b84b9c97b3d793826a8397309068cf9379a423216ab8ea5b2"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/darvid/python-hyperscan/blob/v0.9.1/CMakeLists.txt",
+          "role": "Linux Vectorscan and PCRE 8.45 build recipe."
+        },
+        {
+          "url": "https://raw.githubusercontent.com/VectorCamp/vectorscan/b585ad466658624bb31fb1d194cdb168df34833c/LICENSE"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/PCRE2Project/pcre1/master/LICENCE",
+          "sha256": "51b3dea44f63338b84b9c97b3d793826a8397309068cf9379a423216ab8ea5b2",
+          "role": "Upstream Release 8 BSD notice; upstream build recipe pins PCRE 8.45."
+        }
+      ],
+      "declarations": {
+        "observedEngine": "5.4.12 via hyperscan version API",
+        "buildRecipePCRE": "8.45",
+        "scope": "Vectorscan notice includes its bundled Boost/CRC notices; retaining PCRE build-recipe notice does not prove exact static-link composition."
+      },
+      "limitations": [
+        "Exact statically linked PCRE/Boost/compiler-runtime composition has not been independently verified."
+      ]
+    },
+    {
+      "id": "rtree-linux-1.4.1",
+      "dependency": "rtree",
+      "version": "1.4.1",
+      "platform": "linux-x64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/rtree.libs/libspatialindex-e5350069.so": "e4eec0695dee7d3864e5d6e6ec3b3ba80a5adf8e65e7586bf0d8ed4584b91449"
+      },
+      "files": {
+        "licenses/native/libspatialindex-2.1.0-COPYING.txt": "b63ebfaca9d7ce582580f3e11acabc9d2e37c46ce234533f7fa8a6c7278898a0",
+        "licenses/native/libspatialindex-2.1.0-copyright.txt": "6ce44263393bce3efb9df170d95ac03218d75a41c4803c4e470614c64342ae0f"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/Toblerity/rtree/blob/1.4.1/scripts/install_libspatialindex.sh"
+        },
+        {
+          "url": "https://github.com/libspatialindex/libspatialindex/tree/2.1.0",
+          "role": "COPYING and include/spatialindex/SpatialIndex.h copyright/license header."
+        }
+      ],
+      "declarations": {
+        "observedLibspatialindex": "2.1.0 via SIDX_Version()",
+        "scope": "2.1.0 upstream MIT notices, not obsolete LGPL labels."
+      },
+      "limitations": []
+    },
+    {
+      "id": "cryptography-linux-50.0.2",
+      "dependency": "cryptography",
+      "version": "50.0.2",
+      "platform": "linux-x64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/cryptography/hazmat/bindings/_rust.abi3.so": "1e5d23fa66915204b9b67202a46993844d81cda56f6ad52cead2def37617ee29"
+      },
+      "files": {
+        "licenses/native/OpenSSL-LICENSE.txt": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+        "licenses/native/OpenSSL-4.0.3-copyright.txt": "ec368a39fe8d31b6ed740075969a6ab7dd5128f4ab876e682352128f7551c6e2"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/pyca/cryptography/tree/50.0.2",
+          "role": "Binding license notices retained in packaged dist-info."
+        },
+        {
+          "url": "https://github.com/openssl/openssl/tree/openssl-4.0.3",
+          "role": "LICENSE.txt and include/openssl/opensslv.h copyright/license header."
+        }
+      ],
+      "declarations": {
+        "observedOpenSSL": "4.0.3 via cryptography OpenSSL backend version API",
+        "scope": "Apache license text is shared with standalone Python OpenSSL; not a full vendored Rust-crate audit."
+      },
+      "limitations": [
+        "Complete vendored Rust-crate and compiler/linker-runtime notice coverage has not been verified."
+      ]
+    },
+    {
+      "id": "pymupdf-linux-1.26.7",
+      "dependency": "PyMuPDF",
+      "version": "1.26.7",
+      "platform": "linux-x64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/pymupdf/libmupdf.so.26.12": "c3315dbed24b6f3025b43daafc40e98d4c24188cef31ced93566cf034fe6f933"
+      },
+      "files": {
+        "licenses/native/MuPDF-1.26.12-README.txt": "ec7500c75d800d9d2ce8ee95ad9a528df2fef3dc293dca5a0ff6cd8377571ed6",
+        "licenses/native/MuPDF-fonts-SIL-OFL.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/pymupdf/PyMuPDF/blob/1.26.7/setup.py",
+          "role": "version_mupdf is 1.26.12."
+        },
+        {
+          "url": "https://github.com/ArtifexSoftware/mupdf/tree/1.26.12",
+          "role": "MuPDF copyright/AGPL declaration and font OFL notice; not complete compiled third-party provenance."
+        }
+      ],
+      "declarations": {
+        "observedMuPDF": "1.26.12 via pymupdf.mupdf_version",
+        "grant": "AGPL; no Artifex commercial license supplied.",
+        "fullAGPL": {
+          "path": "LICENSE",
+          "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182"
+        },
+        "scope": "Packaged COPYING is a short dual-license label. Root LICENSE supplies full AGPL text; supplemental notices are not a complete MuPDF constituent audit."
+      },
+      "limitations": [
+        "Exact corresponding-source/modification/build delivery under AGPL has not been verified.",
+        "Complete compiled MuPDF third-party/font provenance and notice coverage remain unverified."
+      ]
+    }
+  ]
+}

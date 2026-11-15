@@ -45,7 +45,8 @@ def prepare(options):
     report_path = ROOT / ".runtime" / (name + "-" + options.phase + label + ".json")
     if report_path.exists():
         raise ValueError("This phase already has evidence; choose a new run ID")
-    if options.phase == "create":
+    create_profile = options.phase == "create" or options.phase == "receive"
+    if create_profile:
         if profile.exists() or data.exists():
             raise ValueError("A create phase requires a new isolated profile/data pair")
         extensions.mkdir(parents=True)
@@ -60,7 +61,7 @@ def prepare(options):
               "reportPath": str(report_path), "statePath": str(ROOT / ".runtime" / (name + "-state.json")),
               "expectedVersion": options.expected_version or installed["version"],
               "pythonPath": options.local_python, "quit": True}
-    if options.phase == "create":
+    if create_profile:
         config["baselineVersion"] = installed["version"]
         with addon.open("rb") as stream:
             config["baselineXpiSha256"] = hashlib.file_digest(stream, "sha256").hexdigest()
@@ -89,7 +90,7 @@ def prepare(options):
         with options.expected_xpi.open("rb") as stream:
             config["expectedXpiSha256"] = hashlib.file_digest(stream, "sha256").hexdigest()
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
-    if options.phase == "create":
+    if create_profile:
         # Reading external options at startup keeps the installed helper unchanged across cold restarts.
         bootstrap = """/** Run isolated native acceptance without blocking the real add-on's startup. */
 /* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils */
@@ -129,6 +130,7 @@ async function runTests() {
   Services.scriptloader.loadSubScript(TEST_URI, scope);
   if (scope.PAPERBRIDGE_UPDATE_TEST_PROMISE) await scope.PAPERBRIDGE_UPDATE_TEST_PROMISE;
   if (scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE) await scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE;
+  if (scope.PAPERBRIDGE_ASSETS_TEST_PROMISE) await scope.PAPERBRIDGE_ASSETS_TEST_PROMISE;
 }
 /** Retain actual helper progress before the acceptance script owns its own report. */
 async function helperCheckpoint(stage) {
@@ -141,6 +143,7 @@ async function helperCheckpoint(stage) {
             "update": ("update_packaged.js", "PAPERBRIDGE_UPDATE_TEST"),
             "alignment": ("alignment_packaged.js", "PAPERBRIDGE_ALIGNMENT_TEST"),
             "upgrade": ("upgrade_packaged.js", "PAPERBRIDGE_UPGRADE_TEST"),
+            "assets": ("assets_packaged.js", "PAPERBRIDGE_ASSETS_TEST"),
         }[options.suite]
         for key, value in {"CONFIG_PATH": json.dumps(str(config_path)),
                            "TEST_URI": json.dumps((ROOT / "tests" / script).as_uri()),
@@ -168,9 +171,9 @@ async function helperCheckpoint(stage) {
 def main():
     """Expose explicit artifacts and cold phases without guessing or modifying public feeds."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade"), required=True)
+    parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade", "assets"), required=True)
     parser.add_argument("--run-id", required=True)
-    parser.add_argument("--phase", choices=("create", "reopen"), default="create")
+    parser.add_argument("--phase", choices=("create", "reopen", "receive"), default="create")
     parser.add_argument("--xpi", type=Path, help="Exact baseline/test XPI, installed only during create")
     parser.add_argument("--local-python", default="")
     parser.add_argument("--case-manifest", type=Path)

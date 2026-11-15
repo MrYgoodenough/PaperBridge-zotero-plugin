@@ -270,7 +270,10 @@ var TranslationTasks = class {
       }
       if (!status || status.state !== "done" || !status.output_path) throw new Error("尚无可保存的译文 PDF。");
       let attachment = await this.bridge.library.findAttachment(record);
-      if (attachment && record.saveState === "imported") return attachment;
+      if (attachment && record.saveState === "imported") {
+        await this.bridge.library.publishMapping(record, attachment);
+        return attachment;
+      }
       if (!attachment) {
         if (!await this.bridge.library.ownerAlive(record)) throw new Error("原论文已删除或在回收站；结果已保留，恢复条目后可重试保存。");
         attachment = await Zotero.Attachments.importFromFile({

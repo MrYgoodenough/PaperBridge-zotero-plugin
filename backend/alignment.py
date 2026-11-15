@@ -14,9 +14,11 @@ from pathlib import Path
 
 import pymupdf
 
-# Version of the captured-pair sidecar contract.
-SCHEMA_VERSION = 1
-# Rectangles use unrotated PDF user coordinates, not screen pixels.
+# Version of newly produced captured-pair sidecars; rectangle-only v1 remains readable.
+SCHEMA_VERSION = 2
+# Identify the pinned producer independently of the sidecar schema.
+GENERATOR_VERSION = "fragment-trace-2"
+# Rectangles and cyclic TL/TR/BR/BL quads use unrotated PDF user coordinates.
 COORDINATE_SPACE = "pdf-user-space"
 # Allow only floating-point noise at page and glyph boundaries, in points.
 _GEOMETRY_EPSILON = 0.0001
@@ -49,9 +51,37 @@ def _open_pdf(content):
     return document
 
 
-def _location(value):
-    """Validate and copy the JSON location shape without repairing coordinates."""
-    if not isinstance(value, dict) or set(value) != {"page", "rects"}:
+def _coordinates(value, length):
+    """Copy finite JSON coordinates without accepting booleans or repairing values."""
+    if (not isinstance(value, (list, tuple)) or len(value) != length
+            or any(type(number) not in (int, float) for number in value)):
+        raise ValueError("invalid_geometry")
+    try:
+        coordinates = [float(number) for number in value]
+    except OverflowError as error:
+        raise ValueError("invalid_geometry") from error
+    if not all(math.isfinite(number) for number in coordinates):
+        raise ValueError("invalid_geometry")
+    return coordinates
+
+
+def _quad_rectangle(quad):
+    """Require a strictly convex clockwise quad in PDF user space and return its bounds."""
+    points = list(zip(quad[::2], quad[1::2]))
+    for index, (x, y) in enumerate(points):
+        next_x, next_y = points[(index + 1) % len(points)]
+        last_x, last_y = points[(index + 2) % len(points)]
+        cross = (next_x - x) * (last_y - next_y) - (next_y - y) * (last_x - next_x)
+        # PDF y increases upward: TL/TR/BR/BL is clockwise, unlike MuPDF's quad storage.
+        if not math.isfinite(cross) or cross >= 0:
+            raise ValueError("invalid_geometry")
+    return [min(quad[::2]), min(quad[1::2]), max(quad[::2]), max(quad[1::2])]
+
+
+def _location(value, schema_version=1):
+    """Validate captured/v1 rectangles or v2 paired rectangles and cyclic quads."""
+    fields = {"page", "rects", "quads"} if schema_version == 2 else {"page", "rects"}
+    if not isinstance(value, dict) or set(value) != fields:
         raise ValueError("invalid_geometry")
     page_number = value["page"]
     rectangles = value["rects"]
@@ -61,19 +91,24 @@ def _location(value):
         raise ValueError("invalid_geometry")
     normalized = []
     for rectangle in rectangles:
-        if not isinstance(rectangle, (list, tuple)) or len(rectangle) != 4:
-            raise ValueError("invalid_geometry")
-        if any(type(number) not in (int, float) for number in rectangle):
-            raise ValueError("invalid_geometry")
-        try:
-            coordinates = [float(number) for number in rectangle]
-        except OverflowError as error:
-            raise ValueError("invalid_geometry") from error
+        coordinates = _coordinates(rectangle, 4)
         x0, y0, x1, y1 = coordinates
-        if not all(math.isfinite(number) for number in coordinates) or x0 >= x1 or y0 >= y1:
+        if x0 >= x1 or y0 >= y1:
             raise ValueError("invalid_geometry")
         normalized.append(coordinates)
-    return {"page": page_number, "rects": normalized}
+    location = {"page": page_number, "rects": normalized}
+    if schema_version == 2:
+        quads = value["quads"]
+        if not isinstance(quads, list) or len(quads) != len(normalized):
+            raise ValueError("invalid_geometry")
+        location["quads"] = []
+        for rectangle, quad in zip(normalized, quads):
+            coordinates = _coordinates(quad, 8)
+            if any(abs(a - b) > _GEOMETRY_EPSILON
+                   for a, b in zip(rectangle, _quad_rectangle(coordinates))):
+                raise ValueError("invalid_geometry")
+            location["quads"].append(coordinates)
+    return location
 
 
 def _contains(outer, inner):
@@ -109,7 +144,7 @@ def _page_space(page, cache):
 
 
 def _clips(document, location, cache):
-    """Convert captured PDF-user rectangles to valid unrotated PyMuPDF clips."""
+    """Check actual page bounds; paired rectangle bounds also constrain every v2 vertex."""
     if location["page"] >= document.page_count:
         raise ValueError("invalid_geometry")
     page = document[location["page"]]
@@ -130,8 +165,25 @@ def _glyph_key(character, origin):
     return character, tuple(round(value, _ORIGIN_DIGITS) for value in origin)
 
 
+def _active_paint_box(origin, active):
+    """Use only valid, agreeing geometry from the already unoccluded paint sequences."""
+    if not active:
+        return None
+    # Declared widths and font advances may differ; anchor rather than crop actual paint bounds.
+    point = pymupdf.Point(origin)
+    anchor = pymupdf.Rect(point, point)
+    first = active[0][1]
+    for _, box in active:
+        if (box.is_empty or box.is_infinite or not all(math.isfinite(value) for value in box)
+                or not _contains(box, anchor)
+                or any(abs(a - b) > _GEOMETRY_EPSILON for a, b in zip(first, box))):
+            return None
+    # Filled-and-stroked text may report the same glyph twice with identical bounds.
+    return pymupdf.Rect(first)
+
+
 def _page_text(page, bounds, cache):
-    """Cache text and paint evidence, excluding hidden or overpainted glyphs."""
+    """Keep raw literal evidence and active paint bounds; emit quads only after matching."""
     if page.number not in cache:
         raw = page.get_text("rawdict", clip=bounds,
                             flags=pymupdf.TEXTFLAGS_RAWDICT & ~pymupdf.TEXT_PRESERVE_IMAGES)
@@ -139,9 +191,9 @@ def _page_text(page, bounds, cache):
         for span in page.get_texttrace():
             if span["type"] not in (0, 1) or span["opacity"] <= 0:
                 continue
-            for codepoint, _, origin, _ in span["chars"]:
+            for codepoint, _, origin, box in span["chars"]:
                 key = _glyph_key(chr(codepoint), origin)
-                painted.setdefault(key, []).append(span["seqno"])
+                painted.setdefault(key, []).append((span["seqno"], pymupdf.Rect(box)))
         # Nontext painting may cover text. Neighboring glyphs commonly have overlapping
         # metric boxes, so later text painting alone is not evidence of occlusion.
         overlays = [(sequence, pymupdf.Rect(box))
@@ -157,40 +209,152 @@ def _page_text(page, bounds, cache):
                     for character in span["chars"]:
                         box = pymupdf.Rect(character["bbox"])
                         sequences = painted.get(_glyph_key(character["c"], character["origin"]), [])
+                        active = [(sequence, paint_box) for sequence, paint_box in sequences
+                                  if not any(later > sequence and overlay.intersects(box)
+                                             for later, overlay in overlays)]
                         # Positioned words may have extractor-generated spaces
                         # without a painted space glyph; whitespace is still literal.
-                        uncovered = character["c"].isspace() or any(
-                            not any(later > sequence and overlay.intersects(box)
-                                    for later, overlay in overlays)
-                            for sequence in sequences)
-                        characters.append((character["c"], box, visible and uncovered))
-                lines.append(characters)
+                        uncovered = character["c"].isspace() or bool(active)
+                        characters.append({"text": character["c"], "box": box,
+                                           "visible": visible and uncovered,
+                                           "paint_box": (_active_paint_box(character["origin"], active)
+                                                         if visible else None),
+                                           "raw": character, "span": span})
+                lines.append({"direction": line.get("dir"), "writing_mode": line.get("wmode"),
+                              "characters": characters})
         cache[page.number] = lines
     return cache[page.number]
 
 
 def _visible_text(page, clips, bounds, cache):
-    """Extract painted text in captured rectangle order, without fuzzy matching."""
-    lines = _page_text(page, bounds, cache)
+    """Inspect raw literal glyphs through fully contained raw or active painted clips."""
     fragments = []
     for clip in clips:
-        for line in lines:
-            characters = []
-            included = False
-            for character, box, visible in line:
-                if visible and _contains(clip, box):
-                    characters.append(character)
-                    included = True
-                else:
-                    # A gap must not join unrelated visible character runs.
-                    characters.append("\0")
+        for line in _page_text(page, bounds, cache):
+            glyphs = line["characters"]
+            selected = [glyph["visible"] and (_contains(clip, glyph["box"])
+                        or (glyph["paint_box"] is not None and _contains(clip, glyph["paint_box"])))
+                        for glyph in glyphs]
+            included = [index for index, inside in enumerate(selected) if inside]
             if included:
-                fragments.append("".join(characters).strip("\0"))
+                # Extractor-generated spaces have no paint bounds. Retain only visible
+                # whitespace between contained glyphs; nonspace gaps remain NUL barriers.
+                characters = []
+                for index in range(included[0], included[-1] + 1):
+                    glyph = glyphs[index]
+                    if selected[index] or (glyph["visible"] and glyph["text"].isspace()):
+                        characters.append(glyph["text"])
+                    else:
+                        characters.append("\0")
+                fragments.append("".join(characters))
     return _normalize_text("\n".join(fragments))
 
 
+def _matched_characters(lines, clips, expected):
+    """Locate one literal occurrence and retain only complete glyphs belonging to it."""
+    fragments, references = [], []
+    for clip_number, clip in enumerate(clips):
+        for line_number, line in enumerate(lines):
+            selected = [(clip_number, line_number, index)
+                        if glyph["visible"] and _contains(clip, glyph["box"]) else None
+                        for index, glyph in enumerate(line["characters"])]
+            included = [index for index, reference in enumerate(selected) if reference is not None]
+            if included:
+                selected = selected[included[0]:included[-1] + 1]
+                fragments.append("".join("\0" if reference is None else
+                                         line["characters"][reference[2]]["text"]
+                                         for reference in selected))
+                references.extend(selected)
+    observed = _layout_text("\n".join(fragments))
+    literal = _layout_text(expected)
+    start = observed.find(literal)
+    if start < 0:
+        raise ValueError("text_not_found")
+    if observed.find(literal, start + 1) >= 0:
+        raise ValueError("ambiguous_text")
+
+    glyph_text, offsets = [], []
+    for reference in references:
+        text = ("\0" if reference is None else
+                lines[reference[1]]["characters"][reference[2]]["text"])
+        normalized = _layout_text(text)
+        glyph_text.append(normalized)
+        offsets.extend([reference] * len(normalized))
+    # Cross-glyph Unicode composition needs a different offset map, not guessed boxes.
+    if "".join(glyph_text) != observed:
+        raise ValueError("unsupported_text_geometry")
+    end = start + len(literal)
+    if ((start and offsets[start - 1] == offsets[start])
+            or (end < len(offsets) and offsets[end - 1] == offsets[end])):
+        raise ValueError("unsupported_text_geometry")
+    matched = []
+    seen = set()
+    for reference in offsets[start:end]:
+        if matched and matched[-1] == reference:
+            continue
+        identity = reference[1:]
+        if identity in seen:
+            raise ValueError("ambiguous_text")
+        seen.add(identity)
+        matched.append(reference)
+    return matched
+
+
+def _line_quad(line, indices, matrix):
+    """Envelope only matched nonspace glyphs along a confidently extracted line direction."""
+    direction = line["direction"]
+    if (line["writing_mode"] != 0 or not isinstance(direction, (list, tuple))
+            or len(direction) != 2 or not all(math.isfinite(value) for value in direction)):
+        raise ValueError("unsupported_direction")
+    dx, dy = direction
+    length = math.hypot(dx, dy)
+    if abs(length - 1) > _GEOMETRY_EPSILON:
+        raise ValueError("unsupported_direction")
+    dx, dy = dx / length, dy / length
+    glyphs = [line["characters"][index] for index in indices]
+    if dx == 1 and dy == 0:
+        rectangle = pymupdf.Rect()
+        for glyph in glyphs:
+            # Ascender boxes can overlap adjacent lines; use the same visible paint evidence.
+            if glyph["paint_box"] is None:
+                raise ValueError("geometry_unavailable")
+            rectangle |= glyph["paint_box"]
+        points = (rectangle.tl, rectangle.tr, rectangle.br, rectangle.bl)
+    else:
+        points = []
+        for glyph in glyphs:
+            try:
+                quad = pymupdf.recover_char_quad(direction, glyph["span"], glyph["raw"])
+            except Exception as error:
+                raise ValueError("geometry_unavailable") from error
+            if not quad.is_convex or not _contains(glyph["box"], quad.rect):
+                raise ValueError("unsupported_direction")
+            points.extend((quad.ul, quad.ur, quad.lr, quad.ll))
+        # Project actual recovered corners onto the line and its perpendicular, not page axes.
+        along = [point.x * dx + point.y * dy for point in points]
+        across = [-point.x * dy + point.y * dx for point in points]
+        left, right, top, bottom = min(along), max(along), min(across), max(across)
+        points = [pymupdf.Point(dx * u - dy * v, dy * u + dx * v)
+                  for u, v in ((left, top), (right, top), (right, bottom), (left, bottom))]
+    return [coordinate for point in points for coordinate in point * ~matrix]
+
+
+def _matched_location(page_number, lines, matched, matrix):
+    """Emit per-line glyph envelopes, keeping distinct captured islands separate."""
+    groups = []
+    for clip_number, line_number, index in matched:
+        if groups and groups[-1][:2] == (clip_number, line_number):
+            groups[-1][2].append(index)
+        else:
+            groups.append((clip_number, line_number, [index]))
+    quads = [_line_quad(lines[line_number], indices, matrix)
+             for _, line_number, indices in groups]
+    return _location({"page": page_number, "rects": [_quad_rectangle(quad) for quad in quads],
+                      "quads": quads}, SCHEMA_VERSION)
+
+
 def _candidate(candidate, documents, spaces, texts, seen):
-    """Validate one applied pair and return only its public mapping fields."""
+    """Verify both literal sides before deriving any public line geometry."""
     if not isinstance(candidate, dict) or type(candidate.get("applied")) is not bool:
         raise ValueError("invalid_candidate")
     if not candidate["applied"]:
@@ -202,29 +366,43 @@ def _candidate(candidate, documents, spaces, texts, seen):
         raise ValueError("duplicate_id")
     seen.add(identifier)
     unit = {"id": identifier, "status": "verified"}
+    evidence = {}
     for side, document in documents.items():
         try:
             location = _location(candidate.get(side))
             page, clips = _clips(document, location, spaces[side])
         except ValueError as error:
             raise ValueError(f"{side}_{error}") from error
+        if side == "target" and location["page"] != evidence["source"][0]:
+            raise ValueError("cross_page")
         expected = candidate.get(f"{side}_text")
         if not isinstance(expected, str) or not _normalize_text(expected) or "\0" in expected:
             raise ValueError(f"{side}_invalid_text")
-        _, bounds = _page_space(page, spaces[side])
+        matrix, bounds = _page_space(page, spaces[side])
         try:
-            observed = _visible_text(page, clips, bounds, texts[side])
+            lines = _page_text(page, bounds, texts[side])
         except Exception as error:
             # Extraction failure disables this candidate, not translation or PDFs.
             raise ValueError(f"{side}_text_unavailable") from error
-        if _layout_text(expected) not in _layout_text(observed):
-            raise ValueError(f"{side}_text_not_found")
+        try:
+            matched = _matched_characters(lines, clips, expected)
+        except ValueError as error:
+            raise ValueError(f"{side}_{error}") from error
+        evidence[side] = (location["page"], lines, matched, matrix)
+    for side, document in documents.items():
+        try:
+            location = _matched_location(*evidence[side])
+            _clips(document, location, spaces[side])
+        except ValueError as error:
+            raise ValueError(f"{side}_{error}") from error
+        except Exception as error:
+            raise ValueError(f"{side}_geometry_unavailable") from error
         unit[side] = location
     return unit
 
 
 def build_mapping(source_path, output_path, candidates):
-    """Build schema v1 from captured pairs; candidate failures become reason counts.
+    """Build schema v2 from captured pairs; candidate failures become reason counts.
 
     Unreadable/encrypted PDFs raise an exception; no files are written here.
     """
@@ -242,7 +420,8 @@ def build_mapping(source_path, output_path, candidates):
                 units.append(_candidate(candidate, documents, spaces, texts, seen))
             except ValueError as error:
                 reasons[str(error)] += 1
-    return {"schema_version": SCHEMA_VERSION, "coordinate_space": COORDINATE_SPACE,
+    return {"schema_version": SCHEMA_VERSION, "generator_version": GENERATOR_VERSION,
+            "coordinate_space": COORDINATE_SPACE,
             "source_sha256": hashlib.sha256(source).hexdigest(),
             "output_sha256": hashlib.sha256(output).hexdigest(), "units": units,
             "metadata": {"candidate_count": candidate_count, "verified_count": len(units),
@@ -252,10 +431,17 @@ def build_mapping(source_path, output_path, candidates):
 def _validate_mapping(mapping):
     """Reject invalid sidecar structure before saving or consulting PDF geometry."""
     required = {"schema_version", "coordinate_space", "source_sha256", "output_sha256", "units"}
-    if not isinstance(mapping, dict) or not required <= set(mapping) or set(mapping) - required - {"metadata"}:
+    if not isinstance(mapping, dict) or not required <= set(mapping):
         raise ValueError("invalid_mapping")
-    if type(mapping["schema_version"]) is not int or mapping["schema_version"] != SCHEMA_VERSION:
+    version = mapping["schema_version"]
+    if type(version) is not int or version not in (1, SCHEMA_VERSION):
         raise ValueError("schema_version_mismatch")
+    if version == 2:
+        required.add("generator_version")
+        if mapping.get("generator_version") != GENERATOR_VERSION:
+            raise ValueError("generator_version_mismatch")
+    if not required <= set(mapping) or set(mapping) - required - {"metadata"}:
+        raise ValueError("invalid_mapping")
     if mapping["coordinate_space"] != COORDINATE_SPACE:
         raise ValueError("unsupported_coordinate_space")
     for field in ("source_sha256", "output_sha256"):
@@ -274,7 +460,7 @@ def _validate_mapping(mapping):
             raise ValueError("invalid_mapping")
         seen.add(identifier)
         for side in ("source", "target"):
-            _location(unit[side])
+            _location(unit[side], version)
     if "metadata" in mapping:
         metadata = mapping["metadata"]
         if (not isinstance(metadata, dict)
@@ -344,7 +530,7 @@ def load_mapping(mapping_path, source_path, output_path):
             for unit in mapping["units"]:
                 for side, document in documents.items():
                     try:
-                        _clips(document, _location(unit[side]), spaces[side])
+                        _clips(document, _location(unit[side], mapping["schema_version"]), spaces[side])
                     except ValueError as error:
                         return {"available": False, "reason": f"{side}_{error}"}
         if not mapping["units"]:

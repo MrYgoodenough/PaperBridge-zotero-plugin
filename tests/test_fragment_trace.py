@@ -11,7 +11,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 import fragment_trace
-from alignment import _page_space, load_mapping
+from alignment import _page_space, _visible_text, load_mapping
 from fragment_trace import FragmentTrace
 
 
@@ -20,12 +20,13 @@ def _box(values):
     return SimpleNamespace(**dict(zip(("x", "y", "x2", "y2"), values)))
 
 
-def _pdf(path, texts, *, crop=False, rotation=0, user_unit=1, width=400, height=600):
+def _pdf(path, texts, *, crop=False, rotation=0, user_unit=1, width=400, height=600,
+         fontsize=12, fontname="helv", leading=45):
     """Write independently painted units and read their exact unrotated PDF glyph boxes."""
     with pymupdf.open() as document:
         page = document.new_page(width=width, height=height)
         for index, text in enumerate(texts):
-            page.insert_text((100, 140 + index * 45), text, fontsize=12)
+            page.insert_text((100, 140 + index * leading), text, fontsize=fontsize, fontname=fontname)
         if crop:
             page.set_cropbox(pymupdf.Rect(50, 80, 350, 550))
         if user_unit != 1:
@@ -43,6 +44,16 @@ def _pdf(path, texts, *, crop=False, rotation=0, user_unit=1, width=400, height=
                               for character in characters])
     assert len(units) == len(texts)
     return units
+
+
+def _painted_lines(path):
+    """Read independent actual paint boxes for these one-span-per-line PDF fixtures."""
+    with pymupdf.open(path) as document:
+        page = document[0]
+        matrix, _ = _page_space(page, {})
+        return [[(chr(codepoint), list(pymupdf.Rect(box) * ~matrix))
+                 for codepoint, _, _, box in span["chars"] if not chr(codepoint).isspace()]
+                for span in page.get_texttrace() if span["type"] == 0 and span["opacity"] > 0]
 
 
 def _union(characters):
@@ -105,18 +116,83 @@ def test_same_refs_and_applied_cache_generate_verified_original_hash(tmp_path, o
     _apply(docs, quality, translated, texts)
     sidecar = tmp_path / "alignment.json"
     mapping = trace.write(output, sidecar, quality)
+    assert mapping["schema_version"] == 2 and mapping["generator_version"] == "fragment-trace-2"
     assert mapping["metadata"]["verified_count"] == 2, mapping
     assert mapping["source_sha256"] == hashlib.sha256(original_bytes).hexdigest()
     assert mapping["output_sha256"] == hashlib.sha256(output_bytes).hexdigest()
+    source_paint, target_paint = _painted_lines(source), _painted_lines(output)
     for index, unit in enumerate(mapping["units"]):
         assert unit["id"] == f"p0-u{index}"
-        assert unit["source"]["rects"][0] == pytest.approx(_union(original[index]))
-        assert unit["target"]["rects"][0] == pytest.approx(_union(translated[index]))
+        assert unit["source"]["rects"][0] == pytest.approx(_union(source_paint[index]))
+        assert unit["target"]["rects"][0] == pytest.approx(_union(target_paint[index]))
+        for side in ("source", "target"):
+            x0, y0, x1, y1 = unit[side]["rects"][0]
+            assert unit[side]["quads"] == [[x0, y1, x1, y1, x1, y0, x0, y0]]
     assert load_mapping(sidecar, source, output)["available"] is True
     assert (source.read_bytes(), output.read_bytes()) == (original_bytes, output_bytes)
-    assert not any("fragment" in value for value in json.dumps(mapping).split('"'))
+    assert "Original fragment" not in json.dumps(mapping)
+    assert "Translated fragment" not in json.dumps(mapping)
     assert trace.rows == {} and trace.document is None
     assert set(path.name for path in tmp_path.iterdir()) == {"source.pdf", "translated.pdf", "alignment.json"}
+
+
+def test_production_multiline_quads_leave_gaps_short_ends_and_neighbors_clear(tmp_path):
+    """Overlapping raw ascender boxes must still leave actual painted interline gaps clear."""
+    source, output, docs, quality, _, _, _ = _case(tmp_path, count=1)
+    source_lines = ["  An ordinary paragraph begins with a fairly long line.  ",
+                    "The next source line has separate glyph geometry.  ", " Short end.      "]
+    target_lines = ["  A translated paragraph has its own fairly long first line. ",
+                    "Another translated line remains visibly separate. ", " Brief end.      "]
+    # Times at 9.96 points has 13.29-point raw boxes, but only 9.96-point paint boxes.
+    source_leading, target_leading = 11.96, 14
+    original = _pdf(source, source_lines, fontsize=9.96, fontname="tiro", leading=source_leading)
+    translated = _pdf(output, target_lines, leading=target_leading)
+    # The unrelated last-line island lies inside the broad captured paragraph extents.
+    for path, leading in ((source, source_leading), (output, target_leading)):
+        with pymupdf.open(path) as document:
+            document[0].insert_text((280, 140 + 2 * leading), "NEXT", fontsize=12)
+            document.saveIncr()
+    original_bytes, output_bytes = source.read_bytes(), output.read_bytes()
+    paragraph = docs.page[0].pdf_paragraph[0]
+    paragraph.unicode = "\n".join(source_lines)
+    origin = docs.page[0].cropbox.box
+    rectangle = _union([glyph for line in original for glyph in line])
+    paragraph.box = _box([rectangle[0] - origin.x, rectangle[1] - origin.y + 1,
+                          rectangle[2] - origin.x, rectangle[3] - origin.y - 1])
+    trace = FragmentTrace(source)
+    trace.inventory(docs)
+    _apply(docs, quality, [[glyph for line in translated for glyph in line]], ["\n".join(target_lines)])
+    sidecar = tmp_path / "alignment.json"
+    mapping = trace.write(output, sidecar, quality)
+    assert len(mapping["units"]) == 1, mapping
+    for side, path, raw_lines in (("source", source, original), ("target", output, translated)):
+        lines = _painted_lines(path)[:3]
+        location = mapping["units"][0][side]
+        assert len(location["rects"]) == len(location["quads"]) == 3
+        if side == "source":
+            raw_rectangle = _union(raw_lines[0])
+            assert raw_rectangle[3] - raw_rectangle[1] == pytest.approx(13.29, abs=0.01)
+            assert location["rects"][0][3] - location["rects"][0][1] == pytest.approx(9.96, abs=0.0001)
+        for index, line in enumerate(lines):
+            expected = _union(line)
+            assert location["rects"][index] == pytest.approx(expected)
+            x0, y0, x1, y1 = expected
+            assert location["quads"][index] == pytest.approx([x0, y1, x1, y1, x1, y0, x0, y0])
+        for index in range(2):
+            assert _union(raw_lines[index + 1])[3] > _union(raw_lines[index])[1]
+            assert location["rects"][index][1] - location["rects"][index + 1][3] == pytest.approx(2, abs=0.0001)
+        assert location["rects"][2][2] < 280 < location["rects"][0][2]
+        with pymupdf.open(path) as document:
+            page = document[0]
+            matrix, bounds = _page_space(page, {})
+            clips = [pymupdf.Rect(rectangle) * matrix for rectangle in location["rects"]]
+            assert _visible_text(page, clips, bounds, {}) == " ".join(text.strip() for text in
+                                                                     (source_lines if side == "source" else target_lines))
+    assert mapping["source_sha256"] == hashlib.sha256(original_bytes).hexdigest()
+    assert mapping["output_sha256"] == hashlib.sha256(output_bytes).hexdigest()
+    assert load_mapping(sidecar, source, output)["available"]
+    assert (source.read_bytes(), output.read_bytes()) == (original_bytes, output_bytes)
+    assert all(text not in json.dumps(mapping) for text in source_lines + target_lines)
 
 
 def test_skips_inventory_only_unresolved_and_moved_units_are_excluded(tmp_path):

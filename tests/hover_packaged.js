@@ -244,7 +244,7 @@
     if (expectMapping) {
       await until(() => state.alignment.mapping && !state.alignment.hoverButton.disabled,
         "Integrated hover mapping is available");
-      check(report.validationCalls > before, "Split loader uses real /alignment/validate");
+      check(report.validationCalls === before, "Split loader validates native reading assets without a backend call");
     } else {
       await until(() => state.alignment.hoverButton.disabled && !state.alignment.mapping
         && !state.alignment.status.textContent.includes("正在"), "Missing-map split resolves nonfatally");
@@ -825,11 +825,11 @@
     native.close();
     await until(() => !Zotero.Reader._readers.includes(native), "Standalone translated reader closes");
     await bridge.library.update(record, { alignment_path: null });
-    await open(false);
-    check(!state.alignment.hoverEnabled && state.alignment.hoverButton.disabled && state.alignment.button.disabled
+    await open(true);
+    check(!state.alignment.hoverEnabled && !state.alignment.hoverButton.disabled && !state.alignment.button.disabled
       && state.alignment.status.getBoundingClientRect().height > 0 && !state.right._state.readOnly
       && state.apps.every(app => app.pdfViewer.getPageView(0).renderingState === renderingFinished),
-    "Actual no-sidecar split retains readable PDFs and editable native translated annotations");
+    "Actual no-sidecar split uses its retained synced asset and keeps native annotations editable");
     await close();
     await bridge.library.update(record, { alignment_path: mappingPath });
     const fixturesValid = await bridge.request("/alignment/validate", "POST",

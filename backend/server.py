@@ -30,7 +30,7 @@ RUNTIME = Path(os.environ.get("PAPERBRIDGE_STATE_DIR",ROOT / ".runtime"))
 # Durable records and immutable artifact folders share the existing cache root.
 JOBS = RUNTIME / "jobs"
 # Public plugin version.
-VERSION = "0.3.5"
+VERSION = "0.3.6"
 # Independently versioned on-disk records.
 RECORD_VERSION = 1
 # Active attempts must never restart automatically after losing their worker.
@@ -666,14 +666,7 @@ class JobStore:
                 warnings.warn(f"Could not remove intermediate files: {error}")
 
     def prune_library(self, request):
-        """Cancel removed owners' work before pruning, while protecting live workers."""
-        keep = {r["fingerprint"] for r in request["keep"] if r.get("fingerprint")}
-        removed = {r["fingerprint"] for r in request["remove"] if r.get("fingerprint")} - keep
-        with self.lock:
-            cancelled = [job["id"] for job in self.jobs.values()
-                         if job["fingerprint"] in removed and job["state"] in ACTIVE_STATES]
-        for job_id in cancelled:
-            self.cancel(job_id)
+        """Prune disposable cache only; cancellation requires the explicit task action."""
         with self.lock:
             for job in self.jobs.values():
                 self.refresh_usage(job)
@@ -682,7 +675,8 @@ class JobStore:
             keep_refs = [*request["keep"],*({"fingerprint":j["fingerprint"],"document_key":j["document_key"],
                                           "model":j["model"],"lang_out":j["lang_out"]} for j in active)]
             cache = Path(os.environ.get("PAPERBRIDGE_CACHE_DIR", ROOT / ".cache"))
-            return prune(cache,JOBS,request["remove"],keep_refs,request.get("sweep",False))
+            return prune(cache,JOBS,request["remove"],keep_refs,request.get("sweep",False),
+                         active=[job["fingerprint"] for job in active])
 
     def shutdown(self):
         """Stop accepting work and bound cancellation without replaying queued attempts."""

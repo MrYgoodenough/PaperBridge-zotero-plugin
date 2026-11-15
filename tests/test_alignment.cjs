@@ -1746,3 +1746,37 @@ test('RAF defers native render painting, coalesces the latest hover, and cancels
     close(waiting);
   }
 });
+
+test('schema-two line polygons miss inter-line gaps and the short last-line whitespace', () => {
+  const f = fixture(), value = mapping();
+  value.schema_version = 2;
+  value.generator_version = 'fragment-trace-2';
+  value.units[0].target.rects = [[10, 20, 30, 28], [10, 32, 20, 40]];
+  for (const side of ['source', 'target']) {
+    value.units[0][side].quads = value.units[0][side].rects.map(rect =>
+      [rect[0], rect[3], rect[2], rect[3], rect[2], rect[1], rect[0], rect[1]]);
+  }
+  assert(f.Alignment.checkMapping(value).mapping);
+  assert.equal(f.Alignment.hitTest(value, 0, [20, 30]).status, 'miss');
+  assert.equal(f.Alignment.hitTest(value, 0, [25, 35]).status, 'miss');
+  assert.equal(f.Alignment.hitTest(value, 0, [15, 25]).status, 'unique');
+  assert.equal(f.Alignment.hitTest(value, 0, [15, 35]).status, 'unique');
+  f.controller.attach(f.state, value);
+  const overlay = f.controller.createHighlight(value.units[0].target, 1, 'line-test', 'background:blue');
+  assert.equal(overlay.children.length, 2);
+  assert(overlay.children.every(mark => mark.style.clipPath.startsWith('polygon(')));
+  const areas = overlay.children.map(mark => parseFloat(mark.style.width) * parseFloat(mark.style.height));
+  assert(areas[1] < areas[0], 'short last line is not stretched to paragraph width');
+  close(f);
+});
+
+test('convex slanted quads hit their polygon rather than the bounding rectangle', () => {
+  const { Alignment } = fixture();
+  const quad = [10, 10, 20, 20, 15, 25, 5, 15];
+  assert.equal(Alignment.validQuad(quad), true);
+  assert.equal(Alignment.pointInQuad(quad, [12, 17]), true);
+  assert.equal(Alignment.pointInQuad(quad, [5, 10]), false);
+  assert.equal(Alignment.validQuad([0, 0, 10, 10, 0, 10, 10, 0]), false);
+  assert.equal(Alignment.validQuad([0, 0, 10, 0, 5, 0, 0, 10]), false);
+  assert.equal(Alignment.pointInQuad(quad, [NaN, 10]), false);
+});

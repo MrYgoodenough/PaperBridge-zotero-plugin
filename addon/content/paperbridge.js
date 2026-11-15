@@ -280,12 +280,32 @@ var PaperBridge = {
     return this.library.matching(source, this.configuration());
   },
 
-  /** Open a retained outcome even when its source is missing. */
+  /** Open downloaded outcomes or synced pairs without contacting a model or requiring Python. */
   async openExisting(reader, fromLibrary = false) {
     const selected = await this.selection(reader,fromLibrary);
-    const saved = selected && (await this.library.savedFor(selected,this.pref("language")) || await this.library.savedFor(selected));
-    if (!saved) throw new Error("没有找到已保存的译文，请先执行翻译。");
-    const source = await this.library.item(saved.record.libraryID,saved.record.sourceKey);
+    const local = selected && (await this.library.savedFor(selected,this.pref("language")) || await this.library.savedFor(selected));
+    const candidates = selected && this.alignmentAssets ? await this.alignmentAssets.savedPairs(selected) : [];
+    if (local && !candidates.some(pair => pair.attachment.key === local.attachment.key && pair.record.sourceKey === local.record.sourceKey)) {
+      candidates.unshift(local);
+    }
+    let saved = candidates[0];
+    if (candidates.length > 1) {
+      const choice = {value:0};
+      const labels = candidates.map(pair => (pair.attachment.getField("title") || pair.attachment.key)
+        + " · " + pair.record.sourceKey + " → " + pair.attachment.key);
+      if (!Services.prompt.select(Zotero.getMainWindow(), "选择已有译本", "多个译本保留各自映射，请选择要打开的附件。",
+        labels.length, labels, choice)) return null;
+      saved = candidates[choice.value];
+    }
+    if (!saved && selected?.isPDFAttachment() && this.library.isTranslation(selected)) {
+      if (!await selected.fileExists()) throw new Error("译文附件尚未下载，请先在 Zotero 中下载；不会重新翻译。");
+      const opened = await Zotero.Reader.open(selected.id);
+      await opened?._initPromise;
+      return selected;
+    }
+    if (!saved) throw new Error("没有找到已保存的译文或可同步映射；请先下载已有附件，不会自动重新翻译。");
+    if (!await saved.attachment.fileExists()) throw new Error("译文附件尚未下载，请先在 Zotero 中下载；不会重新翻译。");
+    const source = saved.source || await this.library.item(saved.record.libraryID,saved.record.sourceKey);
     if (source && !source.deleted && await source.fileExists()) await this.split(source,saved.attachment);
     else {
       const opened = await Zotero.Reader.open(saved.attachment.id);
@@ -337,23 +357,13 @@ var PaperBridge = {
     return view;
   },
 
-  /** Validate the recorded local sidecar against both current PDF attachments. */
+  /** Read and rehash local/synced geometry with Gecko; reading never starts the translation engine. */
   async loadAlignment(state) {
     const record = [...this.library.records].reverse().find(candidate =>
       candidate.libraryID === state.translated.libraryID && candidate.attachmentKey === state.translated.key &&
       candidate.sourceKey === state.source.key);
-    if (!record?.alignmentPath) return { mapping: null, reason: "没有片段映射，继续使用页级同步。" };
-    const result = await this.request("/alignment/validate", "POST", {
-      mapping_path: record.alignmentPath, source_path: await state.source.getFilePathAsync(),
-      output_path: await state.translated.getFilePathAsync()
-    });
-    if (!result.available) {
-      // Mapping failure must explain the downgrade without suggesting a paid retransmission.
-      const reasons = { source_hash_changed: "原文已变化，旧片段映射已停用。", output_hash_changed: "译文已变化，旧片段映射已停用。",
-        missing_mapping: "没有片段映射，继续使用页级同步。", no_verified_units: "没有可信片段，继续使用页级同步。" };
-      result.reason = reasons[result.reason] || "片段映射不可用，仍可正常阅读。";
-    }
-    return result;
+    if (!this.alignmentAssets) return { mapping:null, reason:"映射读取接口不可用，继续使用页级同步。" };
+    return this.alignmentAssets.load(state, record);
   },
 
   /** Reuse an open pair, replacing the right reader only for a different translation. */

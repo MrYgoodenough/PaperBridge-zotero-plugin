@@ -39,6 +39,7 @@ def build_release(tmp_path, monkeypatch):
         "addon/content/annotations.js": b"// Synthetic annotation controller.\n",
         "addon/content/notes.js": b"// Synthetic notes controller.\n",
         "addon/content/diagnostics.js": b"// Synthetic diagnostics controller.\n",
+        "addon/content/reading-assets.js": b"// Synthetic reading assets controller.\n",
         "LICENSE": b"Synthetic license.\n",
     }
     for source in (ROOT / "backend").glob("*.py"):
@@ -274,7 +275,7 @@ def test_runtime_identity_and_new_modules_are_required(build_release):
         _rewrite_xpi(artifacts, replace={member: json.dumps(metadata).encode()})
         with pytest.raises(verifier.VerificationError, match=message):
             verifier.verify_release(*artifacts)
-    for member in ("content/annotations.js", "content/notes.js", "content/diagnostics.js",
+    for member in ("content/annotations.js", "content/notes.js", "content/diagnostics.js", "content/reading-assets.js",
                    "runtime/linux-x64/backend/errors.py", "runtime/linux-x64/backend/diagnostics.py",
                    "runtime/linux-x64/backend/provider_check.py", "runtime/linux-x64/backend/fragment_trace.py",
                    "runtime/linux-x64/python/bin/python3.12"):

@@ -10,11 +10,15 @@ import re
 import zipfile
 
 # Inventory revisions are independent of addon and runtime versions.
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 # File names identify evidence only, never a license or redistribution permission.
 LICENSE_NAMES = ("license", "licence", "copying", "notice", "copyright", "thirdpartynotice")
 # Only PaperBridge sources, not dependency sources, belong in the module summary.
 ADDON_SOURCE_SUFFIXES = {".js", ".xhtml", ".json"}
+# Only this bundled manifest can associate supplemental notices with exact artifacts.
+PROVENANCE_PATH = "licenses/provenance.json"
+# Include versioned ELF libraries and native Windows/macOS wheel artifacts.
+NATIVE_FILE_PATTERN = re.compile(r"\.(?:so(?:\.\d+)*|dylib|dll|pyd|a|lib)$", re.IGNORECASE)
 
 
 def _package_name(name):
@@ -22,7 +26,27 @@ def _package_name(name):
     return re.sub(r"[-_.]+", "-", name.strip()).lower()
 
 
-def _license_evidence(archive, folder, metadata=None, *, recursive=True):
+def _file_evidence(archive, paths):
+    """Hash existing archive members without importing or executing their contents."""
+    return [{"path": name, "bytes": archive.getinfo(name).file_size,
+             "sha256": hashlib.sha256(archive.read(name)).hexdigest()} for name in sorted(set(paths))]
+
+
+def _record_files(archive, folder):
+    """Read wheel ownership paths, keeping installed files within its site-packages tree."""
+    names = set(archive.namelist())
+    if folder + "RECORD" not in names:
+        return set(), "unknown"
+    site_packages = folder.rsplit("/", 2)[0] + "/"
+    try:
+        rows = csv.reader(StringIO(archive.read(folder + "RECORD").decode("utf-8")))
+        files = {posixpath.normpath(site_packages + row[0]) for row in rows if row}
+        return {name for name in files if name in names and name.startswith(site_packages)}, "read"
+    except (UnicodeError, csv.Error):
+        return set(), "unknown"
+
+
+def _license_evidence(archive, folder, metadata=None, *, recursive=True, extra_files=()):
     """Locate declared/discovered files and retain metadata fields without interpreting them."""
     names = {entry.filename for entry in archive.infolist() if not entry.is_dir()}
     fields = {}
@@ -35,24 +59,13 @@ def _license_evidence(archive, folder, metadata=None, *, recursive=True):
     files = {name for name in names if folder is not None and name.startswith(folder)
              and (recursive or "/" not in name[len(folder):]) and (
                  Path(name).name.lower().startswith(LICENSE_NAMES) or "/licenses/" in "/" + name.lower())}
+    files.update(set(extra_files) & names)
     record_status = "not_applicable"
     if metadata is not None and folder is not None:
         # RECORD associates module-local notices with this distribution, not its neighbours.
-        record_status = "unknown"
-        if folder + "RECORD" in names:
-            site_packages = folder.rsplit("/", 2)[0] + "/"
-            try:
-                rows = csv.reader(StringIO(archive.read(folder + "RECORD").decode("utf-8")))
-                for row in rows:
-                    if not row:
-                        continue
-                    name = posixpath.normpath(site_packages + row[0])
-                    if name in names and name.startswith(site_packages) and (
-                            Path(name).name.lower().startswith(LICENSE_NAMES) or "/licenses/" in name.lower()):
-                        files.add(name)
-                record_status = "read"
-            except (UnicodeError, csv.Error):
-                pass
+        owned, record_status = _record_files(archive, folder)
+        files.update(name for name in owned if Path(name).name.lower().startswith(LICENSE_NAMES)
+                     or "/licenses/" in name.lower())
     missing = []
     for relative in declared:
         candidates = {folder + relative, folder + "licenses/" + relative} if folder is not None else set()
@@ -60,12 +73,114 @@ def _license_evidence(archive, folder, metadata=None, *, recursive=True):
         files.update(located)
         if not located:
             missing.append(relative)
-    evidence = [{"path": name, "bytes": archive.getinfo(name).file_size,
-                 "sha256": hashlib.sha256(archive.read(name)).hexdigest()} for name in sorted(files)]
+    evidence = _file_evidence(archive, files)
     reported = any(value != "unknown" for value in fields.values()) or classifiers or any(item["bytes"] for item in evidence)
     return {"status": "reported" if reported else "unknown", "fields": fields,
             "classifiers": classifiers, "files": evidence, "missingDeclaredFiles": missing,
             "recordStatus": record_status}
+
+
+def _wheel_evidence(archive, folder):
+    """Retain wheel tags, ownership metadata and the actual native files listed by RECORD."""
+    owned, _ = _record_files(archive, folder)
+    wheel = None
+    if folder + "WHEEL" in archive.namelist():
+        wheel = _file_evidence(archive, [folder + "WHEEL"])[0]
+        message = BytesParser().parsebytes(archive.read(wheel["path"]))
+        wheel["tags"] = message.get_all("Tag", [])
+    record = _file_evidence(archive, [folder + "RECORD"])[0] if folder + "RECORD" in archive.namelist() else None
+    return {"wheel": wheel, "record": record,
+            "nativeFiles": _file_evidence(archive, [name for name in owned if NATIVE_FILE_PATTERN.search(name)])}
+
+
+def _built_dependency(archive, prefix, package, platform):
+    """Associate a declared source build with its hashed extension and module-local notices."""
+    build = package.get("build")
+    if (not isinstance(build, dict) or not build.get("extensionSha256")
+            or build.get("version") != package.get("version") or build.get("platform") != platform):
+        return None
+    candidates = [name for name in archive.namelist() if name.startswith(prefix + "python/")
+                  and "/site-packages/" in name and NATIVE_FILE_PATTERN.search(name)
+                  and (not build.get("extensionBytes") or archive.getinfo(name).file_size == build["extensionBytes"])]
+    matches = [item for item in _file_evidence(archive, candidates) if item["sha256"] == build["extensionSha256"]]
+    if len(matches) != 1:
+        return None
+    site, relative = matches[0]["path"].split("site-packages/", 1)
+    # A top-level extension must not borrow every neighbouring wheel's notices.
+    folder = site + "site-packages/" + relative.split("/")[0] + "/" if "/" in relative else None
+    return {"name": package["name"], "version": build["version"], "declaredVersion": package["version"],
+            "versionSource": "runtime_manifest_native_build", "metadataPath": None,
+            "buildProvenance": build, "nativeFiles": matches, "license": _license_evidence(archive, folder)}
+
+
+def _provenance_evidence(archive, prefix, entry):
+    """Match both shipped artifact bytes and supplemental notice bytes, without license inference."""
+    result = {"id": entry.get("id", "unknown"), "status": "unknown",
+              "sources": entry.get("sources", []), "declarations": entry.get("declarations", {}),
+              "limitations": entry.get("limitations", []), "missingFiles": [], "mismatchedFiles": []}
+    names = set(archive.namelist())
+    for field, base in (("artifacts", prefix), ("files", "")):
+        expected = entry.get(field)
+        if not isinstance(expected, dict) or not expected or not all(
+                isinstance(path, str) and isinstance(digest, str) for path, digest in expected.items()):
+            result["problem"] = "Missing artifact/notice hash declarations."
+            return result
+        expected = {base + path: digest for path, digest in expected.items()}
+        result["missingFiles"].extend(sorted(set(expected) - names))
+        result[field] = _file_evidence(archive, set(expected) & names)
+        for item in result[field]:
+            item["expectedSha256"] = expected[item["path"]]
+            if item["bytes"] == 0 or item["sha256"] != item["expectedSha256"]:
+                result["mismatchedFiles"].append(item["path"])
+    if not result["missingFiles"] and not result["mismatchedFiles"]:
+        result["status"] = "matched"
+    return result
+
+
+def _apply_bundled_provenance(archive, prefix, metadata, dependencies, components, warnings):
+    """Attach only applicable, byte-matched supplemental evidence; malformed data is advisory."""
+    assigned = set()
+    if PROVENANCE_PATH not in archive.namelist():
+        return {"status": "not_present", "entries": []}, assigned
+    result = {"status": "unknown", "file": _file_evidence(archive, [PROVENANCE_PATH])[0], "entries": []}
+    try:
+        data = json.loads(archive.read(PROVENANCE_PATH))
+        if not isinstance(data, dict) or data.get("schemaVersion") != 1 or not isinstance(data.get("entries"), list):
+            raise ValueError("unsupported provenance manifest")
+        targets = {item["name"]: item for item in components}
+        packages = {_package_name(item["name"]): item for item in dependencies}
+        for entry in data["entries"]:
+            if (not isinstance(entry, dict)
+                    or "dependency" in entry and not isinstance(entry["dependency"], str)
+                    or "component" in entry and not isinstance(entry["component"], str)
+                    or not isinstance(entry.get("limitations", []), list)
+                    or not all(isinstance(text, str) for text in entry.get("limitations", []))):
+                raise ValueError("invalid provenance entry")
+            target = packages.get(_package_name(entry["dependency"])) if "dependency" in entry else targets.get(entry.get("component"))
+            if (target is None or target.get("shipped") is False
+                    or entry.get("platform", metadata.get("platform")) != metadata.get("platform")
+                    or entry.get("python", metadata.get("python")) != metadata.get("python")
+                    or "version" in entry and entry["version"] != target.get("version")):
+                result["entries"].append({"id": entry.get("id", "unknown"), "status": "not_applicable"})
+                continue
+            evidence = _provenance_evidence(archive, prefix, entry)
+            result["entries"].append(evidence)
+            target["license"].setdefault("provenance", []).append(evidence)
+            if evidence["status"] == "matched":
+                files = {item["path"]: item for item in target["license"]["files"]}
+                files.update({item["path"]: {key: item[key] for key in ("path", "bytes", "sha256")}
+                              for item in evidence["files"]})
+                target["license"]["files"] = [files[name] for name in sorted(files)]
+                target["license"]["status"] = "reported"
+                assigned.update(files)
+                warnings.extend(f"Unresolved redistribution evidence: {evidence['id']}: {text}"
+                                for text in evidence["limitations"])
+            else:
+                warnings.append(f"Bundled license provenance unknown: {evidence['id']}; artifact/notice bytes absent or inconsistent.")
+        result["status"] = "read"
+    except (ValueError, KeyError, TypeError, UnicodeError):
+        warnings.append("Bundled license provenance unknown: invalid manifest; no compliance claim is made.")
+    return result, assigned
 
 
 def size_trend(inventory, previous):
@@ -126,24 +241,31 @@ def collect_inventory(xpi, digest=None, previous=None):
         for name in names:
             if not name.startswith(prefix + "python/") or not name.endswith(".dist-info/METADATA"):
                 continue
-            message = BytesParser().parsebytes(archive.read(name))
+            contents = archive.read(name)
+            message = BytesParser().parsebytes(contents)
             package_name = str(message.get("Name", "")).strip() or "unknown"
             version = str(message.get("Version", "")).strip() or "unknown"
             canonical = _package_name(package_name)
             observed.add(canonical)
             expected = declared.get(canonical, {}).get("version") or "unknown"
-            license_info = _license_evidence(archive, name.removesuffix("METADATA"), message)
+            folder = name.removesuffix("METADATA")
+            license_info = _license_evidence(archive, folder, message)
             dependencies.append({"name": package_name, "version": version, "declaredVersion": expected,
-                                 "metadataPath": name, "license": license_info})
+                                 "versionSource": "packaged_metadata", "metadataPath": name,
+                                 "metadataSha256": hashlib.sha256(contents).hexdigest(),
+                                 "projectUrls": message.get_all("Project-URL", []), "license": license_info,
+                                 **_wheel_evidence(archive, folder)})
             if package_name == "unknown" or version == "unknown" or expected != "unknown" and version != expected:
                 warnings.append(f"Dependency version unknown or inconsistent: {package_name}.")
-            if (license_info["status"] == "unknown" or license_info["missingDeclaredFiles"]
-                    or any(item["bytes"] == 0 for item in license_info["files"])):
-                warnings.append(f"License evidence unknown, absent or empty: {package_name}.")
         for name, package in sorted(declared.items()):
             if name not in observed:
+                built = _built_dependency(archive, prefix, package, metadata.get("platform"))
+                if built is not None:
+                    dependencies.append(built)
+                    continue
                 dependencies.append({"name": package["name"], "version": "unknown",
                                      "declaredVersion": package.get("version") or "unknown", "metadataPath": None,
+                                     "versionSource": "unknown", "nativeFiles": [],
                                      "license": _license_evidence(archive, None)})
                 warnings.append(f"Packaged distribution metadata missing: {package['name']}.")
         if not dependencies:
@@ -153,18 +275,39 @@ def collect_inventory(xpi, digest=None, previous=None):
             ("PaperBridge", "", True, False),
             ("CPython interpreter/stdlib", prefix + "python/", metadata.get("pythonMode") == "bundled", False),
             ("Addon notices (unassigned)", "licenses/", any(name.startswith("licenses/") for name in names), True),
-            ("Layout model assets", prefix + ".cache/babeldoc/models/", True, True),
-            ("Tokenizer assets", prefix + ".cache/babeldoc/tiktoken/", True, True),
+            ("Layout model assets", prefix + ".cache/babeldoc/models/",
+             any(name.startswith(prefix + ".cache/babeldoc/models/") for name in names), True),
+            ("Tokenizer assets", prefix + ".cache/babeldoc/tiktoken/",
+             any(name.startswith(prefix + ".cache/babeldoc/tiktoken/") for name in names), True),
         ):
             # Root/stdlib licenses must not borrow evidence from nested dependencies.
-            evidence = _license_evidence(archive, folder, recursive=recursive)
+            stdlib_licenses = [prefix + "python/lib/python3.12/LICENSE.txt", prefix + "python/Lib/LICENSE.txt"]
+            evidence = _license_evidence(archive, folder, recursive=recursive,
+                                         extra_files=stdlib_licenses if name == "CPython interpreter/stdlib" and shipped else ())
             components.append({"name": name, "shipped": shipped, "license": evidence})
-            if shipped and (evidence["status"] == "unknown" or any(item["bytes"] == 0 for item in evidence["files"])):
-                warnings.append(f"Component license evidence unknown or empty: {name}.")
+        provenance, assigned = _apply_bundled_provenance(archive, prefix, metadata, dependencies, components, warnings)
+        unassigned = next(item for item in components if item["name"] == "Addon notices (unassigned)")
+        unassigned["license"]["files"] = [item for item in unassigned["license"]["files"]
+                                          if item["path"] not in assigned and item["path"] != PROVENANCE_PATH]
+        if not unassigned["license"]["files"]:
+            unassigned["shipped"] = False
+            unassigned["license"]["status"] = "unknown"
+        for package in dependencies:
+            evidence = package["license"]
+            if (evidence["status"] == "unknown" or evidence["missingDeclaredFiles"]
+                    or any(item["bytes"] == 0 for item in evidence["files"])):
+                warnings.append(f"License evidence unknown, absent or empty: {package['name']}.")
+        for component in components:
+            evidence = component["license"]
+            if component["shipped"] and (evidence["status"] == "unknown"
+                    or any(item["bytes"] == 0 for item in evidence["files"])):
+                warnings.append(f"Component license evidence unknown or empty: {component['name']}.")
         inventory = {
             "schemaVersion": SCHEMA_VERSION, "scope": "completed_xpi_archive_metadata",
             "nativeExecution": "not_tested", "licenseCompliance": "unknown",
-            "licenseScope": "Packaged METADATA and located files only; vendored native-library obligations are not audited.",
+            "licenseScope": "Packaged METADATA/RECORD, native hashes and matching bundled notices/provenance; "
+                            "not a legal opinion or an exhaustive native-library audit.",
+            "licenseProvenance": provenance,
             "archive": {"name": xpi.name, "sha256": digest, "bytes": xpi.stat().st_size,
                         "compressedEntryBytes": sum(entry.compress_size for entry in entries),
                         "expandedBytes": sum(entry.file_size for entry in entries),
