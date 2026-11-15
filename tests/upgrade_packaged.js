@@ -51,6 +51,25 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
     return Array.from(hash.finish(false), byte => byte.charCodeAt(0).toString(16).padStart(2, "0")).join("");
   }
 
+  /** Exercise the real login-manager replacement and realm clearing only in this isolated profile. */
+  async function nativeCredentialUpdate() {
+    const original = Services.logins.findLogins("chrome://paperbridge", null, "OpenAI-compatible")[0];
+    const guid = original.QueryInterface(Ci.nsILoginMetaInfo).guid;
+    const replacement = fixtureKey + "-replacement";
+    const otherKey = fixtureKey + "-other-profile";
+    await bridge.saveKey(otherKey, "deepseek");
+    await bridge.saveKey(replacement, "compatible");
+    const changed = Services.logins.findLogins("chrome://paperbridge", null, "OpenAI-compatible");
+    check(changed.length === 1 && changed[0].QueryInterface(Ci.nsILoginMetaInfo).guid === guid
+      && bridge.getKey("compatible") === replacement && bridge.getKey("deepseek") === otherKey,
+    "Native nonempty credential replacement retains the login identity and other profile");
+    await bridge.saveKey("", "compatible");
+    check(!bridge.getKey("compatible") && bridge.getKey("deepseek") === otherKey,
+      "Native explicit clearing removes only the selected credential realm");
+    // Restore the established fixture value before subsequent configuration checks.
+    await bridge.saveKey(fixtureKey, "compatible");
+  }
+
   /** Exercise the real settings button and read the generated allowlisted ZIP. */
   async function diagnostics(addonOnly = false) {
     // Exercise a realistically narrow native dialog without a strict screenshot/pixel gate.
@@ -395,6 +414,8 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
       "Engine replacement leaves task-state and cache directories intact");
       if (saved.paragraphCacheSha256) check(await sha256(PathUtils.join(bridge.runtime.cache, "paragraphs.sqlite"))
         === saved.paragraphCacheSha256, "Upgrade preserves the exact historical paragraph cache database");
+      await checkpoint("native-credential-replacement");
+      await nativeCredentialUpdate();
       await checkpoint("settings-diagnostics");
       await diagnostics();
       await checkpoint("startup-failed-diagnostics");

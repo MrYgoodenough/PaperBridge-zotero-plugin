@@ -764,14 +764,15 @@
     "Harness is running only in the disposable alignment profile/data", {
       profile, data: Zotero.DataDirectory.dir, expectedProfileDirectory, expectedDataDirectory });
     check(phase === "create" || phase === "reopen", "Harness phase is create or reopen", { phase });
-    if (config) await verifyPackage(profile);
     if (phase === "reopen") {
+      if (config) await verifyPackage(profile);
       await coldReopen(profile);
       report.ok = true;
       return;
     }
     bridge = Zotero.PaperBridge;
     if (!bridge) throw new Error("PaperBridge is unavailable");
+    if (config) await verifyPackage(profile);
     originalRequest = bridge.request;
     // Forbid job submission/retry before readiness; all other requests reach the actual backend.
     bridge.request = async function request(path, method, data) {
