@@ -82,8 +82,16 @@
     "groupAndCrossLibrary": "not_tested",
     "newPaidTranslationRequests": 0
   },
+  "msvcReview": {
+    "document": "windows-msvc-redistribution.md",
+    "evidence": "windows-msvc-evidence-0.3.6.json",
+    "exactOriginalDllBytesConfirmed": true,
+    "observedVisualStudio": "Community 2026 18.9.2; installation identity only, not distributor eligibility/assent",
+    "redistributionConditions": "pending distributor decision and protective distributor/end-user agreements",
+    "shippingMaterials": "Unchanged XPI/source ZIP identities; the review is a separate documentation supplement, not new shipping notices."
+  },
   "releaseOpenItems": [
-    "Confirm the applicable Microsoft distributor license and exact unmodified DLL redistribution basis for 14.44.35211.0 and 14.40.33810.0; Runtime use terms are not a redistribution grant.",
+    "MSVC original DLL bytes are now confirmed. Before public Windows delivery, confirm the lawful distributor route and its conditions (including Community 2026 indemnity) and integrate protective distributor/end-user agreements; see windows-msvc-redistribution.md. Runtime use EULAs are not independent redistribution grants.",
     "Review corresponding-source sufficiency and deliver AGPL/GPL/Berkeley DB sources and applicable build/service-source obligations with the approved executable distribution.",
     "Complete the authorized real two-device flow without enabling whole-library attachment upload; metadata alone does not validate file download, multiple translations or groups.",
     "Obtain the outstanding human bilingual/visual acceptance and release authorization; then publish exact approved assets before enabling their matching feeds."

@@ -29,7 +29,7 @@ remain separate; a warning there is not silently converted into clearance.
 | OpenCV | Linux image-only 4.12.0 source, CMake cache/toolchain/provenance/build JSON; Windows official headless 5.0.0.93 source and observed 5.0.0 build information | Preserve actual codec notices. Linux path-sanitization hashes differ from pre-sanitization build hashes; see `docs/linux-package-size.md`. No byte-identical wheel rebuild is claimed. |
 | Rust/native notices | All 243 Cargo.lock registry candidates, including checksum-matched crossbeam-deque 0.8.7; orjson's populated vendor tree; original notices | Optional/test/build/other-target crates remain a conservative superset, not shipped-linkage evidence. No prior locked registry candidate remains missing. |
 | tiktoken 0.14.0 | Public tag/sdist, build workflow and both PyPI cp312 wheels; native wheel bytes exactly match the old Linux/Windows baseline; MIT license retained | No public wheel build lock/third-party graph. Additional fancy-regex 0.19.0, bstr 1.13.1 and rustc-hash 2.1.3 sources/notices are declaration/range candidates, not confirmed original-wheel dependency versions. |
-| Microsoft runtimes | VCRuntime 14.44.35211.0 in bundled Python; hyperscan-private MSVCP140 14.40.33810.0 also in local-Python packages; official original license/REDIST documents | Runtime use terms are **not a redistribution grant**. VS2022 REDIST terms are conditional; this distributor's license and exact unmodified DLL-release basis remain unconfirmed. |
+| Microsoft runtimes | VCRuntime 14.44.35211.0 and Hyperscan-private MSVCP140 14.40.33810.0 now match original Microsoft release bytes; all three Windows files have valid signatures; Community 2026 installation identified | Conditional Visual Studio grant route identified, not accepted on the distributor's behalf. Confirm eligibility/assent (including Community 2026 indemnity) and protective distributor/end-user agreements; see `windows-msvc-redistribution.md`. Frozen shipping notices remain unchanged. |
 
 Both original install/full archive digests and selected native-file hashes are
 in `buildEvidence`; no publisher-reported digest is passed off as a local hash.
@@ -100,14 +100,18 @@ hashes; prior-package hashes cannot be borrowed.
 
 ## Delivery obligations and remaining evidence limits
 
-1. **Microsoft redistribution basis — decision needed:** the original Runtime
-   use and VS2022 Community terms plus REDIST page are in `supplemental/msvc/`.
-   Runtime terms permit installation/use but prohibit sharing/distribution to
-   others. VS2022 provides a separate conditional route for listed unmodified
-   files by validly licensed users, with distribution conditions. Confirm the
-   applicable distributor license and release-file basis for these exact DLLs
-   before redistribution; retaining PSF notices or Microsoft's EULA is not enough.
-   No runtime replacement or dependency change is authorized by this evidence.
+1. **Microsoft redistribution conditions — user decision needed:** exact
+   original DLL bytes and the installed Community 2026 product are now identified
+   in `windows-msvc-evidence-0.3.6.json`. The retained Runtime use/VS2022 documents
+   remain unchanged shipping evidence, not proof that the 2022 agreement applies
+   to a 2026 installation. The actual Community 2026 section 8 route requires
+   licensed-use eligibility/assent, protective distributor/end-user agreements,
+   and application-related indemnity/defense with its stated exception. Confirm
+   the distributor's decision and integrate the applicable agreement/acceptance
+   path before public delivery; see `windows-msvc-redistribution.md`. Neither
+   Runtime use EULAs nor free Build Tools dependency-build rights independently
+   grant redistribution. No runtime replacement or dependency change is required
+   by the original-byte finding or authorized by this documentation review.
 2. **Source delivery:** retain the AGPLv3 project and the supplied AGPL/GPL
    dependency sources, modifications and build/install inputs alongside the
    executable. Berkeley DB's actual clause 3 extends

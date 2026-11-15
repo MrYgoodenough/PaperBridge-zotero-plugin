@@ -1,0 +1,137 @@
+{
+  "_comment": "Exact Windows MSVC byte provenance and conditional redistribution evidence; not distributor assent or legal clearance.",
+  "schemaVersion": 1,
+  "checkedDate": "2026-11-16",
+  "scope": "The unchanged private 0.3.6 Windows bundled/local candidates recorded in candidate-delivery-0.3.6.json.",
+  "licenseCompliance": "unknown",
+  "microsoftRedistributionStatus": "distribution_conditions_pending",
+  "exactOriginalDllBytesConfirmed": true,
+  "distributorEligibilityAndAssent": "not_confirmed",
+  "externalDistributorAndEndUserAgreement": "not_established_by_current_shipping_materials",
+  "observedVisualStudio": {
+    "productId": "Microsoft.VisualStudio.Product.Community",
+    "displayName": "Visual Studio Community 2026",
+    "productDisplayVersion": "18.9.2",
+    "installationVersion": "18.9.12120.119",
+    "isComplete": true,
+    "isLaunchable": true,
+    "isPrerelease": false,
+    "otherInstancesDetected": 0,
+    "installedCrtVersion": "14.51.36247.0",
+    "productLicenseUrl": "https://go.microsoft.com/fwlink/?LinkId=2327616",
+    "redistUrl": "https://aka.ms/vs/18/redistribution",
+    "scope": "Installation identity only, not entitlement/acceptance or proof that a vswhere expirationDate is license expiry."
+  },
+  "officialDocuments": [
+    {
+      "id": "community-2026",
+      "url": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual_Studio_2026-License-Community_ENU.docx",
+      "bytes": 69066,
+      "sha256": "02ac07637f4a513a807cd3721c7620433fc483bc049d25784b0c10c54b05e1fb",
+      "eulaId": "VS2026_Comm_ENU.1033",
+      "clauses": "Section 8 Distributable Code: conditional object-code/third-party distribution; Distribution Requirements include protective distributor/end-user agreements and indemnity, defense and hold-harmless except claims based solely on Distributable Code; Distribution Restrictions also apply."
+    },
+    {
+      "id": "redist-2026",
+      "url": "https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution",
+      "bytes": 48465,
+      "sha256": "0a6dd952d5f9041384d9b8b9391c9e6ef1be9c67f4d466646a07937a27383708",
+      "clauses": "VC/redist subtree and official runtime-download route, subject to the product license; unmodified files, excluding debug_nonredist."
+    },
+    {
+      "id": "build-tools-2022-march-2024",
+      "url": "https://visualstudio.microsoft.com/wp-content/uploads/2024/03/Visual-Studio-2022-Diagnostic-Build-Tools-Agent-License_Update-March-2024_EN.docx",
+      "bytes": 34395,
+      "sha256": "2f66b86a00e8d9833789897ce23d05a4a2dbea370cf39c8c1098dbc17d0e7bdc",
+      "clauses": "Limited third-party OSI-dependency build use without a Visual Studio license; no separate Distributable Code grant."
+    },
+    {
+      "id": "build-tools-2026",
+      "url": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual_Studio_2026-License-Diagnostic_and_Build_Tools_ENU.docx",
+      "bytes": 44201,
+      "sha256": "ff03a242ec131e8353643612cdf58ae3d6cc9b51d7dce929351d140ba24a8b83",
+      "clauses": "Limited third-party OSI-dependency build use without a Visual Studio license; no separate Distributable Code grant."
+    },
+    {
+      "id": "runtime-v14-use-2026",
+      "url": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+      "bytes": 39553,
+      "sha256": "08651651a7602fc7c0e2763de0fde1ff9f868df2780597cd1775ee9d6441c783",
+      "clauses": "Installation/use rights; Scope of License prohibits sharing, publishing or otherwise distributing the software or its code. Not an independent distributor grant."
+    }
+  ],
+  "officialOrigins": [
+    {
+      "id": "microsoft-vc143-14.44-base-vsix",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/45d3b8dd-bced-4b37-9974-142f748d710c/4aaf54db0bfc9435f7c3660e1a00237a4b556042bfeea64bde44c2e0194e6ee5/Microsoft.VC.14.44.17.14.CRT.Redist.X64.base.vsix",
+      "bytes": 3224191,
+      "sha256": "4aaf54db0bfc9435f7c3660e1a00237a4b556042bfeea64bde44c2e0194e6ee5",
+      "catalogPayloadHashMatched": true,
+      "catalogDeclaredSizeMatched": false
+    },
+    {
+      "id": "microsoft-vcredist-14.40.33810",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/1754ea58-11a6-44ab-a262-696e194ce543/3642E3F95D50CC193E4B5A0B0FFBF7FE2C08801517758B4C8AEB7105A091208A/VC_redist.x64.exe",
+      "bytes": 25397512,
+      "sha256": "3642e3f95d50cc193e4b5a0b0ffbf7fe2c08801517758b4c8aeb7105a091208a",
+      "hashReference": "https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/m/Microsoft/VCRedist/2015+/x64/14.40.33810.0/Microsoft.VCRedist.2015+.x64.installer.yaml",
+      "referenceHashMatched": true,
+      "cabMember": "packages/vcRuntimeMinimum_amd64/cab1.cab",
+      "cabSha256": "8fafd6d0754ee53125902df1b67ef2db86eb7af4c097522f2fb58443501fecdd"
+    }
+  ],
+  "dlls": [
+    {
+      "shippedPath": "python/vcruntime140.dll",
+      "fileVersion": "14.44.35211.0",
+      "bytes": 124544,
+      "sha256": "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066",
+      "pythonModes": ["bundled"],
+      "officialOrigin": "microsoft-vc143-14.44-base-vsix",
+      "officialMember": "Contents/VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/vcruntime140.dll",
+      "originalBytesMatched": true,
+      "windowsAuthenticodeStatus": "Valid",
+      "signer": "Microsoft Windows, Microsoft Corporation"
+    },
+    {
+      "shippedPath": "python/vcruntime140_1.dll",
+      "fileVersion": "14.44.35211.0",
+      "bytes": 49792,
+      "sha256": "1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f",
+      "pythonModes": ["bundled"],
+      "officialOrigin": "microsoft-vc143-14.44-base-vsix",
+      "officialMember": "Contents/VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/vcruntime140_1.dll",
+      "originalBytesMatched": true,
+      "windowsAuthenticodeStatus": "Valid",
+      "signer": "Microsoft Windows, Microsoft Corporation"
+    },
+    {
+      "shippedPath": "python/Lib/site-packages/hyperscan.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+      "fileVersion": "14.40.33810.0",
+      "bytes": 575056,
+      "sha256": "a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde",
+      "pythonModes": ["bundled", "local"],
+      "officialOrigin": "microsoft-vcredist-14.40.33810",
+      "officialMember": "msvcp140.dll_amd64",
+      "originalBytesMatched": true,
+      "windowsAuthenticodeStatus": "Valid",
+      "signer": "Microsoft Windows Software Compatibility Publisher, Microsoft Corporation",
+      "hyperscanWheel": {
+        "version": "0.9.1",
+        "url": "https://files.pythonhosted.org/packages/31/b9/38f4f926f1beb102df476dbac08ad4fe5fab2d6da916fb0259e41d0fbee1/hyperscan-0.9.1-cp312-cp312-win_amd64.whl",
+        "bytes": 1973007,
+        "sha256": "13241b1d3338818d45c37ffc18620326d5a88eab71ec32d01639ad0aa84469a0",
+        "dllFilenameChangedButBytesUnchanged": true,
+        "delvewheelVersionFromWheel": "1.13.1"
+      }
+    }
+  ],
+  "evidenceLimits": [
+    "Installation metadata and original-byte matches do not prove the distributor's eligibility, contractual authority or assent.",
+    "No complete channel-to-catalog integrity claim: downloaded catalog hashes/sizes and some CRT payload sizes differ from declarations; mismatches are retained in the local source report.",
+    "The distinct 14.40.33816 VSIX does not match the shipped MSVCP; the matching source is the 14.40.33810 EXE/CAB.",
+    "Windows Authenticode Valid includes timestamp-aware validation; a separate present-time offline certificate check can report NotTimeValid and is not substituted for Authenticode.",
+    "Existing runtime use EULAs/attribution files do not establish external distributor/end-user agreement. No agreement was accepted or new software installed in this review.",
+    "This documentation supplement is not inside the unchanged XPI/source ZIP; applicable shipping notices and acceptance behavior still need integration after the distributor decision."
+  ]
+}
