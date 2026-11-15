@@ -78,11 +78,11 @@ node --test tests/test_notes.cjs tests/test_annotations.cjs tests/test_sync.cjs
 node --test tests/test_alignment.cjs tests/test_notes.cjs tests/test_annotations.cjs tests/test_sync.cjs
 ```
 
-`test_notes.cjs` 的 10 项离线测试检查入口编排、元数据形状、父项/根 note 与 group 链接、选区转义、并发去重、只读处理、输入错误、白名单、缓存图像，以及保存前/保存时失败。采用小型 native-item、serializer、inert-DOM 替身；**不是实际 Zotero 编辑器、Gecko HTML 解析或数据库事务验收**，不启动 Zotero、不触碰日常 profile、不请求模型。
+`test_notes.cjs` 检查入口编排、元数据形状、父项/根 note 与 group 链接、选区转义、并发去重、只读处理、输入错误、白名单、缓存图像，以及原生 key 分配前/后保存失败。采用小型 native-item、serializer、inert-DOM 替身；**不是实际 Zotero 编辑器、Gecko HTML 解析或数据库事务验收**，不启动 Zotero、不触碰日常 profile、不请求模型。
 
 `test_alignment.cjs` 另加 6 项笔记 controller 检查：真实选区接口/焦点捕获与页标签、并发禁用、无效范围、原生保存队列/防抖状态、保存和打开的独立错误、关闭/复用后的迟到结果；加 2 项 native harness 隔离拒绝/配置路由检查，覆盖新 run 路径、指定报告、显式拒绝、路径不匹配和旧调用默认值。原有双向定位/hover 检查保留。替身不能认证 Gecko 跨 compartment DOM/Selection 包装或真实原生编辑器行为。
 
-现有 `tests/alignment_packaged.js` 增加了 **尚未执行**的原生步骤：可信鼠标拖选译文真实文字 → 实际笔记按钮；可信原生高亮工具拖选 → 实际汇总按钮；快速重复点击计数、`Notes.open` 返回与实际 `zotero:note` 编辑器 item、原生 note 的 citation/annotation 元数据和显式回链、PDF 字节/原生批注不变，以及分屏关闭/重开后 note 仍在。失败记录真实 stage/check，不注入选区或构造批注。需父 harness 的授权 fixture 在指定页提供完整可见文字 span；没有合适 span 时明确失败，不以注入替代。profile/data 不匹配时不写报告、不导入也不退出 Zotero。
+`tests/alignment_packaged.js` 已在 Linux Zotero 10.0.8 的两种重建 0.3.5 包执行原生步骤：可信拖选 → 实际笔记按钮；原生高亮工具拖选 → 实际汇总按钮；快速重复点击、正式 `Notes.open` 与实际编辑器 item、citation/annotation 元数据和回链、PDF/批注不变，以及真正进程冷重开。父级 PDF/映射是合成 fixture，选区、高亮、保存和编辑器均为原生动作；不冒充模型质量验收，见[限定证据](linux-verification-0.3.5.json)。原生高亮文字的 NFKC 规范化与 PDF 实际字面分开保留，不能将规范化差异或 JSON 位置字段误当功能失败。profile/data 不匹配时不写报告、不导入也不退出 Zotero。
 
 Runner 可在 harness 加载作用域传入以下配置；新验收须使用新的 run ID，不复用有历史数据的默认目录：
 
@@ -90,6 +90,8 @@ Runner 可在 harness 加载作用域传入以下配置；新验收须使用新�
 PAPERBRIDGE_ALIGNMENT_TEST = {
   isolated: true,
   phase: "create", // Use "reopen" in the next native process.
+  expectedVersion: "0.3.5",
+  expectedXpiSha256: "<actual XPI SHA-256>", // prepare_nonmac_test.py fills this from the explicit XPI.
   expectedProfileDirectory: "/absolute/new-run/profile",
   expectedDataDirectory: "/absolute/new-run/data",
   statePath: "/absolute/new-run/alignment-state.json",
@@ -97,25 +99,19 @@ PAPERBRIDGE_ALIGNMENT_TEST = {
 };
 ```
 
-传入配置时必须显式 `isolated: true`，且实际 profile/data 分别与期望路径一致，才允许执行和写报告。未传配置时保持旧调用兼容：`.runtime/alignment-profile`、`.runtime/alignment-data`、`.runtime/alignment-test.json`；默认 `phase: "create"`、state 为 `.runtime/alignment-state.json`。缺省路径字段也使用这些旧值，fixture 位置不变。
+新配置须提供实际期望版本与 XPI hash（或 helper 的 `baselineXpiSha256`），并显式 `isolated: true`；实际 profile/data 分别与期望路径一致才允许执行和写报告。使用 `prepare_nonmac_test.py` 自动生成这些字段，避免把当前源码或同名旧包当作安装证据。未传配置时保留旧目录调用：`.runtime/alignment-profile`、`.runtime/alignment-data`、`.runtime/alignment-test.json`；默认 `phase: "create"`、state 为 `.runtime/alignment-state.json`。缺省路径字段也使用这些旧值，fixture 位置不变。
 
 - **create**：保留完整双向定位、真实选区/原生高亮存 note、重复点击和分屏关闭/重开检查。全部动作完成后从 native item 重新读取已保存正文，保存两条 `noteRecords` 的 HTML/key/library/parent/实际文字/页码、citation/annotation 元数据及实际回链；另存父论文身份、子 note keys、两个附件身份/路径/PDF SHA-256、原生批注 JSON snapshot 和 `Services.appinfo.processID`。这是验收 state 文件，不是生产索引或数据库。继续前须确认 create 报告 `ok: true`。
 - **reopen**：正常退出 create 后，在同一 profile/data 的**新 native 进程**传入 `phase: "reopen"`，保留同一 `statePath`，换用新 `reportPath`。只读取 state，核对不同 PID、父论文/附件/note 归属、精确正文/引用/页码/回链、PDF bytes、批注 snapshot 和 note 数量。通过正式 `Zotero.Notes.open()` 打开已有 note，通过 `ZoteroPane.loadURI()` 路由**实际存下的译文回链**，只读观察正确译文页和已有批注选中；不调用 controller、不重新建 note/导入附件/注入批注，也不通过补设目标页掩盖回链失败。打开后再核对正文、附件和批注未变，写报告并正常 quit。state 不重写。
 
-两阶段均正常 quit；安装 XPI、create 新 run ID 和同 profile reopen 由 `prepare_nonmac_test.py` / 主代理负责，harness 不复制/重写 XPI、不修改 restart 或安装 metadata。分屏重开和真实进程冷重开是不同检查；新增冷重开分支尚未实际启动验收。
+两阶段均正常 quit；准备 create 新 run ID 和同 profile reopen 使用 `prepare_nonmac_test.py`，harness 不复制/重写 XPI、不修改 restart 或安装 metadata。分屏重开和真实进程冷重开是不同检查；后者已在上述两种 Linux 包执行，Windows/macOS 未认证。
 
-宿主私有接口仍需复核：生产 UI 借用 `_internalReader._primaryView._iframeWindow` / `right._primaryView._iframeWindow` 取得 iframe，另只读 `right._state.annotations` 判断防抖是否保存；这些是 Zotero 官方公开源码中的实现字段，不是稳定公开扩展 API。iframe 的 `PDFViewerApplication` 和 textLayer/page DOM 也属 reader/PDF.js 实现契约，JSON 字段结构差异可能使汇总保守提示“仍在保存”。原生 harness 另依赖 `zotero:note` window type 与 `zotero-note-editor` 元素 ID 来确认实际编辑器，这只是测试 UI 契约；生产打开使用已核对的正式 `Zotero.Notes.open()`，核心 notes 模块没有这些宿主私有字段依赖。本轮尚未运行原生环境，没有把这些兼容风险称作已发生故障。
+宿主私有接口仍有兼容风险：生产 UI 借用 `_internalReader._primaryView._iframeWindow` / `right._primaryView._iframeWindow` 取得 iframe，另只读 `right._state.annotations` 判断防抖是否保存；这些是官方源码实现字段，不是稳定扩展 API。iframe 的 `PDFViewerApplication`、textLayer/page DOM 和 JSON 结构差异可能影响选区或使汇总提示“仍在保存”。测试另依赖 `zotero:note` window type、`zotero-note-editor` ID；生产打开使用正式 `Zotero.Notes.open()`，核心 notes 模块没有这些私有字段依赖。Linux Zotero 10.0.8 已覆盖该路径，其他平台/版本仍须原生复核。
 
 冷重开 harness 的额外契约：`loadURI()` 返回 void，必须等实际 reader/页渲染，不能将返回视为导航成功；tab 使用已有 `Reader.getByTabID()`，原生独立 reader 窗口只读 `zotero:reader` 的 `window.reader`。观察批注选中依赖 reader 私有 `_state.selectedAnnotationIDs`，已对照 Zotero 10.0.8 对应的[官方 reader 源码](https://github.com/zotero/reader/blob/c3d467bfcb9e3a8cacfbbe04c5c7fd1369030a36/src/common/reader.js)，不是稳定扩展 API。原生 note window unload 的 `saveSync()` 实际启动异步保存，harness 等待正式 `Zotero.DB.waitForTransaction()` 后用 `note.reload(["note"], true)` 读持久化正文；若正常编辑器打开/关闭规范化 HTML 而改变正文，精确比较会明确失败，不重写 checkpoint 假装保留。实际回链观察不声称每次都发生了物理位移（reader 可能已在该页），也不替代人工点击 citation preview / inline 图像验收。
 
-主代理打包后，在获授权的 Linux Zotero 10.0.8 **隔离 profile/data** 检查以下契约；本子任务没有启动或验收 Zotero：
+## 验证边界
 
-1. 模块实际加载，作用域能解析 `PaperBridgeNotes`；`Zotero.getMainWindow().DOMParser` 的 inert template 路径可用。缺 API/解析失败只报本动作错误，基本阅读和现有原生批注继续工作。
-2. 通过真实 reader 工具创建译文高亮/下划线/评论，等待 adapter 保存。导出全部和指定子集，确认 native note 仅一条、parent/library 正确，原文/译文 PDF、已有批注归属与内容未变。独立 PDF 单独验证根 note。
-3. 打开返回 note，检查实际引用预览、`data-citation-items` 和 native annotation 元数据仍保留；真实点击回链应打开**译文附件、正确物理页及已有批注**。选区入口无批注 key，点击显式回链仍准确回到指定译文页。源附件链接不伪称对应页。
-4. 真实划选含引号、`&`、中文、换行和类似 HTML 的文字；比对主代理传入的 actualSelectionText，检查原生 note 的文字/格式、页标签与 unitID，不接受脚本/事件执行。自定义恶意模板须经真实 Gecko 解析验证无活动内容/外部资源加载。
-5. 重复快速点击及在加载延迟时重复点击，只得到同一返回 note；成功后明确再点允许创建第二条。保存失败显示 attempted key、不自动重试，核查是否有已提交 note，不将缓存判断冒充 DB 结果。
-6. 区域/绘图有 native 缓存时检查图像、citation 与回链；缺缓存检查可读错误且无空 note。真实 group 许可需要可用授权测试库：notes 可写/files 不可写与 library 全只读分别验证；本轮小替身不代替 group 原生验收。
-7. 正常退出并真冷重开同一隔离 profile/data，确认 note 正文、引用、页码与回链、inline 图像保留；检查 note 数量、批注未改及停机数据库完整性。
+Linux 两种包已验证实际选区/高亮新建 note、正确 parent/library、原生引用元数据、页码/批注回链、编辑器打开、并发去重和新进程持久化，停机数据库完整性为 `ok`。详情集中在上述证据文件，不把小替身或 CI 产物核对当作原生通过。
 
-核心与有限分屏 UI/reader 挂接已交付；真实 Linux alignment/notes 验收仍待主代理完成。尤其须验证真实 pointerdown→focus→click 的 Selection 保留、文本层 Range 的 Gecko 包装、原生 reader 防抖 JSON 比较、PDFDocumentProxy 页标签接口、`Notes.open` 窗口、实际回链和两阶段冷重开证据。没有 Windows/macOS 验收、BabelDOC 迁移、术语、新语言、双向批注同步或隐式收费功能；本轮未启动 Zotero、重建、提交或维护 MEMORY。
+独立 PDF 根 note、真实 group 权限、图像/绘图和 citation preview 的 UI、复杂恶意模板/特殊文本等扩展场景仍须单独授权验证；现有核心测试不代替这些原生场景。Windows 由[独立清单](windows-acceptance-0.3.5.md)交接，macOS 暂不推进。任何缺接口/权限/缓存错误只影响该笔记动作，不阻断普通 PDF 阅读，不隐式收费或重试。

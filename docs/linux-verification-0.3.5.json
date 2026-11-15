@@ -1,0 +1,862 @@
+{
+  "schemaVersion": 1,
+  "description": "Actual Linux 0.3.5 candidate package, native note/reading/upgrade and shutdown evidence.",
+  "checkedAtUTC": "2026-11-15T00:25:51.089487+00:00",
+  "sourceCheckedAgainstCommit": "5e8e471ac2ff78ae82f1238dcf65335dfd164937",
+  "version": "0.3.5",
+  "engine": "BabelDOC 0.6.4",
+  "platform": "linux-x64",
+  "host": "Ubuntu 24.04.4 LTS / glibc 2.39 / Zotero 10.0.8",
+  "publicStableVersion": "0.3.4",
+  "newReleaseOrFeedPublished": false,
+  "localStage": "Existing native Linux stage repackaged; this is not a fresh-stage CI claim.",
+  "licenseCompliance": "unknown",
+  "providerCallsThisRound": 0,
+  "artifacts": [
+    {
+      "mode": "bundled",
+      "path": "dist/paperbridge-0.3.5-linux-x64.xpi",
+      "name": "paperbridge-0.3.5-linux-x64.xpi",
+      "sha256": "1a8bbe96685067041b0653d7110d8db752eaf3a2793b8b20ef20c14f728ad604",
+      "bytes": 286148057,
+      "compressedEntryBytes": 284358855,
+      "expandedBytes": 684646162,
+      "entryCount": 6573,
+      "fileCount": 6573,
+      "runtime": {
+        "version": "0.3.5",
+        "platform": "linux-x64",
+        "pythonMode": "bundled",
+        "python": "3.12.16",
+        "buildId": "05331e6238d5135ab589f8e52b51de867a0108ab03984e9e4fa60c01450f2e89",
+        "payloadSha256": "635239dd28fe7839291f895e27085fd7bff87cd6158a43b7c38422c1866f10b5"
+      },
+      "sourceModuleCount": 31,
+      "sourceModulesMatchCurrentCommit": true,
+      "sourceComparison": "30 unchanged file byte hashes plus the independently verified generated platform/mode manifest.",
+      "inventorySHA256": "b9e28a003ed3ac379e7c4e28e6ca2011e61e02f5b9f7adc8622be0202098757f",
+      "verificationSHA256": "514351698567b82d13dba36ebfcdd8f5135e849ef91f86d9fbb7f21d13d05802",
+      "warnings": [
+        "Component license evidence unknown or empty: CPython interpreter/stdlib.",
+        "Component license evidence unknown or empty: Layout model assets.",
+        "Component license evidence unknown or empty: Tokenizer assets.",
+        "Package size increased versus the supplied baseline; advisory only, no size gate."
+      ]
+    },
+    {
+      "mode": "local",
+      "path": "dist/paperbridge-0.3.5-linux-x64-local-python.xpi",
+      "name": "paperbridge-0.3.5-linux-x64-local-python.xpi",
+      "sha256": "90ea2bc98e79f0daac6d68eab41835744b1a27c332c300b1c74045f9e0b2bea9",
+      "bytes": 248229817,
+      "compressedEntryBytes": 246571619,
+      "expandedBytes": 573499368,
+      "entryCount": 5960,
+      "fileCount": 5960,
+      "runtime": {
+        "version": "0.3.5",
+        "platform": "linux-x64",
+        "pythonMode": "local",
+        "python": "3.12.16",
+        "buildId": "11c2cf88395649db54f8637eb40f84bb2a2796804212d4364a5af701d95196ff",
+        "payloadSha256": "a9b64842a2faab6d3124df6e78c97e6b5be126de75ab9c9adf6ed6c0dfa5f11b"
+      },
+      "sourceModuleCount": 31,
+      "sourceModulesMatchCurrentCommit": true,
+      "sourceComparison": "30 unchanged file byte hashes plus the independently verified generated platform/mode manifest.",
+      "inventorySHA256": "fa0abc3838f33abb9f5abd92bd0ef4f9e7f1bf161376efc9d7f7093c2074a313",
+      "verificationSHA256": "2c7c859ad14aa4a06768612b54c332698066ef193d35b75d2431baeefa82edc2",
+      "warnings": [
+        "Component license evidence unknown or empty: Layout model assets.",
+        "Component license evidence unknown or empty: Tokenizer assets.",
+        "Package size increased versus the supplied baseline; advisory only, no size gate."
+      ]
+    }
+  ],
+  "nativeSuites": [
+    {
+      "suite": "alignment",
+      "runID": "p035fix3-b",
+      "mode": "bundled",
+      "profile": ".runtime/alignment-p035fix3-b-profile",
+      "data": ".runtime/alignment-p035fix3-b-data",
+      "installedXpiSHA256": "1a8bbe96685067041b0653d7110d8db752eaf3a2793b8b20ef20c14f728ad604",
+      "phases": [
+        {
+          "phase": "create",
+          "report": ".runtime/alignment-p035fix3-b-create.json",
+          "reportSHA256": "198d508497a22e6aad18c32fb292c9fb69cac8e471e26fb5c0cc7ca5acb151b7",
+          "ok": true,
+          "checks": 128,
+          "nativeProcessID": 1610752,
+          "normalProcessExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "report": ".runtime/alignment-p035fix3-b-reopen.json",
+          "reportSHA256": "c559d67b951c6a935d7c97fc779a4771466de999434b6a1bcca3bd0d04f4d9a7",
+          "ok": true,
+          "checks": 37,
+          "nativeProcessID": 1616640,
+          "normalProcessExitCode": 0
+        }
+      ],
+      "database": {
+        "path": ".runtime/alignment-p035fix3-b-data/zotero.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true
+      },
+      "genuineNewProcessReopen": true,
+      "scope": {
+        "pdfInputs": "Synthetic parent fixtures; not newly translated papers",
+        "mappingGeneration": "parent_fixture_only",
+        "explicitNativeNavigationBothWays": {
+          "source": true,
+          "target": true
+        },
+        "nativeNotesCreated": 2,
+        "nativeNotesReopenedWithoutCreation": 2,
+        "persistedCitationAndBacklinksVerified": true,
+        "pdfAndAnnotationsUnchanged": true
+      }
+    },
+    {
+      "suite": "alignment",
+      "runID": "p035fix-l",
+      "mode": "local",
+      "profile": ".runtime/alignment-p035fix-l-profile",
+      "data": ".runtime/alignment-p035fix-l-data",
+      "installedXpiSHA256": "90ea2bc98e79f0daac6d68eab41835744b1a27c332c300b1c74045f9e0b2bea9",
+      "phases": [
+        {
+          "phase": "create",
+          "report": ".runtime/alignment-p035fix-l-create.json",
+          "reportSHA256": "5a9841fe97fd2bebb054dd2629fc230bf56ef95308c2c2cf79abc3b63cbf026d",
+          "ok": true,
+          "checks": 128,
+          "nativeProcessID": 1616839,
+          "normalProcessExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "report": ".runtime/alignment-p035fix-l-reopen.json",
+          "reportSHA256": "21a09b0fc0b0257b98883afe707429605c6fa33ffa58300eaf0f5993b6aca4aa",
+          "ok": true,
+          "checks": 37,
+          "nativeProcessID": 1617749,
+          "normalProcessExitCode": 0
+        }
+      ],
+      "database": {
+        "path": ".runtime/alignment-p035fix-l-data/zotero.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true
+      },
+      "genuineNewProcessReopen": true,
+      "scope": {
+        "pdfInputs": "Synthetic parent fixtures; not newly translated papers",
+        "mappingGeneration": "parent_fixture_only",
+        "explicitNativeNavigationBothWays": {
+          "source": true,
+          "target": true
+        },
+        "nativeNotesCreated": 2,
+        "nativeNotesReopenedWithoutCreation": 2,
+        "persistedCitationAndBacklinksVerified": true,
+        "pdfAndAnnotationsUnchanged": true
+      }
+    },
+    {
+      "suite": "reading",
+      "runID": "p035fix-b",
+      "mode": "bundled",
+      "profile": ".runtime/reading-p035fix-b-profile",
+      "data": ".runtime/reading-p035fix-b-data",
+      "installedXpiSHA256": "1a8bbe96685067041b0653d7110d8db752eaf3a2793b8b20ef20c14f728ad604",
+      "phases": [
+        {
+          "phase": "create",
+          "report": ".runtime/reading-p035fix-b-create.json",
+          "reportSHA256": "af31b592ff7d6dc5c64ba1c98dc016f2c7b1247d70db09a9dd6b878431e20787",
+          "ok": true,
+          "checks": 123,
+          "nativeProcessID": 1617942,
+          "normalProcessExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "report": ".runtime/reading-p035fix-b-reopen.json",
+          "reportSHA256": "93e12e8a3bb11bec324034dc75a9464efd49806b8c3cbebd0f7d6c134ab02305",
+          "ok": true,
+          "checks": 133,
+          "nativeProcessID": 1618644,
+          "normalProcessExitCode": 0
+        }
+      ],
+      "database": {
+        "path": ".runtime/reading-p035fix-b-data/zotero.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true
+      },
+      "genuineNewProcessReopen": true,
+      "scope": {
+        "pdfInputs": "Existing authorized papers, offline cache-only 0.3.5 replay",
+        "cases": [
+          {
+            "id": "scikit-learn-2011",
+            "units": 8
+          },
+          {
+            "id": "liblinear-2008",
+            "units": 10
+          }
+        ],
+        "paragraphHoverAndNativeAnnotationChecks": true,
+        "fullPaperSemantics": "not_accepted"
+      }
+    },
+    {
+      "suite": "reading",
+      "runID": "p035fix-l",
+      "mode": "local",
+      "profile": ".runtime/reading-p035fix-l-profile",
+      "data": ".runtime/reading-p035fix-l-data",
+      "installedXpiSHA256": "90ea2bc98e79f0daac6d68eab41835744b1a27c332c300b1c74045f9e0b2bea9",
+      "phases": [
+        {
+          "phase": "create",
+          "report": ".runtime/reading-p035fix-l-create.json",
+          "reportSHA256": "9d3310b46e741485f695dbb16b9d7476b34d081c77577ecb8cb54ae493076864",
+          "ok": true,
+          "checks": 123,
+          "nativeProcessID": 1619036,
+          "normalProcessExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "report": ".runtime/reading-p035fix-l-reopen.json",
+          "reportSHA256": "280e646451ce2487e0dec04ba4d1d6f5b5c8f2235fb53c602f3d395e5c4fe523",
+          "ok": true,
+          "checks": 133,
+          "nativeProcessID": 1619717,
+          "normalProcessExitCode": 0
+        }
+      ],
+      "database": {
+        "path": ".runtime/reading-p035fix-l-data/zotero.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true
+      },
+      "genuineNewProcessReopen": true,
+      "scope": {
+        "pdfInputs": "Existing authorized papers, offline cache-only 0.3.5 replay",
+        "cases": [
+          {
+            "id": "scikit-learn-2011",
+            "units": 8
+          },
+          {
+            "id": "liblinear-2008",
+            "units": 10
+          }
+        ],
+        "paragraphHoverAndNativeAnnotationChecks": true,
+        "fullPaperSemantics": "not_accepted"
+      }
+    },
+    {
+      "suite": "upgrade",
+      "runID": "p035fix-b",
+      "mode": "bundled",
+      "profile": ".runtime/upgrade-p035fix-b-profile",
+      "data": ".runtime/upgrade-p035fix-b-data",
+      "installedXpiSHA256": "1a8bbe96685067041b0653d7110d8db752eaf3a2793b8b20ef20c14f728ad604",
+      "phases": [
+        {
+          "phase": "create",
+          "report": ".runtime/upgrade-p035fix-b-create.json",
+          "reportSHA256": "269a66f4f1b99e9695d035fe458282584b79d6efa661efa6b837aa29aa57e2fa",
+          "ok": true,
+          "checks": 6,
+          "nativeProcessID": 1620175,
+          "normalProcessExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "report": ".runtime/upgrade-p035fix-b-reopen.json",
+          "reportSHA256": "d9fd4d7bd893885a85fc77299fd5f7ddc1fe78a57de60d36c02fc2881f04973b",
+          "ok": true,
+          "checks": 49,
+          "nativeProcessID": 1620979,
+          "normalProcessExitCode": 0
+        }
+      ],
+      "database": {
+        "path": ".runtime/upgrade-p035fix-b-data/zotero.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true
+      },
+      "genuineNewProcessReopen": true,
+      "scope": {
+        "upgrade": "0.3.4 to 0.3.5 via native AddonManager file installation",
+        "newEngineMarker": {
+          "version": "0.3.5",
+          "platform": "linux-x64",
+          "pythonMode": "bundled",
+          "buildId": "05331e6238d5135ab589f8e52b51de867a0108ab03984e9e4fa60c01450f2e89"
+        },
+        "automaticUpdateVerified": false,
+        "realNativeCopySearch": [
+          {
+            "term": "机器学习",
+            "selected": "机器学习",
+            "findMatchCount": 4
+          },
+          {
+            "term": "600,000",
+            "selected": "600,000",
+            "findMatchCount": 3
+          }
+        ],
+        "syntheticInternalLinkInput": "Real pipeline with simulated provider response; not a paid translation",
+        "nativeCredentialReplacementAndRealmClearing": true,
+        "startupFailureNativeZIPAndTempFallback": true
+      },
+      "paragraphCache": {
+        "path": ".runtime/upgrade-p035fix-b-data/paperbridge/cache/paragraphs.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true,
+        "historicalBytesPreserved": true,
+        "sha256": "69a9072a4d4202db6ee02e966cd3b7d3e9691092406ac07633052704d9956fce"
+      }
+    },
+    {
+      "suite": "upgrade",
+      "runID": "p035fix-l",
+      "mode": "local",
+      "profile": ".runtime/upgrade-p035fix-l-profile",
+      "data": ".runtime/upgrade-p035fix-l-data",
+      "installedXpiSHA256": "90ea2bc98e79f0daac6d68eab41835744b1a27c332c300b1c74045f9e0b2bea9",
+      "phases": [
+        {
+          "phase": "create",
+          "report": ".runtime/upgrade-p035fix-l-create.json",
+          "reportSHA256": "b2db8787ff2722e02f2337f3fc147b4f0eaafa03361df55b8e9b16676e7be259",
+          "ok": true,
+          "checks": 6,
+          "nativeProcessID": 1621280,
+          "normalProcessExitCode": 0
+        },
+        {
+          "phase": "reopen",
+          "report": ".runtime/upgrade-p035fix-l-reopen.json",
+          "reportSHA256": "f58e09fa919a3284bfe0e73d70d001310309e6fbc10d6175d3f6dd675de53b68",
+          "ok": true,
+          "checks": 49,
+          "nativeProcessID": 1621728,
+          "normalProcessExitCode": 0
+        }
+      ],
+      "database": {
+        "path": ".runtime/upgrade-p035fix-l-data/zotero.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true
+      },
+      "genuineNewProcessReopen": true,
+      "scope": {
+        "upgrade": "0.3.4 to 0.3.5 via native AddonManager file installation",
+        "newEngineMarker": {
+          "version": "0.3.5",
+          "platform": "linux-x64",
+          "pythonMode": "local",
+          "buildId": "11c2cf88395649db54f8637eb40f84bb2a2796804212d4364a5af701d95196ff"
+        },
+        "automaticUpdateVerified": false,
+        "realNativeCopySearch": [
+          {
+            "term": "机器学习",
+            "selected": "机器学习",
+            "findMatchCount": 4
+          },
+          {
+            "term": "600,000",
+            "selected": "600,000",
+            "findMatchCount": 3
+          }
+        ],
+        "syntheticInternalLinkInput": "Real pipeline with simulated provider response; not a paid translation",
+        "nativeCredentialReplacementAndRealmClearing": true,
+        "startupFailureNativeZIPAndTempFallback": true
+      },
+      "paragraphCache": {
+        "path": ".runtime/upgrade-p035fix-l-data/paperbridge/cache/paragraphs.sqlite",
+        "result": "ok",
+        "readOnly": true,
+        "bytesUnchangedByCheck": true,
+        "historicalBytesPreserved": true,
+        "sha256": "69a9072a4d4202db6ee02e966cd3b7d3e9691092406ac07633052704d9956fce"
+      }
+    }
+  ],
+  "offlineContracts": {
+    "mode": "full",
+    "pythonPassed": 243,
+    "pythonSkipped": 1,
+    "nodeSuitesPassed": 22,
+    "syntaxChecksPassed": true,
+    "skipReason": "Optional reference PDF is absent; no substitute fixture declared it passed.",
+    "logSHA256": "5fdbcab2c24a3b5a9a68d273a667c166b2d3d6aab450ea5d315177eebc52d342"
+  },
+  "qualityEvidence": "docs/quality-verification-0.3.5.json",
+  "notClaimed": [
+    "Windows/macOS native acceptance",
+    "Public automatic 0.3.5 delivery",
+    "Human bilingual or whole-paper acceptance",
+    "New paid provider checks",
+    "TC/JA offline language support",
+    "Terminology implementation",
+    "Package slimming implementation"
+  ],
+  "shutdown": {
+    "allTwelvePhasesExitedNormally": true,
+    "taskOwnedProcessesRemaining": [],
+    "forcedExternalKills": 0,
+    "dailyProfileUsed": false,
+    "scope": "Only the six explicit task-owned profile/data pairs were inspected."
+  },
+  "nativeChecksPassed": 952,
+  "candidateBuildCI": {
+    "runID": 43656079515,
+    "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43656079515",
+    "sourceCommit": "5e8e471ac2ff78ae82f1238dcf65335dfd164937",
+    "target": "linux",
+    "status": "success",
+    "freshNativeStageCheck": "Actual Ubuntu runner imports, model load and tokenizer encode with network blocked",
+    "zoteroAcceptance": "not_tested_for_these_CI_bytes",
+    "releaseOrFeedPublication": false,
+    "licenseCompliance": "unknown",
+    "artifacts": [
+      {
+        "mode": "bundled",
+        "artifactID": 14138765290,
+        "name": "candidate-linux-x64-bundled-43656079515-1",
+        "artifactBytes": 288861523,
+        "artifactSHA256": "17f4ff4f7aee1fb1edc4ec83a47c19a307a21f63b3b67624f6e45487ae3ba90a",
+        "expiresAtUTC": "2026-11-18T00:04:10Z",
+        "xpi": {
+          "name": "paperbridge-0.3.5-linux-x64.xpi",
+          "sha256": "388b796f4a07756bbe30d87af8622b8e91170c2bdd6dc7a0bf94571972825022",
+          "bytes": 286284321,
+          "compressedEntryBytes": 284495123,
+          "expandedBytes": 684790982,
+          "entryCount": 6573,
+          "fileCount": 6573
+        },
+        "runtime": {
+          "version": "0.3.5",
+          "platform": "linux-x64",
+          "pythonMode": "bundled",
+          "python": "3.12.16",
+          "buildId": "e31d4d59378841eee728dd7f366feb6f6726f82f4e5d3fb5821019dfbd844dc6",
+          "payloadSha256": "9ca7069126a342335289f19e2f1054cf7cc28458e9063a284970bd86d74ccc85"
+        },
+        "sourceComparison": "30 unchanged file byte hashes plus verified generated platform/mode manifest",
+        "outerAndXpiCRC": "passed",
+        "modelMatchesRealStageProof": true,
+        "stageProofSHA256": "a1d280c8053c0654a625ffce0b9e5392b776bbcd7ffec6027bb40b202cf85dad",
+        "independentVerificationSHA256": "7a484ab47b0c4cd3bbfd37f933dfd73f7fa53f46fa832b84228c0f29fb624026",
+        "warnings": [
+          "Component license evidence unknown or empty: CPython interpreter/stdlib.",
+          "Component license evidence unknown or empty: Layout model assets.",
+          "Component license evidence unknown or empty: Tokenizer assets."
+        ]
+      },
+      {
+        "mode": "local",
+        "artifactID": 14138675481,
+        "name": "candidate-linux-x64-local-43656079515-1",
+        "artifactBytes": 250618317,
+        "artifactSHA256": "6ad8c2348bad9d2ec7fc1799fea443683842afb543334cbf33163fbaf3f9c73f",
+        "expiresAtUTC": "2026-11-18T00:04:15Z",
+        "xpi": {
+          "name": "paperbridge-0.3.5-linux-x64-local-python.xpi",
+          "sha256": "d4cff47af7c8f9008b23f281d961077f54995ae7ff470d5a19dd7bd886fc6b2b",
+          "bytes": 248229809,
+          "compressedEntryBytes": 246571611,
+          "expandedBytes": 573499368,
+          "entryCount": 5960,
+          "fileCount": 5960
+        },
+        "runtime": {
+          "version": "0.3.5",
+          "platform": "linux-x64",
+          "pythonMode": "local",
+          "python": "3.12.16",
+          "buildId": "74891ce89369d3cd19f3b5e93b9146b4bd151d55f78910fe670842a530763df2",
+          "payloadSha256": "a156be430443e4f433381f1e324326ec09ef35d2b856bc54060bbdf49ce60653"
+        },
+        "sourceComparison": "30 unchanged file byte hashes plus verified generated platform/mode manifest",
+        "outerAndXpiCRC": "passed",
+        "modelMatchesRealStageProof": true,
+        "stageProofSHA256": "a1d280c8053c0654a625ffce0b9e5392b776bbcd7ffec6027bb40b202cf85dad",
+        "independentVerificationSHA256": "baa77b3b4601c82abdb1c1fe5f91ef5d6b4d1c5dd802b85b4a0665ab27b6f6fb",
+        "warnings": [
+          "Component license evidence unknown or empty: Layout model assets.",
+          "Component license evidence unknown or empty: Tokenizer assets."
+        ]
+      }
+    ],
+    "stageProof": {
+      "sourceCommit": "5e8e471ac2ff78ae82f1238dcf65335dfd164937",
+      "runtime": {
+        "version": "0.3.5",
+        "platform": "linux-x64",
+        "python": "3.12.16",
+        "packages": [
+          {
+            "name": "annotated-types",
+            "version": "0.8.0"
+          },
+          {
+            "name": "anyio",
+            "version": "4.15.1"
+          },
+          {
+            "name": "BabelDOC",
+            "version": "0.6.4"
+          },
+          {
+            "name": "backports.zstd",
+            "version": "1.8.0"
+          },
+          {
+            "name": "bitarray",
+            "version": "3.12.3"
+          },
+          {
+            "name": "bitstring",
+            "version": "4.4.0"
+          },
+          {
+            "name": "certifi",
+            "version": "2026.10.23"
+          },
+          {
+            "name": "cffi",
+            "version": "2.1.1"
+          },
+          {
+            "name": "chardet",
+            "version": "7.7.0"
+          },
+          {
+            "name": "charset-normalizer",
+            "version": "3.5.2"
+          },
+          {
+            "name": "click",
+            "version": "8.5.0"
+          },
+          {
+            "name": "cloudpickle",
+            "version": "3.1.2"
+          },
+          {
+            "name": "ConfigArgParse",
+            "version": "1.8.0"
+          },
+          {
+            "name": "cryptography",
+            "version": "50.0.2"
+          },
+          {
+            "name": "distro",
+            "version": "1.9.0"
+          },
+          {
+            "name": "filelock",
+            "version": "4.2.4"
+          },
+          {
+            "name": "flatbuffers",
+            "version": "25.12.19"
+          },
+          {
+            "name": "fonttools",
+            "version": "4.67.0"
+          },
+          {
+            "name": "freetype-py",
+            "version": "2.5.1"
+          },
+          {
+            "name": "fsspec",
+            "version": "2026.9.0"
+          },
+          {
+            "name": "h11",
+            "version": "0.16.0"
+          },
+          {
+            "name": "httpcore",
+            "version": "1.0.9"
+          },
+          {
+            "name": "httpcore2",
+            "version": "2.16.0"
+          },
+          {
+            "name": "httpx",
+            "version": "0.28.1"
+          },
+          {
+            "name": "httpx2",
+            "version": "2.16.0"
+          },
+          {
+            "name": "hyperscan",
+            "version": "0.9.1"
+          },
+          {
+            "name": "idna",
+            "version": "3.20"
+          },
+          {
+            "name": "Jinja2",
+            "version": "3.1.6"
+          },
+          {
+            "name": "jiter",
+            "version": "0.18.0"
+          },
+          {
+            "name": "Levenshtein",
+            "version": "0.27.5"
+          },
+          {
+            "name": "lxml",
+            "version": "6.1.3"
+          },
+          {
+            "name": "markdown-it-py",
+            "version": "4.2.0"
+          },
+          {
+            "name": "MarkupSafe",
+            "version": "3.0.4"
+          },
+          {
+            "name": "mdurl",
+            "version": "0.1.2"
+          },
+          {
+            "name": "ml_dtypes",
+            "version": "0.6.0"
+          },
+          {
+            "name": "msgpack",
+            "version": "1.2.4"
+          },
+          {
+            "name": "numpy",
+            "version": "2.5.4"
+          },
+          {
+            "name": "onnx",
+            "version": "1.23.2"
+          },
+          {
+            "name": "onnxruntime",
+            "version": "1.31.1"
+          },
+          {
+            "name": "openai",
+            "version": "2.54.0"
+          },
+          {
+            "name": "opencv-python-headless",
+            "version": "5.0.0.93"
+          },
+          {
+            "name": "orjson",
+            "version": "3.13.0"
+          },
+          {
+            "name": "packaging",
+            "version": "26.3"
+          },
+          {
+            "name": "peewee",
+            "version": "3.19.0"
+          },
+          {
+            "name": "pillow",
+            "version": "13.0.0"
+          },
+          {
+            "name": "protobuf",
+            "version": "7.36.2"
+          },
+          {
+            "name": "psutil",
+            "version": "7.2.2"
+          },
+          {
+            "name": "pycparser",
+            "version": "3.12"
+          },
+          {
+            "name": "pydantic",
+            "version": "2.14.1"
+          },
+          {
+            "name": "pydantic_core",
+            "version": "2.50.1"
+          },
+          {
+            "name": "Pygments",
+            "version": "2.21.0"
+          },
+          {
+            "name": "PyMuPDF",
+            "version": "1.26.7"
+          },
+          {
+            "name": "pymupdf4llm",
+            "version": "0.2.9"
+          },
+          {
+            "name": "PyYAML",
+            "version": "6.0.3"
+          },
+          {
+            "name": "pyzstd",
+            "version": "0.20.0"
+          },
+          {
+            "name": "RapidFuzz",
+            "version": "3.14.6"
+          },
+          {
+            "name": "regex",
+            "version": "2026.9.29"
+          },
+          {
+            "name": "requests",
+            "version": "2.34.2"
+          },
+          {
+            "name": "rich",
+            "version": "15.0.0"
+          },
+          {
+            "name": "rtree",
+            "version": "1.4.1"
+          },
+          {
+            "name": "sniffio",
+            "version": "1.3.1"
+          },
+          {
+            "name": "socksio",
+            "version": "1.0.0"
+          },
+          {
+            "name": "tabulate",
+            "version": "0.10.0"
+          },
+          {
+            "name": "tenacity",
+            "version": "9.2.1"
+          },
+          {
+            "name": "tibs",
+            "version": "0.5.7"
+          },
+          {
+            "name": "tiktoken",
+            "version": "0.14.0"
+          },
+          {
+            "name": "toml",
+            "version": "0.10.2"
+          },
+          {
+            "name": "toposort",
+            "version": "1.10"
+          },
+          {
+            "name": "tqdm",
+            "version": "4.70.1"
+          },
+          {
+            "name": "truststore",
+            "version": "0.10.5"
+          },
+          {
+            "name": "typing_extensions",
+            "version": "4.16.0"
+          },
+          {
+            "name": "typing-inspection",
+            "version": "0.4.4"
+          },
+          {
+            "name": "uharfbuzz",
+            "version": "0.57.0"
+          },
+          {
+            "name": "urllib3",
+            "version": "2.8.0"
+          },
+          {
+            "name": "xsdata",
+            "version": "26.10"
+          }
+        ]
+      },
+      "check": "native_imports_and_model_load",
+      "network": "blocked_for_check",
+      "zoteroAcceptance": "not_tested",
+      "translationSemantics": "not_tested",
+      "model": {
+        "path": ".cache/babeldoc/models/doclayout_yolo_docstructbench_imgsz1024.onnx",
+        "bytes": 75324598,
+        "sha256": "fece9af02f618b603ff7921ccec6861d13e7e1f9830e091dfb7e8ad9311e5b21"
+      },
+      "onnxruntime": "1.31.1",
+      "providers": [
+        "CPUExecutionProvider"
+      ],
+      "opencv": "5.0.0",
+      "tokenizerEncoding": "o200k_base"
+    }
+  },
+  "lightweightCI": {
+    "runID": 43656077025,
+    "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43656077025",
+    "sourceCommit": "5e8e471ac2ff78ae82f1238dcf65335dfd164937",
+    "jobs": [
+      {
+        "name": "Core offline (ubuntu-latest)",
+        "status": "success"
+      },
+      {
+        "name": "Core offline (macos-latest)",
+        "status": "success"
+      },
+      {
+        "name": "Core offline (windows-latest)",
+        "status": "success"
+      }
+    ],
+    "nativeZoteroAcceptance": "not_tested"
+  }
+}

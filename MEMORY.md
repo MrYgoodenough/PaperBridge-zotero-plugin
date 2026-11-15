@@ -2,10 +2,11 @@
 # 当前开发基线
 
 - 共享源码与本机 Linux 候选为 PaperBridge **0.3.5**，主分支 `master`；Linux/Windows 四条稳定公开通道仍为 **0.3.4**，不因源码更新自动覆盖。0.3.5 新增启动失败诊断、显式服务检查、双向可信片段定位、独立笔记回写和书目/字体修复。固定 BabelDOC 0.6.4 / PyMuPDF 1.26.7，默认 `deepseek-flash`。版本须同步 addon manifest、`backend/server.py VERSION`、pyproject 与 uv.lock；`tests/test_bridge.py` 核对契约。
+- 本机两种重建 Linux 0.3.5 候选在 Ubuntu 24.04.4 / Zotero 10.0.8 各完成 476 项限定原生检查：双向定位/独立 note 新建与真进程重开、真实缓存论文阅读、0.3.4 原生文件升级、复制/搜索、密钥替换身份与诊断回退；六套隔离库停机 integrity `ok`，无自有进程残留。精确 XPI hash 和范围见 `docs/linux-verification-0.3.5.json`。这是本机原生 stage 重打包，不是 Windows 验收或新公开自动投递；旧同名候选的通过不能沿用。
 - 改动生产 addon/backend 后必须重建各平台 XPI；同名旧包不会跟随源码更新。四种 0.3.4 包均核对 29 个发货源码文件及最终 XPI SHA-256，在 Ubuntu 24.04 / Win11 + Zotero 10.0.8 各通过 290 项代表性片段读取、304 项同 profile 真冷重开、112 项悬停/批注/降级检查；正常退出、库完整性 `ok`、无隔离引擎残留。Windows 在 `desktop-hz` 使用历史原生 stage 重打包后实机验证，不是交叉编译。当前包与限定范围见 `docs/nonmac-verification-2026-11-15.json`；macOS 未重建。
 - GitHub `v0.3.4` 有四种已验收 XPI 与四份校验文件。根目录 `updates/` 四条 Linux/Windows 独立通道已发布 0.3.4，精确公开 URL、内容/版本/资产 hash 均实测一致；先发布资产再启用清单，不使用查询串绕缓存。四种包均实际完成 `AddonManager.findUpdates` → 公共下载/安装 → 同 profile 真冷重开（0.3.2→0.3.4，18+14 项），并核对当前 health/installed marker 版本和 build ID。`0.3.3` 历史公开资产保留但曾发现后端公开版本不一致，当前使用修复后的 0.3.4。不要把仓库级 `releases/latest` 当作平台回退：Latest 仍为独立 macOS 0.4.2，其 tag/资产/通道未改动；`example.invalid` 的旧安装仍需原生手动安装一次。
 - 日常安装必须保留停机 profile/库备份，并使用 Zotero 原生文件安装或更新安装器；只复制 XPI 不证明 AddonManager 实际加载版本。核对原生插件版本、落盘 XPI hash、延迟引擎 health/marker，再正常退出和同 profile 真冷重开；不得清除插件元数据、preferences 或 NSS 凭据来制造成功。
-- `.github/workflows/ci.yml` 是 Linux/Windows/macOS 轻量矩阵，Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx，运行 `scripts/check_offline.py --mode lightweight`。GitHub run `43636036885` 已核验 0.3.4 源码 `ed7b1ed8e042`：三平台及全部步骤 success。默认 `full` 另检查已安装引擎依赖。CI 不调用服务商、不构建大型 runtime，也不等于 macOS 原生验收；setup-uv 使用 `v10.3.3` 完整 tag。
+- `.github/workflows/ci.yml` 是 Linux/Windows/macOS 轻量矩阵，Python 3.12 / Node 22，只安装 pytest、PyMuPDF、httpx，运行 `scripts/check_offline.py --mode lightweight`。GitHub run `43656077025` 核验 0.3.5 发货源码基线 `5e8e471`：三平台全部必要步骤 success。默认 `full` 另检查已安装引擎依赖，本机及 Linux 构建 CI 为 243 passed / 1 optional-reference skip、22 Node 套件和 32 JS 语法检查通过。轻量 CI 不构建大型 runtime，也不等于 macOS 原生验收；setup-uv 使用 `v10.3.3` 完整 tag。
 - 运行时按 `macos-arm64`、`windows-x64`、`linux-x64` 独立构建。Linux amd64 自带 CPython 3.12，解释器路径 `python/bin/python3.12`；当前 Linux 包的原生库要求 glibc ≥ 2.34。Ubuntu 24.04 + Zotero 10.0.8 已实测，其他发行版尚未实机验证。
 - Linux 使用官方 OpenCV headless wheel，需保留各 wheel 的 `.libs`；仅 macOS 需要自编译精简 OpenCV。打包用 uv 管理的独立解释器，不用系统 Python 作为可重定位运行时。
 - Linux 中文字体通过 fontconfig 查询已安装的思源宋体等中文衬线字体，选择简体中文字面并导出到插件缓存；CFF 字面以 `.ttf` 缓存名保存，但 PDF 中实际为嵌入的 OTF。系统字体不随 XPI 分发。
@@ -13,7 +14,7 @@
 - 正式译文是 Zotero PDF 附件；插件不再因论文进回收站或原文缺失永久删除译文。Zotero 自身的删除行为不变。可恢复成果、任务和共享归属都保留，只有已确认无归属的临时缓存可清理；损坏索引禁用清理。
 - 未完成目标以 GitHub [TODO #1](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/issues/1) 的独立细项及验证范围为准。PDF 笔记批注不是独立笔记，悬停不是显式导航，本地 Python 包不是本地翻译模型；实现、原生验收与公开投递分别判定。
 - 开发政策固定 BabelDOC 0.6.4：新版迁移为低优先级，不列为 TODO 或优先事项，直接维护当前版本功能。macOS 专属源码暂不可得，不推进其合流/验收；本轮 Windows 原生验收交由用户后续的 Windows agent，保留共享实现兼容性。术语表/自定义规则只做技术路线研究；繁体/日文只保留语言接口，暂不实现完整支持。
-- 候选真实构建入口为 `.github/workflows/release-candidate.yml`，仅手动、默认 Linux；Windows 另选，无 macOS。`build.py` 自动写实际包 inventory，`verify_release.py` 独立核对其源码/依赖/许可文件证据；大小只告警，许可合规仍 unknown。不把合成包或 import/model-load CI 当 Zotero 原生验收。公开 feed 必须晚于精确资产；暂停 feed 不能降级已装用户，修复使用递增版本前滚。
+- 候选真实构建入口为 `.github/workflows/release-candidate.yml`，仅手动、默认 Linux；Windows 另选，无 macOS。run `43656079515` 在 `5e8e471` 实际完成 Linux 原生 fresh stage、禁网 imports/model/tokenizer 和两种 XPI 构建；下载核对 artifact SHA、外层/内层 CRC、模型 hash、30 原始源码及生成 manifest，独立 `verify_release` 通过。其 XPI hash 与本机原生验收包不同，不沿用 Zotero 验收。inventory 大小只告警，CPython/模型/tokenizer 许可来源证据仍 unknown。公开 feed 必须晚于精确资产；暂停 feed 不能降级已装用户，修复使用递增版本前滚。
 - Linux 0.3.4 自带包为 272.88 MiB、Windows 为 189.70 MiB；差额主要是依赖 58.30 MiB 和解释器 24.76 MiB，模型/词表相同。`docs/linux-package-size.md` 仅研究：保留资源的 ZIP 候选节省 16.59–18.75 MiB；内层 XZ/别名/模型压缩预算约 201.07 MiB，安装器未实现。CPython 一刀切 strip 实测失败，不采用；不要删除必要资源或联网补齐冒充瘦身。
 
 ## 任务与成果接口
@@ -36,9 +37,8 @@
 
 - `backend/preserve.py` 在现有最终写出步骤修正链接：保护区/未选页保留源链接，译文页剔除已识别的正文旧坐标热点，保留生产者已移动的链接；无法确认的正文目的地使用真正的页级 `/Fit`，不猜测精确坐标。真实禁网 BabelDOC 两页管线覆盖成功与响应丢失，未选页链接保留；该模拟结果不是付费语义验收。维护入口见 `docs/pdf-links.md`。
 - `preserve.metadata_regions()` 在无裁剪/旋转的开篇页，需 explicit abstract + 配对粗体姓名/邮箱 + 斜体机构，才保留作者/机构原语言及源矢量；页脚仅识别带年份版权。歧义不保护，标题/摘要/正文仍翻译。`fonts.py` 在本地字体副本删除同 glyph 的 CJK 兼容/空白/连字符别名，修复“机器”复制为“机器”及 soft hyphen 搜索失败；不改系统字体，Windows 替换前关闭句柄。full-PDF 身份为 `protected-v5-metadata` / `songti-sc-v2-unicode`；段落缓存身份不变，旧 PDF 保留不静默重写。
-- `notes.js` 用官方 annotation serializer 和一次 `note.saveTx()` 建独立 Zotero note；绑定正确 library/parent、译文附件/物理页回链和原生引用，源链接不猜语义对应页。alignment 的“选区存笔记 / 批注汇总笔记”只读实际单页选区/已保存批注，连续请求共享 in-flight 结果；保存成功与打开失败分开，不改 PDF/批注、不收费。入口和宿主兼容边界见 `docs/notes.md`。
+- `notes.js` 用官方 serializer 和一次 `note.saveTx()` 建独立 note；**新 Item 不提前设置 key**，由原生保存分配，否则 `setNote()` 会要求尚未加载的 primaryData。失败只报告实际 key，分配前为 null，不自动重试。绑定正确 library/parent、译文附件/物理页回链和原生引用，源链接不猜语义页；实际单页选区/已保存批注只读、in-flight 去重，保存与打开失败分开，不改 PDF/批注、不收费。Linux 原生高亮的 NFKC 文本和 `Annotations.toJSON()` 位置契约已核对；group/根 note/图像 UI 等扩展仍未原生认证。入口见 `docs/notes.md`。
 - `addon/content/annotations.js` 使用 Zotero 原生附件批注 API，独立于不可取得的 macOS 0.4.2 源码。批注只属于译文附件；写入串行化、关闭先快照并等待持久化、重开等待旧写入；权限变化才调用原生 `setReadOnly`，已销毁 iframe 不再接收保存回调。不可写时只降级批注，不阻断 PDF 阅读，不做原译双向批注复制或完整标签/QuickCopy/公式功能。维护入口见 `docs/annotations.md`。
-- 此前 P0/P1 基线包在 Linux / Win11 Zotero 10.0.8 的自带/本地 Python 模式，各完成 21+8 项原生批注、16 项升级/阅读/链接和 17 项任务/设置检查，正常退出、库完整性 `ok`；索引见 `.runtime/p0-p1-native-verification.json` 和 `.runtime/p0-p1-windows-native-verification-20261114.json`。这些不是当前悬停包对旧套件的再次验收。升级使用保留的本地 0.3.1 包手动替换为 0.3.2，并非自动更新；任务模型结果显式模拟，不是真实论文语义验收。
 
 ## 引擎、片段映射与悬停高亮
 
@@ -79,7 +79,7 @@
 
 ## 仍需注意
 
-- GitHub 已发布 macOS `v0.4.2`（原生译文批注、公式 LaTeX 与缓存），但发布说明明确其源码待同步，该 tag 中 manifest 仍为 0.3.1。本分支 0.3.4 不含这些专属源码，不要冒充 0.4.2 或用本分支重建包覆盖该 macOS 发布产物；需另行取得对应开发源码再合并。本次非 macOS 发布保持该 tag/资产/通道和仓库 Latest 不变。
+- GitHub 已发布 macOS `v0.4.2`（原生译文批注、公式 LaTeX 与缓存），但发布说明明确其源码待同步，该 tag 中 manifest 仍为 0.3.1。共享 0.3.5 不含这些专属源码，不要冒充 0.4.2 或重建覆盖该 macOS 产物；对应源码取得后才有合流条件，当前不推进。非 macOS 工作保持其 tag/资产/通道和仓库 Latest 不变。
 - Linux / Win11 自带和本地 Python 0.3.4 包已在 Zotero 10.0.8 实测；Zotero 9、其他 Linux 发行版和 macOS 未重复实机验证。三平台轻量 CI 不替代这些原生/完整引擎验收。
 - BabelDOC 0.6.4 的历史“已披露解析安全问题”主张缺具体公告或本插件可利用路径依据，不能臆测 CVE 或声称新版已修复。隔离不是 OS 沙箱；只处理可信 PDF。既有新版 probe 属历史低优先级研究，不是当前 TODO，不能以迁移替代维护 0.6.4 的现有功能。
 - `saveKey()` 非空更新使用原生 `modifyLogin(old, old.clone())`，失败保留旧值；有意清空仅删当前 realm。两条 production 排版/tokenizer 消息现归 resource。诊断 schema 2 仅匿名计数、UTC/固定阶段/错误码；job JSON 保留最多 64 次状态变化，startup 最多 32 次，无 raw logs。后端不可用用 Gecko ZIP，state 不可写可落系统 temp；后端/Python版本未确认为 unknown。设置保存与两种检查独立；`POST /providers/check` 须 confirmed，公开短样例、512 输出上限、30 秒、SDK retries 0，不保存草稿/任务/缓存、不回退服务。
