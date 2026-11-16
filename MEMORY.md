@@ -8,7 +8,8 @@
 ## 翻译、身份与结果
 
 - prompt `paperbridge-compact-v2-fragments`：相邻/跨页碎片保持独立 ID，不转移文本/标签、不补造后文。普通拉丁词内连字符不再成为假公式；真实公式、样式和科学维度仍校验。改变 prompt 不复用旧段落来证明新提示质量。
-- 整篇排版身份 `babeldoc-0.6.4-protected-v12-local-font-subsets`；原/工作页真实变换决定保护框，按字符中心清除保护区域。仅缩小与本地 Songti 缓存字节相同的新字体程序，保留 glyph ID、ToUnicode/编码/宽度表；禁止通用 `subset_fonts(fallback=True)` 重建原出版字体字典。源端隐式 Symbol 编码只在工作副本显式化，原 PDF 保持不变。
+- 整篇排版身份 `babeldoc-0.6.4-protected-v13-source-layout`；源行/嵌套图注统一归属，原词尾宽度/URL 断行规则直接修正；`source_formulas.py` 用实际源字形合并完整表达式，多行公式按行顶对齐。原/工作页真实变换决定保护框，旋转页裁切/链接使用未旋转坐标；正文白底置于整段译文之前，原遮盖及图表不猜改。
+- 仅缩小与本地 Songti 缓存字节相同的新字体程序，保留 glyph ID、ToUnicode/编码/宽度表；禁止通用 `subset_fonts(fallback=True)` 重建原出版字体字典。源端隐式 Symbol 编码只在工作副本显式化，原 PDF 保持不变。
 - 执行、quality、PDF 导入与映射导出分开；`complete` 只代表观察到的段落应用，不是整篇语义认可。未知账单和 provider 格式/占位符拒绝如实保留，不用自动重试美化结果。
 - 新尝试 `jobs/attempts/<job-id>-<number>/`，旧 nested 目录仍读。重启不重发；显式重译可能收费，单独保存不收费。最新尝试不能继承旧成果或被旧 `complete` 掩盖。
 - Zotero 数据目录 `paperbridge/engine` 可重建，`cache` 是模型/字体/段落缓存，`.runtime/jobs` 保留任务成果。日常这些目录、原 PDF/译文/JSON、未知归属和备份不能按临时文件猜删。清理不取消任务；SQLite 连接显式关闭以免 Windows 锁文件。

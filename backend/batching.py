@@ -11,7 +11,7 @@ from babeldoc.format.pdf.document_il.midend.il_translator_llm_only import (
     is_placeholder_only_paragraph, is_pure_numeric_paragraph,
 )
 from babeldoc.format.pdf.document_il.midend.il_translator import ILTranslator, RichTextPlaceholder, FormulaPlaceholder
-from babeldoc.format.pdf.document_il.midend import paragraph_finder
+from babeldoc.format.pdf.document_il.midend import paragraph_finder, typesetting
 from babeldoc.format.pdf.document_il.utils.layout_helper import (
     Layout, box_to_tuple, get_character_layout as original_character_layout,
 )
@@ -25,8 +25,31 @@ BATCH_PARAGRAPHS = 12
 PRIORITY_BASE = 1048576
 # Only ordinary prose boxes can disprove a title's incidental glyph-edge overlap.
 BODY_LAYOUTS = {"plain text", "text", "content", "paragraph"}
+# Nested same-kind caption detections describe one caption, not separate word fragments.
+CAPTION_LAYOUTS = {"figure_caption", "table_caption", "caption"}
 # A hyphen joining Latin words is punctuation, not a mathematical subtraction operator.
 WORD_HYPHENS = {"-", "\u00ad", "\u2010", "\u2011"}
+
+
+def source_line_body(char, layout_index, layout_map, line=None):
+    """Find the unique body owning a measured source line, not a tall glyph's incidental edge."""
+    if line is None:
+        glyph = char.visual_bbox.box
+        center_x, center_y = (glyph.x + glyph.x2) / 2, (glyph.y + glyph.y2) / 2
+        lines = [layout_map[index] for index in layout_index.intersection(box_to_tuple(glyph))
+                 if layout_map[index].class_name == "fallback_line"
+                 and layout_map[index].box.x <= center_x <= layout_map[index].box.x2
+                 and layout_map[index].box.y <= center_y <= layout_map[index].box.y2]
+        if len(lines) != 1:
+            return None
+        line = lines[0]
+    center_x, center_y = (line.box.x + line.box.x2) / 2, (line.box.y + line.box.y2) / 2
+    bodies = [layout_map[index] for index in layout_index.intersection(box_to_tuple(line.box))
+              if layout_map[index].class_name in BODY_LAYOUTS
+              and layout_map[index].box.y <= center_y <= layout_map[index].box.y2]
+    if len(bodies) == 1 and bodies[0].box.x <= center_x <= bodies[0].box.x2:
+        return bodies[0]
+    return None
 
 
 def source_character_layout(char, layout_index, layout_map, layout_priority=None, _bbox_mode="auto"):
@@ -35,20 +58,35 @@ def source_character_layout(char, layout_index, layout_map, layout_priority=None
     if selected is None:
         return selected
     glyph = char.visual_bbox.box
+    if selected.name in CAPTION_LAYOUTS:
+        caption = next(layout for layout in layout_map.values() if layout.id == selected.id)
+        enclosing = [layout_map[index] for index in layout_index.intersection(box_to_tuple(caption.box))
+                     if layout_map[index].class_name == caption.class_name
+                     and layout_map[index].box.x <= caption.box.x
+                     and layout_map[index].box.y <= caption.box.y
+                     and layout_map[index].box.x2 >= caption.box.x2
+                     and layout_map[index].box.y2 >= caption.box.y2]
+        # Duplicate nested boxes must share one owner even where a suffix exceeds the narrower box.
+        owner = max(enclosing, key=lambda layout: (layout.box.x2 - layout.box.x) * (layout.box.y2 - layout.box.y))
+        return Layout(owner.id, owner.class_name)
     if selected.name == "fallback_line":
         line = next(layout for layout in layout_map.values() if layout.id == selected.id)
-        center_x, center_y = (line.box.x + line.box.x2) / 2, (line.box.y + line.box.y2) / 2
-        bodies = [layout_map[index] for index in layout_index.intersection(box_to_tuple(line.box))
-                  if layout_map[index].class_name in BODY_LAYOUTS
-                  and layout_map[index].box.y <= center_y <= layout_map[index].box.y2]
-        if len(bodies) == 1 and bodies[0].box.x <= center_x <= bodies[0].box.x2:
+        body = source_line_body(char, layout_index, layout_map, line)
+        if body is not None:
             # A measured source line belongs to one body block; its final letters may exceed YOLO's edge.
-            return Layout(bodies[0].id, bodies[0].class_name)
+            return Layout(body.id, body.class_name)
         return selected
     if selected.name != "title":
         return selected
     candidates = list(layout_index.intersection(box_to_tuple(glyph)))
     title = next(layout_map[index] for index in candidates if layout_map[index].id == selected.id)
+    body = source_line_body(char, layout_index, layout_map)
+    if body is not None:
+        # Title/body boxes may touch inside an ascender; the measured line's center settles ownership.
+        lines = [layout_map[index] for index in candidates if layout_map[index].class_name == "fallback_line"
+                 and layout_map[index].box.y <= (glyph.y + glyph.y2) / 2 <= layout_map[index].box.y2]
+        if len(lines) == 1 and not title.box.y <= (lines[0].box.y + lines[0].box.y2) / 2 <= title.box.y2:
+            return Layout(body.id, body.class_name)
     center_x, center_y = (glyph.x + glyph.x2) / 2, (glyph.y + glyph.y2) / 2
     if title.box.x <= center_x <= title.box.x2 and title.box.y <= center_y <= title.box.y2:
         return selected
@@ -67,8 +105,31 @@ def install_source_layout_selection():
     paragraph_finder.get_character_layout = source_character_layout
 
 
-# The engine imports batching before parsing; repair its existing lookup at that boundary.
+def source_word_tail_width(self, units, scale):
+    """Measure only the word tail; the pinned layout loop already counts the current glyph."""
+    if not units or units[0].can_break_line:
+        return 0
+    width = 0
+    for unit in units[1:]:
+        if unit.can_break_line:
+            break
+        width += unit.width
+    return width * scale
+
+
+def install_source_line_breaks():
+    """Correct the pinned word regex and lookahead without replacing its layout loop."""
+    # An unescaped hyphen creates the ASCII apostrophe-to-middle-dot range, joining whole URLs.
+    typesetting.LINE_BREAK_REGEX = typesetting.regex.compile(
+        typesetting.LINE_BREAK_REGEX.pattern.replace("'-·", "'\\-·"),
+        typesetting.LINE_BREAK_REGEX.flags,
+    )
+    typesetting.Typesetting._get_width_before_next_break_point = source_word_tail_width
+
+
+# The engine imports batching before processing; repair its existing lookups at that boundary.
 install_source_layout_selection()
+install_source_line_breaks()
 
 
 class ObservedILTranslator(ILTranslator):

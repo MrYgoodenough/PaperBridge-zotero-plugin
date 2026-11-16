@@ -1,4 +1,4 @@
-"""Restore protected vectors and reliable links in the final PDF's native page coordinates."""
+"""Preserve source backgrounds, protected vectors and reliable links in native page coordinates."""
 import json
 import re
 import unicodedata
@@ -267,6 +267,50 @@ def exclude_protected_characters(page, height, boxes):
     return original_count - len(page.pdf_character)
 
 
+def _order_text_backgrounds(page, source_page, layout, protected_boxes):
+    """Keep original white line fills behind their entire text block before reflow."""
+    curves = [curve for curve in getattr(page, "pdf_curve", [])
+              if curve.xobj_id == 0 and curve.fill_background and not curve.stroke_path
+              and curve.render_order is not None]
+    if not curves:
+        return
+    from babeldoc.format.pdf.document_il.utils.layout_helper import Layout, is_text_layout
+
+    height = source_page.mediabox.height
+    # Page-level objects have native coordinates; Form clips/transforms are not guessed.
+    characters = [(char.render_order, pymupdf.Point(
+        (char.box.x + char.box.x2) / 2, height - (char.box.y + char.box.y2) / 2))
+        for char in page.pdf_character
+        if char.xobj_id == 0 and char.char_unicode and char.char_unicode.strip()
+        and char.render_order is not None]
+    text_blocks = []
+    for box in layout.boxes:
+        if not is_text_layout(Layout(int(box.cls), layout.names[int(box.cls)])):
+            continue
+        rectangle = pymupdf.Rect(tuple(float(value) for value in box.xyxy))
+        orders = [order for order, center in characters if center in rectangle]
+        if orders:
+            text_blocks.append((rectangle, min(orders)))
+    white_fills = [draw["rect"] for draw in source_page.get_drawings(extended=True)
+                   if draw.get("level") == 0 and draw.get("type") == "f"
+                   and draw.get("fill") == (1, 1, 1) and draw.get("fill_opacity") == 1
+                   and len(draw["items"]) == 1 and draw["items"][0][0] == "re"]
+    for curve in curves:
+        box = curve.box
+        rectangle = pymupdf.Rect(box.x, height - box.y2, box.x2, height - box.y)
+        if (any(rectangle.intersects(pymupdf.Rect(protected)) for protected in protected_boxes)
+                or not any(_same_coordinates(rectangle, fill) for fill in white_fills)):
+            continue
+        covered = [(order, center) for order, center in characters if center in rectangle]
+        # A fill originally after its covered text is a whiteout, not a prose background.
+        if not covered or min(order for order, _ in covered) <= curve.render_order:
+            continue
+        orders = [order for block, order in text_blocks if any(center in block for _, center in covered)]
+        if orders:
+            # BabelDOC moves all translated glyphs to the block's first source paint order.
+            curve.render_order = min(curve.render_order, min(orders) - 1)
+
+
 class ProtectedLayoutModel:
     """Record every translated page, including pages with no protected regions."""
 
@@ -312,6 +356,8 @@ class ProtectedLayoutModel:
                 *reference_boxes, *metadata_boxes]
             self.excluded_characters += exclude_protected_characters(
                 page, document[page.page_number].mediabox.height, working_graphics)
+            _order_text_backgrounds(page, document[page.page_number], layout,
+                                    [*working_graphics, *working_references, *working_metadata])
             yield page, layout
 
 
@@ -396,7 +442,13 @@ def _restore_links(source, translated, original_links, rectangles):
                 if any(_same_anchor(copied, current) for current in existing):
                     continue
                 before = {entry[0] for entry in page.annot_xrefs()}
-                page.insert_link(copied)
+                rotation = page.rotation
+                try:
+                    # Rotated transformation_matrix loses CropBox offsets during insertion.
+                    page.set_rotation(0)
+                    page.insert_link(copied)
+                finally:
+                    page.set_rotation(rotation)
                 # insert_link emits XYZ even for original Fit destinations: keep the actual view mode.
                 if target is not None:
                     for key in ("A/D", "Dest"):
@@ -480,7 +532,7 @@ def restore_regions(source_path, translated_path, output_path, regions):
     with pymupdf.open(source_path) as source, pymupdf.open(translated_path) as translated:
         original_links = [page.get_links() for page in source]
         rectangles = {
-            index: _restoration_rectangles(boxes, translated[index].rect)
+            index: _restoration_rectangles(boxes, translated[index].rect * translated[index].derotation_matrix)
             for index, boxes in regions.items()
         }
         for page_index in regions:
@@ -490,12 +542,21 @@ def restore_regions(source_path, translated_path, output_path, regions):
                         or any((link["from"] * page.derotation_matrix).intersects(rectangle)
                                for rectangle in rectangles[page_index])):
                     page.delete_link(link)
-            # Whole-region redaction erases prose when only its font bbox touches the clip.
-            _redact_protected_text(page, rectangles[page_index])
-            for rectangle in rectangles[page_index]:
-                page.draw_rect(rectangle, color=None, fill=(1, 1, 1), overlay=True)
-                page.show_pdf_page(rectangle, source, page_index, clip=rectangle, overlay=True)
-                count += 1
+            source_page = source[page_index]
+            rotation, source_rotation = page.rotation, source_page.rotation
+            try:
+                # show_pdf_page intersects the clip with source.rect; both must be unrotated.
+                page.set_rotation(0)
+                source_page.set_rotation(0)
+                # Whole-region redaction erases prose when only its font bbox touches the clip.
+                _redact_protected_text(page, rectangles[page_index])
+                for rectangle in rectangles[page_index]:
+                    page.draw_rect(rectangle, color=None, fill=(1, 1, 1), overlay=True)
+                    page.show_pdf_page(rectangle, source, page_index, clip=rectangle, overlay=True)
+                    count += 1
+            finally:
+                page.set_rotation(rotation)
+                source_page.set_rotation(source_rotation)
         # reload_page requires the vector-restoration caller to release its page reference.
         page = None
         _restore_links(source, translated, original_links, rectangles)

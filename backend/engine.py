@@ -173,6 +173,8 @@ async def _translate(request, quality):
     from babeldoc.format.pdf import high_level
     from batching import CostAwareILTranslator
     high_level.ILTranslatorLLMOnly = CostAwareILTranslator
+    from source_formulas import install_formula_groups
+    install_formula_groups()
     from babeldoc.format.pdf.translation_config import TranslationConfig, WatermarkOutputMode
     from deepseek import DeepSeekTranslator
     from babeldoc.docvision.doclayout import DocLayoutModel

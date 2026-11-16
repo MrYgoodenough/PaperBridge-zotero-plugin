@@ -21,14 +21,16 @@ EXCLUDED_ENV = {
 LOOPBACK = {"localhost", "127.0.0.1", "::1"}
 # These modules require the pinned engine or scientific reference implementations.
 FULL_ONLY_MODULES = (
-    "test_compact_math.py", "test_deepseek.py", "test_engine_progress.py",
+    "test_batching.py", "test_compact_math.py", "test_deepseek.py", "test_engine_progress.py",
     "test_quality.py", "test_usage.py",
 )
-# The rest of provider inspection is lightweight; this test uses BabelDOC's real SDK adapter.
+# These individual contracts use pinned engine/native parsing rather than core dependencies only.
 FULL_ONLY_CASES = (
     "test_verify_providers.py::test_one_request_each_and_original_error_sanitized",
     "test_fonts.py::test_subset_local_program_keeps_publisher_encoding_and_visible_glyphs",
     "test_fonts.py::test_implicit_symbol_font_keeps_rendering_and_repairs_source_parsing",
+    "test_preserve.py::test_source_white_line_backgrounds_precede_the_merged_prose",
+    "test_preserve.py::test_normalized_layout_origin_and_adjacent_glyph_overhang",
 )
 
 

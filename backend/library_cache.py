@@ -14,7 +14,7 @@ PROMPT_VERSION = "paperbridge-compact-v2-fragments"
 # Prototype rows used an older namespace and must not inherit later prompt changes.
 LEGACY_PROMPT_VERSION = "paperbridge-compact-v1"
 # Native-region restoration changes invalidate full PDFs, not valid paragraph translations.
-ENGINE_VERSION = "babeldoc-0.6.4-protected-v12-local-font-subsets"
+ENGINE_VERSION = "babeldoc-0.6.4-protected-v13-source-layout"
 # Separate evidence-bearing results from legacy PDF-only jobs.
 QUALITY_VERSION = 1
 # Preserve the existing provider and request limits unless explicitly configured.

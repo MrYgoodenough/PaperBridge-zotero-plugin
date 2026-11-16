@@ -35,7 +35,7 @@ REQUIRED_ADDON_FILES = (
 REQUIRED_BACKEND_FILES = (
     "alignment.py", "batching.py", "compact_math.py", "deepseek.py", "diagnostics.py",
     "engine.py", "errors.py", "fonts.py", "fragment_trace.py", "launcher.py", "library_cache.py",
-    "preserve.py", "references.py", "server.py", "usage.py", "provider_check.py",
+    "preserve.py", "references.py", "server.py", "source_formulas.py", "usage.py", "provider_check.py",
 )
 # Only model and tokenizer assets are intentional build.py cache payloads.
 ASSET_DIRECTORIES = (".cache/babeldoc/models/", ".cache/babeldoc/tiktoken/")

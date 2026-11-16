@@ -1,4 +1,4 @@
-"""Check source-vector preservation without treating bibliographic metadata as body prose."""
+"""Check source background order, native vector restoration and bibliographic protection."""
 import sys
 from pathlib import Path
 
@@ -47,6 +47,102 @@ def test_original_vector_labels_restored_without_changing_body(tmp_path):
         assert "Translated body" in text and "E = mc2" in text
         assert "Garbled figure label" not in text
         assert target[0].rect == source[0].rect
+
+
+@pytest.mark.parametrize("rotation", [90, 270])
+@pytest.mark.parametrize("cropped", [False, True])
+def test_rotated_table_restoration_uses_native_page_bounds(tmp_path, rotation, cropped):
+    """Restore the table beyond the rotated height without changing page boxes or body."""
+    original, translated, output = [tmp_path / name for name in ("source.pdf", "translated.pdf", "protected.pdf")]
+    region = pymupdf.Rect(40, 370, 320, 455)
+    with pymupdf.open() as doc:
+        page = doc.new_page(width=400, height=500)
+        if cropped:
+            page.set_cropbox(pymupdf.Rect(20, 10, 380, 490))
+        page.draw_rect(region, color=None, fill=(0.9, 0.95, 1))
+        page.insert_text((60, 410), "Characteristic | 16 (9.0)", fontsize=14)
+        page.insert_link({"kind": pymupdf.LINK_URI, "from": page.search_for("16 (9.0)")[0],
+                          "uri": "https://example.test/table"})
+        page.insert_text((60, 150), "Original body", fontsize=14)
+        page.set_rotation(rotation)
+        doc.save(original)
+    original_bytes = original.read_bytes()
+    with pymupdf.open(original) as doc:
+        page = doc[0]
+        page.set_rotation(0)
+        page.add_redact_annot(region)
+        page.add_redact_annot((40, 125, 340, 160))
+        page.apply_redactions()
+        page.insert_text((60, 410), "Garbled table", fontsize=14)
+        page.insert_text((60, 150), "Translated body", fontsize=14)
+        page.set_rotation(rotation)
+        doc.save(translated)
+    assert restore_regions(original, translated, output, {0: [tuple(region)]}) == 1
+    assert original.read_bytes() == original_bytes
+    with pymupdf.open(original) as source, pymupdf.open(output) as target:
+        clip = (region + (2, 2, -2, -2)) * source[0].rotation_matrix
+        matrix = pymupdf.Matrix(2, 2)
+        assert source[0].get_pixmap(matrix=matrix, clip=clip).samples == target[0].get_pixmap(matrix=matrix, clip=clip).samples
+        assert "Translated body" in target[0].get_text() and "Garbled table" not in target[0].get_text()
+        assert target[0].rotation == rotation
+        assert target[0].cropbox == source[0].cropbox and target[0].mediabox == source[0].mediabox
+        source_link, target_link = source[0].get_links()[0], target[0].get_links()[0]
+        assert target_link["uri"] == source_link["uri"]
+        assert tuple(target_link["from"]) == pytest.approx(tuple(source_link["from"]))
+
+
+def test_source_white_line_backgrounds_precede_the_merged_prose(tmp_path, monkeypatch):
+    """Real parsed backgrounds move before prose, but graphics and source whiteouts do not."""
+    from babeldoc.format.pdf.new_parser.native_parse import parse_with_new_parser_to_legacy_ir
+    from babeldoc.docvision.base_doclayout import YoloBox, YoloResult
+    from babeldoc.assets import assets
+    import tiktoken
+
+    original = tmp_path / "source.pdf"
+    fixture_font = pymupdf.Font("helv")
+    font_path = tmp_path / "fixture-font.cff"
+    font_path.write_bytes(fixture_font.buffer)
+    # Native parsing needs a fallback catalog, not network-fetched translation fonts.
+    monkeypatch.setattr(assets, "get_font_family", lambda language: {
+        "normal": ["fixture"], "script": [], "fallback": [], "base": ["fixture"]})
+    monkeypatch.setattr(assets, "get_font_and_metadata", lambda name: (font_path, {
+        "ascent": fixture_font.ascender, "descent": fixture_font.descender, "encoding_length": 2}))
+    # Only statistics use tokenization; native glyph parsing needs no remote vocabulary.
+    tokenizer = tiktoken.Encoding(name="fixture-bytes", pat_str=r"[\s\S]",
+        mergeable_ranks={bytes([value]): value for value in range(256)}, special_tokens={})
+    monkeypatch.setattr(tiktoken, "encoding_for_model", lambda name: tokenizer)
+    with pymupdf.open() as doc:
+        page = doc.new_page(width=400, height=500)
+        page.insert_font(fontname="fixture", fontbuffer=fixture_font.buffer)
+        page.draw_rect((40, 40, 360, 70), color=None, fill=(1, 1, 1))
+        page.insert_text((45, 60), "First prose line.", fontname="fixture", fontsize=12)
+        page.draw_rect((40, 70, 360, 100), color=None, fill=(1, 1, 1))
+        page.insert_text((45, 90), "Second prose line.", fontname="fixture", fontsize=12)
+        page.draw_rect((40, 120, 360, 150), color=None, fill=(0.9, 0.95, 1))
+        page.insert_text((45, 140), "Colored prose background.", fontname="fixture", fontsize=12)
+        page.draw_rect((40, 170, 360, 200), color=None, fill=(1, 1, 1))
+        page.insert_text((45, 190), "Protected table label.", fontname="fixture", fontsize=12)
+        page.insert_text((45, 240), "Intentionally hidden source.", fontname="fixture", fontsize=12)
+        page.draw_rect((40, 220, 360, 250), color=None, fill=(1, 1, 1))
+        doc.save(original)
+    document = parse_with_new_parser_to_legacy_ir(original, working_dir=tmp_path / "parse")
+    page = document.page[0]
+    before = [curve.render_order for curve in page.pdf_curve]
+    first_order = min(char.render_order for char in page.pdf_character if char.char_unicode == "F")
+    layout = YoloResult(names={0: "plain text", 1: "table"}, boxes=[
+        YoloBox(xyxy=(40, 40, 360, 250), conf=1, cls=0),
+        YoloBox(xyxy=(40, 170, 360, 200), conf=1, cls=1),
+    ])
+
+    def layout_result(pages, working, config, save_debug_image):
+        """Provide measured detector boxes while retaining real native parser objects."""
+        yield pages[0], layout
+
+    with pymupdf.open(original) as working:
+        adapter = ProtectedLayoutModel(SimpleNamespace(handle_document=layout_result))
+        list(adapter.handle_document([page], working, SimpleNamespace(input_file=original), None))
+    assert all(curve.render_order < first_order for curve in page.pdf_curve[:2])
+    assert [curve.render_order for curve in page.pdf_curve[2:]] == before[2:]
 
 
 def test_normalized_layout_origin_and_adjacent_glyph_overhang(tmp_path):
