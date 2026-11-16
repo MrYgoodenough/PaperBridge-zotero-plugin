@@ -10,7 +10,7 @@
     input, select { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #8886; border-radius:6px; background: light-dark(#fff,#333); color:inherit; font:inherit; }
     .row { display: flex; gap: 14px; } .row > div { flex:1; }
     button { padding: 9px 14px; border:1px solid #8886; border-radius:6px; font:inherit; cursor:pointer; }
-    .actions { display:flex; gap:8px; margin-top:22px; } #save { background:#2963d8;color:white;border-color:#2963d8; }
+    .actions { display:flex;flex-wrap:wrap; gap:8px; margin-top:22px; } #save { background:#2963d8;color:white;border-color:#2963d8; }
     #status { white-space:pre-wrap; font-size:13px; } small { display:block; color:light-dark(#666,#aaa);margin-top:6px; }
   </html:style>
   <html:body>
@@ -33,7 +33,7 @@
     <html:input id="pythonPath" placeholder="例如 /opt/homebrew/bin/python3.12"/>
     <html:small>本机版需要 arm64 Python 3.12，留空检测常见位置；第三方依赖随 XPI 提供。</html:small></html:div>
     <html:small>排版依赖随安装包提供，插件不自动下载资源。</html:small>
-    <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">保存并检查引擎</html:button><html:button id="data">数据目录</html:button><html:button id="close">关闭</html:button></html:div>
+    <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">保存并检查引擎</html:button><html:button id="data">数据目录</html:button><html:button id="formulas">公式缓存</html:button><html:button id="close">关闭</html:button></html:div>
     <html:p id="status" role="status"/>
     <html:p id="usage"/>
     <html:small id="locations" style="overflow-wrap:anywhere"/>

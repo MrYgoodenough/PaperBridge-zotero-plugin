@@ -2,6 +2,7 @@
 var PaperBridge = {
   jobs: new Map(),
   splits: new Map(),
+  closingSplits: new Map(),
   buttons: new Set(),
   alive: true,
 
@@ -12,25 +13,34 @@ var PaperBridge = {
     this.storageRoot = PathUtils.join(Zotero.DataDirectory.dir,"storage");
     this.setPref("model", "deepseek-flash");
     await this.library.load();
-    this.toolbarHandler = event => this.toolbar(event);
+    await this.formulaCache.load();
+    this.toolbarHandler = event => { this.toolbar(event); this.formulas.attach(event.reader); };
     this.contextHandler = ({ reader, append }) => {
-      if (reader._type !== "pdf") return;
+      if (reader._type !== "pdf" || reader._paperbridgeEmbedded) return;
       append({ label: "DeepSeek 翻译并分屏", onCommand: () => this.action(() => this.translate(reader)) });
       append({ label: "PaperBridge：打开已有译文", onCommand: () => this.action(() => this.openExisting(reader)) });
       append({ label: "PaperBridge：取消翻译", onCommand: () => this.action(() => this.cancel(reader.itemID)) });
     };
     Zotero.Reader.registerEventListener("renderToolbar", this.toolbarHandler, id);
     Zotero.Reader.registerEventListener("createViewContextMenu", this.contextHandler, id);
+    this.formulaPopupHandler = event => this.formulas.popup(event);
+    this.formulaMenuHandler = event => this.formulas.menu(event);
+    Zotero.Reader.registerEventListener("renderTextSelectionPopup", this.formulaPopupHandler, id);
+    Zotero.Reader.registerEventListener("createViewContextMenu", this.formulaMenuHandler, id);
     this.observer = {
       notify: (event, type, ids) => {
-        if (type === "tab" && event === "close") ids.forEach(tab => this.closeSplit(tab));
-        if (type === "item" && ["trash","delete","modify"].includes(event)) this.library.schedule();
+        if (type === "tab" && event === "close") ids.forEach(tab => this.action(() => this.closeSplit(tab)));
+        if (type === "item" && ["trash","delete","modify","add"].includes(event)
+            && ids.some(id => {const item=Zotero.Items.get(id);return !item || item.isRegularItem() || item.isPDFAttachment();})) {
+          this.library.schedule().then(() => this.formulaCache.reconcile()).catch(error => Zotero.logError(error));
+        }
       }
     };
     this.notifier = Zotero.Notifier.registerObserver(this.observer,["tab","item"],"paperbridge");
     for (const win of Zotero.getMainWindows()) this.addMenus(win);
     // A newly installed plugin must also appear in readers that were already open.
     for (const reader of Zotero.Reader._readers) {
+      this.formulas.attach(reader);
       await reader._initPromise;
       const doc = reader._iframeWindow.document;
       const host = doc.querySelector(".toolbar .end");
@@ -43,12 +53,18 @@ var PaperBridge = {
   async stop() {
     this.alive = false;
     await Promise.allSettled([...this.jobs.keys()].map(id => this.cancel(id)));
-    for (const tab of [...this.splits.keys()]) this.closeSplit(tab);
+    await Promise.all([...this.splits.keys()].map(tab => this.closeSplit(tab)));
+    await Promise.all([...this.closingSplits.values()]);
+    await this.formulas.stop();
     Zotero.Notifier.unregisterObserver(this.notifier);
     await this.library.settled();
+    await this.formulaCache.settled();
     Zotero.Reader._unregisterEventListenerByPluginID(this.id);
     for (const win of Zotero.getMainWindows()) this.removeMenus(win);
-    for (const button of this.buttons) button.remove();
+    for (const button of this.buttons) {
+      try { button.remove(); }
+      catch (error) { if (!String(error).includes("dead object")) Zotero.logError(error); }
+    }
     this.buttons.clear();
     await this.runtime.stop();
   },
@@ -71,6 +87,7 @@ var PaperBridge = {
       ["DeepSeek 翻译并分屏", () => this.translate()],
       ["打开已有译文分屏", () => this.openExisting()],
       ["取消当前论文翻译", async () => this.cancel((await this.source())?.id)],
+      ["公式缓存…", async () => this.showFormulaCache()],
       ["设置…", async () => this.settings()]
     ]) {
       const item = doc.createXULElement("menuitem");
@@ -99,7 +116,7 @@ var PaperBridge = {
   },
 
   toolbar({ reader, doc, append }) {
-    if (reader._type !== "pdf" || doc.querySelector(".paperbridge-translate")) return;
+    if (reader._type !== "pdf" || reader._paperbridgeEmbedded || doc.querySelector(".paperbridge-translate")) return;
     const button = doc.createElement("button");
     button.className = "toolbar-button paperbridge-translate";
     button.textContent = "译 / 分屏";
@@ -108,12 +125,18 @@ var PaperBridge = {
     button.addEventListener("click", () => this.action(() => this.translate(reader)));
     button.addEventListener("contextmenu", event => { event.preventDefault(); this.settings(); });
     this.buttons.add(button);
+    doc.defaultView.addEventListener("unload", () => this.buttons.delete(button), { once: true });
     append(button);
   },
 
   settings() {
     Zotero.getMainWindow().openDialog("chrome://paperbridge/content/settings.xhtml", "paperbridge-settings",
       "chrome,centerscreen,resizable", { bridge: this });
+  },
+
+  showFormulaCache() {
+    return Zotero.getMainWindow().openDialog("chrome://paperbridge/content/formula-cache.xhtml", "paperbridge-formula-cache",
+      "chrome,centerscreen,resizable", {bridge:this});
   },
 
   async openDataDirectory() {
@@ -247,6 +270,7 @@ var PaperBridge = {
   },
 
   async split(source, translated) {
+    await this.formulaCache.link(source, translated);
     Zotero.debug("PaperBridge: opening source reader");
     const win = Zotero.getMainWindow();
     let reader = await Zotero.Reader.open(source.id);
@@ -254,7 +278,7 @@ var PaperBridge = {
     await reader._initPromise;
     Zotero.debug("PaperBridge: source reader ready");
     await reader._internalReader._primaryView.initializedPromise;
-    this.closeSplit(reader.tabID);
+    await this.closeSplit(reader.tabID);
     const container = reader._iframe.parentElement;
     const originalStyle = container.getAttribute("style") || "";
     const leftStyle = reader._iframe.getAttribute("style") || "";
@@ -279,36 +303,9 @@ var PaperBridge = {
     try {
       await loaded;
       Zotero.debug("PaperBridge: translation reader frame loaded");
-      const frame = browser.contentWindow;
-      frame.addEventListener("error", event => Zotero.logError(event.error || event.message));
-      const bytes = await IOUtils.read(await translated.getFilePathAsync());
-      const ftl = [];
-      for (const locale of [...Services.locale.appLocalesAsBCP47].reverse()) {
-        for (const name of ["branding/brand", "zotero", "reader"]) {
-          const url = `resource://app/localization/${locale}/${name}.ftl`;
-          try { ftl.push(Zotero.File.getContentsFromURL(url)); } catch (error) { Zotero.debug(`PaperBridge locale unavailable: ${url}`); }
-        }
-      }
-      const options = {
-        type: "pdf", data: { buf: bytes }, annotations: [], readOnly: true,
-        primaryViewState: { pageIndex: reader._internalReader._state.primaryViewState?.pageIndex || 0, scale: "page-width" },
-        sidebarOpen: false, sidebarWidth: 200, showContextPaneToggle: false,
-        bottomPlaceholderHeight: null, rtl: Zotero.rtl, fontSize: Zotero.Prefs.get("fontSize"),
-        ftl, showAnnotations: false, enableReadAloud: false,
-        onChangeViewState() {}, onChangeViewStats() {}, onSaveAnnotations() {}, onDeleteAnnotations() {},
-        onSaveCustomThemes() {}, onSetLightTheme() {}, onSetDarkTheme() {},
-        onOpenLink: url => Zotero.launchURL(url),
-        onOpenContextMenu: () => {}, onSetDataTransferAnnotations: () => {},
-        onToggleSidebar: () => {}, onChangeSidebarWidth: () => {}, onChangeSidebarView: () => {},
-        onTextSelectionAnnotationModeChange: () => {}, onToolbarShiftTab: () => {}, onIframeTab: () => {},
-        onConfirm: (title, text) => Services.prompt.confirm(win, title, text)
-      };
-      state.right = frame.wrappedJSObject.createReader(Components.utils.cloneInto(options, frame, { cloneFunctions: true }));
-      Zotero.debug("PaperBridge: translation reader created");
-      state.right.setTitle("译文 · " + translated.getField("title"));
-      await state.right._primaryView.initializedPromise;
-      if (!this.splits.has(reader.tabID)) return;
-      this.splitControls(state, frame.document);
+      await TranslationReader.open(this, state, translated);
+      if (this.splits.get(reader.tabID) !== state) return;
+      this.splitControls(state, browser.contentDocument);
       this.bindSync(state);
       const leftApp = reader._internalReader._primaryView._iframeWindow.PDFViewerApplication;
       const rightApp = state.right._primaryView._iframeWindow.PDFViewerApplication;
@@ -316,7 +313,7 @@ var PaperBridge = {
       rightApp.pdfViewer.currentScaleValue = "page-width";
       this.syncPosition(state, 0);
     } catch (error) {
-      this.closeSplit(reader.tabID);
+      await this.closeSplit(reader.tabID);
       throw error;
     }
   },
@@ -325,7 +322,22 @@ var PaperBridge = {
     // Keep navigation and search usable when each pane is narrower than a full reader.
     for (const target of [state.reader._iframeWindow.document, doc]) {
       const style = target.createElement("style");
-      style.textContent = "@media (max-width:700px){.toolbar .center.tools{display:none!important}.toolbar #read-aloud,.toolbar #navigateBack{display:none!important}.toolbar .start{gap:2px!important}.toolbar .divider{margin:0 2px!important}}";
+      style.textContent = `@media (max-width:700px) {
+        .toolbar {height:76px!important;min-height:76px;flex-wrap:wrap;align-content:center;gap:2px}
+        .toolbar .center.tools {display:flex!important;order:3;flex:1 0 100%;justify-content:center;height:32px;overflow-x:auto}
+        .toolbar #read-aloud,.toolbar #navigateBack {display:none!important}
+        .toolbar .start {gap:2px!important}
+        .toolbar .divider {margin:0 2px!important}
+        #split-view,.split-view,.sidebar-resizer {top:76px}
+        #sidebarContainer {top:76px}
+      }
+      @media (max-width:420px) {
+        .toolbar #zoomIn,.toolbar #zoomOut,.toolbar #zoomAuto,.toolbar #readingMode {display:none!important}
+      }
+      @media (max-width:300px) {
+        .toolbar #previous,.toolbar #next,.toolbar .start .divider {display:none!important}
+      }`;
+
       target.head.append(style);
       state.cleanups.push(() => style.remove());
     }
@@ -342,7 +354,7 @@ var PaperBridge = {
     });
     const close = doc.createElement("button");
     close.textContent = "关闭分屏";
-    close.addEventListener("click", () => this.closeSplit(state.reader.tabID));
+    close.addEventListener("click", () => this.action(() => this.closeSplit(state.reader.tabID)));
     for (const button of [sync, close]) button.style.cssText = "font:13px 'Songti SC','SimSun',serif;padding:5px 8px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer";
     controls.append(sync, close);
     doc.body.append(controls);
@@ -403,14 +415,23 @@ var PaperBridge = {
   },
 
   closeSplit(tabID) {
+    if (this.closingSplits.has(tabID)) return this.closingSplits.get(tabID);
     const state = this.splits.get(tabID);
-    if (!state) return;
+    if (!state) return Promise.resolve();
     this.splits.delete(tabID);
+    if (state.translationReader) this.formulas.detach(state.translationReader);
     for (const cleanup of state.cleanups) cleanup();
-    state.right?._primaryView?.destroy();
-    state.browser.remove();
-    state.divider.remove();
-    state.container.setAttribute("style", state.originalStyle);
-    state.reader._iframe.setAttribute("style", state.leftStyle);
+    const closing = (async () => {
+      try { await TranslationReader.close(state); }
+      finally {
+        state.browser.remove();
+        state.divider.remove();
+        state.container.setAttribute("style", state.originalStyle);
+        state.reader._iframe.setAttribute("style", state.leftStyle);
+        this.closingSplits.delete(tabID);
+      }
+    })();
+    this.closingSplits.set(tabID, closing);
+    return closing;
   }
 };

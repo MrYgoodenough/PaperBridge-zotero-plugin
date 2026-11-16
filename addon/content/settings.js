@@ -34,5 +34,6 @@ window.addEventListener("load", () => {
     } catch (error) { get("status").textContent = error.message; }
   });
   get("close").addEventListener("click", () => window.close());
+  get("formulas").addEventListener("click", () => bridge.showFormulaCache());
   get("data").addEventListener("click", () => bridge.openDataDirectory());
 });

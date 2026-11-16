@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = Path(os.environ.get("PAPERBRIDGE_STATE_DIR",ROOT / ".runtime"))
 JOBS = RUNTIME / "jobs"
-VERSION = "0.3.1"
+VERSION = "0.4.2"
 
 
 def clean_completed_job(folder):
@@ -215,6 +215,18 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if self.command == "GET" and path == "/health":
                 return self.respond(200, {"version": VERSION, "root": str(ROOT), "engine": "BabelDOC 0.6.4", "python":sys.executable})
+            if self.command == "POST" and path == "/formulas/regions":
+                size = int(self.headers.get("Content-Length", "0"))
+                if not 0 < size <= 16384:
+                    return self.respond(413, {"error": "PDF 请求过大"})
+                from formula_regions import detect
+                return self.respond(200, detect(json.loads(self.rfile.read(size))))
+            if self.command == "POST" and path == "/formulas/latex":
+                size = int(self.headers.get("Content-Length", "0"))
+                if not 0 < size <= 256 * 1024:
+                    return self.respond(413, {"error": "公式选区过大"})
+                from formulas import convert
+                return self.respond(200, convert(json.loads(self.rfile.read(size))))
             if self.command == "POST" and path in {"/cache/describe","/cache/prune"}:
                 size = int(self.headers.get("Content-Length", "0"))
                 if not 0 < size <= 8 * 1024 * 1024:

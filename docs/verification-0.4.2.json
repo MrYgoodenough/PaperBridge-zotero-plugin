@@ -1,0 +1,141 @@
+{
+  "version": "0.4.2",
+  "date": "2026-11-12",
+  "platform": "macOS Apple Silicon",
+  "zotero_tested": "10.0.9",
+  "backend_tests": {
+    "existing_and_formula_transcription": 53,
+    "local_formula_regions": 8,
+    "total_passed": 61
+  },
+  "javascript_tests": {
+    "persistent_json_and_reference_lifecycle": "passed",
+    "formula_clipboard_and_failure_safety": "passed",
+    "pdf_coordinate_sync": "passed",
+    "syntax": "passed"
+  },
+  "integration_checks_passed": 53,
+  "integration": {
+    "version": "10.0.9",
+    "plugin": "0.4.2",
+    "checks": {
+      "packagedEngine": true,
+      "rightEditable": true,
+      "rightRegistered": true,
+      "annotationToolbarVisible": true,
+      "highlightSavedToTranslation": true,
+      "underlineSavedToTranslation": true,
+      "noteSavedToTranslation": true,
+      "sourceAnnotationsUntouched": true,
+      "immediateCloseFlush": true,
+      "cleanup": true,
+      "annotationsRestored": true,
+      "forwardSync": true,
+      "reverseSync": true,
+      "independentScroll": true,
+      "inlineLatexClipboard": true,
+      "displayLatexClipboard": true,
+      "formulaPopupButtons": true,
+      "formulaContextMenu": true,
+      "deletePersisted": true,
+      "deleteRestored": true,
+      "tabCloseFlush": true,
+      "tabCloseCleanup": true,
+      "standaloneTranslationTab": true,
+      "standaloneAnnotations": true,
+      "nativeAnnotationUpdates": true,
+      "renderedFormulaPopup": true,
+      "clipboardUnchangedOnFailure": true,
+      "localDisplayFormulaDetection": true,
+      "displayFormulaHoverIcon": true,
+      "hoverMakesNoProviderRequest": true,
+      "hoverCopiesDisplayLatex": true,
+      "repeatedHoverCopyCached": true,
+      "oneJsonForOriginalAndTranslation": true,
+      "formulaAndRegionsPersisted": true,
+      "restartCacheHitWithoutApiKey": true,
+      "cacheViewerShowsLatex": true,
+      "manualClearOnlyFormulaCache": true,
+      "manualClearForcesOneNewRequest": true,
+      "deletingOriginalKeepsFormulaCache": true,
+      "deletingOneTranslationKeepsOtherReferences": true,
+      "deletingOnePaperKeepsSharedReferences": true,
+      "deletingLastPaperRemovesFormulaJson": true,
+      "disabledDeletionInitiallyRetained": true,
+      "startupRemovesDisabledTimeOrphans": true,
+      "pluginStopFlush": true,
+      "pluginStopCleanup": true,
+      "engineStop": true
+    },
+    "engine": {
+      "version": "0.4.2",
+      "root": "<PROJECT_ROOT>/.runtime/zotero042-data/paperbridge/engine",
+      "engine": "BabelDOC 0.6.4",
+      "python": "<PROJECT_ROOT>/.runtime/zotero042-data/paperbridge/engine/python/bin/python3.12"
+    },
+    "sourceID": 2,
+    "translatedID": 3,
+    "tabID": "tab-1mOPpB2W",
+    "layout": {
+      "rightWidth": 497,
+      "toolbarHeight": 76,
+      "formulaButtons": [
+        "复制公式 $…$",
+        "复制公式 $$…$$"
+      ]
+    },
+    "ok": true
+  },
+  "real_restart_and_engine_upgrade": {
+    "version": "10.0.9",
+    "plugin": "0.4.2",
+    "checks": {
+      "realRestartPreservesJson": true,
+      "realRestartPreservesLatex": true,
+      "engineUpgradeLeavesFormulaCache": true,
+      "restartFormulaIdentityStable": true,
+      "realRestartCopiesWithoutApiKey": true,
+      "restartShutdownClean": true
+    },
+    "ok": true
+  },
+  "provider_validation": {
+    "paid_requests": 0,
+    "cache_test_responses": "mocked and counted",
+    "local_display_formula_detection": "real bundled ONNX model, two public-paper equations detected",
+    "transcription_accuracy": "No new live DeepSeek transcription accuracy claim; same model and prompt as 0.4.1."
+  },
+  "formula_cache": {
+    "schema": 1,
+    "layout": "one original-PDF SHA-256 JSON shared by linked attachments",
+    "location": "Zotero data directory/paperbridge/formula-cache",
+    "upgrade_lifetime": "outside versioned engine",
+    "manual_clear": "formula results and display-equation regions only"
+  },
+  "package": {
+    "file": "dist/paperbridge-0.4.2-macos-arm64.xpi",
+    "bytes": 181435655,
+    "MiB": 173.03,
+    "sha256": "6cbc0a5b43a3ab034a5dc0558f8029d8dbcb3f706275a7afe90ba25707b5d285",
+    "entries": 6509,
+    "integrity": "passed",
+    "source_matches": "passed",
+    "credentials_and_test_files_excluded": true,
+    "zoteroRange": "9.0–10.*",
+    "pythonMode": "bundled"
+  },
+  "process_files": [
+    ".runtime/zotero042-profile/",
+    ".runtime/zotero042-data/",
+    ".runtime/zotero042-console.log",
+    ".runtime/zotero042-restart-console.log",
+    ".runtime/formula-cache-unit/",
+    ".cache/package/"
+  ],
+  "git_commit_created": false,
+  "source_publication": {
+    "date": "2026-11-16",
+    "branch": "codex/macos-0.4.2-source",
+    "local_paths_redacted": true
+  }
+}

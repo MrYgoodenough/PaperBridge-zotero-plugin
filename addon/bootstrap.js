@@ -12,9 +12,14 @@ async function startup({ id, version, rootURI }) {
   scope = { Zotero, Services, Cc, Ci, Components, ChromeUtils, IOUtils, PathUtils, rootURI, version, fetch };
   Services.scriptloader.loadSubScript(rootURI + "content/runtime.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/library.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/reader.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/formula-cache.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/formulas.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/paperbridge.js", scope);
   scope.PaperBridge.runtime = new scope.BundledRuntime(rootURI, version);
   scope.PaperBridge.library = new scope.TranslationLibrary(scope.PaperBridge);
+  scope.PaperBridge.formulaCache = new scope.FormulaCache(scope.PaperBridge);
+  scope.PaperBridge.formulas = new scope.FormulaClipboard(scope.PaperBridge);
   Zotero.PaperBridge = scope.PaperBridge;
   Zotero.PaperBridge.ready = Zotero.PaperBridge.start(id);
   await Zotero.PaperBridge.ready;

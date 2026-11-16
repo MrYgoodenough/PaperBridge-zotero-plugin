@@ -138,3 +138,30 @@ def test_loopback_auth_and_origin(store):
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_formula_endpoint_routes_selected_content_and_reports_invalid_input(store, monkeypatch):
+    import formulas
+    seen = []
+    def convert(payload):
+        seen.append(payload)
+        formulas.selection_payload(payload)
+        return {"latex": r"\frac{x^2}{y_i}"}
+    monkeypatch.setattr(formulas, "convert", convert)
+    server = bridge.ThreadingHTTPServer(("127.0.0.1", 0), bridge.Handler)
+    server.token, server.store = "test-token", store
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    url = f"http://127.0.0.1:{server.server_port}/formulas/latex"
+    headers = {"Authorization": "Bearer test-token", "Content-Type": "application/json"}
+    try:
+        data = {"text": "x2/yi", "glyphs": []}
+        with urllib.request.urlopen(urllib.request.Request(url, data=json.dumps(data).encode(), headers=headers)) as response:
+            assert json.load(response)["latex"] == r"\frac{x^2}{y_i}"
+        assert seen == [data]
+        with pytest.raises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(urllib.request.Request(url, data=b"[]", headers=headers))
+        assert error.value.code == 400
+    finally:
+        server.shutdown()
+        server.server_close()

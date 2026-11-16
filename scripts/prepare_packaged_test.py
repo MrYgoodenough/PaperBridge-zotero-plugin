@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = ROOT / ".runtime/packaged-profile"
-PROFILE.mkdir(exist_ok=True)
+PROFILE.mkdir(parents=True, exist_ok=True)
 extensions = PROFILE / "extensions"
 extensions.mkdir(exist_ok=True)
 version=json.loads((ROOT / "addon/manifest.json").read_text())["version"]
@@ -19,7 +19,7 @@ shutil.copyfile(ROOT / f"dist/paperbridge-{version}-macos-arm64{suffix}.xpi", ex
 (ROOT / ".runtime/packaged-options.json").write_text(json.dumps({"pythonPath":options.local_python}))
 manifest = {"manifest_version":2,"name":"PaperBridge isolated integration tests","version":version,
     "applications":{"zotero":{"id":"paperbridge-tests@local.dev","strict_min_version":"9.0",
-    "strict_max_version":"9.*","update_url":"https://example.invalid/tests.json"}}}
+    "strict_max_version":"10.*","update_url":"https://example.invalid/tests.json"}}}
 bootstrap = '''function install(){} function uninstall(){} function shutdown(){}
 async function startup(){
   await Zotero.initializationPromise;
