@@ -21,7 +21,7 @@
 
 ## 缓存与质量
 
-- 段落 namespace 包含服务、端点、能力、语言、文档及 prompt。当前 prompt 为 `paperbridge-compact-v2-fragments`；不复用旧提示下的段落来证明新提示质量。
+- 段落 namespace 包含服务、端点、能力、语言、文档及 prompt。当前 prompt 为 `paperbridge-compact-v4-fragments`；`deepseek.py` 将已有比较后的短残缺条件按实际源字符串分开请求、逐项保留占位符，仅在同一原段落内重组，不向相邻段落/页转移。不复用旧提示下的段落来证明新提示质量。
 - 整篇身份还包含字体、质量版本和 `babeldoc-0.6.4-protected-v11-font-subsets`。排版变化失效旧完整 PDF 复用，**不改写已保存 PDF、不删除旧缓存**。
 - 只有完成且 hash 验证成立的精确结果可自动复用；部分/未知成果可显式打开。请求重试可能收费，保存重试只使用保留文件。
 - 完整/部分/不可用/未知来自真实段落应用证据；`all_pages` 与 `selected_pages` 准确记录请求范围。完整不等于语义认证。缺失的 token 用量和丢失响应保留计费未知，不估造账单。

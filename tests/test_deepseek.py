@@ -36,8 +36,43 @@ def test_fixed_prefix_and_compact_request(tmp_path):
     a=engine.messages([{"id":0,"input":"First paragraph"}])
     b=engine.messages([{"id":0,"input":"A different paragraph"}])
     assert a[0]==b[0] and a[0]["role"]=="system"
+    assert "do not drop a subject, predicate, comparison" in a[0]["content"]
+    assert "comparison before its dangling condition" in a[0]["content"]
     assert a[1]["content"].startswith('{"title":"Stable paper title","paragraphs":')
     assert "layout_label" not in a[1]["content"] and "Structure Rules" not in a[0]["content"]
+
+
+def test_dangling_comparison_parts_keep_the_original_source_and_owner(tmp_path, monkeypatch):
+    """Only one source paragraph is reassembled; its incomplete condition cannot hide the predicate."""
+    from deepseek import source_parts
+    text = "A {v1} is faster than B when the sequence"
+    assert source_parts(text) == ["A {v1} is faster than B ", "when the sequence"]
+    assert source_parts(text + ".") == [text + "."]
+    complete = "A is faster than B when the model converges"
+    assert source_parts(complete) == [complete]
+    assert source_parts('<style id="1">' + text + '</style>') == ['<style id="1">' + text + '</style>']
+    engine = translator(tmp_path)
+
+    def completion(messages):
+        """Translate the two actual substrings, never supply a continuation or a different owner."""
+        inputs = json.loads(messages[1]["content"])["paragraphs"]
+        assert inputs == [{"id": 0, "text": "A {v1} is faster than B "}, {"id": 1, "text": "when the sequence"}]
+        return response([{"id": 0, "text": "A{v1}比B更快"}, {"id": 1, "text": "当序列"}])
+
+    monkeypatch.setattr(engine, "request_completion", completion)
+    assert engine.translate_items([{"id": 5, "input": text}]) == [{"id": 5, "output": "A{v1}比B更快 当序列"}]
+    assert engine.paragraph_cache.get(text) == "A{v1}比B更快 当序列"
+
+
+def test_fragment_placeholders_cannot_move_between_wire_parts(tmp_path, monkeypatch):
+    """Aggregate marker equality must not hide a marker transferred out of its source part."""
+    engine = translator(tmp_path)
+    text = "A {v1}{v2} is faster than B when the sequence"
+    monkeypatch.setattr(engine, "request_completion", lambda messages: response([
+        {"id": 0, "text": "A{v1}比B更快"}, {"id": 1, "text": "当{v2}条件"}]))
+    with pytest.raises(ValueError):
+        engine.translate_items([{"id": 5, "input": text}])
+    assert engine.paragraph_cache.get(text) is None
 
 
 def test_cache_survives_new_batch_order_and_restart(tmp_path,monkeypatch):

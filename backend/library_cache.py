@@ -10,7 +10,7 @@ from urllib.parse import urlsplit, urlunsplit
 from contextlib import closing
 
 # Translation instructions are shared by document and paragraph cache identities.
-PROMPT_VERSION = "paperbridge-compact-v2-fragments"
+PROMPT_VERSION = "paperbridge-compact-v4-fragments"
 # Prototype rows used an older namespace and must not inherit later prompt changes.
 LEGACY_PROMPT_VERSION = "paperbridge-compact-v1"
 # Native-region restoration changes invalidate full PDFs, not valid paragraph translations.
