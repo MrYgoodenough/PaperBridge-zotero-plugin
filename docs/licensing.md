@@ -9,6 +9,11 @@ not a written offer. The baseline stays BabelDOC **0.6.4** / PyMuPDF
 **1.26.7** / MuPDF **1.26.12**. No engine replacement, native reverse engineering
 or macOS-source integration is involved.
 
+For concrete final-package closure and offline generation commands, see
+`source-delivery-readiness.md`. Historical source ZIPs and
+`candidate-delivery-0.3.6.json` do not cover later GUI-v8 or future rebuilt XPI
+hashes; their original bindings remain unchanged.
+
 ## Evidence and limits
 
 `addon/licenses/source-manifest.json` pins archive URLs, versions, sizes, SHA256
@@ -73,12 +78,15 @@ checksum: an internal index alone does not authenticate its own manifest.
 
 - `upstream/`: complete pinned compressed archives, not binaries or placeholder
   links. Cache can also use the same `<source-id>/<filename>` layout.
-- `project/`: tracked working-tree addon/backend/build/setup/configuration files
+- `project/`: tracked working-tree addon/backend/build/setup/configuration/test files
   plus explicitly included `scripts/package_sources.py` and `addon/licenses/`.
   `projectSnapshot` discloses Git HEAD, modified tracked files, included untracked
   delivery files and excluded unrelated untracked source files. HEAD alone does
   **not** identify uncommitted bytes. Stage/commit required source membership
   before final release; the new script is included even in provisional runs.
+  Tracked `tests/` accompanies the workflows and `check_offline.py` that invoke
+  it; untracked tests are disclosed but not silently added. The source-delivery
+  checklist is included with the build instructions.
 - `shipped/<xpi-name>/`: exact delivered project/Python/interface sources,
   notices, metadata and runtime declarations, including Windows RECORD paths
   with backslash separators. They are retained even if the current tree differs.
@@ -93,8 +101,9 @@ checksum: an internal index alone does not authenticate its own manifest.
 
 Keep root `NOTICE.md` and all `addon/licenses/` in every rebuilt XPI, along with
 root `LICENSE`, wheel/module notices and `.libs` material. The generator checks
-all addon license files, not just new supplemental notices. Old XPIs are missing
-the new delivery files; a provisional source ZIP certifies **only its listed old hashes**. Main
+all addon license files, not just new supplemental notices. XPIs predating notice
+integration may lack the delivery files; the GUI-v8 bounded audit found no such
+omission. A historical source ZIP certifies **only its listed old hashes**. Main
 must rebuild, reaccept native packages as needed, and regenerate against new
 hashes; prior-package hashes cannot be borrowed.
 

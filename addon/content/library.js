@@ -8,10 +8,14 @@ const TRANSLATION_RULES_VERSION = 1;
 const TRANSLATION_ID_LENGTH = 24;
 // Only these nonsecret settings form an immutable translation configuration.
 const TRANSLATION_CONFIG_KEYS = ["profile", "capabilities", "baseURL", "model", "language", "pages"];
-// Relations survive a crash between Zotero metadata saving and index saving.
+// Automatic tags survive a crash between Zotero metadata saving and index saving.
 const TRANSLATION_RECORD_URI = "urn:paperbridge:record:";
 // Shared backend jobs still have independent, source-specific library records.
 const TRANSLATION_JOB_URI = "urn:paperbridge:job:";
+// Zotero Cloud permits item URIs, not our internal URNs, in relation values.
+const TRANSLATION_MARKER_PREFIX = "urn:paperbridge:";
+// Native automatic tags distinguish plugin markers from ordinary user tags.
+const TRANSLATION_MARKER_TAG_TYPE = 1;
 
 var TranslationLibrary = class {
   /** Initialize independent reconciliation and atomic-write queues. */
@@ -156,7 +160,52 @@ var TranslationLibrary = class {
     } else {
       await this.migratePreferences();
     }
+    try { await this.migrateMarkers(); }
+    catch (error) { this.warn(error); }
     await this.schedule();
+  }
+
+  /** Read synced automatic tags and legacy relations without changing their identities. */
+  markers(item) {
+    return [...new Set([...(item.getTags?.() || []).map(tag => tag.tag),
+      ...(item.getRelationsByPredicate?.("dc:relation") || [])])]
+      .filter(value => value.startsWith(TRANSLATION_MARKER_PREFIX));
+  }
+
+  /** Locate exact native markers even after an attachment is moved or its owner is lost. */
+  async markedItems(libraryID, marker) {
+    const search = new Zotero.Search();
+    search.libraryID = libraryID;
+    search.addCondition("tag", "is", marker);
+    const items = await Zotero.Items.getAsync(await search.search());
+    if (Zotero.Relations?.getByPredicateAndObject) {
+      items.push(...await Zotero.Relations.getByPredicateAndObject("item", "dc:relation", marker));
+    }
+    return [...new Set(items)].filter(item => item?.libraryID === libraryID);
+  }
+
+  /** Move only internal URNs to native tags; leave genuine Zotero item relations untouched. */
+  normalizeMarkers(item) {
+    const legacy = (item.getRelationsByPredicate("dc:relation") || [])
+      .filter(value => value.startsWith(TRANSLATION_MARKER_PREFIX));
+    for (const marker of legacy) {
+      item.addTag(marker, TRANSLATION_MARKER_TAG_TYPE);
+      item.removeRelation("dc:relation", marker);
+    }
+    return legacy.length > 0;
+  }
+
+  /** Migrate through Zotero saves so existing item keys, files and sync bookkeeping survive. */
+  async migrateMarkers() {
+    const ids = await Zotero.DB.columnQueryAsync(
+      "SELECT DISTINCT itemID FROM itemRelations JOIN relationPredicates USING (predicateID) "
+      + "WHERE predicate = ? AND object LIKE ?", ["dc:relation", TRANSLATION_MARKER_PREFIX + "%"]);
+    for (const item of await Zotero.Items.getAsync(ids)) {
+      try {
+        if (!item.isEditable()) throw new Error("PaperBridge internal markers need an editable library: " + item.libraryID);
+        if (this.normalizeMarkers(item)) await item.saveTx();
+      } catch (error) { this.warn(error); }
+    }
   }
 
   /** Migrate legacy preferences individually, retaining failed entries for recovery. */
@@ -178,7 +227,8 @@ var TranslationLibrary = class {
           libraryID:Number(library), sourceKey:key, sourceID:source?.id,
           ownerKey:owner?.key || key, ownerID:owner?.id, parentKey:owner?.isRegularItem() ? owner.key : null,
           attachmentKey:attachment?.key, attachmentID:attachment?.id,
-          sourceURI:source ? Zotero.URI.getItemURI(source) : attachment?.getRelationsByPredicate("dc:relation")[0],
+          sourceURI:source ? Zotero.URI.getItemURI(source) : attachment?.getRelationsByPredicate("dc:relation")
+            .find(uri => !uri.startsWith(TRANSLATION_MARKER_PREFIX)),
           title:source ? source.getField("title") : "PDF", config,
           modified:old.modified, size:old.size, fingerprint:cache.fingerprint, documentKey:cache.document_key
         }));
@@ -276,7 +326,7 @@ var TranslationLibrary = class {
     return record;
   }
 
-  /** Recover imported PDFs by stable keys first, then unambiguous persistent relations. */
+  /** Recover imported PDFs by stable keys first, then unambiguous persistent markers. */
   async findAttachment(record) {
     for (const key of [record.attachmentKey, record.importingAttachmentKey]) {
       const attachment = await this.item(record.libraryID, key);
@@ -292,19 +342,18 @@ var TranslationLibrary = class {
     if (owner?.isRegularItem()) {
       for (const id of owner.getAttachments(true)) candidates.push(await Zotero.Items.getAsync(id));
     }
-    // The relation query also recovers standalone or moved outcomes after owner loss.
-    if (Zotero.Relations?.getByPredicateAndObject) {
-      for (const uri of [TRANSLATION_RECORD_URI + record.recordID,
-        ...(record.jobID ? [TRANSLATION_JOB_URI + record.jobID] : [])]) {
-        candidates.push(...await Zotero.Relations.getByPredicateAndObject("item", "dc:relation", uri));
-      }
+    // Exact tag and legacy-relation queries also recover standalone or moved outcomes.
+    for (const marker of [TRANSLATION_RECORD_URI + record.recordID,
+      ...(record.jobID ? [TRANSLATION_JOB_URI + record.jobID] : [])]) {
+      candidates.push(...await this.markedItems(record.libraryID, marker));
     }
     for (const attachment of candidates) {
       if (!attachment?.isPDFAttachment() || attachment.libraryID !== record.libraryID || attachment.deleted) continue;
       const relations = attachment.getRelationsByPredicate("dc:relation");
-      if ((relations.includes(TRANSLATION_RECORD_URI + record.recordID) ||
-          (!relations.some(uri => uri.startsWith(TRANSLATION_RECORD_URI)) &&
-           record.jobID && relations.includes(TRANSLATION_JOB_URI + record.jobID) &&
+      const markers = this.markers(attachment);
+      if ((markers.includes(TRANSLATION_RECORD_URI + record.recordID) ||
+          (!markers.some(uri => uri.startsWith(TRANSLATION_RECORD_URI)) &&
+           record.jobID && markers.includes(TRANSLATION_JOB_URI + record.jobID) &&
            record.sourceURI && relations.includes(record.sourceURI))) && await attachment.fileExists()) return attachment;
     }
     return null;
@@ -319,11 +368,13 @@ var TranslationLibrary = class {
     }
     try {
       record = await this.update(record, {importingAttachmentKey:attachment.key});
-      for (const uri of [record.sourceURI, TRANSLATION_RECORD_URI + record.recordID,
+      if (record.sourceURI && !record.sourceURI.startsWith(TRANSLATION_MARKER_PREFIX)) {
+        attachment.addRelation("dc:relation", record.sourceURI);
+      }
+      this.normalizeMarkers(attachment);
+      for (const marker of [TRANSLATION_RECORD_URI + record.recordID,
         record.jobID && TRANSLATION_JOB_URI + record.jobID].filter(Boolean)) {
-        if (!attachment.getRelationsByPredicate("dc:relation").includes(uri)) {
-          attachment.addRelation("dc:relation", uri);
-        }
+        attachment.addTag(marker, TRANSLATION_MARKER_TAG_TYPE);
       }
       // Save caller metadata too: an interrupted earlier save may have left dirty fields.
       await attachment.saveTx();
@@ -354,11 +405,11 @@ var TranslationLibrary = class {
     }
   }
 
-  /** Recognize indexed, partially imported, and relation-marked translations. */
+  /** Recognize indexed, partially imported, tag-marked and legacy translations. */
   isTranslation(item) {
     return this.records.some(record => record.libraryID === item.libraryID &&
       [record.attachmentKey, record.importingAttachmentKey].includes(item.key)) ||
-      (item.getRelationsByPredicate?.("dc:relation") || []).some(uri =>
+      this.markers(item).some(uri =>
         uri.startsWith(TRANSLATION_RECORD_URI) || uri.startsWith(TRANSLATION_JOB_URI));
   }
 
@@ -391,12 +442,13 @@ var TranslationLibrary = class {
   async savedFor(item, language) {
     const records = [...this.records].reverse();
     const relations = item.getRelationsByPredicate?.("dc:relation") || [];
+    const markers = this.markers(item);
     records.sort((a, b) => Number(b.attachmentKey === item.key) - Number(a.attachmentKey === item.key));
     for (const record of records) {
       if (record.libraryID !== item.libraryID || (language && record.language !== language) ||
           (![record.ownerKey, record.sourceKey, record.attachmentKey, record.importingAttachmentKey].includes(item.key) &&
-           !relations.includes(TRANSLATION_RECORD_URI + record.recordID) &&
-           !(record.jobID && relations.includes(TRANSLATION_JOB_URI + record.jobID) && relations.includes(record.sourceURI)))) continue;
+           !markers.includes(TRANSLATION_RECORD_URI + record.recordID) &&
+           !(record.jobID && markers.includes(TRANSLATION_JOB_URI + record.jobID) && relations.includes(record.sourceURI)))) continue;
       const attachment = await this.findAttachment(record);
       if (attachment) return {record, attachment};
     }

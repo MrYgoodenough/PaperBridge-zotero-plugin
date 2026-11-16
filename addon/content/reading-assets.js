@@ -1,6 +1,6 @@
 /** Keep verified PDF alignment as a synced Zotero attachment, independent of Python. */
-/* global Zotero, IOUtils, PathUtils, Cc, Ci, Components, FragmentAlignment */
-// A relation marker identifies our JSON attachments without guessing filenames.
+/* global Zotero, IOUtils, PathUtils, Cc, Ci, Components, FragmentAlignment, TRANSLATION_MARKER_TAG_TYPE */
+// A native automatic tag identifies JSON assets; the same legacy URN remains readable.
 const ALIGNMENT_ASSET_RELATION = "urn:paperbridge:alignment:1";
 // The portable wrapper evolves independently of the producer's geometry schema.
 const ALIGNMENT_ASSET_VERSION = 1;
@@ -93,10 +93,9 @@ var AlignmentAssets = class AlignmentAssets {
     return { ...value, mapping };
   }
 
-  /** Locate explicit relation-marked attachments; a similarly named JSON file is not evidence. */
+  /** Locate exact tag or legacy relation markers; a similar filename is not evidence. */
   async attachments(libraryID) {
-    if (!Zotero.Relations?.getByPredicateAndObject) return [];
-    const items = await Zotero.Relations.getByPredicateAndObject("item", "dc:relation", ALIGNMENT_ASSET_RELATION);
+    const items = await this.bridge.library.markedItems(libraryID, ALIGNMENT_ASSET_RELATION);
     return items.filter(item => item.libraryID === libraryID && item.isAttachment() && !item.deleted);
   }
 
@@ -269,7 +268,7 @@ var AlignmentAssets = class AlignmentAssets {
       const asset = await Zotero.Attachments.importFromFile({ file: path, libraryID: translated.libraryID,
         parentItemID: translated.parentID || undefined });
       asset.setField("title", "PaperBridge 可信片段映射 · " + (translated.getField("title") || translated.key));
-      asset.addRelation("dc:relation", ALIGNMENT_ASSET_RELATION);
+      asset.addTag(ALIGNMENT_ASSET_RELATION, TRANSLATION_MARKER_TAG_TYPE);
       asset.addRelation("dc:relation", Zotero.URI.getItemURI(source));
       asset.addRelation("dc:relation", Zotero.URI.getItemURI(translated));
       await asset.saveTx();

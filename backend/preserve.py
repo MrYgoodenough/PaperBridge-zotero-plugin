@@ -1,4 +1,4 @@
-"""Restore original protected vectors and reliable links in the final PDF writeout."""
+"""Restore protected vectors and reliable links in the final PDF's native page coordinates."""
 import json
 import re
 import unicodedata
@@ -38,6 +38,8 @@ FURNITURE_EDGE_FRACTION = 0.08
 FURNITURE_MIN_PAGES = 2
 # Ignore tiny PDF box serialization differences, not genuine cropping or rotation.
 PAGE_COORDINATE_TOLERANCE = 0.01
+# Point-sized redactions remove protected labels without erasing neighboring glyph overhangs.
+REDACTION_POINT_RADIUS = 0.01
 # Short marginal words are not reliable page furniture; printed integer page numbers are.
 FURNITURE_MIN_CHARACTERS = 8
 # Identify both an inline IEEE abstract and a spaced Elsevier abstract heading.
@@ -81,6 +83,16 @@ def unrotated_full_page(page):
     return (not page.rotation
             and abs(page.cropbox.width - page.mediabox.width) <= PAGE_COORDINATE_TOLERANCE
             and abs(page.cropbox.height - page.mediabox.height) <= PAGE_COORDINATE_TOLERANCE)
+
+
+def _unrotated_transform(page):
+    """Map PDF coordinates to the native unrotated page view, including its crop origin."""
+    rotation = page.rotation
+    try:
+        page.set_rotation(0)
+        return pymupdf.Matrix(page.transformation_matrix)
+    finally:
+        page.set_rotation(rotation)
 
 
 def repeated_furniture(document):
@@ -232,7 +244,7 @@ def metadata_regions(document):
 
 
 def regions_from_layout(layout):
-    """Extract protected detector rectangles in page coordinates."""
+    """Extract protected rectangles in the detector's normalized page coordinates."""
     return [tuple(float(v) for v in box.xyxy) for box in layout.boxes
             if layout.names[int(box.cls)] in PROTECTED]
 
@@ -270,16 +282,31 @@ class ProtectedLayoutModel:
 
     def handle_document(self, pages, document, config, save_debug_image):
         """Exclude protected labels and record the translated page indices."""
+        original_transforms = {}
+        source_path = getattr(config, "input_file", None)
+        if source_path:
+            with pymupdf.open(source_path) as source:
+                original_transforms = {index: _unrotated_transform(page) for index, page in enumerate(source)}
         for page, layout in self.model.handle_document(pages, document, config, save_debug_image):
+            # BabelDOC normalizes MediaBox/CropBox before detection, then restores them on output.
+            working_transform = _unrotated_transform(document[page.page_number])
+            original_transform = original_transforms.get(page.page_number, working_transform)
+            to_original = ~working_transform * original_transform
+            to_working = ~to_original
             reference_boxes = self.references.get(page.page_number,[])
+            working_references = [tuple(pymupdf.Rect(box) * to_working) for box in reference_boxes]
             self.excluded_reference_characters += exclude_protected_characters(
-                page,document[page.page_number].mediabox.height,reference_boxes)
+                page,document[page.page_number].mediabox.height,working_references)
             metadata_boxes = self.metadata.get(page.page_number, [])
+            working_metadata = [tuple(pymupdf.Rect(box) * to_working) for box in metadata_boxes]
             self.excluded_metadata_characters += exclude_protected_characters(
-                page, document[page.page_number].mediabox.height, metadata_boxes)
-            self.regions[page.page_number] = [*regions_from_layout(layout), *reference_boxes, *metadata_boxes]
+                page, document[page.page_number].mediabox.height, working_metadata)
+            working_graphics = regions_from_layout(layout)
+            self.regions[page.page_number] = [
+                *(tuple(pymupdf.Rect(box) * to_original) for box in working_graphics),
+                *reference_boxes, *metadata_boxes]
             self.excluded_characters += exclude_protected_characters(
-                page, document[page.page_number].mediabox.height, self.regions[page.page_number])
+                page, document[page.page_number].mediabox.height, working_graphics)
             yield page, layout
 
 
@@ -398,6 +425,25 @@ def _restoration_rectangles(boxes, page_bounds):
     return rectangles
 
 
+def _redact_protected_text(page, rectangles):
+    """Remove labels by character center, matching input protection rather than font overhang."""
+    has_redactions = False
+    for block in page.get_text("rawdict")["blocks"]:
+        for line in block.get("lines", []):
+            for span in line["spans"]:
+                for character in span["chars"]:
+                    bounds = pymupdf.Rect(character["bbox"])
+                    center = (bounds.tl + bounds.br) / 2
+                    if any(rectangle.contains(center) for rectangle in rectangles):
+                        radius = REDACTION_POINT_RADIUS
+                        point = pymupdf.Rect(center.x - radius, center.y - radius,
+                                            center.x + radius, center.y + radius)
+                        page.add_redact_annot(point, fill=(1, 1, 1))
+                        has_redactions = True
+    if has_redactions:
+        page.apply_redactions(images=0, graphics=0)
+
+
 def restore_regions(source_path, translated_path, output_path, regions):
     """Restore vectors and links before the existing final PDF save."""
     count = 0
@@ -414,11 +460,10 @@ def restore_regions(source_path, translated_path, output_path, regions):
                         or any((link["from"] * page.derotation_matrix).intersects(rectangle)
                                for rectangle in rectangles[page_index])):
                     page.delete_link(link)
+            # Whole-region redaction erases prose when only its font bbox touches the clip.
+            _redact_protected_text(page, rectangles[page_index])
             for rectangle in rectangles[page_index]:
-                page.add_redact_annot(rectangle, fill=(1, 1, 1))
-            if rectangles[page_index]:
-                page.apply_redactions(images=0, graphics=0)
-            for rectangle in rectangles[page_index]:
+                page.draw_rect(rectangle, color=None, fill=(1, 1, 1), overlay=True)
                 page.show_pdf_page(rectangle, source, page_index, clip=rectangle, overlay=True)
                 count += 1
         # reload_page requires the vector-restoration caller to release its page reference.

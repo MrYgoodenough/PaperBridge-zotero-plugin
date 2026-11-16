@@ -72,32 +72,54 @@ var PAPERBRIDGE_ACCOUNT_SYNC_PROMISE = (async () => {
     report.requestedFileLibraries = files ? [Zotero.Libraries.userLibraryID] : [];
     await Zotero.Sync.Runner.sync({background: true, libraries: [Zotero.Libraries.userLibraryID],
       fileLibraries: files ? [Zotero.Libraries.userLibraryID] : [], fullTextLibraries: [],
-      onError: error => errors.push({name: error.name || "Error", code: error.code || error.error || "unknown"})});
+      onError: error => errors.push({name: error.name || "Error", code: error.code || error.error || "unknown",
+        // Keep actionable native object errors visible without exporting URLs or credentials.
+        message: String(error.message || "").replace(/https?:\/\/\S+/g, "[URL]")
+          .replace(/Bearer\s+\S+|\bsk-[\w-]+/gi, "[redacted]")
+          .replace(/((?:api.?key|token|password|authorization)["']?\s*[:=]\s*["']?)[^\s,;&"']+/gi, "$1[redacted]")
+          .slice(0, 1000)})});
     report.syncErrors = errors;
     check(!errors.length, "Native account sync returned no reported error", {files});
   }
 
   /** Create only a synthetic article and note, then upload metadata with all file libraries excluded. */
   async function produceMetadata() {
-    check(!await IOUtils.exists(config.statePath), "Metadata fixture creation needs a fresh run ID");
-    const collection = new Zotero.Collection();
-    collection.libraryID = Zotero.Libraries.userLibraryID;
-    collection.name = "PaperBridge 元数据验收 · " + config.runID;
-    await collection.saveTx();
-    const owner = new Zotero.Item("journalArticle");
-    owner.libraryID = collection.libraryID;
-    owner.setField("title", "PaperBridge metadata-only acceptance · " + config.runID);
-    owner.setCollections([collection.id]);
-    await owner.saveTx();
-    const note = new Zotero.Item("note");
-    note.libraryID = owner.libraryID;
-    note.parentID = owner.id;
-    note.setNote("<p>PaperBridge metadata-only acceptance: " + config.runID + ". No attachment files are uploaded.</p>");
-    await note.saveTx();
-    const index = {kind:"paperbridge-account-metadata-index", runID:config.runID,
-      collectionKey:collection.key, ownerKey:owner.key, noteKey:note.key,
-      title:owner.getField("title"), note:note.getNote()};
-    await IOUtils.writeUTF8(config.statePath, JSON.stringify(index, null, 2));
+    let collection, owner, note, index;
+    if (config.phase === "metadata-resume") {
+      // A labelled explicit retry reuses only its owned fixture, never creating duplicate library items.
+      index = await IOUtils.readJSON(config.statePath);
+      check(index.kind === "paperbridge-account-metadata-index" && index.runID === config.runID,
+        "Metadata resume selects the exact existing owned fixture");
+      const libraryID = Zotero.Libraries.userLibraryID;
+      collection = await Zotero.Collections.getByLibraryAndKeyAsync(libraryID, index.collectionKey);
+      owner = await Zotero.Items.getByLibraryAndKeyAsync(libraryID, index.ownerKey);
+      note = await Zotero.Items.getByLibraryAndKeyAsync(libraryID, index.noteKey);
+      check(collection && owner && note?.isNote() && note.parentID === owner.id
+        && owner.getField("title") === index.title && note.getNote() === index.note,
+        "Metadata resume preserves the original collection, article and note identity/content");
+      report.metadataFixtureResumed = true;
+    } else {
+      check(!await IOUtils.exists(config.statePath), "Metadata fixture creation needs a fresh run ID");
+      collection = new Zotero.Collection();
+      collection.libraryID = Zotero.Libraries.userLibraryID;
+      collection.name = "PaperBridge 元数据验收 · " + config.runID;
+      await collection.saveTx();
+      owner = new Zotero.Item("journalArticle");
+      owner.libraryID = collection.libraryID;
+      owner.setField("title", "PaperBridge metadata-only acceptance · " + config.runID);
+      owner.setCollections([collection.id]);
+      await owner.saveTx();
+      note = new Zotero.Item("note");
+      note.libraryID = owner.libraryID;
+      note.parentID = owner.id;
+      note.setNote("<p>PaperBridge metadata-only acceptance: " + config.runID + ". No attachment files are uploaded.</p>");
+      await note.saveTx();
+      index = {kind:"paperbridge-account-metadata-index", runID:config.runID,
+        collectionKey:collection.key, ownerKey:owner.key, noteKey:note.key,
+        title:owner.getField("title"), note:note.getNote()};
+      await IOUtils.writeUTF8(config.statePath, JSON.stringify(index, null, 2));
+    }
+    report.createdAttachments = 0;
     await sync(false);
     index.userID = Zotero.Users.getCurrentUserID();
     check(!!index.userID, "Native metadata sync established the account's real user ID");
@@ -325,7 +347,7 @@ var PAPERBRIDGE_ACCOUNT_SYNC_PROMISE = (async () => {
     if (config.phase.startsWith("metadata-")) {
       report.fileTransport = "none (metadata-only)";
       observeRuntime();
-      if (config.phase === "metadata-produce") await produceMetadata();
+      if (["metadata-produce", "metadata-resume"].includes(config.phase)) await produceMetadata();
       else {
         const index = await IOUtils.readJSON(config.producerIndex);
         if (config.phase === "metadata-receive") {

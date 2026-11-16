@@ -281,9 +281,39 @@ var PAPERBRIDGE_ASSETS_TEST_PROMISE = (async () => {
       check(payload.source_attachment_key === source.key && payload.translated_attachment_key === translated.key
         && !JSON.stringify(payload).includes("source_text"), "Portable JSON carries exact keys/hashes/geometry without captured text");
       check((await bridge.alignmentAssets.publish(record, translated)).key === asset.key, "Repeated native publication is idempotent");
+      // Seed only this isolated fixture's old URNs, then exercise the actual native migration.
+      const translationMarkers = ["urn:paperbridge:record:" + record.recordID, "urn:paperbridge:job:" + record.jobID];
+      const mappingMarker = "urn:paperbridge:alignment:1";
+      const markerIdentity = {recordID:record.recordID, jobID:record.jobID, sourceKey:source.key,
+        translatedKey:translated.key, assetKey:asset.key, sourceSha256:hashFile(await source.getFilePathAsync()),
+        targetSha256:hashFile(await translated.getFilePathAsync()), mappingSha256:hashFile(await asset.getFilePathAsync())};
+      for (const [item, markers] of [[translated, translationMarkers], [asset, [mappingMarker]]]) {
+        check(markers.every(marker => item.getTags().some(tag => tag.tag === marker && tag.type === 1)),
+          "New native outcomes use automatic tags, not internal URN relations");
+        for (const marker of markers) { item.removeTag(marker); item.addRelation("dc:relation", marker); }
+        await item.saveTx();
+      }
+      await bridge.library.migrateMarkers();
+      for (const [item, markers] of [[translated, translationMarkers], [asset, [mappingMarker]]]) {
+        check(markers.every(marker => item.getTags().some(tag => tag.tag === marker && tag.type === 1))
+          && item.getRelationsByPredicate("dc:relation").every(uri => !uri.startsWith("urn:paperbridge:")),
+          "Native legacy migration removes only internal relations and retains exact automatic marker tags");
+      }
+      check(translated.getRelationsByPredicate("dc:relation").includes(Zotero.URI.getItemURI(source))
+        && asset.getRelationsByPredicate("dc:relation").includes(Zotero.URI.getItemURI(translated)),
+        "Genuine native source and translation URI relations survive marker migration");
+      check(record.recordID === markerIdentity.recordID && record.jobID === markerIdentity.jobID
+        && source.key === markerIdentity.sourceKey && translated.key === markerIdentity.translatedKey && asset.key === markerIdentity.assetKey
+        && hashFile(await source.getFilePathAsync()) === markerIdentity.sourceSha256
+        && hashFile(await translated.getFilePathAsync()) === markerIdentity.targetSha256
+        && hashFile(await asset.getFilePathAsync()) === markerIdentity.mappingSha256,
+        "Marker migration preserves durable IDs, native attachment keys and exact PDF/JSON bytes");
+      check((await bridge.library.markedItems(source.libraryID, mappingMarker)).some(item => item.id === asset.id),
+        "Native exact-tag search discovers the migrated mapping attachment");
+      report.markerMigration = markerIdentity;
       saved = {sourceKey:source.key, translatedKey:translated.key, assetKey:asset.key, libraryID:source.libraryID,
         sourceSha256:hashFile(await source.getFilePathAsync()), targetSha256:hashFile(await translated.getFilePathAsync()),
-        mappingSha256:hashFile(await asset.getFilePathAsync()), processID:report.processID,
+        mappingSha256:hashFile(await asset.getFilePathAsync()), processID:report.processID, markerMigration:markerIdentity,
         sourcePath:await source.getFilePathAsync(), translatedPath:await translated.getFilePathAsync(), mappingPath:await asset.getFilePathAsync()};
       await IOUtils.writeUTF8(config.statePath, JSON.stringify(saved, null, 2));
     } else {
@@ -291,6 +321,14 @@ var PAPERBRIDGE_ASSETS_TEST_PROMISE = (async () => {
       source = await bridge.library.item(saved.libraryID, saved.sourceKey); translated = await bridge.library.item(saved.libraryID, saved.translatedKey);
       asset = await bridge.library.item(saved.libraryID, saved.assetKey);
       check(source && translated && asset, "Exact native attachment keys survive transfer or process cold reopen");
+      if (config.phase === "reopen" && saved.markerMigration) {
+        const record = bridge.library.records.find(value => value.recordID === saved.markerMigration.recordID);
+        check(record?.jobID === saved.markerMigration.jobID && bridge.library.isTranslation(translated),
+          "Cold reopen retains exact migrated record/job markers and translation recognition");
+        check((await bridge.library.markedItems(saved.libraryID, "urn:paperbridge:alignment:1")).some(item => item.id === asset.id),
+          "Cold reopen discovers the migrated asset through native automatic-tag search");
+        report.markerMigration = saved.markerMigration;
+      }
       if (config.phase === "receive" && config.webdavFixture) {
         check(bridge.library.records.length === 0 && !await IOUtils.exists(bridge.runtime.home)
           && !(await IOUtils.getChildren(PathUtils.join(Zotero.DataDirectory.dir, "storage"))).length,

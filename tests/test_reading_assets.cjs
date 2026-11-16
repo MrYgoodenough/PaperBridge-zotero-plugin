@@ -7,7 +7,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const test = require('node:test');
 // Load the actual addon modules rather than another mapping implementation.
-const sources = ['alignment.js', 'reading-assets.js'].map(name =>
+const sources = ['library.js', 'alignment.js', 'reading-assets.js'].map(name =>
   fs.readFileSync(path.join(__dirname, '../addon/content', name), 'utf8'));
 
 /** Convert cross-realm JSON into ordinary assertion values. */
@@ -20,7 +20,7 @@ function fixture() {
   let nextAsset = 0, hashReads = 0;
   /** Model only documented attachment, parent and relation operations. */
   function item(key, file, parentKey = 'OWNER001', libraryID = 1) {
-    const relations = [];
+    const relations = [], tags = [];
     const value = { key, id: items.size + 1, libraryID, parentKey, parentID: items.get(parentKey)?.id || null, deleted: false,
       title: key, file,
       /** Identify the mock native item type. */
@@ -39,6 +39,14 @@ function fixture() {
       getRelationsByPredicate() { return [...relations]; },
       /** Add one persistent relation marker. */
       addRelation(predicate, value) { if (!relations.includes(value)) relations.push(value); },
+      /** Read synced tag metadata independently of native item relations. */
+      getTags() { return tags.map(tag => ({...tag})); },
+      /** Store one native automatic marker without changing ordinary item relations. */
+      addTag(tag, type) {
+        const existing = tags.find(value => value.tag === tag);
+        if (existing) existing.type = type;
+        else tags.push({tag, type});
+      },
       /** Read ordinary title metadata. */
       getField() { return this.title; },
       /** Set ordinary title metadata. */
@@ -64,8 +72,6 @@ function fixture() {
       async update(value, patch) { Object.assign(value, patch); return value; },
       /** Report optional publication failures independently. */
       warn(error) { warnings.push(error.message); },
-      /** Recognize real persistent translation markers. */
-      isTranslation(value) { return value.getRelationsByPredicate().some(relation => relation.startsWith('urn:paperbridge:record:')); },
     } };
   const Zotero = { debug() {}, Utilities: { randomString() { return 'temporary-' + nextAsset; } },
     Items: {
@@ -80,6 +86,14 @@ function fixture() {
       async getByPredicateAndObject(type, predicate, relation) {
         return [...items.values()].filter(value => value.getRelationsByPredicate().includes(relation));
       },
+    }, Search:class {
+      /** Match only the exact native marker tag. */
+      addCondition(field, operator, marker) { assert.equal(field, 'tag'); assert.equal(operator, 'is'); this.marker = marker; }
+      /** Return IDs scoped to the actual library, regardless of local records. */
+      async search() {
+        return [...items.values()].filter(value => value.libraryID === this.libraryID
+          && value.getTags().some(tag => tag.tag === this.marker)).map(value => value.id);
+      }
     }, Attachments: {
       /** Simulate Zotero's imported-file copy and native key allocation. */
       async importFromFile(options) {
@@ -108,6 +122,8 @@ function fixture() {
       async remove(file) { files.delete(file); },
     } });
   sources.forEach(source => vm.runInContext(source, context));
+  // Exercise production marker discovery while retaining unrelated mock file/index operations.
+  bridge.library = Object.assign(new context.TranslationLibrary(bridge), bridge.library);
   const Assets = context.AlignmentAssets;
   /** Replace native crypto only in this mock suite; assert exactly which files are hashed. */
   Assets.hashFile = file => { hashReads++; return crypto.createHash('sha256').update(files.get(file)).digest('hex'); };
@@ -131,6 +147,8 @@ test('publication is immutable, text-free and idempotent for an exact native att
   const first = await f.assets.publish(f.record, f.translated), second = await f.assets.publish(f.record, f.translated);
   assert.equal(first.key, second.key);
   assert.equal(f.items.size, 4);
+  assert.deepEqual(plain(first.getTags()), [{tag:'urn:paperbridge:alignment:1', type:1}]);
+  assert.deepEqual(first.getRelationsByPredicate(), ['zotero:1:SOURCE01', 'zotero:1:TARGET01']);
   const payload = JSON.parse(f.files.get(first.file));
   assert.equal(payload.validation.status, 'verified');
   assert.equal(payload.source_attachment_key, f.source.key);

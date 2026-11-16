@@ -11,9 +11,57 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 import engine as engine_module
 engine_module.localize_cache()
 from babeldoc.format.pdf.document_il.midend import il_translator as il_module
-from batching import BatchParagraph, CostAwareILTranslator, ObservedILTranslator
+from batching import BatchParagraph, CostAwareILTranslator, ObservedILTranslator, source_character_layout
 from deepseek import DeepSeekTranslator
 from usage import ResultQuality
+
+
+def test_title_edge_does_not_split_a_uniform_body_line(monkeypatch):
+    """Exercise actual pinned grouping: a tall body glyph cannot join the preceding title."""
+    from babeldoc.format.pdf.document_il import Box, Page, PageLayout, PdfCharacter, PdfStyle, VisualBbox
+    from babeldoc.format.pdf.document_il.midend import paragraph_finder
+    from babeldoc.format.pdf.document_il.utils.layout_helper import build_layout_index, get_character_layout
+
+    style = PdfStyle(font_id="body", font_size=9)
+    characters = [PdfCharacter(char_unicode=text, pdf_character_id=ord(text), xobj_id=0,
+                              pdf_style=style, box=Box(x, 551.642, x + 2, 560.642),
+                              visual_bbox=VisualBbox(Box(x, 551.642, x + 2, top)))
+                  for text, x, top in (("a", 190, 555.683), ("l", 192, 558.050), ("g", 194, 555.683))]
+    page = Page(pdf_character=characters, page_layout=[
+        PageLayout(box=Box(153, 428, 555, 560), id=1, class_name="plain text"),
+        PageLayout(box=Box(154, 558, 367, 571), id=16, class_name="title")])
+    layout_index, layout_map = build_layout_index(page)
+    finder = paragraph_finder.ParagraphFinder.__new__(paragraph_finder.ParagraphFinder)
+    # Reproduce the unmodified pinned lookup before checking the import-installed correction.
+    monkeypatch.setattr(paragraph_finder, "get_character_layout", get_character_layout)
+    original = finder._group_characters_into_paragraphs(page, layout_index, layout_map)
+    assert [paragraph.layout_label for paragraph in original] == ["plain text", "title", "plain text"]
+    page.pdf_character = characters
+    monkeypatch.setattr(paragraph_finder, "get_character_layout", source_character_layout)
+    fixed = finder._group_characters_into_paragraphs(page, layout_index, layout_map)
+    assert len(fixed) == 1 and fixed[0].layout_label == "plain text"
+    assert [composition.pdf_character.char_unicode for composition in fixed[0].pdf_paragraph_composition] == list("alg")
+    assert all(composition.pdf_character.pdf_style is style for composition in fixed[0].pdf_paragraph_composition)
+
+
+@pytest.mark.parametrize("title_box,body_box,other_label,expected", [
+    ((154, 558, 367, 571), (153, 428, 555, 560), None, "plain text"),
+    ((154, 551, 367, 571), (153, 428, 555, 560), None, "title"),
+    ((154, 558, 367, 571), (153, 428, 555, 555), None, "title"),
+    ((154, 558, 367, 571), (153, 428, 555, 560), "isolate_formula", "isolate_formula"),
+])
+def test_layout_correction_preserves_real_titles_formulas_and_ambiguous_edges(title_box, body_box, other_label, expected):
+    """Reject only disproven title-edge matches; genuine titles and formulas retain priority."""
+    from babeldoc.format.pdf.document_il import Box, Page, PageLayout, PdfCharacter, VisualBbox
+    from babeldoc.format.pdf.document_il.utils.layout_helper import build_layout_index
+
+    glyph = PdfCharacter(char_unicode="l", visual_bbox=VisualBbox(Box(195, 551.642, 197, 558.050)))
+    layouts = [PageLayout(box=Box(*body_box), id=1, class_name="plain text"),
+               PageLayout(box=Box(*title_box), id=16, class_name="title")]
+    if other_label:
+        layouts.append(PageLayout(box=Box(194, 551, 198, 559), id=17, class_name=other_label))
+    layout_index, layout_map = build_layout_index(Page(page_layout=layouts))
+    assert source_character_layout(glyph, layout_index, layout_map).name == expected
 
 
 @pytest.mark.parametrize("space_unicode", ["", " \t"])

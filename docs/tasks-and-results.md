@@ -9,12 +9,12 @@ PaperBridge 保持一个本地后端、一个串行工作线程和每次翻译�
 
 - `backend/server.py`：持久化任务、源文件快照、串行执行、取消与重试。`GET /jobs` 返回列表，`POST /jobs/{id}/retry` 必须重新提供凭据，返回新 ID 并链接旧尝试；服务重启把未完成工作标为中断，不自动调用模型。
 - 后端完整结果缓存由已记录的 PDF SHA-256 校验，旧记录可从 manifest 读取校验值；缺少证据或文件已改变时不自动复用，文件本身仍保留。前端只有完整质量附件可自动复用，部分/未知成果仍可显式打开。
-- `backend/library_cache.py`：唯一的非秘密配置规范化、整篇指纹与段落命名空间。当前整篇排版身份为 `babeldoc-0.6.4-protected-v8-source-clips`；保护/排版修复只失效旧整篇复用，不清除有效段落缓存，也不静默改写已保存 PDF。新增模型能力时，前后端配置、缓存键和测试应一起调整；不要把密钥加入身份。
+- `backend/library_cache.py`：唯一的非秘密配置规范化、整篇指纹与段落命名空间。当前整篇排版身份为 `babeldoc-0.6.4-protected-v10-native-regions`；保护/排版修复只失效旧整篇复用，不清除有效段落缓存，也不静默改写已保存 PDF。新增模型能力时，前后端配置、缓存键和测试应一起调整；不要把密钥加入身份。
 - `backend/deepseek.py`、`usage.py`、`batching.py`：请求能力、实际用量及固定引擎的翻译单元证据。`quality.json` 的完整/部分/不可用/未知与 PDF 是否生成分开判断；完整不等于语义质量认证。
 - `addon/content/tasks.js`：多选入队、恢复状态、逐项取消和保存；批量不调用分屏。单篇和批量入口都把当前配置、未变原文的未完成或未确认成果转到任务列表，不自动重发；批量跳过这些条目后继续其余论文。不同论文可共享后端 job，但各自拥有独立记录、保存状态及附件。重试必须使用返回的新 job ID 和 `forkAttempt()` 的新归属记录。
 - `addon/content/tasks-window.js` / `tasks.xhtml`：任务卡片的状态、可用操作和布局。默认只显示标题、配置、状态、进行中的进度及必要提醒；段落明细、阶段原名、用量和重试次数放入折叠详情，终态隐藏进度条，不可操作按钮隐藏。完整/部分/未知成果不能合并成同一种“成功”，错误及计费未知提醒必须可见。轮询复用卡片和详情节点，保留焦点及展开状态；批量跳过原因独立折叠。
 - `addon/content/ui.css`：设置、任务和条款窗口共享字体、明暗主题及控件状态；各 XHTML 只保留本窗口布局。设置保存区固定在底部，高级项/本地诊断默认收起，不改变配置草稿、显式保存和付费确认逻辑。
-- `addon/content/library.js`：版本 2 的 `translations.json`、附件归属与恢复标记。`put()` 固定配置，`update()` 更新状态，`findAttachment()` 恢复导入，`attach()` 完成保存；`alignment_path` 保存为对应归属的 `alignmentPath`。损坏索引先备份、禁用清理，不推断其余数据可删除。
+- `addon/content/library.js`：版本 2 的 `translations.json`、附件归属与恢复标记。`put()` 固定配置，`update()` 更新状态，`findAttachment()` 恢复导入，`attach()` 完成保存；`alignment_path` 保存为对应归属的 `alignmentPath`。内部 `urn:paperbridge:record:` / `job:` 标记使用 Zotero 自动标签（type 1），`dc:relation` 仅保留原生条目 URI。`load()` 经原生 `saveTx()` 迁移旧 URN 关系，不改 record/job ID、附件 key 或文件；只读条目警告并保留旧标记读取。损坏索引先备份、禁用清理，不推断其余数据可删除。
 - `addon/content/settings.*`、`prefs.js`：默认 DeepSeek 加一个可选兼容 profile；凭据分别保存在 Zotero 登录管理器。切换设置只影响后续入队任务。
 - `backend/errors.py`、`diagnostics.py`、`addon/content/runtime.js`：固定错误分类与安全指引、鉴权 `POST /diagnostics` 的本地 allowlist ZIP；设置页显示加载警告数量并提供导出，不采集原始日志、路径、密钥或文档内容。
 - `addon/content/annotations.js`：译文附件的原生批注读写、通知和关闭前持久化；只接入现有右侧 reader，不复制原文批注，见 [annotations.md](annotations.md)。

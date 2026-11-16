@@ -64,11 +64,13 @@ var LifecycleAssetChecks = {
   async retained(library, saved, verify, stage) {
     const pdf = await library.item(saved.libraryID, saved.translatedKey);
     const record = library.records.find(value => value.recordID === saved.recordID);
+    // Zotero removes relations to erased sources; the exact recovery tag remains independent.
     verify(`[native/frontend] ${stage}: translated PDF and durable record survive`,
       pdf?.isPDFAttachment() && await pdf.fileExists() && record?.attachmentKey === pdf.key &&
       record.sourceKey === saved.sourceKey && record.outputPath === saved.outputPath && record.alignmentPath === saved.alignmentPath &&
       await this.hash(await pdf.getFilePathAsync()) === saved.translatedHash &&
-      pdf.getRelationsByPredicate("dc:relation").includes("urn:paperbridge:record:" + saved.recordID));
+      pdf.getTags().some(tag => tag.tag === "urn:paperbridge:record:" + saved.recordID && tag.type === 1) &&
+      pdf.getRelationsByPredicate("dc:relation").every(uri => !uri.startsWith("urn:paperbridge:")));
     if (saved.noteKey) {
       const note = await library.item(saved.libraryID, saved.noteKey);
       if (note) await note.loadAllData();

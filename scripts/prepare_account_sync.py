@@ -47,9 +47,14 @@ def prepare(options):
             config["candidateSha256"] = hashlib.file_digest(stream, "sha256").hexdigest()
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
     helper = directory / f"account-{options.run_id}-helper.xpi"
+    # Native account checks must install on the same Zotero versions as the actual plugin.
+    compatibility = json.loads((ROOT / "addon/manifest.json").read_text(encoding="utf-8"))["applications"]["zotero"]
     manifest = {"manifest_version": 2, "name": "PaperBridge authorized account acceptance", "version": "1.0",
-                "applications": {"zotero": {"id": HELPER_ID, "strict_min_version": "10.0",
-                                           "strict_max_version": "10.*"}}}
+                "applications": {"zotero": {"id": HELPER_ID,
+                    "strict_min_version": compatibility["strict_min_version"],
+                    "strict_max_version": compatibility["strict_max_version"],
+                    # Zotero requires this field even for an intentionally non-updating test helper.
+                    "update_url": "https://example.invalid/paperbridge-account-tests.json"}}}
     bootstrap = """/** Run only the explicitly authorized account phase without exporting any credential. */
 /* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils */
 /** The helper never installs or changes the real plugin during its own installation. */
@@ -125,7 +130,7 @@ def main():
     parser.add_argument("--account", required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--phase", choices=("inspect", "install", "produce", "receive", "download", "reopen",
-                                            "metadata-produce", "metadata-receive", "metadata-reopen"), required=True)
+                                            "metadata-produce", "metadata-resume", "metadata-receive", "metadata-reopen"), required=True)
     parser.add_argument("--version", default="0.3.6")
     parser.add_argument("--cases", type=Path)
     parser.add_argument("--index", type=Path)

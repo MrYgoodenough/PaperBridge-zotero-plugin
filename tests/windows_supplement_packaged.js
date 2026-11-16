@@ -1,4 +1,4 @@
-/** Bounded Windows native-note and DPI-view supplement; loaded, never auto-run.
+/** Bounded Windows native-marker, note and DPI-view supplement; loaded, never auto-run.
  * Call PAPERBRIDGE_WINDOWS_SUPPLEMENT({bridge, config, check, checkpoint, until, report, state}).
  * config: isolated/expectedProfileDirectory/expectedDataDirectory/reportPath/supplementStatePath,
  * supplementPhase: 'exercise'|'notes'|'reopen'|'views'; the parent supplies upgrade PDF keys.
@@ -26,6 +26,13 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
   const stateSchema = 1;
   // Compare the same persisted annotation fields that the production note command checks.
   const annotationFields = ['type', 'text', 'comment', 'pageLabel', 'color', 'position'];
+  // Exact native automatic tags replace only these legacy internal relation values.
+  const markerPrefix = 'urn:paperbridge:', recordMarkerPrefix = markerPrefix + 'record:',
+    jobMarkerPrefix = markerPrefix + 'job:', alignmentMarker = markerPrefix + 'alignment:1';
+  // Preserve an ordinary user tag separately from automatic plugin markers.
+  const automaticMarkerType = 1, userMarkerType = 0, markerControlTag = 'PaperBridge Windows marker fixture';
+  // Reuse the observed real sidecar beside the configured PDF; never fabricate verified geometry.
+  const markerAlignmentFilename = 'alignment.json', markerNearMatchSuffix = ':near-match';
   // Teardown owns only windows/readers created here; fixture items remain for cold reopen.
   const windows = new Set(), readers = new Set();
   // Do not mix unperformed OS tests or injected faults with native acceptance checks.
@@ -34,8 +41,7 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
     processID: Services.appinfo.processID, nativeChecks: [], injectedChecks: [], snapshots: [], views: [],
     remaining: ['OS 100%/150% setting and visual QA require separate external evidence; this supplement never changes scale',
       'Native long-path and file-occupied errors: no safe production fixture supplied; not injected',
-      'Physical missing-resource failure: parent tests a labelled isolated startup exception, not a missing model',
-      'Editor-link mouse activation: saved URI routing is tested separately'],
+      'Physical missing-resource failure: parent tests a labelled isolated startup exception, not a missing model'],
     parentChecks: 'Diagnostic ZIP/privacy and two synthetic native credential realms are tested by the upgrade harness',
     providerActionsInvoked: 0, providerNetworkMonitoring: 'Parent-owned; no request monkeypatch installed',
     faultCopiesCreated: 0, errors: [] };
@@ -181,6 +187,140 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
     return { source, translated, parent };
   }
 
+  /** Capture only owned native keys, record/job identity and exact PDF/JSON bytes. */
+  async function markerIdentity(fixture, record, asset) {
+    return { recordID: record.recordID, jobID: record.jobID, libraryID: record.libraryID,
+      ownerKey: record.ownerKey, sourceKey: record.sourceKey, attachmentKey: record.attachmentKey,
+      mappingAttachmentKey: record.mappingAttachmentKey,
+      itemKeys: { parent: fixture.parent.key, source: fixture.source.key, translated: fixture.translated.key, asset: asset.key },
+      itemIDs: { parent: fixture.parent.id, source: fixture.source.id, translated: fixture.translated.id, asset: asset.id },
+      sourceChecksum: checksum(await IOUtils.read(await fixture.source.getFilePathAsync())),
+      translatedChecksum: checksum(await IOUtils.read(await fixture.translated.getFilePathAsync())),
+      alignmentChecksum: checksum(await IOUtils.read(await asset.getFilePathAsync())) };
+  }
+
+  /** Verify exact automatic tags while preserving genuine relations and an ordinary user tag. */
+  function markerMetadata(item, markers, relations) {
+    // Native Zotero omits the default user-tag type; automatic markers must still be exactly type 1.
+    const tags = item.getTags().map(tag => ({ tag: tag.tag, type: tag.type ?? userMarkerType }));
+    const actualRelations = [...item.getRelationsByPredicate('dc:relation')].sort();
+    verify(markers.every(marker => tags.some(tag => tag.tag === marker && tag.type === automaticMarkerType))
+      && actualRelations.every(uri => !uri.startsWith(markerPrefix)),
+    'Native record/job/alignment markers are exact automatic tags, never internal URI relations', { itemKey: item.key, markers, tags });
+    verify(JSON.stringify(actualRelations) === JSON.stringify([...relations].sort())
+      && tags.some(tag => tag.tag === markerControlTag && tag.type === userMarkerType),
+    'Native marker writes preserve genuine Zotero item URI relations and ordinary user tags',
+    { itemKey: item.key, relations: actualRelations });
+    return { itemKey: item.key, tags, relations: actualRelations };
+  }
+
+  /** Query production exact-tag discovery without native key or owner fallback shortcuts. */
+  async function markerDiscovery(fixture, record, asset) {
+    const discovered = [];
+    for (const [marker, item] of [[recordMarkerPrefix + record.recordID, fixture.translated],
+      [jobMarkerPrefix + record.jobID, fixture.translated], [alignmentMarker, asset]]) {
+      const exact = await bridge.library.markedItems(saved.libraryID, marker);
+      const near = await bridge.library.markedItems(saved.libraryID, marker + markerNearMatchSuffix);
+      verify(exact.filter(candidate => candidate.id === item.id).length === 1
+        && !near.some(candidate => candidate.id === item.id),
+      'Native exact-tag search discovers the owned marker and rejects a near-match', { marker, itemKey: item.key });
+      discovered.push({ marker, itemKey: item.key, exactIDs: exact.map(candidate => candidate.id), nearIDs: near.map(candidate => candidate.id) });
+    }
+    // Only this detached probe is changed; the persisted record keeps every original key and ID.
+    const probe = { ...record, attachmentKey: null, attachmentID: null, importingAttachmentKey: null,
+      ownerKey: null, ownerID: null };
+    verify((await bridge.library.findAttachment(probe))?.id === fixture.translated.id,
+      'Native translation recovery finds the exact tag without attachment-key or owner shortcuts');
+    verify((await bridge.alignmentAssets.attachments(saved.libraryID)).some(candidate => candidate.id === asset.id),
+      'Production alignment discovery retains the exact automatic-tagged JSON attachment');
+    return discovered;
+  }
+
+  /** Exercise owned legacy metadata migration, or revalidate its exact state after cold reopen. */
+  async function nativeMarkers(fixture) {
+    verify(typeof bridge.library.migrateMarkers === 'function' && !!bridge.alignmentAssets,
+      'Actual installed addon exposes native marker migration and alignment publication');
+    let record, asset, retained;
+    if (evidence.phase === 'exercise') {
+      const mappingPath = canonical(config.markerAlignmentPath
+        || PathUtils.join(PathUtils.parent(config.sourcePDF), markerAlignmentFilename));
+      verify(inside(mappingPath, canonical(PathUtils.parent(config.expectedDataDirectory))),
+        'Marker input JSON belongs to the owned isolated runtime fixtures');
+      const mapping = await bridge.alignmentAssets.constructor.readJSON(mappingPath);
+      await wait(() => pair.apps.every(app => app?.pdfDocument), 'Native marker PDF documents did not initialize');
+      await bridge.alignmentAssets.verified(mapping, { source: fixture.source, translated: fixture.translated,
+        alignment: pair.alignment }, await bridge.alignmentAssets.evidence(fixture.source, fixture.translated));
+      const inputChecksum = checksum(await IOUtils.read(mappingPath));
+      const sourceURI = Zotero.URI.getItemURI(fixture.source), translatedURI = Zotero.URI.getItemURI(fixture.translated),
+        parentURI = Zotero.URI.getItemURI(fixture.parent);
+      fixture.translated.addTag(markerControlTag, userMarkerType);
+      fixture.translated.addRelation('dc:relation', parentURI);
+      await fixture.translated.saveTx();
+      // This is metadata-only fixture identity for existing real files, not a backend/model job response.
+      const jobID = 'native-windows-marker-' + fixture.parent.key;
+      record = await ready(bridge.library.put(fixture.source, fixture.translated, bridge.configuration(),
+        { id: jobID, state: 'done', quality: { status: 'unknown' }, alignment_path: mappingPath },
+        await IOUtils.stat(await fixture.source.getFilePathAsync())), 'Production marker record did not save');
+      asset = await Zotero.Items.getByLibraryAndKeyAsync(saved.libraryID, record.mappingAttachmentKey);
+      verify(record.jobID === jobID && asset?.isAttachment() && !asset.deleted && asset.parentID === fixture.parent.id,
+        'Production record attachment publishes one owned real alignment JSON asset');
+      asset.addTag(markerControlTag, userMarkerType);
+      asset.addRelation('dc:relation', parentURI);
+      await asset.saveTx();
+      await ready(bridge.library.settled(), 'Native marker record/index saves did not settle');
+      const translationMarkers = [recordMarkerPrefix + record.recordID, jobMarkerPrefix + record.jobID];
+      const translatedRelations = [sourceURI, parentURI], assetRelations = [sourceURI, translatedURI, parentURI];
+      const fresh = [markerMetadata(fixture.translated, translationMarkers, translatedRelations),
+        markerMetadata(asset, [alignmentMarker], assetRelations)];
+      const before = await markerIdentity(fixture, record, asset);
+      // Seed only the newly owned items; the real native migration, not test-side tag writes, must repair them.
+      for (const [item, markers] of [[fixture.translated, translationMarkers], [asset, [alignmentMarker]]]) {
+        for (const marker of markers) { item.removeTag(marker); item.addRelation('dc:relation', marker); }
+        await item.saveTx();
+        verify(markers.every(marker => item.getRelationsByPredicate('dc:relation').includes(marker)
+          && !item.getTags().some(tag => tag.tag === marker)),
+        'Owned native legacy seed contains the same old URNs with their automatic tags absent', { itemKey: item.key, markers });
+      }
+      const legacyIDs = await Zotero.DB.columnQueryAsync(
+        'SELECT DISTINCT itemID FROM itemRelations JOIN relationPredicates USING (predicateID) WHERE predicate = ? AND object LIKE ?',
+        ['dc:relation', markerPrefix + '%']);
+      verify(legacyIDs.length === 2 && legacyIDs.every(id => [fixture.translated.id, asset.id].includes(Number(id))),
+        'Explicit native migration has only the two owned legacy-seeded items to change', { itemIDs: legacyIDs });
+      verify(JSON.stringify(await markerIdentity(fixture, record, asset)) === JSON.stringify(before),
+        'Legacy metadata seeding leaves native keys, record/job IDs and PDF/JSON hashes unchanged');
+      await ready(bridge.library.migrateMarkers(), 'Production native marker migration did not finish');
+      await ready(bridge.library.settled(), 'Migrated native marker saves did not settle');
+      const migrated = [markerMetadata(fixture.translated, translationMarkers, translatedRelations),
+        markerMetadata(asset, [alignmentMarker], assetRelations)];
+      const after = await markerIdentity(fixture, record, asset);
+      verify(JSON.stringify(after) === JSON.stringify(before)
+        && checksum(await IOUtils.read(mappingPath)) === inputChecksum,
+      'Native migration preserves every owned item key, record/job ID and original PDF/JSON hash', { before, after });
+      retained = saved.markerMigration = { identity: before, mappingInputPath: mappingPath, mappingInputChecksum: inputChecksum,
+        translationMarkers, translatedRelations, assetRelations };
+      evidence.markerMigration = { phase: 'new-write-and-legacy-migration', fresh, migrated, identityBefore: before, identityAfter: after };
+      await persist();
+    } else {
+      retained = saved.markerMigration;
+      verify(retained?.identity?.recordID && retained.identity.jobID && retained.identity.itemKeys.asset,
+        'Cold marker checks require saved identity from this marker-capable supplement, not preliminary evidence');
+      record = bridge.library.records.find(candidate => candidate.recordID === retained.identity.recordID);
+      asset = await Zotero.Items.getByLibraryAndKeyAsync(saved.libraryID, retained.identity.itemKeys.asset);
+      verify(record?.jobID === retained.identity.jobID && asset?.isAttachment() && !asset.deleted
+        && asset.parentID === fixture.parent.id, 'Cold reopen retains the owned record/job IDs and exact alignment attachment');
+      const metadata = [markerMetadata(fixture.translated, retained.translationMarkers, retained.translatedRelations),
+        markerMetadata(asset, [alignmentMarker], retained.assetRelations)];
+      const after = await markerIdentity(fixture, record, asset);
+      verify(JSON.stringify(after) === JSON.stringify(retained.identity)
+        && checksum(await IOUtils.read(retained.mappingInputPath)) === retained.mappingInputChecksum,
+      'Cold reopen retains exact migrated native keys, record/job IDs and original PDF/JSON bytes', { before: retained.identity, after });
+      evidence.markerMigration = { phase: 'cold-reopen', migrated: metadata, identityBefore: retained.identity, identityAfter: after };
+    }
+    evidence.markerMigration.discovery = await markerDiscovery(fixture, record, asset);
+    evidence.markerMigration.inputChecksum = retained.mappingInputChecksum;
+    evidence.markerMigration.complete = true;
+  }
+
   /** Open a fresh production split, refusing to replace any parent-owned reader or split. */
   async function openPair(fixture) {
     verify(!Zotero.Reader._readers.some(reader => reader.itemID === fixture.source.id),
@@ -201,6 +341,11 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       await wait(() => !pair.sync, 'Production independent-scroll control did not disable page synchronization');
       verify(true, 'Owned note fixture uses the production independent-scroll control');
     }
+    // Expand the real collapsed tools before PDF selection; opening them afterward could disturb that selection.
+    const tools = pair.alignment.selectionNoteButton.closest('details');
+    verify(!!tools, 'Production note buttons belong to the real reading-tools disclosure');
+    if (!tools.open) await click(tools.querySelector('summary'));
+    await wait(() => tools.open, 'Trusted reading-tools click did not reveal the native note commands');
     return pair;
   }
 
@@ -214,9 +359,9 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
   }
 
   /** Await foreground native focus before mouse commands, particularly in Windows interactive sessions. */
-  async function focus(window) {
+  async function focus(window, ownerWindow) {
     // Content-frame focus must raise the containing chrome window, not assign an iframe as activeWindow.
-    const root = windows.has(window) ? window : main;
+    const root = ownerWindow || (windows.has(window) ? window : main);
     root.focus();
     Services.focus.activeWindow = root;
     if (window !== root) window.focus();
@@ -224,28 +369,37 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
   }
 
   /** Click a real, reachable production control and require its trusted native click event. */
-  async function click(element) {
+  async function click(element, ownerWindow) {
     const window = element.ownerDocument.defaultView;
-    await focus(window);
+    await focus(window, ownerWindow);
     element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     await Zotero.Promise.delay(pollMilliseconds);
     const box = element.getBoundingClientRect();
     const x = box.left + box.width / 2, y = box.top + box.height / 2;
     const hit = element.ownerDocument.elementFromPoint(x, y);
+    // SVG className is a live native wrapper; retain only inert strings before any editor closes.
     verify(box.width > 0 && box.height > 0 && !element.disabled && x >= 0 && x < window.innerWidth
       && y >= 0 && y < window.innerHeight && (hit === element || element.contains(hit)),
-    'Production UI control is visible and hit-testable', { id: element.id, className: element.className,
+    'Production UI control is visible and hit-testable', { id: element.id, className: element.getAttribute('class') || '',
       box: { left: box.left, top: box.top, width: box.width, height: box.height }, disabled: !!element.disabled,
-      viewport: { width: window.innerWidth, height: window.innerHeight }, hitClass: hit?.className || null });
-    let trusted = false;
+      viewport: { width: window.innerWidth, height: window.innerHeight }, hitClass: hit?.getAttribute?.('class') || null });
+    const input = { tag: element.localName, id: element.id, className: element.getAttribute('class') || '',
+      href: element.getAttribute('href'), point: [x, y], events: [] };
+    (evidence.controlInputs ||= []).push(input);
+    const eventNames = ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'];
     /** Observe, but never cancel or synthesize, the native click. */
-    function observe(event) { trusted ||= event.isTrusted; }
-    element.addEventListener('click', observe, { capture: true, passive: true });
+    function observe(event) {
+      input.events.push({ type: event.type, trusted: event.isTrusted, buttons: event.buttons });
+    }
+    for (const name of eventNames) element.addEventListener(name, observe, { capture: true, passive: true });
     try {
       mouse(window, 'mousedown', x, y);
       mouse(window, 'mouseup', x, y);
-      verify(trusted, 'Production control receives a trusted mouse click');
-    } finally { element.removeEventListener('click', observe, true); }
+      verify(input.events.some(event => event.type === 'click') && input.events.every(event => event.trusted),
+        'Production control receives a trusted mouse click', { href: input.href, className: input.className });
+    } finally {
+      for (const name of eventNames) element.removeEventListener(name, observe, true);
+    }
   }
 
   /** Use the actual toolbar, toggling an active annotation tool off for pointer selection. */
@@ -357,7 +511,7 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
   }
 
   /** Observe a fully initialized production note editor, not merely a saved Item or window shell. */
-  async function editor(note, label) {
+  async function editor(note, label, targetBacklink) {
     const window = await wait(() => {
       for (const candidate of Services.wm.getEnumerator('zotero:note')) {
         if (candidate.document.getElementById('zotero-note-editor')?.item?.id === note.id) {
@@ -375,14 +529,30 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
     await ready(instance._initPromise, 'Native editor content initialization did not finish');
     const content = await wait(() => instance._iframeWindow?.document.querySelector('[contenteditable="true"]'),
       'Native editor did not render editable note content');
-    await wait(() => content.textContent.includes('Translated'), 'Initialized native editor did not paint the saved note text');
+    // Match the real saved attachment link, not a superseded or localized heading label.
+    await wait(() => [...content.querySelectorAll('a[href]')].some(link =>
+      link.getAttribute('href')?.includes(pair.translated.key)), 'Initialized native editor did not paint the saved note link');
     verify(element.item.id === note.id, 'Initialized native editor selects the saved note item');
+    if (targetBacklink) await editorBacklink(content, window, targetBacklink, label);
     await snapshot(window, label);
     window.close();
     await wait(() => window.closed, 'Owned native note window did not close');
     await ready(Zotero.DB.waitForTransaction(), 'Native note-editor close transaction did not finish');
     await focus(main);
     return note;
+  }
+
+  /** Activate the real editor link and its native popup through trusted mouse input. */
+  async function editorBacklink(content, window, target, label) {
+    const link = [...content.querySelectorAll('a[href]')].find(value => value.getAttribute('href') === target);
+    verify(!!link, 'Native note editor paints the exact saved translated-PDF backlink');
+    await click(link, window);
+    const popupLink = await wait(() => [...content.ownerDocument.querySelectorAll('.link-popup a[href]')]
+      .find(value => value.getAttribute('href') === target), 'Native editor link popup did not expose the saved backlink');
+    await snapshot(window, label + '-popup');
+    // Zotero's editor opens links from this popup; no direct protocol call substitutes for either click.
+    await click(popupLink, window);
+    verify(true, 'Trusted editor-link and popup clicks activate the saved PDF backlink', { target });
   }
 
   /** Invoke a production split button once, keeping native save and native editor-open results distinct. */
@@ -430,11 +600,14 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       annotationKey: annotationKey || null, targetBacklink: target, sourceBacklink: source };
   }
 
-  /** Route the note's actual saved backlink through Zotero, not a guessed URL or external app launch. */
+  /** Follow the saved backlink from its actual native editor and verify the resulting reader. */
   async function backlink(record) {
     verify(!Zotero.Reader._readers.some(reader => reader.itemID === pair.translated.id && !readers.has(reader)),
       'PDF backlink cannot reuse a parent-owned translated reader');
-    main.ZoteroPane.loadURI(record.targetBacklink);
+    const note = await Zotero.Items.getByLibraryAndKeyAsync(saved.libraryID, record.key);
+    verify(note?.isNote(), 'Saved backlink belongs to the retained native note');
+    await Zotero.Notes.open(note.id, null, { openInWindow: true });
+    await editor(note, 'editor-backlink-' + record.kind, record.targetBacklink);
     const native = await wait(() => {
       const reader = Zotero.Reader._readers.find(value => value.itemID === pair.translated.id);
       if (reader) readers.add(reader);
@@ -450,7 +623,11 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       && (!record.annotationKey || native._internalReader._state.selectedAnnotationIDs?.includes(record.annotationKey)),
     'Saved PDF backlink did not reach its actual translated page/highlight');
     verify(true, 'Saved note backlink navigates to the real translated PDF page/annotation',
-      { method: 'Native ZoteroPane.loadURI; not an editor-link mouse-click claim', noteKey: record.key });
+      { method: 'Trusted mouse clicks in the native note editor and its link popup', noteKey: record.key,
+        attachmentKey: pair.translated.key, readerItemID: native.itemID,
+        actualPageNumber: view._iframeWindow.PDFViewerApplication.pdfViewer.currentPageNumber,
+        annotationKey: record.annotationKey || null,
+        selectedAnnotationIDs: [...(native._internalReader._state.selectedAnnotationIDs || [])] });
     main.Zotero_Tabs.select(pair.reader.tabID);
   }
 
@@ -487,7 +664,15 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       windows.add(window);
       await wait(() => window.document.readyState === 'complete'
         && window.document.getElementById(name === 'settings' ? 'diagnostics-export' : 'refresh'), 'Native ' + name + ' view did not load');
-      if (name === 'settings') await click(window.document.querySelector('#diagnostics > summary'));
+      if (name === 'settings') {
+        const support = window.document.getElementById('support-settings');
+        // Diagnostics are nested in the current support disclosure, not an independently visible control.
+        if (support && !support.open) {
+          await click(support.querySelector(':scope > summary'));
+          await wait(() => support.open, 'Native support disclosure did not open');
+        }
+        await click(window.document.querySelector('#diagnostics > summary'));
+      }
       else await wait(() => window.document.querySelector('.task') || window.document.getElementById('status').textContent,
         'Native task rows or empty-state message did not render');
       for (const size of viewSizes) {
@@ -507,6 +692,10 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
         evidence.views.push(view);
         verify(body.scrollWidth <= body.clientWidth + layoutTolerance, name + ' body has no horizontal overflow');
         for (const control of document.querySelectorAll('button, input, select, summary')) {
+          // Gecko can retain geometry below a closed details element; those descendants are not painted controls.
+          const collapsed = [...document.querySelectorAll('details:not([open])')].some(details =>
+            details.contains(control) && !details.querySelector(':scope > summary')?.contains(control));
+          if (collapsed) continue;
           const box = control.getBoundingClientRect();
           if (!box.width || !box.height) continue;
           control.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -523,7 +712,9 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
           if (control.localName === 'button') verify(control.scrollWidth <= control.clientWidth + layoutTolerance,
             name + ' button label is not horizontally clipped', { id: control.id });
         }
-        body.scrollTop = 0;
+        // Settings scroll their content while the footer stays fixed; body.scrollTop cannot reset that view.
+        const scrollContainer = document.querySelector('.settings-content') || document.scrollingElement || body;
+        scrollContainer.scrollTop = 0;
         await snapshot(window, name + '-' + size.width);
         if (name === 'settings') {
           verify(document.getElementById('diagnostics').open, 'Native diagnostic disclosure remains open via the production UI');
@@ -584,6 +775,8 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
     if (evidence.phase === 'exercise') verify(!await IOUtils.exists(statePath), 'Exercise requires a new supplement state path; no silent duplicate notes');
     const fixture = evidence.phase === 'exercise' ? await createFixture() : await restoreFixture();
     await openPair(fixture);
+    await progress('native-markers');
+    await nativeMarkers(fixture);
     await progress('native-notes');
     if (evidence.phase === 'exercise') {
       const before = JSON.stringify(await annotations(pair.translated));

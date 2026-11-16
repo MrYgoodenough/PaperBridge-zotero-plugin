@@ -1,15 +1,20 @@
-"""Larger paragraph batches, retaining BabelDOC's cross-page and placeholder handling.
+"""Correct source paragraph grouping and retain BabelDOC's batch/placeholder handling.
 
 The process_page flow follows BabelDOC 0.6.4 (AGPL-3.0), with a 1200-token /
 12-paragraph threshold in place of its 200-token / 6-paragraph threshold.
 """
 import re
+from types import SimpleNamespace
 
 from babeldoc.format.pdf.document_il.midend.il_translator_llm_only import (
     BatchParagraph, ILTranslatorLLMOnly, is_cid_paragraph,
     is_placeholder_only_paragraph, is_pure_numeric_paragraph,
 )
 from babeldoc.format.pdf.document_il.midend.il_translator import ILTranslator, RichTextPlaceholder
+from babeldoc.format.pdf.document_il.midend import paragraph_finder
+from babeldoc.format.pdf.document_il.utils.layout_helper import (
+    box_to_tuple, get_character_layout as original_character_layout,
+)
 from deepseek import placeholder_tokens
 
 # Keep the existing batching and executor priority policy.
@@ -18,6 +23,38 @@ BATCH_TOKENS = 1200
 BATCH_PARAGRAPHS = 12
 # Match the pinned engine's descending token-based scheduling priority.
 PRIORITY_BASE = 1048576
+# Only ordinary prose boxes can disprove a title's incidental glyph-edge overlap.
+BODY_LAYOUTS = {"plain text", "text", "content", "paragraph"}
+
+
+def source_character_layout(char, layout_index, layout_map, layout_priority=None, _bbox_mode="auto"):
+    """Do not let a touching title edge split glyphs fully contained in a body box."""
+    selected = original_character_layout(char, layout_index, layout_map, layout_priority, _bbox_mode)
+    if selected is None or selected.name != "title":
+        return selected
+    glyph = char.visual_bbox.box
+    candidates = list(layout_index.intersection(box_to_tuple(glyph)))
+    title = next(layout_map[index] for index in candidates if layout_map[index].id == selected.id)
+    center_x, center_y = (glyph.x + glyph.x2) / 2, (glyph.y + glyph.y2) / 2
+    if title.box.x <= center_x <= title.box.x2 and title.box.y <= center_y <= title.box.y2:
+        return selected
+    body_ids = [index for index in candidates if layout_map[index].class_name in BODY_LAYOUTS
+                and layout_map[index].box.x <= glyph.x and glyph.x2 <= layout_map[index].box.x2
+                and layout_map[index].box.y <= glyph.y and glyph.y2 <= layout_map[index].box.y2]
+    if not body_ids:
+        return selected
+    # Reuse pinned priority/IoU tie-breaking; only the false title candidate is ruled out.
+    body_index = SimpleNamespace(intersection=lambda bounds: body_ids)
+    return original_character_layout(char, body_index, layout_map, layout_priority, _bbox_mode)
+
+
+def install_source_layout_selection():
+    """Correct the existing grouping lookup before formulas/styles and translation run."""
+    paragraph_finder.get_character_layout = source_character_layout
+
+
+# The engine imports batching before parsing; repair its existing lookup at that boundary.
+install_source_layout_selection()
 
 
 class ObservedILTranslator(ILTranslator):

@@ -31,6 +31,8 @@ SOURCE_SUFFIXES = {".py", ".pyi", ".c", ".h", ".cc", ".cxx", ".cpp", ".hh", ".hx
 NATIVE_PATTERN = re.compile(r"\.(?:so(?:\.\d+)*|dylib|dll|pyd|a|lib|exe)$", re.IGNORECASE)
 # Recognize renamed SFNT/collection files as well as conventional font filenames.
 FONT_SIGNATURES = {b"\x00\x01\x00\x00", b"OTTO", b"ttcf", b"wOFF", b"wOF2"}
+# Keep tracked tests and developer docs referenced by build workflows and the README.
+PROJECT_SOURCE_DIRS = ("addon", "backend", "scripts", ".github", "tests", "docs")
 
 
 def digest(path):
@@ -188,10 +190,10 @@ def project_files():
     """Snapshot only project/build inputs; never include machine caches, credentials or agent history."""
     result = {ROOT / p for p in ("LICENSE", "NOTICE.md", "README.md", ".env.example",
               "pyproject.toml", "uv.lock", "docs/licensing.md", "docs/linux-package-size.md",
-              "docs/releasing.md")}
+              "docs/releasing.md", "docs/source-delivery-readiness.md")}
     # Git's tracked allowlist avoids accidentally including untracked account/process files.
     tracked = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "-z", "--",
-                                       "addon", "backend", "scripts", ".github"])
+                                       *PROJECT_SOURCE_DIRS])
     result.update(ROOT / safe_path(p.decode("utf-8")) for p in tracked.split(b"\0") if p)
     result.add(ROOT / "scripts/package_sources.py")
     result.update((ROOT / "addon/licenses").rglob("*"))
@@ -206,10 +208,10 @@ def project_snapshot(paths):
     changed = subprocess.check_output(["git", "-C", str(ROOT), "diff", "HEAD", "--name-only", "-z"])
     changed = {p.decode("utf-8") for p in changed.split(b"\0") if p}
     untracked = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "--others",
-                                         "--exclude-standard", "-z", "--", "addon", "backend", "scripts", ".github"])
+                                         "--exclude-standard", "-z", "--", *PROJECT_SOURCE_DIRS])
     untracked = {p.decode("utf-8") for p in untracked.split(b"\0") if p}
     return {"gitHead": subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"]).decode().strip(),
-            "membershipPolicy": "Tracked working-tree build/source files plus explicit package_sources.py and addon/licenses/; never agent history or arbitrary untracked files.",
+            "membershipPolicy": "Tracked working-tree build/source/test files plus explicit delivery docs, package_sources.py and addon/licenses/; never agent history or arbitrary untracked files.",
             "includedUntrackedFiles": sorted(included - tracked),
             "modifiedTrackedFiles": sorted(included & changed),
             "excludedUntrackedSourceFiles": sorted(untracked - included),

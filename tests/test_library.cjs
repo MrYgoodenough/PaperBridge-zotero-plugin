@@ -14,7 +14,7 @@ const stat = {lastModified:100, size:200};
 // Identical jobs may serve multiple independent Zotero sources.
 const job = {id:'shared-job', state:'queued', fingerprint:'a'.repeat(64), document_key:'b'.repeat(64)};
 
-/** Provide in-memory item, relation and atomic-file APIs plus controllable failures. */
+/** Provide in-memory item, tag, relation and atomic-file APIs plus controllable failures. */
 function fixture() {
   const files = new Map();
   const items = new Map();
@@ -27,10 +27,30 @@ function fixture() {
   const Zotero = {
     Utilities:{randomString:() => `record-${nextRecord++}`},
     URI:{getItemURI:item => `zotero://items/${item.libraryID}/${item.key}`},
-    Items:{getAsync:async id => items.get(id),
+    Items:{getAsync:async id => Array.isArray(id) ? id.map(value => items.get(value)) : items.get(id),
       getByLibraryAndKeyAsync:async (libraryID, key) => [...items.values()].find(item => item.libraryID === libraryID && item.key === key)},
     Relations:{getByPredicateAndObject:async (_type, _predicate, uri) =>
       [...items.values()].filter(item => item.relations.includes(uri))},
+    DB:{
+      /** Select legacy marker owners without permitting direct database writes. */
+      columnQueryAsync:async (sql, params) => {
+        assert.match(sql, /^SELECT DISTINCT itemID FROM itemRelations/);
+        assert.deepEqual(plain(params), ['dc:relation', 'urn:paperbridge:%']);
+        return [...items.values()].filter(item => item.relations.some(uri => uri.startsWith('urn:paperbridge:')))
+          .map(item => item.id);
+      }
+    },
+    Search:class {
+      /** Keep exact tag matching scoped to the requested native library. */
+      addCondition(field, operator, marker) {
+        assert.equal(field, 'tag'); assert.equal(operator, 'is'); this.marker = marker;
+      }
+      /** Return native IDs independently of parent/source availability. */
+      async search() {
+        return [...items.values()].filter(item => item.libraryID === this.libraryID
+          && item.tags.some(tag => tag.tag === this.marker)).map(item => item.id);
+      }
+    },
     Promise:{delay:async () => {}},
     logError:error => errors.push(error.message)
   };
@@ -73,16 +93,26 @@ function fixture() {
   /** Create an item whose bytes and dirty metadata survive library-instance restarts. */
   function item(key, parent = null, regular = false, libraryID = 1) {
     const result = {id:nextID++, key, libraryID, parentID:parent?.id, parentKey:parent?.key,
-      deleted:false, relations:[], file:`/storage/${key}.pdf`, stat:{...stat}, dirty:false,
+      deleted:false, relations:[], tags:[], editable:true, saves:0, file:`/storage/${key}.pdf`, stat:{...stat}, dirty:false,
       isRegularItem:() => regular, isPDFAttachment:() => !regular,
+      isEditable:() => result.editable,
       getField:() => key, getFilePathAsync:async () => result.file,
       fileExists:async () => files.has(result.file),
       getAttachments:() => [...items.values()].filter(child => child.parentID === result.id).map(child => child.id),
       getRelationsByPredicate:() => [...result.relations],
       addRelation:(_predicate, uri) => { result.relations.push(uri); result.dirty = true; },
+      removeRelation:(_predicate, uri) => { result.relations = result.relations.filter(value => value !== uri); result.dirty = true; },
+      getTags:() => result.tags.map(tag => ({...tag})),
+      addTag:(tag, type) => {
+        const existing = result.tags.find(value => value.tag === tag);
+        if (existing) existing.type = type;
+        else result.tags.push({tag, type});
+        result.dirty = true;
+      },
       hasChanged:() => result.dirty,
       saveTx:async () => {
         if (faults.metadata-- > 0) throw new Error('metadata failed');
+        result.saves++;
         result.dirty = false;
       },
       eraseTx:async () => assert.fail('Plugin must never permanently erase an attachment')};
@@ -243,7 +273,8 @@ test('importing keys and source/job relations recover the right PDF without cros
   await restored.attach(restored.records[0], pdf);
   restored = await f.reload();
   assert.equal(restored.records[0].saveState, 'imported');
-  assert(pdf.relations.includes('urn:paperbridge:record:' + record.recordID));
+  assert(pdf.tags.some(tag => tag.tag === 'urn:paperbridge:record:' + record.recordID && tag.type === 1));
+  assert(pdf.relations.every(uri => !uri.startsWith('urn:paperbridge:')));
   assert.equal(restored.isTranslation(pdf), true);
   assert.strictEqual(await restored.attach(restored.records[0], wrong), pdf);
   assert(f.items.has(wrong.id), 'An extra imported copy must never be erased automatically');
@@ -281,6 +312,46 @@ test('record relations recover the metadata-save/index-save crash window', async
   assert.strictEqual((await restored.savedFor(pdf, config.language)).attachment, pdf);
   await restored.attach(restored.records[0], pdf);
   assert.equal(restored.records[0].attachmentID, pdf.id);
+});
+
+test('legacy URNs migrate to automatic tags without changing item identities, files or genuine relations', async () => {
+  const f = fixture();
+  const record = await f.library.put(f.source, null, config, job, stat);
+  const pdf = f.item('MIGRATE', f.owner), originalFile = f.files.get(pdf.file);
+  const markers = ['urn:paperbridge:record:' + record.recordID, 'urn:paperbridge:job:' + job.id,
+    'urn:paperbridge:alignment:1'];
+  pdf.addRelation('dc:relation', record.sourceURI);
+  markers.forEach(marker => pdf.addRelation('dc:relation', marker));
+  pdf.addTag('ordinary user tag', 0);
+  const originalID = pdf.id, originalParent = pdf.parentKey;
+  const restored = await f.reload();
+  assert.deepEqual(pdf.relations, [record.sourceURI]);
+  assert.deepEqual(pdf.tags, [{tag:'ordinary user tag', type:0}, ...markers.map(tag => ({tag, type:1}))]);
+  assert.equal(pdf.id, originalID); assert.equal(pdf.parentKey, originalParent);
+  assert.equal(f.files.get(pdf.file), originalFile);
+  assert.equal(restored.records[0].recordID, record.recordID);
+  assert.equal(restored.records[0].jobID, job.id);
+  assert.equal(restored.isTranslation(pdf), true);
+  f.items.delete(f.owner.id); f.items.delete(f.source.id);
+  assert.strictEqual(await restored.findAttachment(restored.records[0]), pdf);
+  assert.strictEqual((await restored.savedFor(pdf, config.language)).attachment, pdf);
+  await restored.migrateMarkers();
+  assert.equal(pdf.saves, 1, 'Migration is idempotent and does not repeatedly dirty native metadata');
+  assert.deepEqual(f.calls, [], 'Metadata repair cannot submit translation or cache requests');
+});
+
+test('read-only legacy markers warn without blocking migration of editable items', async () => {
+  const f = fixture(), readonly = f.item('READONLY'), writable = f.item('WRITABLE');
+  readonly.editable = false;
+  readonly.addRelation('dc:relation', 'urn:paperbridge:record:readonly');
+  writable.addRelation('dc:relation', 'urn:paperbridge:record:writable');
+  await f.library.migrateMarkers();
+  assert.deepEqual(readonly.relations, ['urn:paperbridge:record:readonly']);
+  assert.deepEqual(readonly.tags, []);
+  assert.equal(f.library.isTranslation(readonly), true, 'Legacy reading recognition remains available');
+  assert.equal(writable.relations.length, 0);
+  assert.deepEqual(writable.tags, [{tag:'urn:paperbridge:record:writable', type:1}]);
+  assert.match(f.errors[0], /editable library/);
 });
 
 test('legacy records migrate without hiding saved PDFs or inventing successful pending tasks', async () => {

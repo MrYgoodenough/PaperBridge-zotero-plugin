@@ -6,7 +6,7 @@ import pymupdf
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
-from preserve import restore_regions, exclude_protected_characters, metadata_regions
+from preserve import ProtectedLayoutModel, restore_regions, exclude_protected_characters, metadata_regions
 from types import SimpleNamespace
 
 
@@ -47,6 +47,64 @@ def test_original_vector_labels_restored_without_changing_body(tmp_path):
         assert "Translated body" in text and "E = mc2" in text
         assert "Garbled figure label" not in text
         assert target[0].rect == source[0].rect
+
+
+def test_normalized_layout_origin_and_adjacent_glyph_overhang(tmp_path):
+    """Real pinned MediaBox normalization must not clip formulas or delete nearby prose."""
+    from babeldoc.format.pdf.high_level import fix_media_box
+
+    original, translated, output = [tmp_path / name for name in ("source.pdf", "translated.pdf", "protected.pdf")]
+    with pymupdf.open() as doc:
+        page = doc.new_page(width=400, height=500)
+        page.set_mediabox(pymupdf.Rect(8, 8, 408, 508))
+        page.insert_text((40, 100), "E = mc2", fontsize=14)
+        page.insert_text((40, 410), "Source author", fontsize=14)
+        page.insert_text((40, 200), "Original body", fontsize=14)
+        formula_box = tuple(page.search_for("E = mc2")[0])
+        metadata_box = tuple(page.search_for("Source author")[0])
+        doc.save(original)
+    with pymupdf.open(original) as working:
+        fix_media_box(working)
+        formula = working[0].search_for("E = mc2")[0]
+        metadata = working[0].search_for("Source author")[0]
+        body = working[0].search_for("Original body")[0]
+        height = working[0].mediabox.height
+
+        def character(rectangle):
+            """Represent a native-measured character center in the engine's bottom-up IL space."""
+            center = (rectangle.tl + rectangle.br) / 2
+            return SimpleNamespace(box=SimpleNamespace(x=center.x - 1, x2=center.x + 1,
+                y=height - center.y - 1, y2=height - center.y + 1))
+
+        characters = [character(formula), character(metadata), character(body)]
+        il_page = SimpleNamespace(page_number=0, pdf_character=list(characters))
+        layout = SimpleNamespace(boxes=[SimpleNamespace(cls=0, xyxy=tuple(formula))], names={0:"formula"})
+
+        def layout_result(pages, document, config, save_debug_image):
+            """Supply only layout geometry; this core regression never invokes a model."""
+            yield pages[0], layout
+
+        adapter = ProtectedLayoutModel(SimpleNamespace(handle_document=layout_result), metadata={0:[metadata_box]})
+        list(adapter.handle_document([il_page], working, SimpleNamespace(input_file=original), None))
+        assert adapter.regions[0][0] == pytest.approx(formula_box)
+        assert adapter.regions[0][1] == metadata_box
+        assert il_page.pdf_character == [characters[2]]
+        assert adapter.excluded_metadata_characters == adapter.excluded_characters == 1
+    with pymupdf.open() as doc:
+        page = doc.new_page(width=400, height=500)
+        page.set_mediabox(pymupdf.Rect(8, 8, 408, 508))
+        page.insert_text((40, 100), "BAD", fontsize=14)
+        # Its font bbox touches the formula clip, but its actual painted letters are below it.
+        page.insert_text((40, 117), "Translated body", fontsize=14)
+        doc.save(translated)
+    assert restore_regions(original, translated, output, adapter.regions) == 2
+    with pymupdf.open(original) as source, pymupdf.open(output) as target:
+        text = target[0].get_text()
+        assert "Translated body" in text and "Source author" in text
+        assert "E = mc2" in text and "BAD" not in text
+        clip = pymupdf.Rect(formula_box)
+        assert source[0].get_pixmap(clip=clip).samples == target[0].get_pixmap(clip=clip).samples
+        assert target[0].mediabox == source[0].mediabox
 
 
 def test_bibliographic_metadata_does_not_protect_title_or_body():
