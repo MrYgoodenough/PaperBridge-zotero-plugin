@@ -38,6 +38,59 @@ def test_single_column_references_stop_at_appendix():
         assert boxes[1][0][1]==0 and boxes[1][0][3]<220
 
 
+def test_three_column_references_do_not_protect_left_body():
+    """A middle-column bibliography must not absorb the preceding scientific column."""
+    with pymupdf.open() as document:
+        page = document.new_page(width=594, height=783)
+        for x in (45, 219, 393):
+            for y in range(60, 361, 30):
+                page.insert_text((x, y), "Ordinary body text stays translatable.", fontsize=9)
+        page.insert_text((219, 200), "References", fontsize=9)
+        regions = reference_regions(document)
+        assert len(regions[0]) == 2
+        assert not any(pymupdf.Point(100, 300) in pymupdf.Rect(box) for box in regions[0])
+        assert any(pymupdf.Point(250, 250) in pymupdf.Rect(box) for box in regions[0])
+        assert any(pymupdf.Point(450, 100) in pymupdf.Rect(box) for box in regions[0])
+
+
+def test_shifted_columns_keep_later_right_references_active():
+    """Left acknowledgements precede right references even when their y position is lower."""
+    with pymupdf.open() as document:
+        first = document.new_page(width=612, height=792)
+        for x in (168, 378):
+            for y in range(60, 631, 30):
+                first.insert_text((x, y), "Ordinary body text stays translatable.", fontsize=9)
+        first.insert_text((168, 420), "Acknowledgements", fontsize=9)
+        first.insert_text((378, 100), "Funding", fontsize=9)
+        first.insert_text((378, 330), "Data availability", fontsize=9)
+        first.insert_text((378, 366), "References", fontsize=9)
+        second = document.new_page(width=612, height=792)
+        for x in (168, 378):
+            for y in range(60, 631, 30):
+                second.insert_text((x, y), "Continuing reference entry, 2025.", fontsize=9)
+        regions = reference_regions(document)
+        assert set(regions) == {0, 1}
+        assert len(regions[0]) == 1 and regions[0][0][0] > 316
+        assert not any(pymupdf.Point(210, 390) in pymupdf.Rect(box) for box in regions[0])
+        assert not any(pymupdf.Point(420, 100) in pymupdf.Rect(box) for box in regions[0])
+        assert any(pymupdf.Point(420, 400) in pymupdf.Rect(box) for box in regions[0])
+        assert len(regions[1]) == 2 and all(box[1] == 0 for box in regions[1])
+
+
+def test_single_column_hanging_indents_do_not_create_columns():
+    """Different left indents with overlapping text widths remain one reading column."""
+    with pymupdf.open() as document:
+        page = document.new_page()
+        for y in range(60, 211, 30):
+            page.insert_text((168, y), "Long scientific prose occupies the same wide text column.", fontsize=9)
+        page.insert_text((36, 280), "References", fontsize=9)
+        for y in range(310, 581, 30):
+            page.insert_text((56, y), "Reference entry with authors and a long journal title, 2024.", fontsize=9)
+        regions = reference_regions(document)
+        assert len(regions[0]) == 1
+        assert regions[0][0][0] == 0 and regions[0][0][2] == page.rect.width
+
+
 def test_real_two_column_section_and_appendix():
     """Retain the existing two-column real-PDF boundary contract when available."""
     source=Path(__file__).resolve().parents[1] / ".cache/references/pi0-v3.pdf"

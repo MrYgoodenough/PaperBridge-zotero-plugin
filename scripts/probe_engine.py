@@ -9,7 +9,6 @@ import hashlib
 from contextlib import redirect_stdout
 from importlib.metadata import version
 import json
-import os
 from pathlib import Path
 import sys
 from types import SimpleNamespace

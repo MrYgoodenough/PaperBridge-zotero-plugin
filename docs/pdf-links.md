@@ -1,3 +1,4 @@
+<!-- Reliable annotation restoration within the existing final PDF writeout. -->
 # PDF links
 
 `backend/preserve.py::restore_regions` handles links in the existing final PDF
@@ -13,8 +14,9 @@ annotations; therefore links must be restored separately within that same writeo
   rectangle are recovered once. Source links on unselected pages are also recovered,
   even if preprocessing removed their annotations.
 - On selected pages, source-derived hotspots outside restored rectangles are removed.
-  Hotspots crossing a restoration boundary are not reconstructed. A producer's moved
-  or otherwise distinct link outside the restored content is retained.
+  URI links may then be relocated onto their exact visible destination URL, including
+  wrapped lines, or a unique unchanged source/final label. Ambiguous or translated
+  prose is not guessed. A producer's moved or otherwise distinct link is retained.
 - An inherited internal destination keeps its exact view when its target page is
   unselected or its point lies in a restored rectangle. Otherwise only the target
   page is reliable: the link uses an actual PDF `/Fit` destination, not a made-up
@@ -26,15 +28,15 @@ annotations; therefore links must be restored separately within that same writeo
 ## Limits and verification
 
 This relies on the existing mono output retaining source page order and geometry.
-It does not infer body-link alignment from translated text: even an unchanged-looking
-source body hotspot on a selected page lacks reliable mapping evidence. Arbitrary
+It does not infer body-link alignment from translated prose or reuse a stale body
+rectangle. Literal URL/label recovery uses the actual final text geometry. Arbitrary
 named destinations, outlines and non-link annotations are not rebuilt. Recovery
 preserves link actions and hotspots, not custom annotation appearance.
 
 Run the project Python with `-m pytest -q tests/test_pdf_links.py tests/test_preserve.py`.
 These tests use small legal synthetic PDFs and no network/provider calls; they cover
 URI/GoTo, restored and unselected content, body reflow, exact/page-only targets,
-overlapping/boundary regions and unselected rotated-page hotspots.
+overlapping/boundary regions, literal URL reflow and unselected rotated-page hotspots.
 
 `tests/offline_quality_pipeline.py` also exercises the real BabelDOC pipeline with a
 two-page synthetic source and explicitly simulated completion responses. Only page one

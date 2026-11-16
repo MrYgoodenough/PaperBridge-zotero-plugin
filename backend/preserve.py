@@ -7,6 +7,11 @@ from pathlib import Path
 
 import pymupdf
 
+if __package__:
+    from .fonts import subset_songti
+else:
+    from fonts import subset_songti
+
 # Layout classes whose content is copied verbatim rather than translated.
 PROTECTED = {"figure", "table", "isolate_formula", "isolated_formula", "formula"}
 # Match PDF coordinates despite harmless decimal serialization differences.
@@ -346,38 +351,63 @@ def _inside_region(rectangle, regions):
     return not rectangle.is_empty and any(rectangle in region for region in regions)
 
 
+def _literal_uri_anchors(source_page, translated_page, link, source_anchor):
+    """Relocate an exact visible URL or unique unchanged label, never guess translated prose."""
+    if link["kind"] != pymupdf.LINK_URI:
+        return []
+    uri = link.get("uri", "")
+    if uri:
+        source_matches = source_page.search_for(uri)
+        target_matches = translated_page.search_for(uri)
+        if target_matches and any(match.intersects(source_anchor) for match in source_matches):
+            # A wrapped or repeated literal destination can safely keep that exact URI on each line.
+            return target_matches
+    label = source_page.get_textbox(source_anchor).strip()
+    if not label:
+        return []
+    source_matches = source_page.search_for(label)
+    target_matches = translated_page.search_for(label)
+    if (len(source_matches) == len(target_matches) == 1
+            and source_matches[0].intersects(source_anchor)):
+        return target_matches
+    return []
+
+
 def _restore_links(source, translated, original_links, rectangles):
     """Recover reliable source anchors and validate inherited internal destinations."""
     for page_index, links in enumerate(original_links):
         page = translated[page_index]
-        existing = page.get_links()
+        existing = [{**link, "from": link["from"] * page.derotation_matrix} for link in page.get_links()]
         for link in links:
             anchor = link["from"] * source[page_index].derotation_matrix
             if page_index in rectangles and not _inside_region(anchor, rectangles[page_index]):
-                continue
-            if any(_same_anchor(link, current) for current in existing):
-                continue
-            copied = {key: value for key, value in link.items() if key not in {"xref", "id"}}
-            # get_links exposes rotated coordinates; insert_link expects unrotated ones.
-            copied["from"] = anchor
+                anchors = _literal_uri_anchors(source[page_index], page, link, anchor)
+            else:
+                anchors = [anchor]
             target = _goto_page(link)
-            if target is not None:
-                if not 0 <= target < len(translated):
+            if target is not None and not 0 <= target < len(translated):
+                continue
+            for anchor in anchors:
+                copied = {key: value for key, value in link.items() if key not in {"xref", "id"}}
+                # get_links exposes rotated coordinates; insert_link expects unrotated ones.
+                copied["from"] = anchor
+                if target is not None:
+                    copied.update(kind=pymupdf.LINK_GOTO, page=target)
+                if any(_same_anchor(copied, current) for current in existing):
                     continue
-                copied.update(kind=pymupdf.LINK_GOTO, page=target)
-            before = {entry[0] for entry in page.annot_xrefs()}
-            page.insert_link(copied)
-            # insert_link emits XYZ even for original Fit destinations: keep the actual view mode.
-            if target is not None:
-                for key in ("A/D", "Dest"):
-                    kind, destination = source.xref_get_key(link["xref"], key)
-                    prefix = f"[{source.page_xref(target)} 0 R"
-                    if kind == "array" and destination.startswith(prefix):
-                        xref = next(entry[0] for entry in page.annot_xrefs() if entry[0] not in before)
-                        destination = f"[{translated.page_xref(target)} 0 R" + destination[len(prefix):]
-                        translated.xref_set_key(xref, "A/D", destination)
-                        break
-            existing.append(link)
+                before = {entry[0] for entry in page.annot_xrefs()}
+                page.insert_link(copied)
+                # insert_link emits XYZ even for original Fit destinations: keep the actual view mode.
+                if target is not None:
+                    for key in ("A/D", "Dest"):
+                        kind, destination = source.xref_get_key(link["xref"], key)
+                        prefix = f"[{source.page_xref(target)} 0 R"
+                        if kind == "array" and destination.startswith(prefix):
+                            xref = next(entry[0] for entry in page.annot_xrefs() if entry[0] not in before)
+                            destination = f"[{translated.page_xref(target)} 0 R" + destination[len(prefix):]
+                            translated.xref_set_key(xref, "A/D", destination)
+                            break
+                existing.append(copied)
 
         page = translated.reload_page(page)
         for link in page.get_links():
@@ -469,8 +499,8 @@ def restore_regions(source_path, translated_path, output_path, regions):
         # reload_page requires the vector-restoration caller to release its page reference.
         page = None
         _restore_links(source, translated, original_links, rectangles)
-        # MuPDF 1.26.7 leaves CFF faces whole; its supported FontTools path preserves used glyph IDs.
-        translated.subset_fonts(fallback=True)
+        # Global fallback subsetting replaces publisher encodings; only shrink our new font streams.
+        subset_songti(translated, source)
         translated.save(output_path, garbage=4, deflate=True)
     Path(output_path).with_suffix(".regions.json").write_text(json.dumps(regions))
     return count

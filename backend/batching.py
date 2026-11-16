@@ -13,7 +13,7 @@ from babeldoc.format.pdf.document_il.midend.il_translator_llm_only import (
 from babeldoc.format.pdf.document_il.midend.il_translator import ILTranslator, RichTextPlaceholder, FormulaPlaceholder
 from babeldoc.format.pdf.document_il.midend import paragraph_finder
 from babeldoc.format.pdf.document_il.utils.layout_helper import (
-    box_to_tuple, get_character_layout as original_character_layout,
+    Layout, box_to_tuple, get_character_layout as original_character_layout,
 )
 from deepseek import placeholder_tokens
 
@@ -30,11 +30,23 @@ WORD_HYPHENS = {"-", "\u00ad", "\u2010", "\u2011"}
 
 
 def source_character_layout(char, layout_index, layout_map, layout_priority=None, _bbox_mode="auto"):
-    """Do not let a touching title edge split glyphs fully contained in a body box."""
+    """Keep body glyphs together despite detector edges, without changing real title/formula priority."""
     selected = original_character_layout(char, layout_index, layout_map, layout_priority, _bbox_mode)
-    if selected is None or selected.name != "title":
+    if selected is None:
         return selected
     glyph = char.visual_bbox.box
+    if selected.name == "fallback_line":
+        line = next(layout for layout in layout_map.values() if layout.id == selected.id)
+        center_x, center_y = (line.box.x + line.box.x2) / 2, (line.box.y + line.box.y2) / 2
+        bodies = [layout_map[index] for index in layout_index.intersection(box_to_tuple(line.box))
+                  if layout_map[index].class_name in BODY_LAYOUTS
+                  and layout_map[index].box.y <= center_y <= layout_map[index].box.y2]
+        if len(bodies) == 1 and bodies[0].box.x <= center_x <= bodies[0].box.x2:
+            # A measured source line belongs to one body block; its final letters may exceed YOLO's edge.
+            return Layout(bodies[0].id, bodies[0].class_name)
+        return selected
+    if selected.name != "title":
+        return selected
     candidates = list(layout_index.intersection(box_to_tuple(glyph)))
     title = next(layout_map[index] for index in candidates if layout_map[index].id == selected.id)
     center_x, center_y = (glyph.x + glyph.x2) / 2, (glyph.y + glyph.y2) / 2

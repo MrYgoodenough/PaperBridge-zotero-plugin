@@ -25,7 +25,11 @@ FULL_ONLY_MODULES = (
     "test_quality.py", "test_usage.py",
 )
 # The rest of provider inspection is lightweight; this test uses BabelDOC's real SDK adapter.
-FULL_ONLY_CASES = ("test_verify_providers.py::test_one_request_each_and_original_error_sanitized",)
+FULL_ONLY_CASES = (
+    "test_verify_providers.py::test_one_request_each_and_original_error_sanitized",
+    "test_fonts.py::test_subset_local_program_keeps_publisher_encoding_and_visible_glyphs",
+    "test_fonts.py::test_implicit_symbol_font_keeps_rendering_and_repairs_source_parsing",
+)
 
 
 def clean_environment():

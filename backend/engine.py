@@ -168,7 +168,7 @@ async def _translate(request, quality):
         """Keep tokenizer loading offline and report missing packaged resources."""
         raise RuntimeError("安装包的 tokenizer 资源缺失或损坏。请重新安装 XPI；PaperBridge 不会自动下载资源。")
     tiktoken.load.read_file = no_tokenizer_download
-    from fonts import install_songti
+    from fonts import install_songti, normalize_symbol_encoding
     install_songti(assets)
     from babeldoc.format.pdf import high_level
     from batching import CostAwareILTranslator
@@ -187,6 +187,7 @@ async def _translate(request, quality):
     source = folder / "source.pdf"
     # Mapping always hashes the original snapshot, never the optional repaired working input.
     original_source = source
+    restoration_source = source
     document_key = request.get("document_key") or hashlib.sha256(source.read_bytes()).hexdigest()
     with pymupdf.open(source) as document:
         blocks = document[0].get_text("dict")["blocks"]
@@ -194,11 +195,15 @@ async def _translate(request, quality):
                    " ".join(span["text"] for line in block["lines"] for span in line["spans"]))
                   for block in blocks if block.get("lines") and any(line["spans"] for line in block["lines"])]
         title = max(titles,key=lambda item:item[0])[1][:300] if titles else ""
-        if document.is_repaired:
-            progress.upstream({"stage": "修复 PDF 交叉引用"})
-            repaired = folder / "repaired.pdf"
-            document.save(repaired, garbage=4, deflate=True)
-            source = repaired
+        repaired_input = document.is_repaired
+        symbol_fonts = normalize_symbol_encoding(document)
+        if repaired_input or symbol_fonts:
+            progress.upstream({"stage": "修复 PDF 交叉引用" if repaired_input else "规范 Symbol 字体编码"})
+            working = folder / ("repaired.pdf" if repaired_input else "working-fonts.pdf")
+            document.save(working, garbage=4, deflate=True)
+            source = working
+            if repaired_input:
+                restoration_source = working
     translator = DeepSeekTranslator(document_title=title,
                                   document_key=document_key,
                                   paragraph_cache=CACHE / "paragraphs.sqlite",
@@ -235,7 +240,7 @@ async def _translate(request, quality):
                 raise RuntimeError("BabelDOC 未返回译文 PDF")
             temporary = folder / "translated.tmp.pdf"
             progress.restoring()
-            restore_regions(source, output, temporary, layout_model.regions)
+            restore_regions(restoration_source, output, temporary, layout_model.regions)
             temporary.replace(folder / "translated.pdf")
             translator.fragment_trace.write(folder / "translated.pdf", folder / "alignment.json", quality)
             quality.write(artifact_exists=True)

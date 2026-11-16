@@ -64,6 +64,41 @@ def test_layout_correction_preserves_real_titles_formulas_and_ambiguous_edges(ti
     assert source_character_layout(glyph, layout_index, layout_map).name == expected
 
 
+def test_fallback_line_suffix_stays_in_its_single_body_paragraph():
+    """A detector ending inside BART's word clear must not create a separate ar: paragraph."""
+    from babeldoc.format.pdf.document_il import Box, Page, PageLayout, PdfCharacter, PdfStyle, VisualBbox
+    from babeldoc.format.pdf.document_il.midend import paragraph_finder
+    from babeldoc.format.pdf.document_il.utils.layout_helper import build_layout_index
+
+    style = PdfStyle(font_id="body", font_size=10)
+    characters = [PdfCharacter(char_unicode=letter, pdf_character_id=ord(letter), xobj_id=0,
+                              pdf_style=style, box=Box(x, 445, x + 2, 452),
+                              visual_bbox=VisualBbox(Box(x, 445, x + 2, 452)))
+                  for letter, x in zip("clear:", (269, 271, 273, 277, 281, 284))]
+    page = Page(pdf_character=characters, page_layout=[
+        PageLayout(box=Box(77, 441, 276, 454), id=17, class_name="plain text"),
+        PageLayout(box=Box(72, 445, 286, 452), id=29, class_name="fallback_line")])
+    index, mapping = build_layout_index(page)
+    finder = paragraph_finder.ParagraphFinder.__new__(paragraph_finder.ParagraphFinder)
+    paragraphs = finder._group_characters_into_paragraphs(page, index, mapping)
+    assert len(paragraphs) == 1 and paragraphs[0].layout_id == 17
+    assert "".join(composition.pdf_character.char_unicode
+                   for composition in paragraphs[0].pdf_paragraph_composition) == "clear:"
+
+
+def test_fallback_line_crossing_two_body_blocks_remains_ambiguous():
+    """A line spanning distinct body boxes cannot justify transferring a glyph between them."""
+    from babeldoc.format.pdf.document_il import Box, Page, PageLayout, PdfCharacter, VisualBbox
+    from babeldoc.format.pdf.document_il.utils.layout_helper import build_layout_index
+
+    glyph = PdfCharacter(char_unicode="a", visual_bbox=VisualBbox(Box(277, 445, 279, 452)))
+    page = Page(page_layout=[PageLayout(box=Box(77, 441, 276, 454), id=17, class_name="plain text"),
+                            PageLayout(box=Box(280, 441, 300, 454), id=18, class_name="plain text"),
+                            PageLayout(box=Box(72, 445, 286, 452), id=29, class_name="fallback_line")])
+    index, mapping = build_layout_index(page)
+    assert source_character_layout(glyph, index, mapping).name == "fallback_line"
+
+
 @pytest.mark.parametrize("space_unicode", ["", " \t"])
 def test_space_styles_normalized_before_validation_and_valid_cache_reused(tmp_path, monkeypatch, space_unicode):
     """Whitespace is not a rich-text constraint; meaningful styles and formulas remain exact."""

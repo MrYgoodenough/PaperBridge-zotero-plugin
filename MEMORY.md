@@ -1,14 +1,14 @@
 <!-- Current shared baseline, safe development entry points and unresolved product boundaries. -->
 # 当前开发基线
 
-- 主分支 `master`，共享源码 **0.3.7**；版本同步 addon manifest、server VERSION、pyproject 和 uv.lock。Linux/Windows 四包已构建/在验收，公开稳定通道在发布完成前仍为 0.3.4；不能把源码推送当作发货。
+- 主分支 `master`，共享源码 **0.3.7**；版本同步 addon manifest、server VERSION、pyproject 和 uv.lock。修复后的 Linux/Windows 四包须按最终哈希重新验收，公开稳定通道在发布完成前仍为 0.3.4；不能把源码推送当作发货。
 - 固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。不顺带升级引擎。独立 macOS **0.4.2** 专属源码未取得：不合流、逆向提取、重建覆盖或推进其发布；共享代码继续跨平台。
 - 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。Windows 用项目实际有效的环境，不借用其他产品的 Python。
 
 ## 翻译、身份与结果
 
 - prompt `paperbridge-compact-v2-fragments`：相邻/跨页碎片保持独立 ID，不转移文本/标签、不补造后文。普通拉丁词内连字符不再成为假公式；真实公式、样式和科学维度仍校验。改变 prompt 不复用旧段落来证明新提示质量。
-- 整篇排版身份 `babeldoc-0.6.4-protected-v11-font-subsets`；原/工作页的真实变换决定保护框，按字符中心清除保护区域，避免伤及正文。最终字体走 PyMuPDF 支持的 FontTools subset 路径，解决 CFF 整字体嵌入；保留原始系统字体，只改新结果。
+- 整篇排版身份 `babeldoc-0.6.4-protected-v12-local-font-subsets`；原/工作页真实变换决定保护框，按字符中心清除保护区域。仅缩小与本地 Songti 缓存字节相同的新字体程序，保留 glyph ID、ToUnicode/编码/宽度表；禁止通用 `subset_fonts(fallback=True)` 重建原出版字体字典。源端隐式 Symbol 编码只在工作副本显式化，原 PDF 保持不变。
 - 执行、quality、PDF 导入与映射导出分开；`complete` 只代表观察到的段落应用，不是整篇语义认可。未知账单和 provider 格式/占位符拒绝如实保留，不用自动重试美化结果。
 - 新尝试 `jobs/attempts/<job-id>-<number>/`，旧 nested 目录仍读。重启不重发；显式重译可能收费，单独保存不收费。最新尝试不能继承旧成果或被旧 `complete` 掩盖。
 - Zotero 数据目录 `paperbridge/engine` 可重建，`cache` 是模型/字体/段落缓存，`.runtime/jobs` 保留任务成果。日常这些目录、原 PDF/译文/JSON、未知归属和备份不能按临时文件猜删。清理不取消任务；SQLite 连接显式关闭以免 Windows 锁文件。

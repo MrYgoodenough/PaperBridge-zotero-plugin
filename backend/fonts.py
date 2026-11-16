@@ -1,6 +1,9 @@
-"""Use the user's installed Songti-style fonts; never distribute system font files."""
+"""Prepare local Songti faces, correct implicit Symbol decoding, and subset only new PDF fonts."""
 from pathlib import Path
+import hashlib
+import io
 import os
+import re
 import subprocess
 import sys
 import unicodedata
@@ -223,6 +226,147 @@ def install_songti(assets):
 
     assets.get_font_family = family
     assets.get_font_and_metadata = metadata
+
+
+def normalize_symbol_encoding(document):
+    """Make implicit base-14 Symbol encoding explicit in a working copy for the pinned parser."""
+    import pymupdf
+    from fontTools.cffLib import CFFFontSet
+
+    xrefs = {font[0] for page in document for font in page.get_fonts(full=True)
+             if font[1] == "n/a" and font[2] == "Type1" and font[3] == "Symbol"
+             and document.xref_get_key(font[0], "Encoding")[0] == "null"
+             and document.xref_get_key(font[0], "ToUnicode")[0] == "null"}
+    if not xrefs:
+        return 0
+    # The parser assumes StandardEncoding here: Lambda becomes ASCII L with zero advance.
+    # MuPDF's bundled Symbol face provides the PDF standard's built-in glyph encoding.
+    collection = CFFFontSet()
+    collection.decompile(io.BytesIO(pymupdf.Font("symb").buffer), None)
+    encoding = collection[collection.fontNames[0]].Encoding
+    differences = []
+    previous = None
+    for code, glyph in enumerate(encoding):
+        if glyph == ".notdef":
+            continue
+        if previous is None or code != previous + 1:
+            differences.append(str(code))
+        differences.append("/" + glyph)
+        previous = code
+    value = "<</Type/Encoding/Differences[" + " ".join(differences) + "]>>"
+    for xref in xrefs:
+        document.xref_set_key(xref, "Encoding", value)
+    return len(xrefs)
+
+
+def _font_objects(document, font_xref):
+    """Locate the pinned mapper's indirect CID font descriptor and embedded program."""
+    kind, value = document.xref_get_key(font_xref, "DescendantFonts")
+    descendants = re.findall(r"\b(\d+)\s+0\s+R\b", value) if kind == "array" else []
+    if len(descendants) != 1:
+        return None
+    descendant = int(descendants[0])
+    kind, value = document.xref_get_key(descendant, "FontDescriptor")
+    if kind != "xref":
+        return None
+    descriptor = int(value.split()[0])
+    for key in ("FontFile2", "FontFile3"):
+        kind, value = document.xref_get_key(descriptor, key)
+        if kind == "xref":
+            return descendant, descriptor, int(value.split()[0])
+    return None
+
+
+def _subset_pdf_name(prefix, name):
+    """Encode a deterministic subset name without changing the font's PDF encoding."""
+    value = prefix + "+" + name
+    return "/" + "".join(chr(byte) if 33 <= byte <= 126 and chr(byte) not in "#%()/<>[]{}"
+                         else f"#{byte:02X}" for byte in value.encode("utf-8"))
+
+
+def subset_songti(document, source):
+    """Shrink only locally embedded Songti programs; preserve source fonts and all encoding tables."""
+    import pymupdf
+
+    cached = {hashlib.sha256(path.read_bytes()).digest()
+              for name in NAMES.values() if (path := FONT_DIR / name).is_file()}
+    if not cached:
+        return 0
+    # A source may itself use our full face; never shrink a publisher-owned shared program.
+    source_fonts = {font[0] for page in source for font in page.get_fonts(full=True) if font[1] in {"ttf", "otf"}}
+    original = {hashlib.sha256(source.extract_font(xref)[-1]).digest() for xref in source_fonts}
+    programs = {}
+    seen = set()
+    for page in document:
+        for font in page.get_fonts(full=True):
+            xref, extension, kind, basename, resource, encoding = font[:6]
+            if xref in seen or resource not in NAMES.values() or kind != "Type0" or encoding != "Identity-H":
+                continue
+            seen.add(xref)
+            if extension not in {"ttf", "otf"} or not (objects := _font_objects(document, xref)):
+                continue
+            buffer = document.extract_font(xref)[-1]
+            digest = hashlib.sha256(buffer).digest()
+            if digest not in cached or digest in original:
+                continue
+            program = programs.setdefault(digest, {"buffer": buffer, "names": set(), "objects": [],
+                                                   "gids": set(), "unicodes": set()})
+            program["objects"].append((xref, *objects))
+            program["names"].update((basename, pymupdf.Font(fontbuffer=buffer).name,
+                                     document.xref_get_key(objects[0], "BaseFont")[1][1:]))
+    if not programs:
+        return 0
+    from fontTools import subset
+    from fontTools.ttLib import TTFont
+
+    for page in document:
+        for span in page.get_texttrace():
+            for program in programs.values():
+                if span["font"] not in program["names"]:
+                    continue
+                for unicode, glyph, *_ in span["chars"]:
+                    program["gids"].add(glyph)
+                    program["unicodes"].add(unicode)
+    saved = 0
+    for program in programs.values():
+        if not program["gids"]:
+            continue
+        try:
+            options = subset.Options()
+            # PDF content uses existing glyph IDs, not the subsetter's compacted numbering.
+            options.retain_gids = True
+            options.layout_features = ["*"]
+            options.passthrough_tables = True
+            options.ignore_missing_glyphs = True
+            options.ignore_missing_unicodes = True
+            options.symbol_cmap = True
+            with TTFont(io.BytesIO(program["buffer"]), recalcTimestamp=False) as font:
+                subsetter = subset.Subsetter(options=options)
+                subsetter.populate(gids=program["gids"], unicodes=program["unicodes"])
+                subsetter.subset(font)
+                output = io.BytesIO()
+                font.save(output)
+            buffer = output.getvalue()
+        except Exception as error:
+            # Shrinking is optional: retain a readable larger PDF when a local face is unsupported.
+            warnings.warn(f"Songti font subsetting was unavailable; original font retained: {error}")
+            continue
+        if len(buffer) >= len(program["buffer"]):
+            continue
+        # Six alphabetic characters are the PDF subset prefix; stable bytes give stable names.
+        prefix = "".join(chr(ord("A") + byte % 26) for byte in hashlib.sha256(buffer).digest()[:6])
+        streams = set()
+        for font, descendant, descriptor, stream in program["objects"]:
+            if stream not in streams:
+                document.update_stream(stream, buffer)
+                document.xref_set_key(stream, "Length1", str(len(buffer)))
+                streams.add(stream)
+            for xref, key in ((font, "BaseFont"), (descendant, "BaseFont"), (descriptor, "FontName")):
+                kind, name = document.xref_get_key(xref, key)
+                if kind == "name":
+                    document.xref_set_key(xref, key, _subset_pdf_name(prefix, name[1:]))
+        saved += (len(program["buffer"]) - len(buffer)) * len(streams)
+    return saved
 
 
 if __name__ == "__main__":

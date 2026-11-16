@@ -80,15 +80,17 @@ def test_preserved_and_unselected_links_survive_without_stale_body_hotspots(tmp_
         assert "Reflowed translated body" in document[0].get_text()
 
 
-def test_selected_page_without_protected_regions_still_drops_old_anchor(tmp_path):
-    """An empty region list means translated, not an untouched page."""
+def test_selected_page_without_protected_regions_still_drops_stale_body_anchor(tmp_path):
+    """Literal unchanged labels may recover links; an absent original body still loses its old hotspot."""
     source, translated, output = [tmp_path / name for name in ("source.pdf", "translated.pdf", "output.pdf")]
     create_source(source)
     create_translation(source, translated)
     restore_regions(source, translated, output, {0: []})
     with pymupdf.open(output) as document:
-        assert len(document[0].get_links()) == 1
-        assert tuple(document[0].get_links()[0]["from"]) == MOVED_ANCHOR
+        links = document[0].get_links()
+        assert len(links) == 2
+        assert any(tuple(link["from"]) == MOVED_ANCHOR for link in links)
+        assert all(tuple(link["from"]) != BODY_ANCHOR for link in links)
 
 
 def test_internal_target_in_reflowed_body_is_page_only(tmp_path):
@@ -113,7 +115,8 @@ def test_internal_target_in_restored_region_keeps_exact_destination(tmp_path):
     with pymupdf.open(output) as document:
         internal = next(link for link in document[0].get_links() if link["kind"] == pymupdf.LINK_GOTO)
         assert internal["page"] == 1 and internal["to"] == pymupdf.Point(55, 70)
-        assert len(document[1].get_links()) == 1
+        # Its unchanged body URI is also recovered from a unique literal label, not old coordinates.
+        assert len(document[1].get_links()) == 2
 
 
 def test_producer_mapped_destination_is_not_replaced_by_an_old_target(tmp_path):
@@ -149,6 +152,49 @@ def test_partial_protection_and_overlapping_regions_do_not_create_false_or_dupli
         links = document[0].get_links()
         assert len(links) == 3
         assert all(link.get("uri") != "https://example.org/partial" for link in links)
+
+
+def test_reflowed_literal_url_recovers_all_hotspots_without_duplicates(tmp_path):
+    """Two source hotspots for one URL collapse onto the actual final visible URL, never its old position."""
+    source, translated, output = [tmp_path / name for name in ("source.pdf", "translated.pdf", "output.pdf")]
+    uri = "https://example.org/paper"
+    with pymupdf.open() as document:
+        page = document.new_page()
+        page.insert_text((40, 90), uri)
+        bounds = page.search_for(uri)[0]
+        middle = (bounds.x0 + bounds.x1) / 2
+        for anchor in (pymupdf.Rect(bounds.x0, bounds.y0, middle, bounds.y1),
+                       pymupdf.Rect(middle, bounds.y0, bounds.x1, bounds.y1)):
+            page.insert_link({"kind": pymupdf.LINK_URI, "from": anchor, "uri": uri})
+        document.save(source)
+    with pymupdf.open() as document:
+        page = document.new_page()
+        page.insert_text((80, 180), uri)
+        expected = tuple(page.search_for(uri)[0])
+        document.save(translated)
+    restore_regions(source, translated, output, {0: []})
+    with pymupdf.open(output) as document:
+        links = document[0].get_links()
+        assert len(links) == 1 and links[0]["uri"] == uri
+        assert tuple(links[0]["from"]) == pytest.approx(expected, abs=0.01)
+
+
+def test_ambiguous_non_url_label_does_not_invent_a_link(tmp_path):
+    """A repeated source label cannot identify which destination belongs to a single final occurrence."""
+    source, translated, output = [tmp_path / name for name in ("source.pdf", "translated.pdf", "output.pdf")]
+    with pymupdf.open() as document:
+        page = document.new_page()
+        page.insert_text((40, 90), "Read this article")
+        page.insert_text((40, 150), "Read this article")
+        page.insert_link({"kind": pymupdf.LINK_URI, "from": page.search_for("Read this article")[0],
+                          "uri": "https://example.org/first"})
+        document.save(source)
+    with pymupdf.open() as document:
+        document.new_page().insert_text((80, 180), "Read this article")
+        document.save(translated)
+    restore_regions(source, translated, output, {0: []})
+    with pymupdf.open(output) as document:
+        assert document[0].get_links() == []
 
 
 @pytest.mark.parametrize("rotation", [0, 90])
