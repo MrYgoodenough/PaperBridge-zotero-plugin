@@ -7,17 +7,17 @@ Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容�
 
 ## 安装
 
-按系统和 Python 模式选择 XPI，在 Zotero **工具 → 插件 → 从文件安装**。共享源码当前为 **0.3.6 候选**；源码更新不等于稳定通道更新。
+按系统和 Python 模式选择 XPI，在 Zotero **工具 → 插件 → 从文件安装**。Linux/Windows 共享版本为 **0.3.7**，与独立 macOS 发布分开维护。
 
 | 平台 | 稳定版本 | 安装包 |
 | --- | --- | --- |
-| Linux x64 | 0.3.4 | [自带 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-linux-x64.xpi) · [本地 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-linux-x64-local-python.xpi) |
-| Windows x64 | 0.3.4 | [自带 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-windows-x64.xpi) · [本地 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-windows-x64-local-python.xpi) |
+| Linux x64 | 0.3.7 | [自带 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-linux-x64.xpi) · [本地 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-linux-x64-local-python.xpi) |
+| Windows x64 | 0.3.7 | [自带 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-windows-x64.xpi) · [本地 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-windows-x64-local-python.xpi) |
 | macOS Apple Silicon | 独立 0.4.2 | [独立发布](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)；专属源码不在本轮合流/重建范围 |
 
 自带版包含解释器、依赖、版面模型和 tokenizer，安装后不联网补引擎资源。本地版仅借用同架构 CPython **3.12**，依赖和模型仍随包提供，不修改系统 Python。Linux 需要 glibc ≥ 2.34，并安装思源宋体等简体中文衬线字体。
 
-**0.3.6 候选 Windows 包**首次启用排版引擎时需同意随包提供的 Microsoft DLL 条款；相同条款只确认一次，无需安装 Visual Studio、注册微软账号或另装运行库。暂不接受仍可阅读原文和已有译文。
+Windows 包首次启用排版引擎时需同意随包提供的 Microsoft DLL 条款；相同条款只确认一次，无需安装 Visual Studio、注册微软账号或另装运行库。暂不接受仍可阅读原文和已有译文。
 
 更新前备份 Zotero profile/数据目录，正常退出后操作。Linux/Windows 使用独立的平台/模式更新通道，不以仓库 Latest 判断适用版本。
 
@@ -32,7 +32,7 @@ Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容�
 ### 可信片段与笔记
 
 - 原文或译文点击/拖选松开后，使用 **定位译文片段 / 定位原文片段** 显式导航。普通点击不抢链接、选区或批注。
-- **0.3.6 候选**把 verified 映射保存为独立 Zotero JSON 附件：只含身份、PDF 哈希和有限几何，没有原/译全文。另一设备下载相同附件字节后，可不启动 Python、不调用 API 地打开可信对照。
+- verified 映射保存为独立 Zotero JSON 附件：只含身份、PDF 哈希和有限几何，没有原/译全文。另一设备下载相同附件字节后，可不启动 Python、不调用 API 地打开可信对照。
 - 新映射采用逐行四边形，减少整段大框对行间空白和短末行外区域的误命中。无法可靠追踪、跨页、歧义或无映射的区域不猜配；旧矩形兼容读取。
 - 默认关闭的 **段落高亮** 使用原生 CSS 文本高亮，两侧悬停联动但不跳页、不改变选区。映射缺失、损坏、未下载或 PDF 换字节时，精确功能明确降级，普通阅读/页同步保留；不会收费补映射。
 - 译文批注属于译文附件。**选区存笔记 / 批注汇总笔记**创建独立 Zotero note，带附件/物理页回链及引用。不复制原译双向批注，不修改 PDF。
@@ -44,6 +44,7 @@ Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容�
 插件数据位于 `Zotero 数据目录/paperbridge/`：`engine/` 是已解包引擎，`cache/` 为模型/字体/段落缓存，`.runtime/` 为任务与保留成果。译文、笔记和可同步映射另外保存为 Zotero 原生条目。
 
 - 缓存命中可避免重复请求；服务、模型、语言及排版身份不同不会错误串用。账单未知和部分/未知质量明确显示，不用 PDF 已生成冒充翻译成功。
+- 科学公式保持受保护；普通词内连字符不作为公式占位符。译文使用字体子集，避免把完整中日韩字体嵌入每篇 PDF。
 - 回收站、原文缺失或仅从分类移除，不会触发插件永久删除译文。清理仅针对确定无归属、无可恢复成果的临时缓存；不会以清理代替取消任务。索引损坏时保留备份并停用清理。
 - macOS 使用系统宋体-简，Windows 使用宋体并选择可用粗体，Linux 经 fontconfig 找思源宋体。系统字体不随 XPI 分发。缺资源明确提示，不静默下载。
 - 繁体/日文只保留语言接口，完整支持与术语规则尚未交付。服务短检查需要确认，格式通过不保证长论文任务或语义质量。

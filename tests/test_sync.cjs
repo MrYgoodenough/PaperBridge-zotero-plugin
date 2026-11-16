@@ -129,7 +129,7 @@ function fixture(firstReady = Promise.resolve()) {
       .map(view => view._iframeWindow);
     state.apps = state.frames.map(frame => frame.PDFViewerApplication);
   };
-  return { bridge, calls, reader, source, translated, left };
+  return { bridge, calls, reader, source, translated, left, context };
 }
 
 test('PDF coordinate mapping and page clamping', () => {
@@ -148,6 +148,18 @@ test('PDF coordinate mapping and page clamping', () => {
   destination = null;
   bridge.syncPosition({ apps: [{ pdfViewer: left }, { pdfViewer: right }] }, 0);
   assert.equal(destination, null);
+});
+
+test('restored source tabs resolve by item ID rather than the selected unrelated reader', async () => {
+  const f = fixture();
+  f.reader.itemID = f.source.id;
+  const unrelated = { ...f.reader, itemID:99, tabID:'unrelated-tab' };
+  f.context.Zotero.getMainWindow().Zotero_Tabs = {selectedID:unrelated.tabID};
+  Object.assign(f.context.Zotero.Reader, {open:async () => undefined,
+    getByTabID:() => unrelated, _readers:[unrelated, f.reader]});
+  await f.bridge.split(f.source, f.translated);
+  assert.strictEqual(f.bridge.splits.get(f.reader.tabID)?.reader, f.reader);
+  assert.equal(f.bridge.splits.has(unrelated.tabID), false);
 });
 
 test('the same attachment IDs reuse the pair without reloading or resetting position and zoom', async () => {

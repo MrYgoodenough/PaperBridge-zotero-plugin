@@ -130,12 +130,14 @@ test('saving locks drafts and persists once without checking the local engine or
   gate.resolve();
   await saving;
   assertLock(f, false);
-  assert.equal(f.calls.stops, 1, 'Changing saved Python only stops the old runtime');
+  assert.equal(f.calls.stops, 0, 'Saving Python must not stop the runtime that owns queued or running work');
   assert.equal(f.prefs.pythonPath, '/fixture/unsaved-python');
   assert.equal(f.prefs.profile, 'compatible');
   assert.ok(f.calls.prefs.some(([name, value]) => name === 'compatibleBaseURL' && value === 'https://draft.example.invalid/v1'));
   assert.equal(f.calls.requests.length, 0);
   assert.match(f.controls.status.textContent, /已保存/);
+  assert.match(f.controls.status.textContent, /下次引擎启动.*不会重启当前引擎/);
+  assert.match(f.controls.status.textContent, /等待任务完成后正常重启 Zotero/);
   const failed = deferred();
   const writes = f.calls.prefs.length;
   f.bridge.keyGate = failed.promise;
@@ -146,6 +148,35 @@ test('saving locks drafts and persists once without checking the local engine or
   assertLock(f, false);
   assert.equal(f.calls.prefs.length, writes, 'Failed key persistence leaves preferences unchanged');
   assert.match(f.controls.status.textContent, /synthetic key write failure/);
+});
+
+test('Python path saves preserve live and starting runtimes without inspecting uncertain local job ownership', async () => {
+  for (const starting of [false, true]) {
+    const f = fixture();
+    const process = { marker:'existing-runtime' };
+    const connection = starting ? null : { port:12345, token:'synthetic-token' };
+    const pending = deferred().promise;
+    Object.assign(f.bridge.runtime, { process, connection, pending });
+    Object.defineProperty(f.bridge.library, 'records', {
+      /** A local journal cannot prove that the backend serial queue is idle. */
+      get() { assert.fail('A settings save must not infer backend idleness from library records'); },
+    });
+    f.controls.pythonPath.value = '/fixture/new-python';
+    await f.fire('save');
+    assert.equal(f.calls.stops + f.calls.requests.length, 0);
+    assert.strictEqual(f.bridge.runtime.process, process);
+    assert.strictEqual(f.bridge.runtime.connection, connection);
+    assert.strictEqual(f.bridge.runtime.pending, pending);
+    assert.equal(f.prefs.pythonPath, '/fixture/new-python');
+    assert.match(f.controls.status.textContent, /下次引擎启动/);
+    assertLock(f, false);
+  }
+  const bundled = fixture();
+  bundled.bridge.runtime.build.pythonMode = 'bundled';
+  bundled.controls.pythonPath.value = '/fixture/unused-local-python';
+  await bundled.fire('save');
+  assert.equal(bundled.calls.stops + bundled.calls.requests.length, 0);
+  assert.match(bundled.controls.status.textContent, /自带 Python.*不影响引擎/);
 });
 
 test('local engine check uses saved configuration, not draft validation or credential persistence', async () => {

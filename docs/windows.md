@@ -1,7 +1,7 @@
 <!-- Windows runtime/build boundaries and isolated native verification entry points. -->
 # Windows 安装与开发
 
-Windows x64 稳定包仍为 **0.3.4**；共享源码 **0.3.6 候选**不自动更新公开通道。支持范围由 manifest 声明 Zotero 9/10，本轮原生环境为 Win11 / Zotero 10.0.8。Windows ARM64 尚未提供。独立 macOS 0.4.2 专属源码不在本轮合流/重建范围。
+Windows x64 共享版本为 **0.3.7**，支持范围由 manifest 声明 Zotero 9/10，原生验收使用 Win11 / Zotero 10.0.8。Windows ARM64 尚未提供。独立 macOS 0.4.2 专属源码不在本轮合流/重建范围。
 
 一般用户选择自带 Python XPI。`--python local` 仅借用本机 x64 CPython **3.12**，依赖、模型和 tokenizer 仍随包提供；在高级设置指定解释器，不把其他产品的 Python 当作已验证环境。安装已有译文/映射后，可信阅读不要求 Python。
 
@@ -39,4 +39,4 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 - 原生 UI 必须在登录的交互 Session 运行；OpenSSH Session 0 不合适。只启动自有隔离 profile，正常退出后核对实际 UI PID/引擎消失和 SQLite integrity，不强杀日常进程。
 - `reopen` 保留相同 profile/data/已安装插件；新进程才算冷重开。失败用新 report label，不覆盖旧证据。公共自动更新、0.3.4 升级保留、系统 100%/150% 缩放专项是不同范围，不能用本 suite 冒充全部通过。
 
-稳定 0.3.4 历史依据见 [nonmac-verification-2026-11-15.json](nonmac-verification-2026-11-15.json)。后续每轮验收须绑定当轮精确 XPI hash；不借用历史通过结论。
+每轮验收绑定当轮精确 XPI hash；不借用历史通过结论。保存新的本机 Python 路径不会中断已有引擎；等待任务完成并正常重启 Zotero 后，下一次启动使用新路径。

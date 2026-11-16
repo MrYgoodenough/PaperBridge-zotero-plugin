@@ -291,11 +291,13 @@ var TranslationLibrary = class {
     if (!jobID || jobID === record.jobID) throw new Error("A translation retry needs a new backend job ID.");
     let attempt = this.records.find(candidate => candidate.retryOf === record.recordID && candidate.jobID === jobID);
     if (!attempt) {
+      // Active retries retain old job-level results; only their latest attempt owns new artifacts.
+      const outcome = status.state === "done" ? status : status.attempts?.at(-1) || status;
       attempt = this.restoreRecord({...record, recordID:this.newID(), retryOf:record.recordID,
-        jobID, state:status.state || "queued", detached:false, retryPendingSince:null, quality:status.quality ?? "unknown",
-        saveState:status.state === "done" || status.output_path ? "produced" : null,
+        jobID, state:status.state || "queued", detached:false, retryPendingSince:null, quality:outcome.quality ?? "unknown",
+        saveState:status.state === "done" || outcome.output_path ? "produced" : null,
         lastError:status.error || "", attachmentID:null, attachmentKey:null, importingAttachmentKey:null,
-        outputPath:status.output_path || null, alignmentPath:status.alignment_path || null,
+        outputPath:outcome.output_path || null, alignmentPath:outcome.alignment_path || null,
         mappingAttachmentKey:null, mappingState:null, mappingWarning:null,
         fingerprint:status.fingerprint ?? record.fingerprint,
         documentKey:status.document_key ?? record.documentKey});

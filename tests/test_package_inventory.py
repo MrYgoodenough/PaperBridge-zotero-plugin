@@ -44,13 +44,17 @@ def test_stdlib_notices_do_not_borrow_dependency_licenses(tmp_path, platform, py
     assert inventory["licenseCompliance"] == "unknown"
 
 
-def test_record_owns_notices_and_native_hashes(tmp_path):
+@pytest.mark.parametrize("record_style", ("posix", "windows"))
+def test_record_owns_notices_and_native_hashes(tmp_path, record_style):
     """Use METADATA/RECORD evidence rather than a neighbouring module's notice."""
     dist = SITE + "widget-1.dist-info/"
+    record = "widget/NOTICE.txt,,\nwidget/native.so,,\n../outside/LICENSE.txt,,\n"
+    if record_style == "windows":
+        record = "\ufeff" + record.replace("/", "\\")
     inventory = _xpi(tmp_path, {
         dist + "METADATA": b"Name: widget\nVersion: 1\nLicense-File: absent.txt\n\n",
         dist + "WHEEL": b"Wheel-Version: 1.0\nTag: cp312-cp312-manylinux_2_34_x86_64\n\n",
-        dist + "RECORD": b"widget/NOTICE.txt,,\nwidget/native.so,,\n../outside/LICENSE.txt,,\n",
+        dist + "RECORD": record.encode("utf-8"),
         SITE + "widget/NOTICE.txt": b"Owned notice.\n",
         SITE + "widget/native.so": b"Synthetic native bytes",
         SITE + "neighbour/LICENSE.txt": b"Unrelated notice.\n",

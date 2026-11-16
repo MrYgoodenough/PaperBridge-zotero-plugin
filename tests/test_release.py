@@ -31,6 +31,7 @@ def build_release(tmp_path, monkeypatch):
         "scripts/package_inventory.py": (ROOT / "scripts/package_inventory.py").read_bytes(),
         "addon/manifest.json": (ROOT / "addon/manifest.json").read_bytes(),
         "addon/bootstrap.js": b"// Synthetic bootstrap.\n",
+        "addon/prefs.js": b"// Synthetic preferences.\n",
         "addon/content/runtime.js": b"// Synthetic runtime controller.\n",
         "addon/content/library.js": b"// Synthetic library controller.\n",
         "addon/content/tasks.js": b"// Synthetic task controller.\n",
@@ -40,6 +41,14 @@ def build_release(tmp_path, monkeypatch):
         "addon/content/notes.js": b"// Synthetic notes controller.\n",
         "addon/content/diagnostics.js": b"// Synthetic diagnostics controller.\n",
         "addon/content/reading-assets.js": b"// Synthetic reading assets controller.\n",
+        "addon/content/runtime-terms.js": b"// Synthetic runtime consent controller.\n",
+        "addon/content/runtime-terms-window.js": b"// Synthetic runtime consent window.\n",
+        "addon/content/runtime-terms.xhtml": b"<!-- Synthetic runtime consent UI. -->\n",
+        "addon/content/settings.js": b"// Synthetic settings controller.\n",
+        "addon/content/settings.xhtml": b"<!-- Synthetic settings UI. -->\n",
+        "addon/content/tasks-window.js": b"// Synthetic task window.\n",
+        "addon/content/tasks.xhtml": b"<!-- Synthetic task UI. -->\n",
+        "addon/content/ui.css": b"/* Synthetic UI styles. */\n",
         "LICENSE": b"Synthetic license.\n",
     }
     for source in (ROOT / "backend").glob("*.py"):
@@ -275,7 +284,10 @@ def test_runtime_identity_and_new_modules_are_required(build_release):
         _rewrite_xpi(artifacts, replace={member: json.dumps(metadata).encode()})
         with pytest.raises(verifier.VerificationError, match=message):
             verifier.verify_release(*artifacts)
-    for member in ("content/annotations.js", "content/notes.js", "content/diagnostics.js", "content/reading-assets.js",
+    for member in ("prefs.js", "content/annotations.js", "content/notes.js", "content/diagnostics.js",
+                   "content/reading-assets.js", "content/ui.css", "content/runtime-terms.js",
+                   "content/runtime-terms-window.js", "content/runtime-terms.xhtml", "content/settings.js",
+                   "content/settings.xhtml", "content/tasks-window.js", "content/tasks.xhtml",
                    "runtime/linux-x64/backend/errors.py", "runtime/linux-x64/backend/diagnostics.py",
                    "runtime/linux-x64/backend/provider_check.py", "runtime/linux-x64/backend/fragment_trace.py",
                    "runtime/linux-x64/python/bin/python3.12"):
@@ -286,6 +298,10 @@ def test_runtime_identity_and_new_modules_are_required(build_release):
     artifacts = build_release()
     _rewrite_xpi(artifacts, replace={"runtime/linux-x64/backend/diagnostics.py": b"# Changed after build.\n"})
     with pytest.raises(verifier.VerificationError, match="Runtime buildId"):
+        verifier.verify_release(*artifacts)
+    artifacts = build_release()
+    _rewrite_xpi(artifacts, replace={"runtime/linux-x64/python/bin/python3.12": b""})
+    with pytest.raises(verifier.VerificationError, match="interpreter.*empty"):
         verifier.verify_release(*artifacts)
     for key, value, message in (("id", "wrong@addon", "Built addon ID"),
                                 ("update_url", "https://example.invalid/feed.json", "Addon update URL")):

@@ -129,7 +129,7 @@ function fixture() {
     await restored.load();
     return restored;
   }
-  return {library, files, items, calls, errors, faults, prefs, item, owner, source, reload};
+  return {library, files, items, calls, errors, faults, prefs, item, owner, source, reload, bridge, context};
 }
 
 /** Strip vm prototypes before comparing durable JSON. */
@@ -185,9 +185,13 @@ test('configuration snapshots and status updates persist only public metadata', 
 test('retry forks leave previous imported outcomes intact and persist detached owner state', async () => {
   const f = fixture();
   const pdf = f.item('PREVIOUS', f.owner);
-  const prior = await f.library.put(f.source, pdf, config, {...job, state:'done', alignment_path:'/outputs/previous-alignment.json'}, stat);
+  const prior = await f.library.put(f.source, pdf, config, {...job, state:'done', output_path:'/outputs/previous.pdf',
+    alignment_path:'/outputs/previous-alignment.json', quality:{status:'partial'}}, stat);
   const previous = plain(prior);
-  const attempt = await f.library.forkAttempt(prior, {...job, id:'retry'});
+  // The backend keeps a previous successful result while the newest attempt is queued.
+  const attempt = await f.library.forkAttempt(prior, {...job, id:'retry', output_path:prior.outputPath,
+    alignment_path:prior.alignmentPath, quality:prior.quality,
+    attempts:[{job_id:'retry', state:'queued', output_path:null, quality:{status:'unknown'}}]});
   assert.deepEqual(plain(prior), previous);
   assert.notEqual(attempt.recordID, prior.recordID);
   assert.equal(attempt.retryOf, prior.recordID);
@@ -195,6 +199,7 @@ test('retry forks leave previous imported outcomes intact and persist detached o
   assert.equal(attempt.saveState, null);
   assert.equal(attempt.outputPath, null);
   assert.equal(attempt.alignmentPath, null, 'a new attempt cannot inherit the old output mapping');
+  assert.equal(attempt.quality.status, 'unknown');
   assert.equal(await f.library.findAttachment(attempt), null);
   assert.strictEqual(await f.library.forkAttempt(prior, {...job, id:'retry'}), attempt);
   await assert.rejects(f.library.forkAttempt(prior, job), /new backend job ID/);
@@ -298,6 +303,32 @@ test('metadata and index-save failures can be retried on the original imported a
   assert.equal(restored.records[0].lastError, '');
   assert.equal(restored.records[0].attachmentKey, pdf.key);
   assert.equal(pdf.dirty, false);
+});
+
+test('task saves commit native metadata and automatic recovery tags together', async () => {
+  const f = fixture();
+  const record = await f.library.put(f.source, null, config, job, stat);
+  const pdf = f.item('TRANSLATED', f.owner);
+  let imports = 0;
+  pdf.setField = (_field, value) => { pdf.title = value; };
+  const saveMetadata = pdf.saveTx;
+  pdf.saveTx = async () => {
+    assert.ok(pdf.getRelationsByPredicate().every(uri => !uri.startsWith('urn:paperbridge:')),
+      'every native metadata commit must already be Zotero Cloud-compatible');
+    await saveMetadata();
+  };
+  f.context.Zotero.Attachments = {importFromFile:async () => { imports++; return pdf; }};
+  Object.assign(f.bridge, {library:f.library, alive:true});
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../addon/content/tasks.js'), 'utf8'), f.context);
+  const tasks = new f.context.TranslationTasks(f.bridge);
+  assert.strictEqual(await tasks.save(record, {...job, state:'done', output_path:'/outputs/translated.pdf',
+    quality:{status:'partial'}}), pdf);
+  assert.equal(imports, 1);
+  assert.equal(pdf.saves, 1, 'library.attach owns the single metadata-and-marker commit');
+  assert.match(pdf.title, /部分可用/);
+  assert.deepEqual(pdf.tags.map(tag => tag.tag), ['urn:paperbridge:record:' + record.recordID,
+    'urn:paperbridge:job:' + record.jobID]);
+  assert.equal((await f.reload()).records[0].saveState, 'imported');
 });
 
 test('record relations recover the metadata-save/index-save crash window', async () => {

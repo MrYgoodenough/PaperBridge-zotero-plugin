@@ -15,7 +15,12 @@ function setup() {
     describe: async () => ({ fingerprint: "fingerprint", document_key: "document" }),
     update: async (record, patch) => Object.assign(record, patch, patch.id ? { jobID: patch.id } : {},
       patch.document_key ? { documentKey: patch.document_key } : {}),
-    attach: async (record, attachment) => Object.assign(record, { attachmentKey: attachment.key, saveState: "imported" }),
+    /** Commit metadata at the same boundary as the real library. */
+    attach: async (record, attachment) => {
+      await attachment.saveTx();
+      Object.assign(record, { attachmentKey: attachment.key, saveState: "imported" });
+      return attachment;
+    },
     findAttachment: async record => attachments.get(record.attachmentKey || record.importingAttachmentKey),
     ownerAlive: async () => true,
     put: async (source, _, config, status) => {
@@ -209,10 +214,49 @@ async function recoveryFlow(source) {
     assert.match(attachment.title, /质量未确认/);
     assert.equal(local.imports(), 1);
   }
-  const unusable = setup();
-  const failed = { state: "failed", outputPath: "/retained.pdf", quality: { status: "unusable" } };
-  await assert.rejects(unusable.tasks.save(failed), /已确认不可用/);
-  assert.equal(unusable.imports(), 0, "Known unusable output must not be promoted to unknown-quality success");
+  for (const status of [undefined, { state: "failed", quality: { status: "partial" },
+    attempts: [{ quality: { status: "unusable" } }] }]) {
+    const unusable = setup();
+    unusable.context.IOUtils.exists = async () => assert.fail("Unusable results must be refused before reading recovery files");
+    const failed = { state: "failed", outputPath: "/retained.pdf", quality: { status: "unusable" } };
+    await assert.rejects(unusable.tasks.save(failed, status), /已确认不可用/);
+    assert.equal(unusable.imports(), 0, "An old job-level verdict cannot promote the unusable current attempt to recovery");
+  }
+}
+
+/** Check that polling publishes the current attempt's mapping and recovery output. */
+async function resultFlow(source) {
+  const completed = setup();
+  const { record } = await completed.tasks.enqueue(source);
+  const status = { id: record.jobID, state: "done", output_path: "/translated.pdf",
+    alignment_path: "/alignment.json", quality: { status: "partial" } };
+  let saves = 0;
+  completed.tasks.save = async current => {
+    saves++;
+    assert.equal(current.alignmentPath, status.alignment_path, "the mapping must reach the library before PDF import");
+    current.saveState = "imported";
+  };
+  completed.bridge.request = async (_, method) => {
+    assert.equal(method, "GET", "completion polling cannot resubmit a translation");
+    return [status];
+  };
+  await completed.tasks.refresh();
+  assert.equal(record.alignmentPath, status.alignment_path);
+  assert.equal(saves, 1);
+
+  const failed = setup();
+  const retry = { recordID: "retry", sourceID: source.id, sourceKey: source.key, libraryID: 1,
+    jobID: "retry-job", state: "running", retryOf: "previous", outputPath: null, alignmentPath: null };
+  failed.library.records.push(retry);
+  failed.bridge.request = async () => [{ id: retry.jobID, state: "failed",
+    output_path: "/previous.pdf", alignment_path: "/previous.json", output_available: false,
+    quality: { status: "partial" }, attempts: [{ job_id: retry.jobID, state: "failed",
+      output_path: "/retry.pdf", alignment_path: "/retry.json", quality: { status: "unusable" } }] }];
+  await failed.tasks.refresh();
+  assert.equal(retry.outputPath, "/retry.pdf", "a failed retry must not expose the old successful PDF as its own output");
+  assert.equal(retry.alignmentPath, "/retry.json");
+  assert.equal(retry.quality.status, "unusable");
+  assert.equal(retry.outputAvailable, null, "old output availability cannot hide a distinct retained attempt file");
 }
 
 /** Run meaningful queue contracts rather than duplicating backend scheduling tests. */
@@ -357,6 +401,7 @@ async function main() {
   await readerFlow(source);
   await batchReview();
   await recoveryFlow(source);
+  await resultFlow(source);
   console.log("Batch deduplication, shared cancellation, idempotent save and passive/lost-response recovery passed");
 }
 

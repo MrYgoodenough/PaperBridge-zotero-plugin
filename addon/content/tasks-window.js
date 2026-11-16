@@ -182,7 +182,7 @@ window.addEventListener("load", () => {
       const errorNotice = record.errorHint || (record.lastError
         ? record.saveState === "import_failed" ? "译文未能保存，可单独重试保存。"
           : "任务存在异常，请查看详情后重试。" : "");
-      const notices = [errorNotice,
+      const notices = [errorNotice, record.mappingWarning,
         record.state === "done" && quality === "partial" ? "译文不完整，请对照原文核对。" : "",
         record.state === "done" && quality === "unknown" ? "译文完整性尚未确认，请核对后使用。" : "",
         usage?.billing_uncertain ? "部分请求用量未知，可能已计费。" : ""];
@@ -197,6 +197,7 @@ window.addEventListener("load", () => {
         `${countsText(counts)}${status?.cached ? "\n整篇 PDF 缓存复用（不是本次新译段落）。" : ""}\n` +
         `${elapsedText(record, status)}\n` +
         `完整性：${qualities[quality] || "未确认"}\n保存：${saves[record.saveState] || "尚未产出"}` +
+        (record.mappingWarning ? `\n映射：${record.mappingWarning}` : "") +
         (usage ? `\n已记录累计用量：${usage.api_requests ?? "—"} 次 API · 输入 ${usage.input_tokens ?? "—"} · 输出 ${usage.output_tokens ?? "—"} token（不等于最终账单）` : "") +
         (status?.attempts?.length > 1 ? `\n尝试记录：${status.attempts.length} 次` : "");
       view.buttons.cancel.disabled = (!record.jobID && !!record.fingerprint) || tasks.terminal(record.state);
@@ -225,7 +226,8 @@ window.addEventListener("load", () => {
     const active = records.filter(record => !tasks.terminal(record.state)).length;
     const saved = records.filter(record => record.saveState === "imported" && record.quality?.status === "complete").length;
     const attention = records.filter(record => ["failed", "interrupted"].includes(record.state)
-      || record.saveState === "import_failed" || (record.state === "done" && (record.saveState !== "imported" || record.quality?.status !== "complete"))).length;
+      || record.saveState === "import_failed" || record.mappingWarning
+      || (record.state === "done" && (record.saveState !== "imported" || record.quality?.status !== "complete"))).length;
     document.getElementById("summary").textContent = [records.length ? `${records.length} 个任务` : "",
       active ? `${active} 进行中` : "", saved ? `${saved} 已保存` : "", attention ? `${attention} 待处理` : ""].filter(Boolean).join(" · ");
     const errors = [...new Set([actionError, tasks.lastError].filter(Boolean))].join("\n");

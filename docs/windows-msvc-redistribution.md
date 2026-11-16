@@ -1,130 +1,99 @@
-<!-- Microsoft runtime provenance, conditional grants, and distributor decisions. -->
+<!-- Microsoft runtime byte origins, confirmed distributor duties and isolated consent. -->
 # Windows MSVC redistribution
 
-This review covers the three Microsoft DLLs in the frozen Linux/Windows 0.3.6
-candidate, not Windows activation or a general license clearance. Exact original
-Microsoft bytes are now identified. **The distributor has explicitly confirmed
-lawful Community 2026 use and responsibility for its section 8 distribution
-conditions; the protective agreement is implemented, with final-package native acceptance pending.** This
-is the user's declaration, not an independent legal audit or general clearance.
-`licenseCompliance` stays `unknown`. Machine-readable hashes and references are
-in `windows-msvc-evidence-0.3.6.json`.
+Scope: **0.3.7 Linux/Windows bundled + local-Python**; these DLLs apply only to
+Windows. Byte evidence/user confirmation are **not current build/native/publication
+acceptance or legal clearance**. No runtime replacement or macOS integration/replacement.
 
-## Original files
+## Exact original DLLs
 
-| Shipped file | Version | Official matching release | Scope |
+| XPI member | Version | Matching Microsoft origin | Scope |
 | --- | --- | --- | --- |
-| `python/vcruntime140.dll` | 14.44.35211.0 | Microsoft 14.44 CRT base VSIX, `VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/` | Bundled Python only |
-| `python/vcruntime140_1.dll` | 14.44.35211.0 | The same VSIX and CRT directory | Bundled Python only |
-| `python/Lib/site-packages/hyperscan.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` | 14.40.33810.0 | Microsoft VC_redist 14.40.33810 EXE, embedded `vcRuntimeMinimum_amd64/cab1.cab` | Both Windows Python modes |
+| `python/vcruntime140.dll` | 14.44.35211.0 | 14.44 CRT base VSIX, `VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/` | Bundled Python only |
+| `python/vcruntime140_1.dll` | 14.44.35211.0 | Same VSIX and CRT directory | Bundled Python only |
+| `python/Lib/site-packages/hyperscan.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` | 14.40.33810.0 | VC_redist 14.40.33810 EXE, `vcRuntimeMinimum_amd64/cab1.cab` | Both Windows modes |
 
-All three existing Windows files have a valid Microsoft Authenticode signature.
-The Hyperscan wheel DLL is byte-for-byte identical to the Microsoft CAB member:
-only this DLL's filename changed. This is not a general claim about all files
-processed by delvewheel. The different 14.40.33816 VSIX is **not** a matching
-origin. Current installed CRTs are 14.51.36247.0, not the shipped versions.
+The [DLL-origin inventory](windows-msvc-evidence-0.3.6.json) binds inspected samples
+to original bytes and valid Authenticode, **not 0.3.7 acceptance**. Hyperscan's DLL
+was only renamed; this does not cover all delvewheel output. **14.40.33816 VSIX is
+not a matching origin**. Installed CRTs do not prove shipped-file identity.
 
-Downloaded CRT VSIX hashes match their catalog payload hashes, but channel-to-
-catalog hashes/sizes and some declared payload sizes did not match the responses.
-Do not claim that the entire catalog integrity chain passed. Exact DLL hashes,
-Windows Authenticode, and the independently hash-bound 14.40 EXE/wheel comparison
-are the bounded evidence used here.
+CRT VSIX payload hashes matched catalog payload hashes, but some channel/catalog
+hashes and sizes differed from responses: **no complete catalog integrity chain
+is claimed**. Retain these limits and the hash-bound EXE/CAB comparison. Match
+finished-XPI native files/notices to [source-manifest.json](../addon/licenses/source-manifest.json);
+versions/signatures alone do not establish rights or source sufficiency.
 
-## Applicable grant routes
+## Grant route and original materials
 
-- Microsoft's [deployment guidance](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files)
-  limits runtime package, merge-module and individual-binary distribution to
-  licensed Visual Studio users, subject to their license terms.
-- [VS2022 REDIST](https://learn.microsoft.com/en-us/visualstudio/releases/2022/redistribution)
-  and [VS2026 REDIST](https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution)
-  list the `VC\redist` subtree, exclude debug/nonredistributable files, prohibit
-  modifying the files, and reference the official runtime downloads. Obtaining
-  a file from Microsoft or an open-source wheel is not itself a distributor grant.
-- [Community 2022](https://visualstudio.microsoft.com/license-terms/vs2022-ga-community/)
-  section 4 and [Community 2026](https://visualstudio.microsoft.com/license-terms/vs2026-ga-community/)
-  section 8 provide conditional Distributable Code rights. Individual developers
-  working on their own applications have an eligible use route; organizational
-  open-source use also has a route. Eligibility and acceptance must be factual,
-  not inferred solely from installed files.
-- Standalone Build Tools [2022](https://visualstudio.microsoft.com/license-terms/vs2022-ga-diagnosticbuildtools/)
-  and [2026](https://visualstudio.microsoft.com/license-terms/vs2026-ga-diagnostic-buildtools/)
-  allow a limited third-party OSI-dependency build route without a Visual Studio
-  product license. Neither contains a separate Distributable Code grant.
-- The retained Runtime 2015–2022 terms and the current
-  [v14 Runtime terms](https://visualstudio.microsoft.com/license-terms/vs2026-ga-visualcpp-v14-redist-runtime/)
-  authorize installation/use, not redistribution. Copying an EULA into an XPI
-  does not establish either the distributor grant or an end-user agreement.
+Microsoft's [deployment guidance](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files)
+limits runtime/merge-module/binary distribution to licensed Visual Studio users.
+[Community 2026 agreement](https://visualstudio.microsoft.com/license-terms/vs2026-ga-community/)
+section 8 provides conditional Distributable Code rights. REDIST excludes
+debug/nonredistributable files. Microsoft downloads/open-source wheels are not grants.
 
-## Existing installation and decisions
+Keep the original Community 2026 agreement, VS2026 REDIST, Runtime documents and
+retained 2022 texts under [supplemental/msvc](../addon/licenses/supplemental/msvc/),
+plus [attribution](../addon/licenses/supplemental/MSVC-runtime-attribution.txt),
+byte-for-byte; do not apply the 2022 agreement silently to 2026. Runtime EULAs grant
+use, not redistribution. Free Build Tools' OSI-build rights, EULAs and consent are
+not standalone redistribution grants.
 
-The Windows machine has one complete, launchable, non-prerelease installation:
-**Visual Studio Community 2026 18.9.2**, installation version
-`18.9.12120.119`. Its installed product metadata links to
-[the Community 2026 terms](https://go.microsoft.com/fwlink/?LinkId=2327616),
-and its `Redist.txt` links to VS18 REDIST. It is not a BuildTools-only machine.
-This inventory does not prove the user's eligibility, assent or contractual
-authority. The installer `expirationDate` is not treated as license-expiry proof.
-Do not silently apply the retained 2022 agreement to a 2026 installation.
+## Existing distributor confirmation
 
-Distributor confirmation and protective agreement:
+On **2026-11-16**, the user explicitly confirmed lawful use of installed
+**Visual Studio Community 2026 18.9.2** and agreed to proceed under its **section 8**
+distribution conditions. This is the user's declaration, not an agent's acceptance
+on the user's behalf or an independent legal audit. **Do not request the same
+decision again.** Installation alone does not prove eligibility/assent.
 
-1. On 2026-11-16, the user explicitly confirmed lawful use of the installed
-   Community 2026 and agreed to proceed under its section 8 distribution
-   conditions. That decision is recorded from the user, not accepted by an agent
-   on the user's behalf or independently legally audited; the same decision
-   does not need to be requested again. Section 8, **Distribution Requirements**,
-   requires indemnifying, defending
-   and holding Microsoft harmless from claims, including attorneys' fees,
-   related to distribution/use of the application, except to the extent a claim
-   is based solely on the Distributable Code. Responsibility remains with the
-   distributor.
-2. The same **Distribution Requirements** require distributors and external end users to agree to
-   terms protecting Microsoft's Distributable Code at least as much as the
-   agreement. `Microsoft-Runtime-Terms.txt` supplies a Microsoft-DLL-only
-   end-user/downstream-distributor agreement, presented offline by
-   `addon/content/runtime-terms.js` before the Windows engine can unpack or run.
-   It does not impose restrictions on the AGPL project or other open-source code.
-3. Keep the DLLs unmodified, ship them with the application's significant primary
-   functionality, and comply with the unreleased/Insiders, trademark, excluded-
-   source-license and applicable trade-law restrictions. Microsoft DLL source
-   or byte-identical rebuilding of upstream Python/wheels is not requested here.
+Preserve the confirmed duties under the original agreement:
 
-## End-user experience and delivery follow-up
+- Indemnify, defend and hold Microsoft harmless from application distribution/use
+  claims, including attorneys' fees, **except to the extent a claim is based solely
+  on Distributable Code**. This duty belongs to distributors, not ordinary users.
+- Require downstream distributors and external end users to agree to terms at
+  least as protective of Microsoft Code as Microsoft's agreement.
+- Keep DLLs unmodified with significant primary application functionality; retain
+  unreleased/Insiders, trademark, excluded-source-license and trade-law restrictions.
+  DLLs are not relicensed under AGPL; DLL-only terms must not restrict AGPL/other
+  open-source code, PDFs or translated output.
 
-The implementation, offline core contracts and bounded final-package native
-checks are complete. Exact identities and exclusions are in
-`runtime-terms-acceptance-0.3.6.json`:
+## One-time isolated DLL agreement
 
-- Windows bundled/local modes share offline, explicit-consent terms limited to
-  the shipped Microsoft MSVC DLLs. The first active action needing the backend,
-  or an explicit click in settings, presents the confirmation; background
-  migration, monitoring, cleanup and diagnostic export do not open consent windows.
-- Acceptance is persisted for the same terms identity, not requested again
-  merely because the plugin version changes. Declining or closing disables only
-  the backend, not ordinary Zotero use or reading already saved PDFs. A refused
-  session does not repeatedly prompt; the settings button allows reconsideration.
-- Ordinary users will notice this confirmation, but it adds no installation
-  steps: no Visual Studio, Microsoft account, purchased license or separate
-  Visual C++ redistributable installer is required by this consent flow. Other
-  existing backend setup requirements are unchanged.
-- Retain the original Visual Studio/Runtime documents without rewriting them.
-  Retained terms or end-user consent do not independently grant redistribution
-  rights. The DLL-only terms must not restrict the AGPL plugin as a whole or
-  other open-source code.
+[runtime-terms.js](../addon/content/runtime-terms.js) presents the unchanged offline
+[Microsoft-Runtime-Terms.txt](../addon/licenses/supplemental/msvc/Microsoft-Runtime-Terms.txt),
+identity **`msvc-community-2026-v1`**. Maintain this behavior in both Windows modes:
 
-Both Windows modes passed a real AddonManager file install, refusal, saved-PDF
-reading without an engine, explicit settings acceptance, actual backend health
-and a different-PID cold reopen at the existing 150% display scale. Input used
-trusted Gecko `windowUtils.sendMouseEvent` in production windows, not a synthetic
-DOM click; external OS mouse injection is not claimed. Linux bundled/local
-checks confirmed exemption and local health without writing Windows consent.
-These are synthetic-library tests, not a new translation, upgrade/notes,
-account-sync or human-quality acceptance.
+- Prompt on the first active backend action or explicit settings action, before
+  engine unpack/run. Background migration, monitoring, cleanup and diagnostic
+  export do not open consent windows.
+- Persist explicit acceptance locally by terms identity, not plugin version;
+  collect/upload no account or document data.
+- Refusal/close is not acceptance and disables **only the backend**. Ordinary
+  Zotero and saved-PDF reading remain usable. A refused session does not repeatedly
+  prompt; settings allow reconsideration.
+- Linux is exempt. Consent requires no Visual Studio, Microsoft account, purchased
+  license or separate CRT installer; existing backend setup is unchanged.
 
-The four private packages are rebuilt and locally verified; all 188 shipped
-project-source/notice files per package match current source, and the Microsoft
-DLLs are unchanged. Hash-bound source delivery is recorded separately in
-`candidate-delivery-0.3.6.json`. Public assets/feeds and macOS remain unchanged.
-Earlier native reports retain their own old XPI identities. AGPL/GPL, Berkeley
-DB and public-source delivery obligations remain open; overall
-`licenseCompliance` is `unknown` and corresponding-source closure is `partial`.
+This DLL-only protective agreement operates under the user's confirmed route,
+not as a standalone redistribution grant or AGPL-wide end-user license.
+
+## Verify and deliver exact packages
+
+Follow [releasing](releasing.md): native AddonManager install/update, Windows refusal,
+saved-PDF reading without an engine, settings acceptance, actual backend health,
+same-profile/data new-PID cold reopen and Linux exemption without Windows consent.
+Bind results to **finished XPI SHA256**, never previous runs/version labels.
+
+Keep original notices/terms and dependency `.libs` material in both Windows modes.
+Local omits the interpreter, **not** the Hyperscan DLL or its duties.
+Use the [source-delivery guide](source-delivery-readiness.md) for **303 archives**,
+**four Linux build inputs**, project `.venv` commands and pinned cache reuse.
+Rebind after source/notice/native changes; check source-tree/shipped notices and
+external source sidecars separately.
+
+`licenseCompliance=unknown` is not legal clearance or proof of missing obligations;
+resolve concrete omissions under [licensing](licensing.md). Authorized publication
+uses **`make_latest=false`**, preserving repository-wide Latest and unrelated assets/
+channels.

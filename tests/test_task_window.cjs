@@ -172,6 +172,13 @@ async function main() {
   assert.equal(badge.textContent, "部分译文");
   assert.doesNotMatch(badge.className, /\bsuccess\b/);
   assert.doesNotMatch(elements.summary.textContent, /已保存/, "saved partial results are not counted as complete");
+  record.mappingWarning = "映射附件未保存；译文已保存：metadata failed";
+  redraw();
+  assert.equal(notice.hidden, false);
+  assert.match(notice.textContent, /映射附件未保存；译文已保存/);
+  assert.match(details.textContent, /metadata failed/);
+  assert.equal(badge.textContent, "部分译文", "optional mapping failures must not become PDF import failures");
+  delete record.mappingWarning;
   record.jobID = null;
   redraw();
   assert.equal(retry.disabled, false, "imported legacy results with no durable job ID still offer explicit retry");

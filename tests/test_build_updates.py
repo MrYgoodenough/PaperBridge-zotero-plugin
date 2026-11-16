@@ -6,6 +6,7 @@ import runpy
 import sys
 import tomllib
 import zipfile
+import zlib
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -45,6 +46,7 @@ def build_tree(tmp_path, monkeypatch):
             prefix + interpreter: f"{name} interpreter".encode(),
             prefix + f"{site_packages}/native/module.bin": name.encode(),
             prefix + f"{site_packages}/native.libs/library.bin": name.encode(),
+            prefix + f"{site_packages}/native/runtime.json": b'{"dependency": true}\n',
             prefix + ".cache/babeldoc/models/layout.onnx": b"model fixture",
         })
     for relative, contents in files.items():
@@ -107,6 +109,7 @@ def test_build_feeds_match_platform_and_python_mode(build_tree, monkeypatch):
                 assert (prefix + interpreter in names) == (mode == "bundled")
                 assert archive.read(prefix + f"{site_packages}/native/module.bin") == name.encode()
                 assert archive.read(prefix + f"{site_packages}/native.libs/library.bin") == name.encode()
+                assert archive.read(prefix + f"{site_packages}/native/runtime.json") == b'{"dependency": true}\n'
                 assert archive.read(prefix + ".cache/babeldoc/models/layout.onnx") == b"model fixture"
                 metadata = json.loads(archive.read(prefix + "runtime.json"))
                 assert (metadata["version"], metadata["platform"], metadata["pythonMode"]) == (version, name, mode)
@@ -115,6 +118,38 @@ def test_build_feeds_match_platform_and_python_mode(build_tree, monkeypatch):
     assert (build_tree / "addon/manifest.json").read_bytes() == source_bytes
     assert [path.name for path in (build_tree / "updates").iterdir()] == ["published.json"]
     assert (build_tree / "updates/published.json").read_bytes() == published_bytes
+
+
+@pytest.mark.parametrize("host,machine", (("linux", "x86_64"), ("win32", "AMD64")))
+def test_build_preserves_notice_bytes_and_is_reproducible(build_tree, monkeypatch, host, machine):
+    """Keep notices unchanged, use requested compression and reproduce bytes at another time."""
+    script = build_tree / "scripts/build.py"
+    (build_tree / "LICENSE").write_bytes(b"Synthetic original license.\r\n")
+    (build_tree / "NOTICE.md").write_bytes(b"Synthetic original notice.\r\n")
+    _, _, target, _, site_packages = next(row for row in PLATFORMS if row[0] == host)
+    # Repeated records distinguish configured level 9 from Python's default level 6.
+    contents = b"".join(f"entry-{i % 97}: {i % 31} synthetic runtime metadata\n".encode() for i in range(5000))
+    native = f"{site_packages}/native/module.bin"
+    (build_tree / ".cache/package" / target / native).write_bytes(contents)
+    monkeypatch.setattr(sys, "platform", host)
+    monkeypatch.setattr(platform, "machine", Mock(return_value=machine))
+    monkeypatch.setattr(sys, "argv", [str(script)])
+    snapshots = []
+    for timestamp in ((2026, 1, 2, 3, 4, 6, 4, 2, -1), (2027, 2, 3, 4, 5, 8, 2, 34, -1)):
+        monkeypatch.setattr(zipfile.time, "localtime", Mock(return_value=timestamp))
+        runpy.run_path(str(script), run_name="__main__")
+        snapshots.append({p.relative_to(build_tree / "dist").as_posix(): p.read_bytes()
+                          for p in (build_tree / "dist").rglob("*") if p.is_file()})
+    assert snapshots[0] == snapshots[1]
+    xpi = next((build_tree / "dist").glob("*.xpi"))
+    with zipfile.ZipFile(xpi) as archive:
+        assert archive.read("LICENSE") == (build_tree / "LICENSE").read_bytes()
+        assert archive.read("NOTICE.md") == (build_tree / "NOTICE.md").read_bytes()
+        assert len({entry.date_time for entry in archive.infolist()}) == 1
+        # ZIP members use raw DEFLATE, with no zlib wrapper bytes.
+        compressor = zlib.compressobj(9, wbits=-zlib.MAX_WBITS)
+        compressed = compressor.compress(contents) + compressor.flush()
+        assert archive.getinfo(f"runtime/{target}/{native}").compress_size == len(compressed)
 
 
 def test_explicit_repackage_uses_the_staged_platform(build_tree, monkeypatch):

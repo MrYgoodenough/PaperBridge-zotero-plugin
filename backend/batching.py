@@ -10,7 +10,7 @@ from babeldoc.format.pdf.document_il.midend.il_translator_llm_only import (
     BatchParagraph, ILTranslatorLLMOnly, is_cid_paragraph,
     is_placeholder_only_paragraph, is_pure_numeric_paragraph,
 )
-from babeldoc.format.pdf.document_il.midend.il_translator import ILTranslator, RichTextPlaceholder
+from babeldoc.format.pdf.document_il.midend.il_translator import ILTranslator, RichTextPlaceholder, FormulaPlaceholder
 from babeldoc.format.pdf.document_il.midend import paragraph_finder
 from babeldoc.format.pdf.document_il.utils.layout_helper import (
     box_to_tuple, get_character_layout as original_character_layout,
@@ -25,6 +25,8 @@ BATCH_PARAGRAPHS = 12
 PRIORITY_BASE = 1048576
 # Only ordinary prose boxes can disprove a title's incidental glyph-edge overlap.
 BODY_LAYOUTS = {"plain text", "text", "content", "paragraph"}
+# A hyphen joining Latin words is punctuation, not a mathematical subtraction operator.
+WORD_HYPHENS = {"-", "\u00ad", "\u2010", "\u2011"}
 
 
 def source_character_layout(char, layout_index, layout_map, layout_priority=None, _bbox_mode="auto"):
@@ -61,24 +63,33 @@ class ObservedILTranslator(ILTranslator):
     """Observe real paragraph application and make upstream fallback cache-only."""
 
     def get_translate_input(self, paragraph, page_font_map=None, disable_rich_text_translate=None):
-        """Keep actual styles and formulas, but do not make whitespace a rich-text constraint."""
+        """Keep actual styles/formulas without false constraints on spaces or word hyphens."""
         prepared = super().get_translate_input(paragraph, page_font_map, disable_rich_text_translate)
         if prepared is None:
             return None
         original = prepared.unicode
         removed = []
         for placeholder in list(prepared.placeholders):
-            if not isinstance(placeholder, RichTextPlaceholder):
+            if isinstance(placeholder, FormulaPlaceholder):
+                formula = placeholder.formula
+                content = "".join(character.char_unicode or "" for character in formula.pdf_character)
+                pattern = re.escape(placeholder.placeholder)
+                if (content not in WORD_HYPHENS or formula.pdf_curve or formula.pdf_form
+                        or not re.search(r"(?<=[A-Za-z])" + pattern + r"(?=[A-Za-z])", prepared.unicode)):
+                    continue
+                # The detector marks some ordinary font hyphens as formulas inside real prose.
+                normalized, count = re.subn(pattern, lambda match: content, prepared.unicode)
+            elif isinstance(placeholder, RichTextPlaceholder):
+                # The upstream unicode helper strips whitespace; inspect the actual composition.
+                content = "".join(character if isinstance(character, str) else (character.char_unicode or "")
+                                  for character in placeholder.composition.pdf_character)
+                if not content or not content.isspace():
+                    continue
+                pattern = re.escape(placeholder.left_placeholder) + r"(\s*)" + re.escape(placeholder.right_placeholder)
+                normalized, count = re.subn(pattern, lambda match: match[1] or content, prepared.unicode)
+            else:
                 continue
-            # The upstream unicode helper strips whitespace, so inspect the actual composition.
-            content = "".join(character if isinstance(character, str) else (character.char_unicode or "")
-                              for character in placeholder.composition.pdf_character)
-            if not content or not content.isspace():
-                continue
-            pattern = re.escape(placeholder.left_placeholder) + r"(\s*)" + re.escape(placeholder.right_placeholder)
-            normalized, count = re.subn(pattern, lambda match: match[1] or content, prepared.unicode)
             if count == 1:
-                # Synthetic spaces can have a different font; there is no visible style to preserve.
                 prepared.unicode = normalized
                 prepared.placeholders.remove(placeholder)
                 removed.append((pattern, content))
@@ -87,11 +98,11 @@ class ObservedILTranslator(ILTranslator):
         cached = self.translate_engine.paragraph_cache.get(original)
         if isinstance(cached, str) and placeholder_tokens(cached) == placeholder_tokens(original):
             for pattern, content in removed:
-                cached, count = re.subn(pattern, lambda match: match[1] or content, cached)
+                cached, count = re.subn(pattern, lambda match: (match[1] or content) if match.lastindex else content, cached)
                 if count != 1:
                     break
             else:
-                # Only a previously valid, whitespace-only transformation can avoid another charge.
+                # Only previously validated literal punctuation/spacing can avoid another charge.
                 if cached.strip() and placeholder_tokens(cached) == placeholder_tokens(prepared.unicode):
                     self.translate_engine.paragraph_cache.put(prepared.unicode, cached)
         return prepared

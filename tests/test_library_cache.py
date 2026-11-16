@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sqlite3
 import sys
+from contextlib import closing
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1] / "backend"))
@@ -64,25 +65,40 @@ def test_other_page_range_keeps_shared_paragraphs(tmp_path):
         assert db.execute("SELECT count(*) FROM paragraphs").fetchone()[0]==2
 
 
-def test_legacy_cache_is_attributed_before_pruning(tmp_path):
-    """Legacy ownership migration preserves only surviving owners."""
+def test_legacy_cache_is_attributed_before_pruning(tmp_path, monkeypatch):
+    """Legacy migration preserves surviving owners and releases every Windows database handle."""
     cache,jobs = tmp_path/"cache",tmp_path/"jobs"
     (cache/"babeldoc").mkdir(parents=True);jobs.mkdir()
     a,b = reference("a"),reference("b")
     text = "A cached paragraph"
-    with sqlite3.connect(cache / "paragraphs.sqlite") as db:
+    with closing(sqlite3.connect(cache / "paragraphs.sqlite")) as db, db:
         db.execute("CREATE TABLE paragraphs (key TEXT PRIMARY KEY,translation TEXT NOT NULL)")
         for ref in [a,b]:
             namespace=json.dumps(["paperbridge-compact-v1",ref["model"],ref["lang_out"],ref["document_key"]],separators=(",", ":"))
             key=hashlib.sha256((namespace+"\0"+text).encode()).hexdigest()
             db.execute("INSERT INTO paragraphs VALUES (?,?)",(key,"缓存译文"))
-    with sqlite3.connect(cache / "babeldoc/cache.v1.db") as db:
+    with closing(sqlite3.connect(cache / "babeldoc/cache.v1.db")) as db, db:
         db.execute("CREATE TABLE _translationcache (translate_engine TEXT,original_text TEXT)")
         db.execute("INSERT INTO _translationcache VALUES (?,?)",("paperbridge","prefix\n## Here is the input:\n\n"+json.dumps([{"id":0,"input":text}])))
-    prune(cache,jobs,[a],[b],sweep=True)
-    with sqlite3.connect(cache / "paragraphs.sqlite") as db:
+    connections = []
+    original_connect = sqlite3.connect
+
+    def tracked_connect(*args, **kwargs):
+        """Retain real connections so garbage collection cannot hide a missing explicit close."""
+        connection = original_connect(*args, **kwargs)
+        connections.append(connection)
+        return connection
+
+    with monkeypatch.context() as patch:
+        patch.setattr(sqlite3, "connect", tracked_connect)
+        prune(cache,jobs,[a],[b],sweep=True)
+    assert connections
+    for connection in connections:
+        with pytest.raises(sqlite3.ProgrammingError, match="closed"):
+            connection.execute("SELECT 1")
+    with closing(sqlite3.connect(cache / "paragraphs.sqlite")) as db:
         assert db.execute("SELECT document_key FROM paragraphs").fetchall()==[(b["document_key"],)]
-    with sqlite3.connect(cache / "babeldoc/cache.v1.db") as db:
+    with closing(sqlite3.connect(cache / "babeldoc/cache.v1.db")) as db:
         assert db.execute("SELECT count(*) FROM _translationcache").fetchone()[0]==0
 
 

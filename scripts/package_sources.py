@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "MrYgoodenough/PaperBridge-zotero-plugin"
 # ZIP timestamps and modes are fixed so identical inputs produce identical bundles.
 ZIP_DATE = (1980, 1, 1, 0, 0, 0)
+# Interpret fixed source-file attributes consistently on Linux and Windows packagers.
+ZIP_CREATE_SYSTEM = 3
 # Stream archives rather than loading entire corresponding-source tarballs into RAM.
 COPY_CHUNK = 1024 * 1024
 # Retain shipped source and generated interfaces, but not bytecode or native binaries.
@@ -33,6 +35,10 @@ NATIVE_PATTERN = re.compile(r"\.(?:so(?:\.\d+)*|dylib|dll|pyd|a|lib|exe)$", re.I
 FONT_SIGNATURES = {b"\x00\x01\x00\x00", b"OTTO", b"ttcf", b"wOFF", b"wOF2"}
 # Keep tracked tests and developer docs referenced by build workflows and the README.
 PROJECT_SOURCE_DIRS = ("addon", "backend", "scripts", ".github", "tests", "docs")
+# Root metadata and explicit release guidance are also part of the delivered snapshot.
+PROJECT_SOURCE_FILES = ("LICENSE", "NOTICE.md", "README.md", ".env.example", "pyproject.toml", "uv.lock",
+                        "docs/licensing.md", "docs/linux-package-size.md", "docs/releasing.md",
+                        "docs/source-delivery-readiness.md")
 
 
 def digest(path):
@@ -161,6 +167,7 @@ def add_bytes(archive, name, contents, files):
     if name in files:
         raise ValueError(f"Duplicate bundle member: {name}")
     info = zipfile.ZipInfo(name, ZIP_DATE)
+    info.create_system = ZIP_CREATE_SYSTEM
     info.external_attr = 0o100644 << 16
     info.compress_type = zipfile.ZIP_DEFLATED
     archive.writestr(info, contents)
@@ -173,6 +180,7 @@ def add_file(archive, name, path, files):
     if name in files:
         raise ValueError(f"Duplicate bundle member: {name}")
     info = zipfile.ZipInfo(name, ZIP_DATE)
+    info.create_system = ZIP_CREATE_SYSTEM
     info.external_attr = (0o100755 if Path(path).stat().st_mode & 0o111 else 0o100644) << 16
     # Upstream compressed archives are stored unchanged; project/build text is compressed.
     if not str(path).endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".zip", ".crate")):
@@ -188,9 +196,7 @@ def add_file(archive, name, path, files):
 
 def project_files():
     """Snapshot only project/build inputs; never include machine caches, credentials or agent history."""
-    result = {ROOT / p for p in ("LICENSE", "NOTICE.md", "README.md", ".env.example",
-              "pyproject.toml", "uv.lock", "docs/licensing.md", "docs/linux-package-size.md",
-              "docs/releasing.md", "docs/source-delivery-readiness.md")}
+    result = {ROOT / p for p in PROJECT_SOURCE_FILES}
     # Git's tracked allowlist avoids accidentally including untracked account/process files.
     tracked = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "-z", "--",
                                        *PROJECT_SOURCE_DIRS])
@@ -205,6 +211,9 @@ def project_snapshot(paths):
     included = {p.relative_to(ROOT).as_posix() for p in paths}
     tracked = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "-z"])
     tracked = {p.decode("utf-8") for p in tracked.split(b"\0") if p}
+    # A deleted tracked source must not disappear from an otherwise "committed" snapshot.
+    missing = {p for p in tracked if p not in included and (
+        p in PROJECT_SOURCE_FILES or p.split("/", 1)[0] in PROJECT_SOURCE_DIRS)}
     changed = subprocess.check_output(["git", "-C", str(ROOT), "diff", "HEAD", "--name-only", "-z"])
     changed = {p.decode("utf-8") for p in changed.split(b"\0") if p}
     untracked = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "--others",
@@ -213,9 +222,10 @@ def project_snapshot(paths):
     return {"gitHead": subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"]).decode().strip(),
             "membershipPolicy": "Tracked working-tree build/source/test files plus explicit delivery docs, package_sources.py and addon/licenses/; never agent history or arbitrary untracked files.",
             "includedUntrackedFiles": sorted(included - tracked),
-            "modifiedTrackedFiles": sorted(included & changed),
+            "modifiedTrackedFiles": sorted((included | missing) & changed),
+            "missingTrackedFiles": sorted(missing),
             "excludedUntrackedSourceFiles": sorted(untracked - included),
-            "fromCommitOnly": not (included - tracked or included & changed)}
+            "fromCommitOnly": not (included - tracked or included & changed or missing)}
 
 
 def record_members(shipped, folder, names):
@@ -280,13 +290,27 @@ def project_source_matches(name, data, path, metadata):
 def shipped_evidence(xpi, inventory, archive, files, spec):
     """Retain exact shipped sources/notices and report font blobs without redistributing them."""
     prefix = f"runtime/{inventory['runtime']['platform']}/"
-    project_sources = {item["path"] for item in inventory["sourceModules"]}
-    selected = set(project_sources)
+    # Compare complete build.py membership, not only modules still present in the XPI.
+    local_sources = {}
+    for folder, base in ((ROOT / "addon", ""), (ROOT / "backend", prefix + "backend/")):
+        for path in folder.rglob("*"):
+            if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc":
+                local_sources[base + path.relative_to(folder).as_posix()] = path
+    project_sources = set(local_sources)
+    selected = {item["path"] for item in inventory["sourceModules"]}
     fonts, mismatches, native_files = [], [], []
     with zipfile.ZipFile(xpi) as shipped:
         names = {safe_path(item.filename) for item in shipped.infolist() if not item.is_dir()}
         if len(names) != sum(not item.is_dir() for item in shipped.infolist()):
             raise ValueError("Duplicate XPI members are not supported")
+        project_sources.update(n for n in names if n.startswith(prefix + "backend/")
+                               or not n.startswith("runtime/") and n not in {"LICENSE", "NOTICE.md"})
+        mismatches.extend(sorted(project_sources - names))
+        # Asset membership is compared too, while retention still excludes native/font blobs.
+        for name in sorted(project_sources & names):
+            local = local_sources.get(name)
+            if local is None or not project_source_matches(name, shipped.read(name), local, inventory["runtime"]):
+                mismatches.append(name)
         # All delivered Python/C interfaces are useful modification evidence, not just GPL RECORD rows.
         selected.update(n for n in names if n.startswith(prefix) and Path(n).suffix in SOURCE_SUFFIXES)
         selected.add(prefix + "runtime.json")
@@ -303,11 +327,6 @@ def shipped_evidence(xpi, inventory, archive, files, spec):
         for name in sorted(selected & names):
             data = shipped.read(name)
             add_bytes(archive, f"shipped/{xpi.name}/{name}", data, files)
-            if name in project_sources:
-                local = ROOT / (name.removeprefix(prefix) if name.startswith(prefix + "backend/")
-                                else "addon/" + name)
-                if not project_source_matches(name, data, local, inventory["runtime"]):
-                    mismatches.append(name)
         for name in sorted(names):
             # Cache asset names may have no extension; magic is a public format header.
             if NATIVE_PATTERN.search(name) or name in {prefix + "python/bin/python3.12"}:
@@ -334,8 +353,9 @@ def shipped_evidence(xpi, inventory, archive, files, spec):
             name = local.relative_to(ROOT).as_posix().removeprefix("addon/")
             if name not in names or hashlib.sha256(shipped.read(name)).hexdigest() != digest(local):
                 missing_delivery.append(name)
-    return {"projectSourceSnapshotMismatches": mismatches, "fonts": fonts,
-            "projectSourceComparison": "Exact bytes except manifest.json: build.py platform/mode update_url and JSON serialization; all other fields must match.",
+    return {"projectSourceSnapshotMismatches": sorted(mismatches), "fonts": fonts,
+            "projectSourceComparison": "Complete addon/backend membership and exact bytes except manifest.json: "
+                                       "build.py platform/mode update_url and JSON serialization; all other fields must match.",
             "nativeFiles": native_files, "nativeAttribution": attribution,
             "deliveryFilesMissingOrChanged": missing_delivery,
             "fontScope": "Standalone font blobs only; compiled MuPDF fonts are covered by source notices, not binary extraction."}
@@ -440,7 +460,7 @@ def build_bundle(xpis, output, cache, download, manifest_path):
     finally:
         temporary.unlink(missing_ok=True)
     output.with_name(output.name + ".manifest.json").write_bytes(json_bytes(result))
-    output.with_name(output.name + ".sha256").write_text(f"{digest(output)}  {output.name}\n", encoding="utf-8")
+    output.with_name(output.name + ".sha256").write_text(f"{digest(output)}  {output.name}\n", encoding="utf-8", newline="\n")
     return result
 
 

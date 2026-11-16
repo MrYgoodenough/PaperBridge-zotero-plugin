@@ -214,9 +214,12 @@ var TranslationTasks = class {
         continue;
       }
       const latest = status.attempts?.at(-1);
-      const quality = status.state === "done" ? status.quality : latest?.quality || status.quality;
-      const patch = { state: status.state, quality: quality || { status: "unknown" },
-        outputPath: status.output_path || record.outputPath || null, outputAvailable: status.output_available,
+      // A retry's job-level result can still describe the previous successful attempt.
+      const outcome = status.state === "done" ? status : latest || status;
+      const outputPath = outcome.output_path || record.outputPath || null;
+      const patch = { state: status.state, quality: outcome.quality || { status: "unknown" },
+        outputPath, alignmentPath: outcome.alignment_path || record.alignmentPath || null,
+        outputAvailable: outputPath === status.output_path ? status.output_available : null,
         events: Array.isArray(status.events) ? status.events : record.events || [] };
       if (status.error) patch.lastError = status.error;
       patch.errorCode = status.error_code;
@@ -252,7 +255,8 @@ var TranslationTasks = class {
   async saveOnce(record, status) {
     try {
       // Losing backend access must not erase an already known unusable verdict.
-      const knownUnusable = (status?.quality?.status || record.quality?.status) === "unusable";
+      const outcome = status?.state === "done" ? status : status?.attempts?.at(-1) || status;
+      const knownUnusable = (outcome?.quality?.status || record.quality?.status) === "unusable";
       if (status?.state === "interrupted" && record.jobID) {
         try {
           status = await this.bridge.request(`/jobs/${record.jobID}/recover`, "POST", {});
@@ -265,7 +269,8 @@ var TranslationTasks = class {
           status = null;
         }
       }
-      if (knownUnusable || (status?.quality?.status || record.quality?.status) === "unusable") {
+      const quality = status?.state === "done" ? status?.quality : status?.attempts?.at(-1)?.quality || record.quality;
+      if (knownUnusable || quality?.status === "unusable") {
         throw new Error("本次结果已确认不可用；可打开保留文件位置核查，或显式重试翻译。");
       }
       if (!status || status.state !== "done" || !status.output_path) {
@@ -289,13 +294,11 @@ var TranslationTasks = class {
         record.importingAttachmentKey = attachment.key;
         await this.bridge.library.update(record, { importingAttachmentKey: attachment.key });
       }
-      const quality = status.quality?.status || "unknown";
-      const warning = quality === "complete" ? "" : quality === "partial" ? " · 部分可用" : " · 质量未确认";
+      const savedQuality = status.quality?.status || "unknown";
+      const warning = savedQuality === "complete" ? "" : savedQuality === "partial" ? " · 部分可用" : " · 质量未确认";
       attachment.setField("title", `译文${warning} · ${record.language} · ${record.title}`);
-      if (record.sourceURI) attachment.addRelation("dc:relation", record.sourceURI);
-      attachment.addRelation("dc:relation", "urn:paperbridge:job:" + record.jobID);
-      await attachment.saveTx();
-      await this.bridge.library.attach(record, attachment);
+      // The library commits metadata and Cloud-compatible recovery markers together.
+      attachment = await this.bridge.library.attach(record, attachment);
       await this.bridge.library.update(record, { saveState: "imported", lastError: "", quality: status.quality || { status: "unknown" } });
       const usage = status.cached ? { api_requests: 0, full_pdf_cache: true } : status.usage;
       if (usage) this.bridge.setPref("lastUsage", JSON.stringify({ ...usage, model: record.model, date: new Date().toISOString() }));

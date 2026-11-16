@@ -165,14 +165,16 @@ def test_inline_abstract_indexed_authors_and_running_furniture(nonzero_origin):
         assert len(regions[1]) == 2, "Only repeated header/footer, never a body email, is preserved"
 
 
-def test_margin_notice_and_unindexed_affiliation_leave_abstract_translatable():
+@pytest.mark.parametrize("institution", ["Department of Physics, Example University",
+                                        "1Departamento de Matematicas, Universidad de Oviedo"])
+def test_margin_notice_and_unindexed_affiliation_leave_abstract_translatable(institution):
     """Preserve observed Nature/Science metadata without swallowing the research abstract."""
     with pymupdf.open() as doc:
         page = doc.new_page(width=600, height=800)
         page.insert_text((80, 85), "Research title", fontsize=20)
         page.insert_text((215, 135), "Alice Researcher & Bob Author", fontsize=9)
         page.insert_text((215, 190), "Numerical results, methods and their scientific interpretation.", fontsize=9)
-        page.insert_text((40, 710), "Department of Physics, Example University", fontsize=8)
+        page.insert_text((40, 710), institution, fontsize=8)
         # Standard test fonts cannot encode a zero-width-space glyph; keep actual email text.
         page.insert_text((40, 724), "e-mail: author@example.org", fontsize=8)
         page.insert_text((492, 65), "Copyright © 2024", fontsize=7)
@@ -180,7 +182,7 @@ def test_margin_notice_and_unindexed_affiliation_leave_abstract_translatable():
         page.insert_text((80, 420), "The example mentions © 2024 but remains research body.", fontsize=10)
         regions = metadata_regions(doc)[0]
         protected = "\n".join(page.get_text(clip=pymupdf.Rect(box)) for box in regions)
-        assert "Alice Researcher" in protected and "Department of Physics" in protected
+        assert "Alice Researcher" in protected and institution in protected
         assert "Copyright © 2024" in protected
         assert "Research title" not in protected and "Numerical results" not in protected
         assert "The example" not in protected

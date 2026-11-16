@@ -88,9 +88,63 @@ async function checkRuntime(platform, mode) {
   if (mode === "local") {
     assert.equal(calls.length, 2);
     assert.ok(calls[0].arguments.at(-1).includes(`platform.machine()=='${platform.machine}'`));
+    await checkPythonPathDeferral(scope, runtime, paths);
   } else {
     assert.equal(calls.length, 1);
   }
+}
+
+/** Exercise real launch/reuse/exit logic with native subprocess boundaries kept offline. */
+async function checkPythonPathDeferral(scope, runtime, paths) {
+  const launches = [], children = [];
+  let kills = 0;
+  let configured = runtime.python;
+  const previousPref = scope.Zotero.Prefs.get;
+  scope.Zotero.Prefs.get = name => name === "extensions.paperbridge.pythonPath" ? configured : previousPref(name);
+  scope.IOUtils.readUTF8 = async file => paths.basename(file) === "token"
+    ? "synthetic-token" : JSON.stringify({ port:12300 + launches.length });
+  scope.ChromeUtils.importESModule = () => ({ Subprocess: {
+    /** Probe in memory and expose a manually completed native-process promise. */
+    async call(options) {
+      if (options.arguments.includes("-c")) return {
+        stdout:{ readString:async () => "paperbridge-python-ok" }, wait:async () => ({ exitCode:0 })
+      };
+      let exit;
+      const completion = new Promise(resolve => { exit = resolve; });
+      const process = { stdout:{ readString:async () => "" }, wait:() => completion,
+        /** Explicit shutdown remains available; preference changes must never call it. */
+        kill() { kills++; exit({ exitCode:0 }); }
+      };
+      launches.push(options);
+      children.push({ process, exit });
+      return process;
+    }
+  } });
+  const original = await runtime.ensure({ interactive:false });
+  const running = runtime.process;
+  const pending = runtime.pending;
+  configured = paths.join(runtime.base, "new-python");
+  assert.strictEqual(await runtime.ensure({ interactive:false }), original);
+  assert.strictEqual(runtime.process, running);
+  assert.strictEqual(runtime.pending, pending);
+  assert.equal(launches.length, 1);
+  assert.equal(kills, 0);
+  assert.notEqual(runtime.python, configured, "a saved setting does not replace a live interpreter");
+
+  // Finish only this synthetic child; exercise the actual process.wait cleanup callback.
+  children[0].exit({ exitCode:0 });
+  await turn();
+  assert.equal(runtime.connection, null);
+  assert.equal(runtime.process, null);
+  assert.equal(runtime.pending, null);
+  const [next, shared] = await Promise.all([runtime.ensure({ interactive:false }), runtime.ensure({ interactive:false })]);
+  assert.strictEqual(next, shared, "next use still shares one launch, not a replacement scheduler");
+  assert.notStrictEqual(next, original);
+  assert.equal(launches.length, 2);
+  assert.equal(launches[1].command, configured);
+  assert.equal(kills, 0);
+  await runtime.stop();
+  assert.equal(kills, 1, "only explicit lifecycle shutdown stops the synthetic runtime");
 }
 
 /** Mock dependency readiness without loading Zotero or a user profile. */
@@ -113,6 +167,7 @@ function context(initializationPromise, uiReadyPromise, delay) {
     for (const mode of ["bundled", "local"]) await checkRuntime(platform, mode);
   }
   console.log("Six platform/Python launch contracts passed (mocked, not native Zotero)");
+  console.log("Saved Python paths wait for natural exit and one next-use launch on all three local platforms (mocked)");
   let initialize, ready, finishDelay;
   const state = context(new Promise(r => initialize = r), new Promise(r => ready = r),
     () => new Promise(r => finishDelay = r));

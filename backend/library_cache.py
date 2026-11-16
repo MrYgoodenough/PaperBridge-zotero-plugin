@@ -7,11 +7,14 @@ import sqlite3
 import warnings
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
+from contextlib import closing
 
 # Translation instructions are shared by document and paragraph cache identities.
-PROMPT_VERSION = "paperbridge-compact-v1"
+PROMPT_VERSION = "paperbridge-compact-v2-fragments"
+# Prototype rows used an older namespace and must not inherit later prompt changes.
+LEGACY_PROMPT_VERSION = "paperbridge-compact-v1"
 # Native-region restoration changes invalidate full PDFs, not valid paragraph translations.
-ENGINE_VERSION = "babeldoc-0.6.4-protected-v10-native-regions"
+ENGINE_VERSION = "babeldoc-0.6.4-protected-v11-font-subsets"
 # Separate evidence-bearing results from legacy PDF-only jobs.
 QUALITY_VERSION = 1
 # Preserve the existing provider and request limits unless explicitly configured.
@@ -145,20 +148,22 @@ def migrate_paragraphs(cache, references):
         return
     texts = set()
     if old_path.exists():
-        with sqlite3.connect(old_path) as old:
+        with closing(sqlite3.connect(old_path)) as old:
             for (text,) in old.execute("SELECT original_text FROM _translationcache WHERE translate_engine='paperbridge'"):
                 marker = "## Here is the input:\n\n"
                 if marker in text:
                     texts.update(p["input"] for p in json.loads(text.split(marker,1)[1]))
                 else:
                     texts.add(text.split("Now translate the following text:\n\n",1)[-1])
-    with sqlite3.connect(paragraph_path) as db:
+    # Transactions alone leave SQLite handles open and can lock Windows cache files.
+    with closing(sqlite3.connect(paragraph_path)) as db, db:
         add_document_column(db)
         for ref in references:
             doc = ref.get("document_key")
             if not doc:
                 continue
-            namespace = json.dumps([PROMPT_VERSION,ref["model"],ref["lang_out"],doc],separators=(",", ":"))
+            # Prototype rows predate provider namespaces and remain tied to their original prompt.
+            namespace = json.dumps([LEGACY_PROMPT_VERSION,ref["model"],ref["lang_out"],doc],separators=(",", ":"))
             keys = [(doc,hashlib.sha256((namespace+"\0"+text).encode()).hexdigest()) for text in texts]
             db.executemany("UPDATE paragraphs SET document_key=? WHERE key=? AND document_key IS NULL",keys)
         # Unattributed prototype cache entries have no surviving library owner.
@@ -166,7 +171,7 @@ def migrate_paragraphs(cache, references):
         db.commit()
         db.execute("VACUUM")
     if old_path.exists():
-        with sqlite3.connect(old_path) as old:
+        with closing(sqlite3.connect(old_path)) as old, old:
             old.execute("DELETE FROM _translationcache WHERE translate_engine='paperbridge'")
             old.commit()
             old.execute("VACUUM")
@@ -234,7 +239,7 @@ def prune(cache, jobs, remove, keep, sweep=False, active=()):
     path = cache / "paragraphs.sqlite"
     rows = 0
     if path.exists():
-        with sqlite3.connect(path) as db:
+        with closing(sqlite3.connect(path)) as db, db:
             add_document_column(db)
             if sweep:
                 existing_docs = {row[0] for row in db.execute("SELECT DISTINCT document_key FROM paragraphs")}

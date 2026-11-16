@@ -141,7 +141,8 @@ async def translate(request):
     localize_cache()
     from library_cache import normalize_config
     from usage import ResultQuality
-    quality = ResultQuality(Path(request["folder"]) / "quality.json")
+    scope = "selected_pages" if str(request.get("pages") or "").strip() else "all_pages"
+    quality = ResultQuality(Path(request["folder"]) / "quality.json", scope=scope)
     quality.write()
     try:
         await _translate({**request, **normalize_config(request)}, quality)

@@ -1,7 +1,7 @@
 <!-- Linux installation requirements and native development entry points. -->
 # Linux 安装与开发
 
-Linux amd64 使用 `paperbridge-0.3.4-linux-x64.xpi`，支持 Zotero 9 / 10，实测环境为 Ubuntu 24.04 amd64、Zotero 10.0.8。安装包包含独立 CPython 3.12、CPU 版面引擎、模型和 tokenizer，运行时不依赖系统 Python、CUDA 或 ROS2。当前预编译包的 ELF 依赖要求 **glibc ≥ 2.34**，不使用 Ubuntu 24.04 专用接口；满足该基线的其他发行版尚未逐一实机验证。未提供 musl/Alpine 和 ARM64 安装包。
+Linux amd64 使用 `paperbridge-0.3.7-linux-x64.xpi`，支持 Zotero 9 / 10，原生验收环境为 Ubuntu 24.04 amd64、Zotero 10.0.8。安装包包含独立 CPython 3.12、CPU 版面引擎、模型和 tokenizer，运行时不依赖系统 Python、CUDA 或 ROS2。当前预编译包的 ELF 依赖要求 **glibc ≥ 2.34**，不使用 Ubuntu 24.04 专用接口；满足该基线的其他发行版尚未逐一实机验证。未提供 musl/Alpine 和 ARM64 安装包。
 
 ## 使用
 
@@ -46,4 +46,4 @@ sh scripts/setup.sh
 
 `--phase reopen` 使用同一 profile/data 和真新进程，不复制已安装 XPI、不清空缓存；失败重试用新 `--report-label` 保留原证据。测试辅助插件不会进入正式安装包。历史 `tests/packaged.js` 默认可能调用付费服务，不属于无费用原生验收入口，须另获明确授权。
 
-历史 0.3.1 的翻译、字体、缓存与生命周期范围见 [linux-verification-0.3.1.json](linux-verification-0.3.1.json)，不能替代新包的原生或全文质量验收。段落高亮以可追溯翻译请求为单位；重排、跨页或多义区域不猜配，接口缺失只停用高亮。
+每次验收绑定当轮精确 XPI hash，不借用历史包的通过结论。段落高亮以可追溯翻译请求为单位；重排、跨页或多义区域不猜配，接口缺失只停用高亮。

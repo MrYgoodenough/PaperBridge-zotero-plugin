@@ -36,10 +36,11 @@ var BundledRuntime = class {
     throw new Error(`此安装包不支持 ${os}（${abi}）。请安装与你的系统对应的版本。`);
   }
 
-  /** Reuse one launch and report actionable failures without exposing raw output. */
+  /** Reuse a live/starting engine; changed Python settings are read on a fresh launch. */
   async ensure(options) {
     // Consent precedes shared launch state so background reads cannot open a window.
     await this.terms.ensure(options);
+    // Preference edits must not interrupt this process's paid serial queue.
     if (this.connection) return this.connection;
     this.pending ||= this.launch().catch(error => {
       this.pending = null;
@@ -258,6 +259,7 @@ var BundledRuntime = class {
     // PathUtils.join rejects a component that contains a separator, so split the
     // packaged executable path instead of appending it in one piece.
     if (this.build.pythonMode === "bundled") return PathUtils.join(this.home, ...platform.python.split("/"));
+    // Read the latest saved path during launch, never to replace an existing job owner.
     const configured = Zotero.Prefs.get("extensions.paperbridge.pythonPath", true) || "";
     const candidates = configured ? [configured] : this.pythonCandidates(platform);
     // Interpreter probes must use the same clean native-library environment as the engine.

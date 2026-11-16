@@ -30,9 +30,10 @@ def token_value(value):
 class ResultQuality:
     """Track pinned-engine evidence separately from PDF production and API usage."""
 
-    def __init__(self, path):
+    def __init__(self, path, scope="selected_pages"):
         """Start with unknown coverage until the IL translation stage is observed."""
         self.path = Path(path)
+        self.scope = scope
         self.lock = threading.RLock()
         self.paragraphs = {}
         self.inventory_observed = False
@@ -128,7 +129,7 @@ class ResultQuality:
                     status = "partial"
                 elif counts["failed"]:
                     status = "unusable"
-            return {"schema_version": 1, "status": status, "scope": "selected_pages",
+            return {"schema_version": 1, "status": status, "scope": self.scope,
                     "basis": "paragraph_application_evidence_not_linguistic_verification",
                     "artifact_exists": self.artifact_exists, "finalized": self.finalized,
                     "inventory_observed": self.inventory_observed,

@@ -382,7 +382,9 @@ var PaperBridge = {
     Zotero.debug("PaperBridge: opening source reader");
     const win = Zotero.getMainWindow();
     let reader = await Zotero.Reader.open(source.id);
-    reader ||= Zotero.Reader.getByTabID(win.Zotero_Tabs.selectedID);
+    // Reader.open can return undefined for a restored tab; never pair an unrelated selected PDF.
+    reader ||= Zotero.Reader._readers?.find(opened => opened.itemID === source.id);
+    if (!reader) throw new Error("原文阅读器未能打开；译文已保存，可直接打开译文附件后重试。");
     await reader._initPromise;
     Zotero.debug("PaperBridge: source reader ready");
     await this.readerView(reader).initializedPromise;

@@ -96,6 +96,26 @@ def test_space_styles_normalized_before_validation_and_valid_cache_reused(tmp_pa
     assert normalized not in cache
 
 
+def test_word_hyphens_are_not_formula_constraints(monkeypatch):
+    """Only plain intra-word hyphens lose false formula markers; subtraction stays protected."""
+    hyphen = il_module.FormulaPlaceholder(1, SimpleNamespace(
+        pdf_character=[SimpleNamespace(char_unicode="-")], pdf_curve=[], pdf_form=[]), "{v1}", r"\{v1\}")
+    minus = il_module.FormulaPlaceholder(2, SimpleNamespace(
+        pdf_character=[SimpleNamespace(char_unicode="-")], pdf_curve=[], pdf_form=[]), "{v2}", r"\{v2\}")
+    original = "The soil{v1}landscape model has x {v2} y terms."
+    prepared = il_module.ILTranslator.TranslateInput(original, [hyphen, minus])
+    cache = {original: "土壤{v1}景观模型包含 x {v2} y 项。"}
+    observed = ObservedILTranslator.__new__(ObservedILTranslator)
+    observed.translate_engine = SimpleNamespace(paragraph_cache=SimpleNamespace(
+        get=cache.get, put=lambda source, output: cache.update({source: output})))
+    monkeypatch.setattr(il_module.ILTranslator, "get_translate_input", lambda *args: prepared)
+    result = observed.get_translate_input(SimpleNamespace())
+    assert result.unicode == "The soil-landscape model has x {v2} y terms."
+    assert result.placeholders == [minus]
+    assert cache[result.unicode] == "土壤-景观模型包含 x {v2} y 项。"
+    assert cache[original] == "土壤{v1}景观模型包含 x {v2} y 项。"
+
+
 class DeferredExecutor:
     """Run submitted upstream fallbacks deterministically after the batch returns."""
 
@@ -230,8 +250,9 @@ def test_pdf_and_unapplied_or_unchanged_text_never_mean_complete(tmp_path):
     assert quality.report()["status"] == "partial"
 
 
-def test_engine_finalizes_quality_when_layout_fails(tmp_path, monkeypatch):
-    """The engine retains quality evidence even if it fails before producing a PDF."""
+@pytest.mark.parametrize("pages,scope", [("", "all_pages"), ("2-3", "selected_pages")])
+def test_engine_finalizes_quality_when_layout_fails(tmp_path, monkeypatch, pages, scope):
+    """The engine retains accurate page scope even when layout fails before producing a PDF."""
     async def fail(request, quality):
         """Simulate an engine exception before any artifact exists."""
         quality.register("p", "Text", 1)
@@ -240,10 +261,11 @@ def test_engine_finalizes_quality_when_layout_fails(tmp_path, monkeypatch):
 
     monkeypatch.setattr(engine_module, "_translate", fail)
     with pytest.raises(RuntimeError, match="layout failed"):
-        asyncio.run(engine_module.translate({"folder": str(tmp_path)}))
+        asyncio.run(engine_module.translate({"folder": str(tmp_path), "pages": pages}))
     data = json.loads((tmp_path / "quality.json").read_text())
     assert data["status"] == "unusable" and data["finalized"]
     assert data["engine_error"] == "RuntimeError" and data["counts"]["failed"] == 1
+    assert data["scope"] == scope
 
 
 def test_engine_parent_watchdog_exits_only_after_original_parent_is_lost():

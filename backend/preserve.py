@@ -47,7 +47,7 @@ ABSTRACT_HEADING = re.compile(r"^a\s*b\s*s\s*t\s*r\s*a\s*c\s*t\b", re.I)
 # Indexed institutions are an independent signal of author metadata.
 AFFILIATION_START = re.compile(
     r"^(?:(?:\d{1,2}|[a-z])\s*)?(?:(?:CAS\s+)?key\s+)?"
-    r"(?:department|school|institute|centre|center|division|university|laboratory|college)\b", re.I)
+    r"(?:department|departamento|school|institute|centre|center|division|university|universidad|laboratory|college)\b", re.I)
 # Adjacent name and institution blocks remain separate from the paper's title.
 AUTHOR_BLOCK_GAP = 20
 # Small bibliographic blocks must not absorb large research titles.
@@ -469,7 +469,8 @@ def restore_regions(source_path, translated_path, output_path, regions):
         # reload_page requires the vector-restoration caller to release its page reference.
         page = None
         _restore_links(source, translated, original_links, rectangles)
-        translated.subset_fonts()
+        # MuPDF 1.26.7 leaves CFF faces whole; its supported FontTools path preserves used glyph IDs.
+        translated.subset_fonts(fallback=True)
         translated.save(output_path, garbage=4, deflate=True)
     Path(output_path).with_suffix(".regions.json").write_text(json.dumps(regions))
     return count

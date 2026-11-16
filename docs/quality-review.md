@@ -1,133 +1,45 @@
-<!-- Offline compatibility checks, real-paper provenance, and explicit review limits. -->
-# Offline CI and fixed-paper quality review
+<!-- Separate paid-paper, structural, visual and native acceptance evidence. -->
+# 质量测试与验收
 
-This entry point separates reproducible PDF structure checks from explicitly recorded human semantic and visual review. It never translates, contacts a provider, loads credentials, or invents scores.
+生产基线固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**。不通过换引擎、免费重排或降低全文标准冒充问题修复。
 
-## Lightweight CI
-
-`.github/workflows/ci.yml` runs a Linux/Windows/macOS lightweight matrix with Python 3.12 and Node 22. It installs only pytest, PyMuPDF and httpx; dependency installation requires network access, but the checks need no external services:
-
-- `pytest tests`, with external plugin autoload and inherited pytest options disabled;
-- all built-in Node suites matching `tests/test_*.cjs`, including annotation logic, not native UI acceptance;
-- Python syntax via AST, and addon/test JavaScript syntax via `node --check`;
-- existing build/update contracts using tiny fixtures for three platforms × two Python modes, including XPI names, manifests, checksums and update feeds.
-
-It does not stage a complete runtime, launch Zotero, use real API keys, call paid APIs, impose a package-size hard gate, or run a three-platform GUI matrix. A missing optional reference PDF remains an explicit pytest skip. New Python tests under `tests/` and Node suites matching `tests/test_*.cjs` are collected automatically by `scripts/check_offline.py`.
-
-The 0.3.4 source baseline passed [GitHub run 43636036885](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/43636036885) on all three runners. Each newer source revision still needs its own run; this is not native acceptance or publication.
-
-The runner removes inherited Python/native-library paths and common credential environment variables from child processes. Its pytest socket guard blocks external DNS/TCP and permits only local service connections. This is an accidental-network-call guard, **not an OS sandbox**; it does not constrain arbitrary subprocesses. Existing subprocess tests use local fixtures. Standalone integration/translation scripts in `tests/` are not executed by pytest collection.
-
-## Project environment commands
-
-Run from the project root after the existing environment setup. No new dependencies are introduced. `uv run --offline --no-sync` uses the existing project `.venv`, without resolving or downloading packages:
-
-```text
-uv run --offline --no-sync python scripts/check_offline.py
-uv run --offline --no-sync python scripts/review_quality.py --case liblinear-2008 --report .runtime/quality/liblinear-report.json
-```
-
-If uv is not on PATH, use the setup-provided `.tools/bin/uv` (Linux/macOS) or `.tools\bin\uv.exe` (Windows). Direct project-interpreter equivalents:
+## 离线入口
 
 ```sh
-# Linux/macOS; discard inherited ROS/Conda runtime paths before Python starts.
-env -u PYTHONHOME -u PYTHONPATH -u LD_LIBRARY_PATH -u LD_PRELOAD \
-  .venv/bin/python scripts/check_offline.py
-env -u PYTHONHOME -u PYTHONPATH -u LD_LIBRARY_PATH -u LD_PRELOAD \
-  .venv/bin/python scripts/review_quality.py --case liblinear-2008 \
-  --source /absolute/source.pdf --output /absolute/real-translation.mono.pdf \
-  --report .runtime/quality/liblinear-report.json \
-  --write-review-template .runtime/quality/liblinear-human.json
+env -u PYTHONPATH -u PYTHONHOME -u LD_LIBRARY_PATH -u LD_PRELOAD   .venv/bin/python -B scripts/check_offline.py --mode full
 ```
 
-```powershell
-# Windows PowerShell, using this project's own environment.
-Remove-Item Env:PYTHONHOME, Env:PYTHONPATH -ErrorAction SilentlyContinue
-& .\.venv\Scripts\python.exe scripts\check_offline.py
-& .\.venv\Scripts\python.exe scripts\review_quality.py --case liblinear-2008 `
-  --source 'C:\papers\source.pdf' --output 'C:\papers\real-translation.mono.pdf' `
-  --report .runtime\quality\liblinear-report.json `
-  --write-review-template .runtime\quality\liblinear-human.json
-```
+Windows 使用本项目的 `.venv\Scripts\python.exe` 和 PowerShell，清除继承的 Python/native 环境。`--mode lightweight` 仅检查小依赖合约，不能代替完整引擎或原生 Zotero。入口阻止外部网络、禁用 pytest 外部插件，不允许离线测试偷偷产生费用。
 
-No PDFs are downloaded automatically. Missing/unreadable source or output PDFs are recorded independently; available checks continue and the report is **not accepted**. Exit code 0 means a report was written, not that quality passed. `--require-acceptance` opts into exit code 1 for an unaccepted report. Invalid CLI/JSON input returns exit code 2. Template creation never overwrites existing human work, and report/template paths cannot overwrite the input PDFs or review files.
+核心测试维护在现有 `tests/test_*.py` / `tests/test_*.cjs`，只为重要修复保留必要断言；运行结果保存到 `agent/report` 或本轮私有过程目录，开发文档不存测试流水账。
 
-## Fixed public corpus
+## 真实文献与费用
 
-`docs/quality-corpus.json` defines two small, digitally typeset JMLR papers:
+`docs/quality-corpus.json` 是一个小型固定公共样本，不是代表性语义基准。扩大抽样时记录平台、标题、公开来源、原始 PDF hash、总页数和测试重点，包含双栏、长篇、公式、表格、图像密集和非 ASCII 文字。原 PDF 及译文保留在私有测试目录，公开文档只存必要元数据；不能规避付费墙、认证或下载限制。
 
-| Case | Source pages | Default translated pages | Main checks |
-| --- | --- | --- | --- |
-| `scikit-learn-2011` | 6 | 2–4 | API names, terminology, tables, reading order, unselected author block/references |
-| `liblinear-2008` | 4 | 1–3 | optimization terms, formulas, performance table, unselected bibliography/links |
+默认按全文执行；选页诊断明确标为选页，不计作整篇成功。记录每次实际请求的返回 ID、token 用量、计费未知及账户观察。官方价格估算不是账单，余额差额为账户级、可能四舍五入/延迟结算且存在并行使用。条件预算只有在可核验的累计用量成立时才授权额外样本。
 
-Each entry records stable publisher landing/PDF URLs, publisher licensing policy, expected page count, source SHA-256, selected pages and specific human check locations. Author copyright is retained; the older PDFs do not specify a CC BY version. The software license mentioned inside a paper is **not** its article license. Only metadata is committed; verify the applicable rights before redistributing a PDF or translated derivative. If the publisher changes the PDF, inspection still runs but source identity is flagged for review; update the corpus only after checking the actual replacement.
+冻结版本、XPI hash、后端模块和源 PDF hash。基线、问题诊断、修复重测和额外样本分别保留，不覆盖失败、不自动重发未知请求。已有段落缓存的重排是免费/部分费用修复验证，不是新调用或新论文语义验收。
 
-This is a reproducible **smoke corpus**, not representative accuracy acceptance across 15–25 papers or 300 human checks. `--pages 1,2-3` can override the translated pages to describe an existing real result; required human sample locations remain those of the fixed case. The report's `scope` records the actual selection separately from the case defaults; a single-page override is not a completed three-page corpus run. `bounded_smoke_selected_pages` records the separately authorized sklearn page 2 / LIBLINEAR page 1 smoke selection without changing either default. Source excerpts and PDF paths may be private: keep generated reports local unless explicitly cleared for publication.
+## 四种不同结论
 
-## Automatic evidence
+| 证据 | 能说明什么 | 不能替代什么 |
+| --- | --- | --- |
+| `usage.json` | 物理调用和服务商返回用量 | 最终发票/语义质量 |
+| `quality.json` | 固定引擎段落是否验证并真正应用 | 整篇人类双语接受 |
+| PDF/text/视觉比较 | 公式、表格、字形、剪裁、阅读顺序和抽样含义 | 所有未读段落的语义认证 |
+| 原生 Zotero | 精确 XPI 的安装、保存、映射、笔记/批注和重开 | 真实云同步或另一包身份 |
 
-Reports contain file hashes and per-page geometry (size, media/crop boxes, rotation), extracted-text counts/excerpts/hashes, basic CJK/replacement-character counts, font names/types/embedding, out-of-bounds text spans and link targets. Matched source/output pages are compared for count/geometry, selected-text presence/change, unselected-text preservation and retention of source link targets.
+`complete` 表示观察到的段落应用覆盖完整，仍可能有语言错误；`partial`、`unknown` 和 `unusable` 如实呈现。保留参考文献/图表文字不属于正文漏译，但不能把误保护的研究正文算作允许跳过。
 
-Text or CJK presence is **not** proof of translation; changed text is **not** proof of semantic correctness. Base-14 unembedded fonts can be legitimate and are surfaced for review rather than stopping execution. Embedded fonts do not prove glyph coverage or visible Chinese text. Extracted text cannot establish reading order, clipping, overlap, formula correctness or visual fidelity. Link targets alone do not establish usable click areas. Single-language **mono** PDFs are the comparison contract; dual-page outputs are still inventoried but cannot be treated as a mono-layout acceptance result.
+## 文本与视觉复核
 
-Protection checks are opt-in, because this script does not infer formulas or bibliography boxes. Supply `--regions regions.json`, a JSON list of definitions of this form:
+`scripts/review_quality.py` 读取显式原/译 PDF 和真实质量证据，检查页数、字面、字体、链接及异常，并生成需人工判断的项目。对标题/摘要/方法/结果/参考文献和复杂页做双语抽样，重点核对否定、数值、单位、科学维度、限定语和公式附近解释。
 
-```json
-[
-  {"page": 2, "bbox": [50, 200, 550, 300], "label": "manually located formula"}
-]
-```
+图片先裁剪或组合少量 source/target 面板，限制分辨率，避免把大量全尺寸页面一次送入模型。只有实际渲染可检查覆盖/剪裁；只看提取文本不能证明版式正常。字体子集修复需同时复核复制/搜索文本和渲染，不以文件变小推定正确。
 
-These are format-only coordinates: replace them with boxes selected on the **actual source**. Pages are one-based; boxes use unrotated, crop-relative PDF points. The script compares extracted text and exact rendered pixel bytes at 144 dpi inside each box, recording hashes and dimensions. Any difference requests review rather than pretending a perceptual score proves safety. Invalid boxes are unassessed. With no boxes, protection remains `not_evaluated`; no detection or preservation claim is made. Inspect source/output pages visually for all human layout checks, including content outside these boxes.
+## 原生包与发布
 
-## Human semantic and layout judgement
+`prepare_nonmac_test.py` 的 assets/upgrade/runtime-terms suites 与相应 `tests/*_packaged.js` 使用新隔离 profile/data、原生 AddonManager、具体 PDF/mapping。新 PID 冷重开保留原数据，外部驱动采集正常退出和 SQLite integrity。已有日常库另需明确授权和停机备份。
 
-Create a template with `--write-review-template`, inspect the actual source/output PDFs, then fill the template and rerun with `--review`:
-
-```text
-uv run --offline --no-sync python scripts/review_quality.py --case liblinear-2008 --source source.pdf --output real-translation.mono.pdf --regions regions.json --review .runtime/quality/liblinear-human.json --report .runtime/quality/liblinear-reviewed.json
-```
-
-Required evidence:
-
-- `case_id`, `source_sha256`, `output_sha256`: template-generated identity of the **actual** artifacts; source must also match the fixed corpus hash;
-- `reviewer`, `reviewed_at`: human reviewer and review timestamp;
-- `provenance.kind`: `real_translation` only for an actual translation; leave `unknown` when uncertain and use `mock` for simulated output;
-- `provenance.provider`, `model`, `prompt_source`: actual provider/model and a reproducible non-secret prompt reference (e.g. source commit plus function, or archived prompt file and hash). Record the generation prompt, not merely the review instructions. For a real cached translation, retain its original generation provenance. Never include keys or credential files;
-- each required item: `verdict` (`pass`, `fail`, `not_evaluated`), exact source/output locators and substantive `notes`. Preserve the fixed item ID/page. Notes should describe what was compared and any discrepancy, not an invented score.
-
-The report retains the recorded verdict and independently computes `effective_verdict`. Missing/duplicate items, absent notes/locators, artifact mismatch, missing model/prompt provenance, or `mock`/`unknown` provenance cannot produce an effective semantic pass. Partial work remains unassessed; an evidence-backed failed item produces `fail`. Semantic and visual layout statuses are separate. The script validates bookkeeping, **not the truth of a human's declaration or judgement**; an automated judge/model response is not a substitute for these human entries.
-
-`acceptance=accepted` is narrowly scoped to this case's required human sample items **plus all configured structural checks**, including explicit protection boxes. Unassessed protection or any warning leaves it `not_accepted`; this is not a release-wide or whole-paper semantic guarantee. Mock/synthetic unit PDFs test only this bookkeeping and the structural comparisons, never real translation quality.
-
-## Remaining real evaluation
-
-The entry point does not fetch private Zotero files or locate translations implicitly. The coordinating agent must supply available real artifacts and genuine generation provenance, perform visual/semantic checks, and decide separately whether any bounded, authorized API evaluation is needed. With no real output or human review, semantic quality remains **not evaluated** regardless of passing CI. Broader paper coverage, cross-platform GUI behavior and full-paper semantic quality still require separate evidence.
-
-## Bounded real smoke evidence (November 14, 2026)
-
-The separately authorized run translated **exactly sklearn page 2 and LIBLINEAR page 1**, once each, through the normal engine; all other pages remain original. The three-page defaults above were not translated or accepted. Local artifacts live under `.runtime/quality-p1-20261114/`; each case has `translated.pdf`, `generation.json`, `provider-evidence.json`, `prompt.json`, `quality.json`, `review.json`, selected-page renders and an unfilled `human-unassessed.json`. `summary.json` indexes the evidence; `assistant-inspection.md` records an explicitly non-human semantic/visual spot inspection. Engine source snapshots and actual-byte hashes bind the provenance to the dirty working tree rather than a Git revision alone.
-
-| Case / selected page | Requests | Provider-reported input / output tokens | Engine quality | Review acceptance |
-| --- | --- | --- | --- | --- |
-| sklearn / 2 | 2 | 1,002 / 698 | partial: 6 applied-but-unchanged entries remain unknown | not accepted |
-| LIBLINEAR / 1 | 2 | 1,293 / 995 | partial: 10 applied-but-unchanged entries remain unknown | not accepted |
-
-All four actual provider calls returned `deepseek-flash`; SDK retries, paid reruns, API probes and local paragraph-cache hits were zero. Usage is fully reported (2,295 input / 1,693 output total; no cached input); no monetary cost was estimated. Eight unselected pages passed exact text and 144-dpi pixel preservation checks. New Chinese fonts are embedded; original unembedded Base-14 fonts remain a structural warning. Font/embed acceptance and native copy/search behavior remain pending, not a font-quality pass.
-
-The historical prose was readable in assistant spot inspection, **not human-accepted**. These outputs had affiliation wrapping inside “sur Yvette”, lost author styling and copyright reconstruction as `c○`; see the 0.3.5 repair below. The historical review records remain `needs_review` / `not_accepted` and are not rewritten. Both PDFs contain zero link annotations, so an empty-target comparison proves no clickable-link behavior. Translated display math/tables and wider human bilingual review remain separate work; these QA PDFs are not release assets.
-
-## 0.3.5 source-vector repair and cache-only replay
-
-`preserve.metadata_regions()` recognizes only an email/bold-name/italic-affiliation block before an explicit abstract on opening pages, and a year-bearing copyright notice in the footer. Ambiguous layouts are left to the normal pipeline. Recognized bibliographic metadata is kept in its **original language and vector fonts**; titles, abstracts and body prose are not blanket-protected. The existing exclusion/restoration path performs the repair, without a separate PDF rewrite implementation.
-
-Two selected pages were reapplied through `engine.translate` using an isolated copy of the existing paragraph cache: **19 cache hits, zero misses, zero provider/HTTP/DNS attempts**, with historical inputs unchanged. Both new structural ledgers are `complete`; this means all considered paragraphs were applied or intentionally protected, **not semantic acceptance**. The two author blocks and LIBLINEAR copyright have exact source text and 144-dpi pixels. All eight unselected pages retain exact text and pixels. Full-page and detail PNGs were visually inspected by the assistant.
-
-The full-PDF identity is now `babeldoc-0.6.4-protected-v5-metadata`; paragraph identity is unchanged so valid old translations remain reusable. Existing PDFs and old job directories are preserved, not silently rewritten. Native copy/search and upgrade evidence must refer to the exact new XPI; broader formulas/tables and genuine human review remain open.
-
-## Offline synthetic links versus native acceptance
-
-The separate two-page synthetic link pipeline exercises success and lost-response simulation with **zero actual network/provider calls**. Its simulated responses/usage are not paid-corpus evidence. PDF link preservation in that pipeline does not establish clickable-link behavior in Zotero, and the real papers above have no link annotations to exercise it.
-
-Historical Linux Zotero 10.0.8 evidence in `.runtime/p0-p1-native-verification.json` covers the earlier annotation, restart, settings and synthetic internal-link smoke checks. Later 0.3.4 Linux/Windows scope is recorded in [nonmac verification](nonmac-verification-2026-11-15.json); neither record certifies a newer XPI. The rebuilt 0.3.5 Linux candidates have separate [native verification](linux-verification-0.3.5.json), including actual copy/search and cached-paper reading, bound to their exact XPI hashes. This is not human bilingual acceptance or acceptance of the different CI-built bytes. Windows/macOS native acceptance is not performed this round. See [release verification](releasing.md) for candidate-build, publication and native-test boundaries.
+每个 Linux/Windows Python 模式有独立包和更新通道。真实同步、其他 DPI、未测原生工具和 macOS 专属源码范围不得借用既有通过结论。发布的 artifact/source/更新检查见[releasing.md](releasing.md)。

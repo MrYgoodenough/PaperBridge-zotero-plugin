@@ -96,8 +96,11 @@ window.addEventListener("load", function initializeSettings() {
     get(fields.baseURL).value = baseURL;
     get(fields.model).value = model;
     get(fields.key).value = key;
-    if (pythonChanged) await bridge.runtime.stop();
-    setStatus("设置已保存（当前服务及全局设置）。已入队任务不受影响。", "success");
+    // A live or starting runtime owns paid work; changed paths wait for its next launch.
+    const pythonNotice = !pythonChanged ? "" : bridge.runtime.build?.pythonMode === "bundled"
+      ? "\n本安装包使用自带 Python，保存的本机路径不影响引擎。"
+      : "\n本机版 Python 路径将用于下次引擎启动；保存设置不会重启当前引擎。如需切换，请等待任务完成后正常重启 Zotero。";
+    setStatus("设置已保存（当前服务及全局设置）。已入队任务不受影响。" + pythonNotice, "success");
   }
 
   /** Save the current profile without checking an engine or service. */

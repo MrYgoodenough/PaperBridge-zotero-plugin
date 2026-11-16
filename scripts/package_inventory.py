@@ -14,7 +14,7 @@ SCHEMA_VERSION = 2
 # File names identify evidence only, never a license or redistribution permission.
 LICENSE_NAMES = ("license", "licence", "copying", "notice", "copyright", "thirdpartynotice")
 # Only PaperBridge sources, not dependency sources, belong in the module summary.
-ADDON_SOURCE_SUFFIXES = {".js", ".xhtml", ".json"}
+ADDON_SOURCE_SUFFIXES = {".js", ".xhtml", ".json", ".css"}
 # Only this bundled manifest can associate supplemental notices with exact artifacts.
 PROVENANCE_PATH = "licenses/provenance.json"
 # Include versioned ELF libraries and native Windows/macOS wheel artifacts.
@@ -39,8 +39,9 @@ def _record_files(archive, folder):
         return set(), "unknown"
     site_packages = folder.rsplit("/", 2)[0] + "/"
     try:
-        rows = csv.reader(StringIO(archive.read(folder + "RECORD").decode("utf-8")))
-        files = {posixpath.normpath(site_packages + row[0]) for row in rows if row}
+        rows = csv.reader(StringIO(archive.read(folder + "RECORD").decode("utf-8-sig")))
+        # Installed Windows RECORDs may use backslashes; ZIP member names remain POSIX.
+        files = {posixpath.normpath(site_packages + row[0].replace("\\", "/")) for row in rows if row}
         return {name for name in files if name in names and name.startswith(site_packages)}, "read"
     except (UnicodeError, csv.Error):
         return set(), "unknown"
@@ -330,4 +331,4 @@ def write_inventory(path, inventory):
     """Write an indented UTF-8 machine-readable sidecar beside its completed artifact."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")

@@ -121,6 +121,6 @@ var runLifecycleTests = async bridge => {
   report.cacheRoot=bridge.runtime.cache;
   report.indexPath=bridge.library.path;
   report.ok=Object.values(report.checks).every(Boolean);
-  await IOUtils.writeUTF8(root+"/docs/lifecycle-"+bridge.runtime.version+".json",JSON.stringify(report,null,2));
+  // The packaged-test caller retains this result in its isolated report, not developer docs.
   return report;
 };

@@ -24,9 +24,12 @@ PLATFORMS = {
 }
 # Production controllers include notes and startup diagnostics, not just reader UI.
 REQUIRED_ADDON_FILES = (
-    "manifest.json", "bootstrap.js", "content/runtime.js", "content/library.js",
+    "manifest.json", "bootstrap.js", "prefs.js", "content/runtime.js", "content/library.js",
     "content/tasks.js", "content/alignment.js", "content/paperbridge.js", "content/annotations.js",
     "content/notes.js", "content/diagnostics.js", "content/reading-assets.js",
+    "content/runtime-terms.js", "content/runtime-terms-window.js", "content/runtime-terms.xhtml",
+    "content/settings.js", "content/settings.xhtml", "content/tasks-window.js", "content/tasks.xhtml",
+    "content/ui.css",
 )
 # The current backend requires these modules, including trace and provider diagnostics.
 REQUIRED_BACKEND_FILES = (
@@ -178,6 +181,8 @@ def verify_release(xpi, sha256, feed, source_manifest=SOURCE_MANIFEST, previous_
                      f"Required module is missing or empty: {name}")
         _require((prefix + interpreter in names) == (mode == "bundled"),
                  "Bundled interpreter presence differs from runtime pythonMode.")
+        _require(mode != "bundled" or archive.getinfo(prefix + interpreter).file_size > 0,
+                 "Bundled interpreter is empty.")
         for directory in (site_packages + "/", *ASSET_DIRECTORIES):
             _require(any(name.startswith(prefix + directory) and not name.endswith("/") for name in names),
                      f"Required runtime directory has no files: {directory}")
