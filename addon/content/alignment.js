@@ -15,6 +15,8 @@ var FragmentAlignment = class FragmentAlignment {
   static HOVER_PRIORITY = -1;
   // Native font line boxes slightly overhang painted glyph bounds; allow two CSS pixels.
   static TEXT_RECT_TOLERANCE = 2;
+  // Horizontal font padding may exceed rounding noise, but ink must occupy most of the item.
+  static TEXT_INK_MIN_HEIGHT_RATIO = 0.6;
   // Permit only rounding noise between each quad and its compatibility bounding rectangle.
   static GEOMETRY_EPSILON = 0.0001;
   // Share one lazily loaded native note module across split controllers.
@@ -189,24 +191,33 @@ var FragmentAlignment = class FragmentAlignment {
     const doc = state.browser?.contentDocument || rightFrame?.document || state.reader?._iframeWindow?.document;
     this.control = doc.createElement("div");
     this.control.className = "paperbridge-fragment-alignment";
-    this.control.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;gap:5px;max-width:330px";
+    this.control.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;gap:4px;position:relative;min-width:0";
+    const tools = doc.createElement("details");
+    tools.className = "paperbridge-reading-tools";
+    const toolsLabel = doc.createElement("summary");
+    toolsLabel.textContent = "阅读工具";
+    toolsLabel.setAttribute("aria-label", "定位与笔记工具");
+    const toolsPanel = doc.createElement("div");
+    toolsPanel.className = "paperbridge-reading-tools-panel";
+    tools.append(toolsLabel, toolsPanel);
     this.button = doc.createElement("button");
-    this.button.textContent = "定位原文片段";
+    this.button.textContent = "定位原文";
     this.button.className = "paperbridge-localize-source";
-    this.button.style.cssText = "font:inherit;padding:5px 8px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer;white-space:nowrap";
+    this.button.style.cssText = "font:inherit;padding:6px 9px;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;white-space:nowrap";
     this.targetButton = doc.createElement("button");
-    this.targetButton.textContent = "定位译文片段";
+    this.targetButton.textContent = "定位译文";
     this.targetButton.className = "paperbridge-localize-target";
     this.targetButton.style.cssText = this.button.style.cssText;
     this.status = doc.createElement("span");
     this.status.setAttribute("role", "status");
     this.status.setAttribute("aria-live", "polite");
-    this.status.style.cssText = "font-size:12px;overflow-wrap:anywhere";
+    this.status.style.cssText = "display:block;width:100%;font-size:12px;line-height:1.5;overflow-wrap:anywhere;opacity:.8";
     this.hoverButton = doc.createElement("button");
     this.hoverButton.className = "paperbridge-paragraph-hover-toggle";
     this.hoverButton.setAttribute("aria-label", "原译文段落双向高亮");
     this.hoverButton.style.cssText = this.button.style.cssText;
-    this.control.append(this.button, this.status, this.targetButton, this.hoverButton);
+    toolsPanel.append(this.button, this.targetButton, this.status);
+    this.control.append(this.hoverButton, tools);
     this.selectionNoteButton = doc.createElement("button");
     this.selectionNoteButton.className = "paperbridge-selection-note";
     this.selectionNoteButton.textContent = "选区存笔记";
@@ -214,14 +225,14 @@ var FragmentAlignment = class FragmentAlignment {
     this.selectionNoteButton.style.cssText = this.button.style.cssText;
     this.annotationsNoteButton = doc.createElement("button");
     this.annotationsNoteButton.className = "paperbridge-annotations-note";
-    this.annotationsNoteButton.textContent = "批注汇总笔记";
+    this.annotationsNoteButton.textContent = "汇总批注";
     this.annotationsNoteButton.title = "汇总译文附件已保存的原生批注；不修改 PDF 或批注。";
     this.annotationsNoteButton.style.cssText = this.button.style.cssText;
     this.noteStatus = doc.createElement("span");
     this.noteStatus.setAttribute("role", "status");
     this.noteStatus.setAttribute("aria-live", "polite");
     this.noteStatus.style.cssText = this.status.style.cssText;
-    this.control.append(this.selectionNoteButton, this.annotationsNoteButton, this.noteStatus);
+    toolsPanel.append(this.selectionNoteButton, this.annotationsNoteButton, this.noteStatus);
     const control = this.control;
     state.cleanups.push(() => {
       if (this.control === control) this.dispose();
@@ -456,7 +467,7 @@ var FragmentAlignment = class FragmentAlignment {
       const result = { note, opened: false };
       if (this.disposed || this.control !== control) return result;
       this.lastNoteResult = result;
-      this.noteStatus.textContent = "笔记已保存（" + note.key + "）。";
+      this.noteStatus.textContent = "笔记已保存。";
       try {
         if (!Zotero.Notes?.open) throw new Error("Zotero 原生笔记打开接口不可用。");
         await Zotero.Notes.open(note.id, null, { openInWindow: true });
@@ -464,7 +475,7 @@ var FragmentAlignment = class FragmentAlignment {
       } catch (error) {
         result.openError = error;
         if (!this.disposed && this.control === control) {
-          this.noteStatus.textContent = "笔记已保存（" + note.key + "），但打开失败；请在 Zotero 库中打开，勿重复保存：" + (error.message || error);
+          this.noteStatus.textContent = "笔记已保存，但打开失败；请在 Zotero 库中打开，勿重复保存：" + (error.message || error);
         }
       }
       return result;
@@ -482,7 +493,7 @@ var FragmentAlignment = class FragmentAlignment {
 
   /** Show an independent per-split switch and a nonfatal mapping availability reason. */
   updateHoverButton(reason = "") {
-    this.hoverButton.textContent = this.hoverEnabled ? "⇄ 段落高亮开启" : "⇄ 段落高亮关闭";
+    this.hoverButton.textContent = "段落高亮";
     this.hoverButton.setAttribute("aria-pressed", String(this.hoverEnabled));
     this.hoverButton.disabled = !this.mapping || !this.hoverAvailable;
     this.hoverButton.title = reason || (this.hoverAvailable ? "悬停高亮已验证的原译文片段；不跳页、不创建批注。"
@@ -623,7 +634,31 @@ var FragmentAlignment = class FragmentAlignment {
     this.hoverRepaint = false;
   }
 
-  /** Paint whole native text items wholly inside one verified request, never guessed word pairs. */
+  /** Match whole items, discounting only horizontal font line-box padding around verified ink. */
+  static containsTextRect(rect, box, polygon = null) {
+    const tolerance = this.TEXT_RECT_TOLERANCE;
+    if (rect.left < box[0] - tolerance || rect.right > box[2] + tolerance) return false;
+    let top = rect.top, bottom = rect.bottom;
+    if (top < box[1] - tolerance || bottom > box[3] + tolerance) {
+      const axisAligned = !polygon || polygon.every((value, index) =>
+        Math.abs(value - box[index % 2]) <= this.GEOMETRY_EPSILON
+        || Math.abs(value - box[index % 2 + 2]) <= this.GEOMETRY_EPSILON);
+      const middle = (top + bottom) / 2;
+      const overlap = Math.min(bottom, box[3]) - Math.max(top, box[1]);
+      // PDF.js Range boxes include font ascent/descent, unlike the final painted glyph quads.
+      // Do not widen horizontal, rotated, skewed or neighboring-line geometry to compensate.
+      if (!axisAligned || box[2] - box[0] < box[3] - box[1]
+        || middle < box[1] || middle > box[3]
+        || overlap / (bottom - top) < this.TEXT_INK_MIN_HEIGHT_RATIO) return false;
+      top = Math.max(top, box[1]);
+      bottom = Math.min(bottom, box[3]);
+    }
+    if (top < box[1] - tolerance || bottom > box[3] + tolerance) return false;
+    return !polygon || [[rect.left, top], [rect.right, top], [rect.right, bottom], [rect.left, bottom]]
+      .every(point => this.pointInQuad(polygon, point, tolerance));
+  }
+
+  /** Paint complete native text items within one verified request, never guessed word pairs. */
   createHoverHighlight(side, index, unitID) {
     const pageView = this.apps[index].pdfViewer.getPageView(side.page);
     if (!pageView?.viewport || pageView.div?.isConnected === false
@@ -649,7 +684,6 @@ var FragmentAlignment = class FragmentAlignment {
       return polygon.map((value, coordinate) => coordinate % 2 ? top + value * sy : left + value * sx);
     });
     const ranges = [];
-    const tolerance = FragmentAlignment.TEXT_RECT_TOLERANCE;
     for (const span of layer.querySelectorAll("span")) {
       const parent = span.parentElement?.closest("span");
       // Search markup belongs to its complete PDF text item; do not split it into words.
@@ -658,10 +692,8 @@ var FragmentAlignment = class FragmentAlignment {
       const range = div.ownerDocument.createRange();
       range.selectNodeContents(span);
       const rects = [...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0);
-      if (rects.length && rects.every(rect => boxes.some((box, region) => rect.left >= box[0] - tolerance
-        && rect.top >= box[1] - tolerance && rect.right <= box[2] + tolerance && rect.bottom <= box[3] + tolerance
-        && (!polygons || [[rect.left, rect.top], [rect.right, rect.top], [rect.right, rect.bottom], [rect.left, rect.bottom]]
-          .every(point => FragmentAlignment.pointInQuad(polygons[region], point, tolerance)))))) {
+      if (rects.length && rects.every(rect => boxes.some((box, region) =>
+        FragmentAlignment.containsTextRect(rect, box, polygons?.[region])))) {
         ranges.push(range);
       }
     }

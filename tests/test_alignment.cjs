@@ -439,7 +439,7 @@ function assertHoverRecord(f, index, unit, spans) {
 }
 
 /** Invoke the returned control exactly as an explicit toolbar click would. */
-function click(control) { control.children[0].emit('click'); }
+function click(control) { control.querySelector('.paperbridge-localize-source').emit('click'); }
 
 /** Run every registered split cleanup, matching PaperBridge.closeSplit. */
 function close(f) { for (const cleanup of f.state.cleanups) cleanup(); }
@@ -786,7 +786,7 @@ test('pointerup remembers a hit but only the toolbar action navigates and paints
   pointer(f, { target: { closest: selector => selector === '.page[data-page-number]' ? pageWrapper : null } });
   assert.deepEqual(Array.from(f.controller.point.point), [20, 30]);
   assert.equal(pointer(f), false);
-  pointer(f, { target: control.children[0] });
+  pointer(f, { target: control.querySelector('.paperbridge-localize-source') });
   assert.equal(f.destinations.length, 0);
   assert.deepEqual(Array.from(f.controller.point.point), [20, 30]);
   click(control);
@@ -815,12 +815,12 @@ test('pointerup remembers a hit but only the toolbar action navigates and paints
 test('toolbar, secondary, and non-primary pointer releases do not create a remembered PDF hit', () => {
   const f = fixture();
   const control = f.controller.attach(f.state, mapping());
-  pointer(f, { target: control.children[0] });
+  pointer(f, { target: control.querySelector('.paperbridge-localize-source') });
   pointer(f, { button: 2 });
   pointer(f, { isPrimary: false });
   click(control);
   assert.equal(f.destinations.length, 0);
-  assert.match(control.children[1].textContent, /先点击/);
+  assert.match(control.querySelector('[role="status"]').textContent, /先点击/);
   close(f);
 });
 
@@ -977,8 +977,8 @@ test('overlaps and misses show nonfatal status instead of guessing a source', ()
     pointer(f);
     click(control);
     assert.equal(f.destinations.length, 0);
-    assert.match(control.children[1].textContent, mode === 'overlap' ? /重叠/ : /没有已验证/);
-    assert.equal(control.children[0].disabled, false);
+    assert.match(control.querySelector('[role="status"]').textContent, mode === 'overlap' ? /重叠/ : /没有已验证/);
+    assert.equal(control.querySelector('.paperbridge-localize-source').disabled, false);
     assert.equal(f.state.sync, true);
     close(f);
   }
@@ -988,10 +988,10 @@ test('missing or broken mappings have visible reasons without disabling the read
   for (const value of [null, { ...mapping(), coordinate_space: 'invalid' }]) {
     const f = fixture();
     const control = f.controller.attach(f.state, value, value ? '' : 'Parent: hash mismatch');
-    assert.equal(control.children[0].disabled, true);
+    assert.equal(control.querySelector('.paperbridge-localize-source').disabled, true);
     assert.equal(f.controller.hoverButton.disabled, true);
     assert.equal(f.controller.hoverEnabled, false);
-    assert.match(control.children[1].textContent, value ? /格式/ : /hash mismatch/);
+    assert.match(control.querySelector('[role="status"]').textContent, value ? /格式/ : /hash mismatch/);
     pointer(f);
     click(control);
     assert.equal(f.destinations.length, 0);
@@ -1004,12 +1004,12 @@ test('missing navigation or CSS Highlight APIs disable only their independent fe
   const f = fixture();
   delete f.leftViewer.scrollPageIntoView;
   const control = f.controller.attach(f.state, mapping());
-  assert.match(control.children[1].textContent, /接口不可用/);
-  assert.equal(control.children[0].disabled, true);
+  assert.match(control.querySelector('[role="status"]').textContent, /接口不可用/);
+  assert.equal(control.querySelector('.paperbridge-localize-source').disabled, true);
   assert.equal(f.controller.hoverButton.disabled, false);
   assert.ok(f.rightDoc.listeners.get('pointermove')?.length);
   close(f);
-  assert.equal(control.children[0].count(), 0);
+  assert.equal(control.querySelector('.paperbridge-localize-source').count(), 0);
   for (const [index, api] of [[0, 'Highlight'], [1, 'Highlight'], [0, 'registry'], [1, 'registry']]) {
     const missing = fixture();
     const frame = index === 0 ? missing.leftFrame : missing.rightFrame;
@@ -1018,7 +1018,7 @@ test('missing navigation or CSS Highlight APIs disable only their independent fe
     const availableControl = missing.controller.attach(missing.state, mapping());
     assert.equal(missing.controller.hoverAvailable, false);
     assert.equal(missing.controller.hoverButton.disabled, true);
-    assert.equal(availableControl.children[0].disabled, false);
+    assert.equal(availableControl.querySelector('.paperbridge-localize-source').disabled, false);
     hover(missing);
     assertHoverCleared(missing);
     pointer(missing);
@@ -1040,7 +1040,7 @@ test('invalid source page and navigation failures neither clamp nor break ordina
     assert.doesNotThrow(() => click(control));
     assert.equal(f.destinations.length, 0);
     assert.equal(f.leftPage.div.querySelectorAll('.paperbridge-fragment-highlight').length, 0);
-    assert.match(control.children[1].textContent, mode === 'page' ? /页不存在/ : /mock navigation failure/);
+    assert.match(control.querySelector('[role="status"]').textContent, mode === 'page' ? /页不存在/ : /mock navigation failure/);
     assert.equal(f.state.sync, true);
     close(f);
   }
@@ -1057,7 +1057,7 @@ test('close removes controls, overlays, listeners, timers, and owned sync suppre
   assert.equal(f.rightDoc.count(), 0);
   assert.equal(f.leftBus.count(), 0);
   assert.equal(f.rightBus.count(), 0);
-  assert.equal(control.children[0].count(), 0);
+  assert.equal(control.querySelector('.paperbridge-localize-source').count(), 0);
   assert.equal(f.timers.size, 0);
   assert.equal(control.isConnected, false);
   assert.equal(f.state.alignmentNavigationUntil, 0);
@@ -1151,7 +1151,7 @@ test('unfinished translated pages cannot provide a potentially incorrect placeho
   pointer(f);
   assert.equal(f.controller.point, null);
   assert.equal(f.rightViewport.calls.pdf.length, 0);
-  assert.match(control.children[1].textContent, /仍在渲染/);
+  assert.match(control.querySelector('[role="status"]').textContent, /仍在渲染/);
   f.rightPage.renderingState = 3;
   pointer(f);
   click(control);
@@ -1162,21 +1162,21 @@ test('unfinished translated pages cannot provide a potentially incorrect placeho
 test('parent load callback supplies mappings or reasons and never restores a closed split', async () => {
   const f = fixture({ loadMapping: async () => ({ mapping: mapping() }) });
   const control = f.controller.attach(f.state);
-  assert.match(control.children[1].textContent, /正在读取/);
+  assert.match(control.querySelector('[role="status"]').textContent, /正在读取/);
   await new Promise(resolve => setImmediate(resolve));
-  assert.equal(control.children[0].disabled, false);
+  assert.equal(control.querySelector('.paperbridge-localize-source').disabled, false);
   close(f);
 
   const missing = fixture({ loadMapping: async () => ({ mapping: null, reason: 'Parent: output changed' }) });
   const missingControl = missing.controller.attach(missing.state);
   await new Promise(resolve => setImmediate(resolve));
-  assert.match(missingControl.children[1].textContent, /output changed/);
+  assert.match(missingControl.querySelector('[role="status"]').textContent, /output changed/);
   close(missing);
 
   const broken = fixture({ loadMapping: async () => { throw new Error('Parent: unavailable'); } });
   const brokenControl = broken.controller.attach(broken.state);
   await new Promise(resolve => setImmediate(resolve));
-  assert.match(brokenControl.children[1].textContent, /unavailable/);
+  assert.match(brokenControl.querySelector('[role="status"]').textContent, /unavailable/);
   close(broken);
 
   let resolveLoad;
@@ -1210,17 +1210,23 @@ test('whole-request hit testing supports both sides without weakening explicit o
   assert.equal(Alignment.hitTest(value, 0, [20, 30], 'target', true).status, 'ambiguous');
 });
 
-test('the appended hover toggle is opt-in and independent of sync and navigation support', () => {
+test('the visible hover toggle and collapsed reading tools retain independent behavior', () => {
   for (const navigation of [true, false]) {
     const f = fixture();
     f.state.sync = false;
     if (!navigation) delete f.leftViewer.scrollPageIntoView;
     const control = f.controller.attach(f.state, mapping());
     const button = f.controller.hoverButton;
-    assert.equal(control.children[0], f.controller.button);
-    assert.equal(control.children[1], f.controller.status);
-    assert.equal(control.children[2], f.controller.targetButton);
-    assert.equal(control.children[3], button);
+    assert.equal(control.children[0], button);
+    const tools = control.querySelector('.paperbridge-reading-tools');
+    assert.equal(control.children[1], tools);
+    assert.equal(tools.getAttribute('open'), null);
+    const panel = tools.querySelector('.paperbridge-reading-tools-panel');
+    assert.equal(panel.children[0], f.controller.button);
+    assert.equal(panel.children[1], f.controller.targetButton);
+    assert.equal(panel.children[2], f.controller.status);
+    assert.equal(f.controller.selectionNoteButton.parent, panel);
+    assert.equal(f.controller.annotationsNoteButton.parent, panel);
     assert.equal(button.classList.contains('paperbridge-paragraph-hover-toggle'), true);
     assert.equal(button.getAttribute('aria-pressed'), 'false');
     assert.equal(f.controller.hoverEnabled, false);
@@ -1242,7 +1248,7 @@ test('the appended hover toggle is opt-in and independent of sync and navigation
     assert.equal(f.state.sync, true);
     assert.equal(f.destinations.length, 0);
     assert.equal(f.timers.size, 0);
-    assert.equal(control.children[0].disabled, !navigation);
+    assert.equal(control.querySelector('.paperbridge-localize-source').disabled, !navigation);
     close(f);
   }
 });
@@ -1323,6 +1329,21 @@ test('unsafe pointer interactions, off-page coordinates, and ambiguous or missin
   assertHoverCleared(f);
   assert.equal(f.destinations.length, 0);
   assert.equal(f.timers.size, 0);
+  close(f);
+});
+
+/** Cover measured font padding without admitting neighboring lines or horizontal overhang. */
+test('native font padding is distinct from mapped ink and never expands rotated geometry', () => {
+  const f = fixture(), alignment = f.Alignment;
+  const box = [59.08, 165.97, 446.31, 177.71];
+  const quad = [box[0], box[1], box[2], box[1], box[2], box[3], box[0], box[3]];
+  const native = { left: 59.1, top: 162.38, right: 447.48, bottom: 180.38 };
+  assert.equal(alignment.containsTextRect(native, box, quad), true, 'actual Chinese native title line');
+  assert.equal(alignment.containsTextRect({ ...native, right: box[2] + 2.25 }, box, quad), false);
+  assert.equal(alignment.containsTextRect({ ...native, top: 177.5, bottom: 197.5 }, box, quad), false);
+  assert.equal(alignment.containsTextRect({ ...native, top: 150, bottom: 193 }, box, quad), false);
+  const skewed = [box[0], box[1] + 3, box[2], box[1], box[2], box[3] - 3, box[0], box[3]];
+  assert.equal(alignment.containsTextRect(native, box, skewed), false);
   close(f);
 });
 

@@ -1,12 +1,12 @@
-/** Edit isolated provider profiles and export an allowlisted diagnostic ZIP. */
+/** Edit isolated provider drafts with optional checks and local diagnostics. */
 
 /** Initialize profile drafts without storing credentials in preferences. */
 window.addEventListener("load", function initializeSettings() {
   const bridge = window.arguments[0].bridge;
   // Separate controls retain unsaved drafts, including keys, when switching profiles.
   const profiles = {
-    deepseek: { section: "deepseek-settings", key: "key", baseURL: "baseURL", model: "model" },
-    compatible: { section: "compatible-settings", key: "compatibleKey", baseURL: "compatibleBaseURL", model: "compatibleModel" }
+    deepseek: { section: "deepseek-settings", advanced: "deepseek-advanced", key: "key", baseURL: "baseURL", model: "model" },
+    compatible: { section: "compatible-settings", advanced: "compatible-advanced", key: "compatibleKey", baseURL: "compatibleBaseURL", model: "compatibleModel" }
   };
   // These preferences apply to both profiles.
   const globalFields = ["language", "pages", "pythonPath"];
@@ -23,13 +23,19 @@ window.addEventListener("load", function initializeSettings() {
   /** Find a settings control. */
   function get(id) { return document.getElementById(id); }
 
-  /** Show only the selected draft and expand compatible capabilities. */
+  /** Show the selected draft without expanding optional settings. */
   function showProfile() {
     const selected = get("profile").value;
     for (const [profile, fields] of Object.entries(profiles)) {
       get(fields.section).hidden = profile !== selected;
+      get(fields.advanced).hidden = profile !== selected;
     }
-    if (selected === "compatible") get("compatible-capabilities").open = true;
+  }
+
+  /** Keep actionable notices visible outside the collapsed support section. */
+  function setStatus(message, tone = "") {
+    get("status").textContent = message;
+    get("status").className = tone;
   }
 
   /** Validate an HTTPS base URL without credentials, queries, or fragments. */
@@ -91,7 +97,7 @@ window.addEventListener("load", function initializeSettings() {
     get(fields.model).value = model;
     get(fields.key).value = key;
     if (pythonChanged) await bridge.runtime.stop();
-    get("status").textContent = "设置已保存（仅当前配置及全局设置）。已排队任务仍使用入队时的配置。";
+    setStatus("设置已保存（当前服务及全局设置）。已入队任务不受影响。", "success");
   }
 
   /** Save the current profile without checking an engine or service. */
@@ -104,7 +110,7 @@ window.addEventListener("load", function initializeSettings() {
     try {
       await save();
     } catch (error) {
-      get("status").textContent = error.message;
+      setStatus(error.message, "error");
     } finally {
       for (const control of controls) control.disabled = false;
       saving = false;
@@ -137,26 +143,33 @@ window.addEventListener("load", function initializeSettings() {
         if (!bridge.confirm("检查服务将使用当前配置草稿发送一条公开短样例，输出上限 512 tokens，可能计费。不会保存设置、翻译论文、自动重试或回退其他服务。继续？")) return;
       }
     } catch (error) {
-      get("status").textContent = error.message;
+      setStatus(error.message, "error");
       return;
     }
     checking = true;
     const controls = document.querySelectorAll("input, select, #save, #test, #service-check");
     for (const control of controls) control.disabled = true;
-    get("status").textContent = provider ? "正在检查服务（一次短请求）…" : "正在检查已保存配置的本地引擎…";
+    setStatus(provider ? "正在检查服务（一次短请求）…" : "正在检查已保存配置的本地引擎…");
+    // Hide stale readiness details during a fresh local check, including failures.
+    if (!provider) get("engine-details").hidden = true;
     try {
       if (provider) {
         const result = await bridge.request("/providers/check", "POST", { ...draft, confirmed: true });
-        get("status").textContent = result.ok
+        setStatus(result.ok
           ? "服务已响应且翻译 JSON 格式可用。仅一次公开短样例；未保存草稿，未验证真实论文质量或账单。"
-          : [result.error || "服务检查未通过。", result.hint || "", "未保存草稿；请求可能已计费，不会自动重试。"].filter(Boolean).join("\n");
+          : [result.error || "服务检查未通过。", result.hint || "", "未保存草稿；请求可能已计费，不会自动重试。"].filter(Boolean).join("\n"),
+          result.ok ? "success" : "error");
       } else {
         const health = await bridge.request("/health");
-        get("status").textContent = `排版引擎已就绪 · ${health.engine} · v${health.version}\nPython：${health.python}\n未保存草稿，未调用服务商。若修改 Python 路径，请先明确保存后再检查。`;
-        if (health.warning_count > 0) get("status").textContent += `\n有 ${health.warning_count} 条记录警告；已有文件保留，可导出脱敏诊断包。`;
+        get("engine-info").textContent = `引擎：${health.engine}\n后端版本：${health.version}\nPython：${health.python}`;
+        get("engine-details").hidden = false;
+        const warning = health.warning_count > 0;
+        setStatus("排版引擎已就绪。未保存草稿，未调用服务商。" +
+          (warning ? `\n有 ${health.warning_count} 条记录警告；已有文件保留，可导出脱敏诊断包。` : ""),
+          warning ? "warning" : "success");
       }
     } catch (error) {
-      get("status").textContent = error.message;
+      setStatus(error.message, "error");
     } finally {
       for (const control of controls) control.disabled = false;
       checking = false;
@@ -168,7 +181,7 @@ window.addEventListener("load", function initializeSettings() {
 
   /** Open the engine and cache directory. */
   async function openData() {
-    try { await bridge.openDataDirectory(); } catch (error) { get("status").textContent = error.message; }
+    try { await bridge.openDataDirectory(); } catch (error) { setStatus(error.message, "error"); }
   }
 
   /** Export safe counters and lifecycle events without saving profile drafts. */
@@ -211,8 +224,8 @@ window.addEventListener("load", function initializeSettings() {
   get("diagnostics-open").addEventListener("click", openDiagnostics);
   // Do not fall back to legacy unscoped key access, which could mix credentials.
   if (typeof bridge.configuration !== "function") {
-    get("status").textContent = "此设置界面需要支持双配置的 PaperBridge 主程序，请更新插件后重开设置。";
-    for (const control of document.querySelectorAll("input, select, #save, #test")) control.disabled = true;
+    setStatus("此设置界面需要支持双配置的 PaperBridge 主程序，请更新插件后重开设置。", "error");
+    for (const control of document.querySelectorAll("input, select, #save, #test, #service-check")) control.disabled = true;
     return;
   }
   const current = bridge.configuration();
@@ -248,7 +261,7 @@ window.addEventListener("load", function initializeSettings() {
   get("test").addEventListener("click", check);
   get("service-check").addEventListener("click", check);
   get("locations").textContent = `译文：${bridge.storageRoot}/<附件 key>/translated.pdf\n缓存与引擎：${bridge.runtime.base}`;
-  if (bridge.library.lastError) get("status").textContent = "上次缓存清理未完成：" + bridge.library.lastError;
+  if (bridge.library.lastError) setStatus("上次缓存清理未完成：" + bridge.library.lastError, "warning");
   const recorded = bridge.pref("lastUsage");
   if (recorded) {
     try {

@@ -67,8 +67,8 @@ def _painted_rectangle(document, page_number, captured, cache):
     for line in _page_text(page, bounds, cache["texts"]):
         for glyph in line["characters"]:
             box = glyph["box"]
-            if (glyph["visible"] and not glyph["text"].isspace()
-                    and region.contains((box.tl + box.br) / 2)):
+            # Spaces can use larger font metrics than letters; retain their full raw proof.
+            if glyph["visible"] and region.contains((box.tl + box.br) / 2):
                 union |= box
     if union.is_empty:
         raise ValueError("no_visible_glyphs")

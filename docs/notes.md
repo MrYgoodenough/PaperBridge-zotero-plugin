@@ -7,11 +7,11 @@
 
 ### 分屏操作与 reader 边界
 
-- **选区存笔记**：从译文 `_primaryView._iframeWindow.document.getSelection()` 读取实际文字、Range 首尾的 `.textLayer` 和 `.page[data-page-number]`。按钮主指针按下/键盘激活时先捕获，避免之后的工具栏焦点导致选区丢失；不设置 Range、不恢复或注入 Selection、不从原文或映射猜文字。只接受一个连接中的单页范围，跨页/多范围明确提示分开保存。
+- **选区存笔记**：位于默认收起的“阅读工具”中，从译文 `_primaryView._iframeWindow.document.getSelection()` 读取实际文字、Range 首尾的 `.textLayer` 和 `.page[data-page-number]`。按钮主指针按下/键盘激活时先捕获，避免之后的工具栏焦点导致选区丢失；不设置 Range、不恢复或注入 Selection、不从原文或映射猜文字。只接受一个连接中的单页范围，跨页/多范围明确提示分开保存。
 - 页索引取实际选区 DOM 所在页，不用 viewer 当前页号猜。可用时通过 PDFDocumentProxy `getPageLabels()` 读取真实页标签；标签查询失败退回物理页号，不阻止笔记。当前有限 UI 不推断或传入 unitID。
 - **批注汇总笔记**：参数为 `state.translated` 和 `state.source`，只导出译文附件自己的已保存 native children。先等待 `state.annotations.pending`；在现有公开源码 reader `_state.annotations` 可读时，用 native JSON 只读比较 key、类型、文字/评论、位置、页标签与颜色。仍在原生防抖保存中的变化会提示稍后重试；绝不手动补写、复制或移动批注。`_state` 不是稳定承诺 API，是沿用现有 adapter 的只读兼容边界，Zotero/reader 升级须复核。
 - 定位/高亮映射缺失不影响笔记操作。两个笔记按钮在完整“保存＋打开”动作期间都禁用，直接重复调用也返回当前同一 Promise。动作结束后的新明确请求允许另建 note。
-- 保存成功立即显示 native note key，再调用正式 `Zotero.Notes.open(note.id, null, { openInWindow: true })` 打开独立原生窗口，保留阅读器标签。打开失败仍显示“已保存”，提示到库中手动打开、勿重复保存；不伪装成创建失败或重发保存。保存结果不确定单独显示 native key 和“未确认”，不自动重试。
+- 保存成功显示“笔记已保存”，再调用正式 `Zotero.Notes.open(note.id, null, { openInWindow: true })` 打开独立原生窗口，保留阅读器标签。打开失败仍显示“已保存”，提示到库中手动打开、勿重复保存；不伪装成创建失败或重发保存。只有保存结果不确定时才显示 native key 和“未确认”，不自动重试。
 - 分屏关闭前尚未开始保存的异步请求会取消；已交给 note 模块保存的操作不删除或回滚其成果。旧请求不能改动重新打开的分屏控件。单独笔记窗口由 Zotero 原生管理。
 
 两个入口均返回 `Promise<Zotero.Item>`，成功结果为已保存的原生 `note`：
@@ -45,7 +45,7 @@ const selectionNote = await PaperBridgeNotes.createFromSelection({
 实现依据 Zotero **10.0.8 官方公开源码**，使用 `Annotations.toJSON()`、`EditorInstanceUtilities.serializeAnnotations(json, true)`、`URI.getItemURI/getLibraryPath()` 和 `Item.setNote/saveTx()`。原生 serializer 保留附件 URI/key、真实批注 key、译文位置与页标签、论文 citation/locator；完整 note 用原生 `data-citation-items` 容器和 schema 10。
 
 - 选区作为临时序列化输入，没有 `id/annotationKey`，不生成虚假 annotation 子条目。其位置仅包含明确提供的 `pageIndex`，不杜撰矩形；另有显式 `zotero://open-pdf/...?...page=` 回链保证可回到译文物理页。真实批注回链同时带 `annotation=`。个人未同步库与 group 库走官方协议路径，group 使用 group ID 而非 library ID。
-- 引用是论文父项引用；独立 PDF 无论文 CSL citation，保留附件回链和页码。即便自定义 native note 模板省略引用区域，显式附件链接仍保留。
+- 引用是论文父项引用；独立 PDF 无论文 CSL citation，保留附件回链和页码。显式链接显示“译文 · 第 N 页”和“原文”，不展示内部 key；可选 unitID 仅作非显示元数据。即便自定义 native note 模板省略引用区域，显式附件链接仍保留。原生 `data-annotation` 保存引用/位置，实际选区文字在引用 span 的内容中，不应假设元数据内有 `text` 字段。
 - 可读的只读/外部/他人批注可以复制；目标 library 必须可写、父论文必须可编辑且未删除。`filesEditable=false` 不禁止独立文本笔记，因为没有修改附件文件。真正只读库、feed、删除父项或非法附件会在保存前报错。异步读取后复核目标归属和权限。
 - 原生 HTML 先在标准 DOM 的 **inert template** 内解析，再白名单重建。只保留基础排版、native span/img citation/annotation 元数据，以及缓存 PNG/JPEG 的 base64 图像；去掉脚本、SVG、iframe、事件属性、style 和任意模板链接。模块自建标题、unitID、可见页码、附件链接均 HTML 转义，不接受外部图片 URL 或 SVG data URI。不提供任意富 HTML 输入接口。
 - 高亮、下划线、便签、文字、区域、绘图走原生序列化。区域/绘图只使用 `toJSON()` 已提供的缓存图像，不启动 PDFWorker、不新建图像附件。没有文字/评论且缺缓存的条目会明确失败，不保存看似成功的空笔记。缓存图像采用 inline data URI，其真实编辑器/重开表现仍须原生验收。

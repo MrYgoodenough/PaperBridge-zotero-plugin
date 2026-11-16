@@ -14,11 +14,25 @@ from provider_check import request_completion as provider_completion
 
 # Keep the existing two-request concurrency limit independent of batch size.
 WIRE_CONCURRENCY = 2
+# Check explicit low-dimensional scientific labels without interpreting general prose.
+DIMENSION_TOKEN = re.compile(r"\b([123])(?:-?D|(?:-|\s+)dimensional)\b|([一二三])\s*维")
+# Chinese dimensional labels have the same physical meaning as their numeric forms.
+CHINESE_DIMENSIONS = {"一": 1, "二": 2, "三": 3}
 
 
 def placeholder_tokens(text):
     """Count formula and rich-text markers that must survive translation unchanged."""
     return Counter(re.findall(r"\{v\d+\}|</?style\b[^>]*>", text))
+
+
+def preserves_dimensions(source, output):
+    """Reject changed explicit 1D/2D/3D labels, not certify scientific semantics."""
+    counts = []
+    for text in (source, output):
+        plain = re.sub(r"</?style\b[^>]*>", "", text)
+        counts.append(Counter(int(match[1]) if match[1] else CHINESE_DIMENSIONS[match[2]]
+                              for match in DIMENSION_TOKEN.finditer(plain)))
+    return not counts[0] or counts[0] == counts[1]
 
 
 class ParagraphCache:
@@ -104,7 +118,8 @@ class DeepSeekTranslator(MeteredTranslator):
             keys[index] = self.quality.register(key, paragraph["input"])
             cached = self.paragraph_cache.get(paragraph["input"])
             if not isinstance(cached, str) or not cached.strip() or (
-                    placeholder_tokens(cached) != placeholder_tokens(paragraph["input"])):
+                    placeholder_tokens(cached) != placeholder_tokens(paragraph["input"])) or (
+                    not preserves_dimensions(paragraph["input"], cached)):
                 missing.append(paragraph)
             else:
                 results[index] = cached
@@ -171,6 +186,10 @@ class DeepSeekTranslator(MeteredTranslator):
                     self.quality.record(key, "failure", "invalid_text_or_placeholders")
                     invalid = True
                     continue
+                if not preserves_dimensions(paragraph["input"], output):
+                    self.quality.record(key, "failure", "changed_dimensions")
+                    invalid = True
+                    continue
                 self.paragraph_cache.put(paragraph["input"], output)
                 results[paragraph["id"]] = output
                 self.quality.record(key, "validated")
@@ -178,7 +197,7 @@ class DeepSeekTranslator(MeteredTranslator):
                     self.quality.record(key, "unchanged")
             self.quality.write()
             if invalid:
-                raise ValueError("Provider 返回空译文或修改了公式占位符或样式标记")
+                raise ValueError("Provider 返回空译文，或修改了公式占位符、样式标记或科学维度")
         self.write_usage()
         self.quality.write()
         return [{"id":p["id"],"output":results[p["id"]]} for p in paragraphs]

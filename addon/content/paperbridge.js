@@ -147,9 +147,9 @@ var PaperBridge = {
     if (reader._type !== "pdf" || doc.querySelector(".paperbridge-translate")) return;
     const button = doc.createElement("button");
     button.className = "toolbar-button paperbridge-translate";
-    button.textContent = "译 / 分屏";
+    button.textContent = "翻译";
     button.title = "论文翻译并分屏；执行中点击可重新打开任务进度 · 右键打开设置";
-    button.style.cssText = "width:auto;padding:0 9px;font-size:12px;white-space:nowrap";
+    button.style.cssText = "width:auto;padding:0 10px;font:12px system-ui,sans-serif;white-space:nowrap";
     button.addEventListener("click", () => this.action(() => this.translate(reader)));
     button.addEventListener("contextmenu", event => { event.preventDefault(); this.settings(); });
     this.buttons.add(button);
@@ -527,6 +527,42 @@ var PaperBridge = {
     for (const target of [state.reader._iframeWindow.document, doc]) {
       const style = target.createElement("style");
       style.textContent = "@media (max-width:700px){.toolbar .center.tools{display:none!important}.toolbar #read-aloud,.toolbar #navigateBack{display:none!important}.toolbar .start{gap:2px!important}.toolbar .divider{margin:0 2px!important}}";
+      if (target === doc) {
+        // Scope the new palette to our controls, leaving native PDF and text layers untouched.
+        style.textContent += `
+          .paperbridge-split-controls {
+            --pb-surface:#fff; --pb-border:#dce1e8; --pb-text:#202733;
+            --pb-accent:#285fc1; --pb-soft:#eaf0fc;
+            position:fixed; bottom:14px; right:14px; z-index:1000;
+            display:flex; flex-wrap:wrap; align-items:center; gap:3px; padding:5px;
+            max-width:calc(100vw - 28px); border:1px solid var(--pb-border); border-radius:10px;
+            background:var(--pb-surface); color:var(--pb-text); box-shadow:0 3px 16px #0002;
+            font:13px/1.5 system-ui,sans-serif;
+          }
+          .paperbridge-split-controls button:hover:not(:disabled),
+          .paperbridge-reading-tools > summary:hover { background:var(--pb-soft)!important; }
+          .paperbridge-split-controls button:disabled { opacity:.5; cursor:default!important; }
+          .paperbridge-split-controls :is(button,summary):focus-visible {
+            outline:2px solid var(--pb-accent); outline-offset:2px;
+          }
+          .paperbridge-paragraph-hover-toggle[aria-pressed="true"] {
+            color:var(--pb-accent)!important; background:var(--pb-soft)!important;
+          }
+          .paperbridge-reading-tools > summary { padding:6px 9px; border-radius:6px; }
+          .paperbridge-reading-tools-panel {
+            position:absolute; bottom:calc(100% + 12px); right:0;
+            width:min(250px,calc(100vw - 40px)); max-height:60vh; overflow:auto;
+            display:flex; flex-wrap:wrap; gap:5px; padding:12px;
+            border:1px solid var(--pb-border); border-radius:10px;
+            background:var(--pb-surface); box-shadow:0 4px 20px #0003;
+          }
+          @media (prefers-color-scheme:dark) {
+            .paperbridge-split-controls {
+              --pb-surface:#252930; --pb-border:#3e4652; --pb-text:#e8ebf0;
+              --pb-accent:#9bbcff; --pb-soft:#2c3a54;
+            }
+          }`;
+      }
       if (target === doc && state.annotations) {
         // Keep Zotero's actual annotation tools reachable even in a narrow translated pane.
         style.textContent += "@media (max-width:700px){.toolbar{overflow-x:auto}.toolbar .center.tools{display:flex!important}.toolbar .start,.toolbar .center,.toolbar .end{flex-shrink:0}}";
@@ -536,24 +572,26 @@ var PaperBridge = {
     }
     const controls = doc.createElement("div");
     controls.className = "paperbridge-split-controls";
-    controls.style.cssText = "position:fixed;bottom:14px;right:18px;z-index:1000;display:flex;flex-wrap:wrap;align-items:center;max-width:calc(100vw - 36px);gap:5px;padding:5px;border:1px solid #ccc;border-radius:7px;background:var(--material-background,#fff);box-shadow:0 2px 12px #0002";
     const sync = doc.createElement("button");
-    sync.textContent = "⇄ 同步开启";
+    sync.textContent = "⇄ 同步滚动";
+    sync.title = "切换原文与译文的滚动同步。";
     sync.setAttribute("aria-pressed", "true");
     sync.addEventListener("click", () => {
       state.sync = !state.sync;
-      sync.textContent = state.sync ? "⇄ 同步开启" : "⇄ 独立滚动";
+      sync.textContent = state.sync ? "⇄ 同步滚动" : "⇄ 独立滚动";
       sync.setAttribute("aria-pressed", String(state.sync));
       if (state.sync) this.syncPosition(state, state.active);
     });
     const close = doc.createElement("button");
-    close.textContent = "关闭分屏";
+    close.textContent = "关闭";
+    close.title = "关闭译文分屏，保留原文阅读器。";
+    close.setAttribute("aria-label", "关闭译文分屏");
     close.addEventListener("click", () => this.closeSplit(state.reader.tabID));
-    for (const button of [sync, close]) button.style.cssText = "font:13px 'Songti SC','SimSun',serif;padding:5px 8px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer";
-    controls.append(sync, close);
+    for (const button of [sync, close]) button.style.cssText = "font:inherit;padding:6px 9px;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;white-space:nowrap";
+    controls.append(sync);
     // Missing maps disable only localization/hover; ordinary reading and annotations remain usable.
     state.alignment = new FragmentAlignment({ loadMapping: split => this.loadAlignment(split) });
-    controls.append(state.alignment.attach(state));
+    controls.append(state.alignment.attach(state), close);
     doc.body.append(controls);
     const listen = (target, type, handler, options) => {
       target.addEventListener(type, handler, options);

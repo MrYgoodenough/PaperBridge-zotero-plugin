@@ -2,56 +2,14 @@
 <!-- Compact task window for live progress, retained outcomes and available actions. -->
 <window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge 翻译任务" width="860" height="640">
+  <html:link rel="stylesheet" href="chrome://paperbridge/content/ui.css"/>
   <html:style>
-    /* Shared palette keeps native controls and task surfaces in the same theme. */
+    /* The HTML body owns scrolling inside the XUL window. */
     :root {
-      color-scheme: light dark;
-      --page: #f6f7f9;
-      --surface: #ffffff;
-      --surface-soft: #eef1f5;
-      --text: #202733;
-      --text-muted: #5f6978;
-      --border: #dce1e8;
-      --accent: #285fc1;
-      --accent-hover: #204e9e;
-      --accent-soft: #eaf0fc;
-      --on-accent: #ffffff;
-      --success: #246643;
-      --success-soft: #eaf5ee;
-      --warning: #815b16;
-      --warning-soft: #faf2df;
-      --error: #ab3434;
-      --error-soft: #fbecec;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: var(--page);
-      color: var(--text);
     }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --page: #1c1f24;
-        --surface: #252930;
-        --surface-soft: #2d323b;
-        --text: #e8ebf0;
-        --text-muted: #adb6c4;
-        --border: #3e4652;
-        --accent: #9bbcff;
-        --accent-hover: #bad0ff;
-        --accent-soft: #2c3a54;
-        --on-accent: #18243b;
-        --success: #9ed5b3;
-        --success-soft: #293d32;
-        --warning: #e9c779;
-        --warning-soft: #413824;
-        --error: #f0a2a2;
-        --error-soft: #452e32;
-      }
-    }
-
-    /* The HTML body owns scrolling inside the XUL window. */
-    body, body * { box-sizing: border-box; }
     body {
       flex: 1;
       min-width: 0;
@@ -60,7 +18,7 @@
       padding: 22px;
       overflow-x: hidden;
       overflow-y: auto;
-      font: 14px/1.5 system-ui, sans-serif;
+      font: inherit;
     }
     [hidden] { display: none !important; }
     .page-header {
@@ -224,13 +182,17 @@
       <html:div id="batch-skipped" class="details"/>
     </html:details>
     <html:p id="status" class="status" role="status" hidden="hidden"/>
+    <html:details id="action-details" class="task-details batch-details" hidden="hidden">
+      <html:summary>错误详情</html:summary>
+      <html:div id="action-error" class="details"/>
+    </html:details>
     <html:div id="tasks" class="task-list"/>
     <html:details class="help">
       <html:summary>使用说明</html:summary>
       <html:p>批量任务串行执行，完成后只保存，不自动打开阅读器。</html:p>
       <html:p>进度百分比不代表翻译质量；段落计数仅覆盖所选页。</html:p>
       <html:p>重启中断的任务不会自动重发。重试翻译可能重复计费，重试保存不会调用模型。</html:p>
-      <html:p>阅读器中再次点击“译 / 分屏”可重新打开当前任务。</html:p>
+      <html:p>阅读器中再次点击“翻译”可重新打开当前任务。</html:p>
     </html:details>
   </html:body>
   <script src="chrome://paperbridge/content/tasks-window.js"/>

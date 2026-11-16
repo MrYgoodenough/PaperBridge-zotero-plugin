@@ -241,7 +241,7 @@ test('annotation subset creates one paper child note with native citations and e
 });
 
 /** Feed actual selection text to serialization, with no synthetic annotation key or write. */
-test('selection escapes script-like text, uses physical page and optional actual label, and retains unit text', async () => {
+test('selection escapes text, uses actual page labels, and hides unit provenance from note text', async () => {
   const f = fixture();
   const text = 'Actual <script>alert(1)</script> & <img src="x" onerror="evil()">\nSecond line';
   const note = await f.api.createFromSelection({ translatedAttachment: f.translated, text,
@@ -255,7 +255,9 @@ test('selection escapes script-like text, uses physical page and optional actual
   assert.match(note.html, /TRANS001\?page=7/);
   assert.doesNotMatch(note.html, /<script|<img|[?&]annotation=/);
   assert.match(note.html, /&lt;script&gt;/);
-  assert.match(note.html, /PaperBridge unit: &lt;unit&amp;1&gt;/);
+  assert.match(note.html, /data-paperbridge-unit="&lt;unit&amp;1&gt;"/);
+  assert.doesNotMatch(note.html, /PaperBridge unit:|Translated PDF TRANS001|Source PDF SOURCE01/);
+  assert.match(note.html, /译文 · 第 S-7 页/);
   assert.equal(f.translated.getAnnotations().length, 0);
   assert.equal(f.calls.saved.length, 1);
 });

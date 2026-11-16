@@ -19,12 +19,12 @@ window.addEventListener("load", function initializeRuntimeTerms() {
     status.textContent = "当前条款已同意；升级或重启不会重复确认相同条款。";
   } else {
     accept.disabled = false;
-    status.textContent = "请阅读以上完整条款。“同意并继续”仅确认运行库条款，不调用翻译服务商。";
+    status.textContent = "仅确认运行库条款，不调用翻译服务商。";
   }
   decline.addEventListener("click", function declineTerms() { window.close(); });
   accept.addEventListener("click", function acceptTerms() {
     try { terms.accept(); window.close(); }
-    catch (error) { status.textContent = "同意状态未能保存，请重试：" + error.message; }
+    catch (error) { status.className = "error"; status.textContent = "同意状态未能保存，请重试：" + error.message; }
   });
   window.addEventListener("keydown", function closeOnEscape(event) {
     if (event.key === "Escape") window.close();

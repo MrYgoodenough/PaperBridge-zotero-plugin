@@ -182,16 +182,70 @@ def _active_paint_box(origin, active):
     return pymupdf.Rect(first)
 
 
+def _trace_compounds(span):
+    """Identify adjacent ToUnicode continuations without treating them as painted glyphs."""
+    chars = span["chars"]
+    for index, (codepoint, glyph, origin, bbox) in enumerate(chars):
+        if glyph < 0:
+            continue
+        end = index + 1
+        while end < len(chars) and chars[end][1] == -1:
+            end += 1
+        if end == index + 1:
+            continue
+        members = chars[index:end]
+        # Invalid compound evidence must not fall back to accepting its lead alone.
+        valid = (span.get("dir") == (1.0, 0.0) and span.get("wmode") == 0
+                 and all(member[2] == origin
+                         and member[3] == (origin[0], bbox[1], origin[0], bbox[3])
+                         for member in members[1:]))
+        literal = tuple(chr(member[0]) for member in members) if valid else None
+        yield _glyph_key(chr(codepoint), origin), literal, span["seqno"], pymupdf.Rect(bbox)
+
+
+def _compound_indices(line, index, paints):
+    """Pair a trace compound with consecutive raw continuations on one baseline."""
+    literal = paints[0][0]
+    if (literal is None or any(paint[0] != literal for paint in paints)
+            or any(text == "\0" or text.isspace() for text in literal)
+            or line["direction"] != (1.0, 0.0) or line["writing_mode"] != 0):
+        return None
+    glyphs = line["characters"][index:index + len(literal)]
+    if tuple(glyph["text"] for glyph in glyphs) != literal:
+        return None
+    lead = glyphs[0]
+    box, origin = lead["box"], lead["raw"]["origin"]
+    if box.is_empty or box.is_infinite or not all(math.isfinite(value) for value in box):
+        return None
+    for glyph in glyphs[1:]:
+        raw_box, raw_origin = glyph["box"], glyph["raw"]["origin"]
+        if (glyph["span"] is not lead["span"] or raw_box.x1 < raw_box.x0
+                or not all(math.isfinite(value) for value in (*raw_box, *raw_origin))
+                or any(abs(a - b) > _GEOMETRY_EPSILON for a, b in
+                       zip((raw_box.x0, raw_box.y0, raw_box.y1), (box.x1, box.y0, box.y1)))
+                or any(abs(a - b) > _GEOMETRY_EPSILON for a, b in
+                       zip(raw_origin, (box.x1, origin[1])))):
+            return None
+        # A following real glyph can share the tail's literal/origin (for example, "fll").
+        # Its paint lookup is not evidence against the preceding ToUnicode continuation.
+        # Some embedded fonts also give the virtual tail a metric width; trace paint is real.
+    return tuple(range(index, index + len(literal)))
+
+
 def _page_text(page, bounds, cache):
     """Keep raw literal evidence and active paint bounds; emit quads only after matching."""
     if page.number not in cache:
         raw = page.get_text("rawdict", clip=bounds,
                             flags=pymupdf.TEXTFLAGS_RAWDICT & ~pymupdf.TEXT_PRESERVE_IMAGES)
-        painted = {}
+        painted, compounds = {}, {}
         for span in page.get_texttrace():
             if span["type"] not in (0, 1) or span["opacity"] <= 0:
                 continue
-            for codepoint, _, origin, box in span["chars"]:
+            for key, literal, sequence, box in _trace_compounds(span):
+                compounds.setdefault(key, []).append((literal, sequence, box))
+            for codepoint, glyph, origin, box in span["chars"]:
+                if glyph < 0:
+                    continue
                 key = _glyph_key(chr(codepoint), origin)
                 painted.setdefault(key, []).append((span["seqno"], pymupdf.Rect(box)))
         # Nontext painting may cover text. Neighboring glyphs commonly have overlapping
@@ -220,8 +274,33 @@ def _page_text(page, bounds, cache):
                                            "paint_box": (_active_paint_box(character["origin"], active)
                                                          if visible else None),
                                            "raw": character, "span": span})
-                lines.append({"direction": line.get("dir"), "writing_mode": line.get("wmode"),
-                              "characters": characters})
+                extracted = {"direction": line.get("dir"), "writing_mode": line.get("wmode"),
+                             "characters": characters}
+                for index, character in enumerate(characters):
+                    if character.get("compound") is not None:
+                        continue
+                    key = _glyph_key(character["text"], character["raw"]["origin"])
+                    if key not in compounds:
+                        continue
+                    paints = compounds[key]
+                    indices = _compound_indices(extracted, index, paints)
+                    if indices is None:
+                        character["visible"], character["paint_box"] = False, None
+                        continue
+                    # Every literal member is painted by the lead, including any covered tail.
+                    members = [characters[member] for member in indices]
+                    active = [(sequence, paint_box) for _, sequence, paint_box in paints
+                              if not any(later > sequence and (overlay.intersects(paint_box)
+                                         or any(overlay.intersects(member["box"]) for member in members))
+                                         for later, overlay in overlays)]
+                    paint_box = _active_paint_box(character["raw"]["origin"], active)
+                    visible = (paint_box is not None and all(
+                        member["span"].get("alpha", 0) > 0
+                        and bool(member["span"].get("char_flags", 0) & _PAINTED_TEXT_FLAGS)
+                        for member in members))
+                    for member in members:
+                        member.update(compound=indices, visible=visible, paint_box=paint_box)
+                lines.append(extracted)
         cache[page.number] = lines
     return cache[page.number]
 
@@ -232,7 +311,8 @@ def _visible_text(page, clips, bounds, cache):
     for clip in clips:
         for line in _page_text(page, bounds, cache):
             glyphs = line["characters"]
-            selected = [glyph["visible"] and (_contains(clip, glyph["box"])
+            selected = [glyph["visible"] and (
+                        (not glyph.get("compound") and _contains(clip, glyph["box"]))
                         or (glyph["paint_box"] is not None and _contains(clip, glyph["paint_box"])))
                         for glyph in glyphs]
             included = [index for index, inside in enumerate(selected) if inside]
@@ -256,7 +336,10 @@ def _matched_characters(lines, clips, expected):
     for clip_number, clip in enumerate(clips):
         for line_number, line in enumerate(lines):
             selected = [(clip_number, line_number, index)
-                        if glyph["visible"] and _contains(clip, glyph["box"]) else None
+                        if glyph["visible"] and (
+                            (not glyph.get("compound") and _contains(clip, glyph["box"]))
+                            or (glyph.get("compound") and glyph["paint_box"] is not None
+                                and _contains(clip, glyph["paint_box"]))) else None
                         for index, glyph in enumerate(line["characters"])]
             included = [index for index, reference in enumerate(selected) if reference is not None]
             if included:
@@ -297,6 +380,12 @@ def _matched_characters(lines, clips, expected):
             raise ValueError("ambiguous_text")
         seen.add(identity)
         matched.append(reference)
+    selected = set(matched)
+    for clip_number, line_number, index in matched:
+        compound = lines[line_number]["characters"][index].get("compound", ())
+        # Offset matching must not split a multi-character ToUnicode paint operation.
+        if any((clip_number, line_number, member) not in selected for member in compound):
+            raise ValueError("unsupported_text_geometry")
     return matched
 
 

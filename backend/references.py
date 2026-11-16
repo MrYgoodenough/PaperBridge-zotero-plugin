@@ -1,8 +1,12 @@
 """Keep bibliography sections as original PDF regions, before LLM batching."""
 import re
 
+# Long mixed prose and citation entries are not reliable section headings.
+MAX_STOP_HEADING_CHARACTERS = 140
+
 
 def heading_kind(text, bold=False):
+    """Classify literal bibliography boundaries, including methods after a reference list."""
     text = text.strip()
     title = re.sub(r"^(?:(?:[IVXLCDM]+|\d+(?:\.\d+)*)[.)]\s*|(?:[IVXLCDM]+|\d+(?:\.\d+)*)\s+)", "", text, flags=re.I)
     compact = re.sub(r"\s+", "", title).strip(":：").lower()
@@ -11,15 +15,19 @@ def heading_kind(text, bold=False):
         return "start"
     if (compact in {"appendix","appendices","supplementarymaterial","supplementaryinformation",
                     "acknowledgments","acknowledgements","authorcontributions","dataavailability",
-                    "funding","conflictsofinterest","competinginterests"}
+                    "funding","conflictsofinterest","competinginterests",
+                    "starmethods","star+methods","keyresourcestable","methoddetails",
+                    "materialsandmethods","experimentalmodelandsubjectdetails",
+                    "quantificationandstatisticalanalysis"}
             or re.fullmatch(r"appendix[a-z0-9](?:[.:].*)?",compact)):
         return "stop"
-    if len(text)<140 and re.match(r"^(?:[A-Z]|[IVXLCDM]+)[.)]\s+",text) and (text.isupper() or bold):
+    if len(text)<MAX_STOP_HEADING_CHARACTERS and re.match(r"^(?:[A-Z]|[IVXLCDM]+)[.)]\s+",text) and (text.isupper() or bold):
         return "stop"
     return None
 
 
 def reference_regions(document):
+    """Track reference spans in column reading order without protecting later scientific sections."""
     regions = {}
     active = False
     for page_number,page in enumerate(document):

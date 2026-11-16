@@ -16,6 +16,38 @@ from deepseek import DeepSeekTranslator
 from usage import ResultQuality
 
 
+@pytest.mark.parametrize("space_unicode", ["", " \t"])
+def test_space_styles_normalized_before_validation_and_valid_cache_reused(tmp_path, monkeypatch, space_unicode):
+    """Whitespace is not a rich-text constraint; meaningful styles and formulas remain exact."""
+    space = il_module.RichTextPlaceholder(1, SimpleNamespace(pdf_character=[" ", "\t"]),
+                                         "<style id='1'>", "</style>")
+    bold = il_module.RichTextPlaceholder(4, SimpleNamespace(pdf_character=["bold"]),
+                                        "<style id='4'>", "</style>")
+    formula = il_module.FormulaPlaceholder(3, SimpleNamespace(pdf_character=[]), "{v3}", r"\{v3\}")
+    original = f"A<style id='1'>{space_unicode}</style>B {{v3}} <style id='4'>bold</style>"
+    translated = f"甲<style id='1'>{space_unicode}</style>乙 {{v3}} <style id='4'>粗体</style>"
+    prepared = il_module.ILTranslator.TranslateInput(original, [space, formula, bold])
+    cache = {original: translated}
+    observed = ObservedILTranslator.__new__(ObservedILTranslator)
+    observed.translate_engine = SimpleNamespace(paragraph_cache=SimpleNamespace(
+        get=cache.get, put=lambda source, output: cache.update({source: output})))
+    monkeypatch.setattr(il_module.ILTranslator, "get_translate_input", lambda *args: prepared)
+    result = observed.get_translate_input(SimpleNamespace())
+    # BabelDOC strips the inner style text; recover actual spaces, not a joined word.
+    normalized_space = space_unicode or " \t"
+    normalized = f"A{normalized_space}B {{v3}} <style id='4'>bold</style>"
+    assert result.unicode == normalized
+    assert result.placeholders == [formula, bold]
+    assert cache[result.unicode] == f"甲{normalized_space}乙 {{v3}} <style id='4'>粗体</style>"
+    assert cache[original] == translated, "Old paid cache data remains intact"
+    # A formerly empty style containing real text cannot be migrated by dropping that text.
+    prepared.unicode, prepared.placeholders = original, [space, formula, bold]
+    cache[original] = translated.replace(space_unicode + "</style>", "新增内容</style>", 1)
+    cache.pop(normalized)
+    observed.get_translate_input(SimpleNamespace())
+    assert normalized not in cache
+
+
 class DeferredExecutor:
     """Run submitted upstream fallbacks deterministically after the batch returns."""
 

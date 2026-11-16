@@ -44,9 +44,10 @@ function textOutsideDetails(root, visibleOnly = false) {
 
 /** Run a few representative snapshots through the real window renderer. */
 async function main() {
-  const elements = Object.fromEntries(["tasks", "summary", "status", "refresh", "close", "batch-details", "batch-label", "batch-skipped"]
-    .map(id => [id, new Element(id === "batch-details" ? "details" : id)]));
+  const elements = Object.fromEntries(["tasks", "summary", "status", "refresh", "close", "batch-details", "batch-label", "batch-skipped", "action-details", "action-error"]
+    .map(id => [id, new Element(id.endsWith("-details") ? "details" : id)]));
   elements["batch-details"].append(elements["batch-label"], elements["batch-skipped"]);
+  elements["action-details"].append(elements["action-error"]);
   const events = {}, timers = new Map(), actions = [];
   let now = Date.parse("2026-11-13T08:02:00Z");
   const record = { recordID: "owner", sourceID: 1, sourceKey: "PDF", libraryID: 1, title: "Example <PDF>",
@@ -57,12 +58,13 @@ async function main() {
   bridge.tasks = new context.TranslationTasks(bridge);
   bridge.tasks.refresh = async () => {};
   for (const name of ["cancel", "retry", "save"]) bridge.tasks[name] = async item => { actions.push([name, item]); };
+  // Native task dialogs receive Zotero through their opener, not a global injection.
   const window = { arguments: [{ bridge, sourceID: 1 }],
+    opener: { Zotero: { Reader: { open: async id => { actions.push(["open", id]); } } } },
     addEventListener: (event, handler) => { events[event] = handler; },
     setInterval: (handler, interval) => { timers.set(interval, handler); return interval; },
     clearInterval: id => timers.delete(id), close: () => { window.closed = true; events.unload(); } };
-  Object.assign(context, { window, document: { getElementById: id => elements[id], createElementNS: (_, tag) => new Element(tag) },
-    Zotero: { Reader: { open: async id => { actions.push(["open", id]); } } } });
+  Object.assign(context, { window, document: { getElementById: id => elements[id], createElementNS: (_, tag) => new Element(tag) } });
   vm.runInContext(fs.readFileSync(path.join(__dirname, "../addon/content/tasks-window.js"), "utf8"), context);
   events.load();
   const redraw = timers.get(500);
@@ -179,13 +181,16 @@ async function main() {
   bridge.library.findAttachment = async () => null;
   await open.handlers.click();
   redraw();
-  assert.match(elements.status.textContent, /译文附件不可用/, "elapsed redraws must not erase an action failure");
+  assert.match(elements.status.textContent, /操作未完成/, "elapsed redraws must not erase an action failure");
+  assert.match(elements["action-error"].textContent, /译文附件不可用/);
+  assert.equal(elements["action-details"].hidden, false);
+  assert.equal(elements["action-details"].open, false);
   assert.equal(elements.status.hidden, false);
 
   record.saveState = "produced";
   delete record.attachmentKey;
   snapshot.usage.billing_uncertain = false;
-  for (const [state, error, label, warning] of [["failed", "请求失败，请稍后重试", "翻译失败", /请求失败/],
+  for (const [state, error, label, warning] of [["failed", "请求失败，请稍后重试\nProvider traceback", "翻译失败", /任务存在异常/],
     ["done", "", "待核对", /完整性尚未确认/]]) {
     record.state = snapshot.state = snapshot.attempts[1].state = state;
     record.quality = { status: "unknown" };
@@ -193,6 +198,8 @@ async function main() {
     redraw();
     assert.equal(notice.hidden, false);
     assert.match(notice.textContent, warning);
+    assert.doesNotMatch(textOutsideDetails(row, true), /Provider traceback/);
+    if (error) assert.match(details.textContent, /Provider traceback/);
     assert.equal(badge.textContent, label);
     assert.doesNotMatch(badge.className, /\bsuccess\b/, "failure or unverified integrity is not success");
     assert.equal(progressBlock.hidden, true);

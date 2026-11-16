@@ -13,6 +13,7 @@
 - `backend/alignment.py` 校验实际 PDF SHA-256、已应用身份和唯一可见字面，再由最终字符/行/span 生成逐行几何。输出 **schema 2**、`generator_version: fragment-trace-2`、`coordinate_space: pdf-user-space`，`page` 从 0 开始。
 - 每侧为 `{page, rects, quads}`。每个 `quad` 按 TL/TR/BR/BL 循环存 8 个坐标；`rects` 是逐个四边形的兼容包围矩形，不是整段大框。捕获全文不写入 sidecar，旧 schema 1 矩形仍可读。
 - 普通横排段落用最终可见 paint glyph bounds，避免 raw ascender 框相邻行重叠；保留行间空白和短末行。确认可恢复的倾斜文字使用真实方向。不可靠字符范围 unavailable，不裁切字形或为提高覆盖率猜配。
+- `preserve.py` 恢复原始出版信息、图表及参考文献时，仅合并包含或同列紧邻的源裁切区；不能把双列参考文献形成的 L 形区域扩成整页，覆盖仍需翻译的正文。
 - 采集上限仅限制可选映射，不限制翻译：4,096 单元、每侧 1,000,000 字符、每单元 32,768 字符。失败仅警告，继续保存 PDF/质量/用量。
 
 ## 可同步 Zotero 附件
@@ -42,7 +43,8 @@
 
 - `alignment.js` 提供双向显式定位：点击/拖选松开仅记录落点，按钮才导航。普通链接、批注和选区不被抢占。
 - schema 2 按四边形命中，逐行显示短暂高亮；行间空白和短末行外不命中。不同单元重叠拒绝定位；schema 1 保留旧矩形行为。
-- 默认关闭的悬停采用原生 CSS Custom Highlights，仅注册完全落入可信区域的文本项 Range，`priority=-1`。不改 textLayer opacity、PDF、canvas 或 selection；不跳页、不改页同步。
+- 默认关闭的悬停采用原生 CSS Custom Highlights，按可信区域筛选完整文本项 Range，`priority=-1`。横排仅补偿原生字体上下留白，要求中心及主要高度仍在同一可信行内；不扩大横向、旋转或倾斜边界，不改变后端字面/几何验证。不改 textLayer opacity、PDF、canvas 或 selection；不跳页、不改页同步。
+- 同步和悬停开关常显；显式定位、选区笔记与批注汇总集中在默认收起的“阅读工具”中。主题样式仅作用于插件控件，不重设原生 PDF 或文字层。
 - 缩放/旋转/重绘撤销旧几何，关闭分屏清理自有监听、timer 和 registry。可选原生接口缺失只停用对应功能。
 - 同一附件对重复打开复用分屏与初始化 promise，保留页码、缩放、宽度和同步状态；不同译本重新建立对应状态。
 
@@ -51,6 +53,7 @@
 | 改什么 | 入口 |
 | --- | --- |
 | 捕获与排除段落 | `backend/fragment_trace.py`、`batching.py` |
+| 作者、出版信息与参考文献保护 | `backend/preserve.py`、`references.py` |
 | 字面证据、最终几何与 schema | `backend/alignment.py` |
 | JSON 附件、接收端归属/hash | `addon/content/reading-assets.js` |
 | PDF 保存、可选映射失败提示 | `addon/content/library.js`、`tasks.js` |

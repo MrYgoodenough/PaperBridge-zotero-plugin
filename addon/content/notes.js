@@ -164,19 +164,19 @@ var PaperBridgeNotes = (() => {
     let body = '<h1>' + escapeHTML(title) + '</h1>\n' + safeHTML;
     // Explicit links survive custom templates that omit native citation/annotation spans.
     for (const annotation of jsonAnnotations) {
-      const label = 'Translated PDF ' + ctx.attachment.key + ' · p. ' + annotation.pageLabel;
+      const label = '译文 · 第 ' + annotation.pageLabel + ' 页';
       body += '<p><a href="' + escapeHTML(attachmentLink(ctx.attachment,
         annotation.position.pageIndex, annotation.id)) + '">' + escapeHTML(label) + '</a></p>';
     }
     if (ctx.source) {
       // No source page is asserted: matching physical pages is not a semantic alignment.
-      body += '<p><a href="' + escapeHTML(attachmentLink(ctx.source)) + '">Source PDF '
-        + escapeHTML(ctx.source.key) + '</a></p>';
+      body += '<p><a href="' + escapeHTML(attachmentLink(ctx.source)) + '">原文</a></p>';
     }
-    if (unitID) body += '<p>PaperBridge unit: ' + escapeHTML(unitID) + '</p>';
     const metadata = escapeHTML(encodeURIComponent(JSON.stringify(citationItems)));
+    // Keep optional provenance out of the readable note body and native PDF links.
+    const provenance = unitID ? ' data-paperbridge-unit="' + escapeHTML(unitID) + '"' : '';
     const noteHTML = '<div data-citation-items="' + metadata + '" data-schema-version="'
-      + NOTE_SCHEMA_VERSION + '">' + body + '</div>';
+      + NOTE_SCHEMA_VERSION + '"' + provenance + '>' + body + '</div>';
     if (noteHTML.length > MAX_HTML_LENGTH) throw new Error('The complete note is too large');
     // Recheck permissions after asynchronous annotation/image loading, before the sole write.
     const current = context(ctx.attachment, ctx.source);
@@ -255,7 +255,7 @@ var PaperBridgeNotes = (() => {
         jsonAnnotations.push({ ...json, id: item.key, attachmentItemID: ctx.attachment.id,
           text, comment, pageLabel: textValue(json.pageLabel || String(page), 'Page label', MAX_PROVENANCE_LENGTH) });
       }
-      return saveNote(ctx, jsonAnnotations, 'Translated annotations');
+      return saveNote(ctx, jsonAnnotations, '译文批注汇总');
     });
   }
 
@@ -273,7 +273,7 @@ var PaperBridgeNotes = (() => {
     return once(key, async () => {
       const annotation = { attachmentItemID: ctx.attachment.id,
         type: 'highlight', text, comment: '', color: SELECTION_COLOR, pageLabel, position: { pageIndex } };
-      return saveNote(ctx, [annotation], 'Translated selection', unitID);
+      return saveNote(ctx, [annotation], '译文选区', unitID);
     });
   }
 

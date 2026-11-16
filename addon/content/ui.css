@@ -1,0 +1,81 @@
+/* Shared system typography, blue/neutral theme, controls and keyboard focus. */
+:root {
+  color-scheme: light dark;
+  /* Semantic colors are shared by settings, tasks and runtime terms. */
+  --page: #f6f7f9;
+  --surface: #ffffff;
+  --surface-soft: #eef1f5;
+  --text: #202733;
+  --text-muted: #5f6978;
+  --border: #dce1e8;
+  --accent: #285fc1;
+  --accent-hover: #204e9e;
+  --accent-soft: #eaf0fc;
+  --on-accent: #ffffff;
+  --success: #246643;
+  --success-soft: #eaf5ee;
+  --warning: #815b16;
+  --warning-soft: #faf2df;
+  --error: #ab3434;
+  --error-soft: #fbecec;
+  background: var(--page);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Keep the same semantic contrast when the operating system uses dark mode. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #1c1f24;
+    --surface: #252930;
+    --surface-soft: #2d323b;
+    --text: #e8ebf0;
+    --text-muted: #adb6c4;
+    --border: #3e4652;
+    --accent: #9bbcff;
+    --accent-hover: #bad0ff;
+    --accent-soft: #2c3a54;
+    --on-accent: #18243b;
+    --success: #9ed5b3;
+    --success-soft: #293d32;
+    --warning: #e9c779;
+    --warning-soft: #413824;
+    --error: #f0a2a2;
+    --error-soft: #452e32;
+  }
+}
+
+body { font: inherit; color: var(--text); background: var(--page); }
+body, body * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea {
+  min-width: 0;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  accent-color: var(--accent);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+button {
+  min-height: 36px;
+  max-width: 100%;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  cursor: pointer;
+}
+button:hover:not(:disabled) { background: var(--surface-soft); border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+button:disabled, input:disabled, select:disabled { opacity: .6; cursor: default; }
+summary { cursor: pointer; }
+a { color: var(--accent); }
+/* Native disclosure markers and a visible outline support keyboard navigation. */
+:is(button, input, select, textarea, summary, a):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

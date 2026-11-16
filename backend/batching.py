@@ -3,11 +3,14 @@
 The process_page flow follows BabelDOC 0.6.4 (AGPL-3.0), with a 1200-token /
 12-paragraph threshold in place of its 200-token / 6-paragraph threshold.
 """
+import re
+
 from babeldoc.format.pdf.document_il.midend.il_translator_llm_only import (
     BatchParagraph, ILTranslatorLLMOnly, is_cid_paragraph,
     is_placeholder_only_paragraph, is_pure_numeric_paragraph,
 )
-from babeldoc.format.pdf.document_il.midend.il_translator import ILTranslator
+from babeldoc.format.pdf.document_il.midend.il_translator import ILTranslator, RichTextPlaceholder
+from deepseek import placeholder_tokens
 
 # Keep the existing batching and executor priority policy.
 BATCH_TOKENS = 1200
@@ -19,6 +22,42 @@ PRIORITY_BASE = 1048576
 
 class ObservedILTranslator(ILTranslator):
     """Observe real paragraph application and make upstream fallback cache-only."""
+
+    def get_translate_input(self, paragraph, page_font_map=None, disable_rich_text_translate=None):
+        """Keep actual styles and formulas, but do not make whitespace a rich-text constraint."""
+        prepared = super().get_translate_input(paragraph, page_font_map, disable_rich_text_translate)
+        if prepared is None:
+            return None
+        original = prepared.unicode
+        removed = []
+        for placeholder in list(prepared.placeholders):
+            if not isinstance(placeholder, RichTextPlaceholder):
+                continue
+            # The upstream unicode helper strips whitespace, so inspect the actual composition.
+            content = "".join(character if isinstance(character, str) else (character.char_unicode or "")
+                              for character in placeholder.composition.pdf_character)
+            if not content or not content.isspace():
+                continue
+            pattern = re.escape(placeholder.left_placeholder) + r"(\s*)" + re.escape(placeholder.right_placeholder)
+            normalized, count = re.subn(pattern, lambda match: match[1] or content, prepared.unicode)
+            if count == 1:
+                # Synthetic spaces can have a different font; there is no visible style to preserve.
+                prepared.unicode = normalized
+                prepared.placeholders.remove(placeholder)
+                removed.append((pattern, content))
+        if not removed:
+            return prepared
+        cached = self.translate_engine.paragraph_cache.get(original)
+        if isinstance(cached, str) and placeholder_tokens(cached) == placeholder_tokens(original):
+            for pattern, content in removed:
+                cached, count = re.subn(pattern, lambda match: match[1] or content, cached)
+                if count != 1:
+                    break
+            else:
+                # Only a previously valid, whitespace-only transformation can avoid another charge.
+                if cached.strip() and placeholder_tokens(cached) == placeholder_tokens(prepared.unicode):
+                    self.translate_engine.paragraph_cache.put(prepared.unicode, cached)
+        return prepared
 
     def pre_translate_paragraph(self, paragraph, tracker, page_font_map, xobj_font_map):
         """Link prepared wire inputs to their source paragraph, including preprocessing skips."""

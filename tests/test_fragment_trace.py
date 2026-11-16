@@ -11,7 +11,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 import fragment_trace
-from alignment import _page_space, _visible_text, load_mapping
+from alignment import _matched_characters, _page_space, _page_text, _visible_text, load_mapping
 from fragment_trace import FragmentTrace
 
 
@@ -54,6 +54,24 @@ def _painted_lines(path):
         return [[(chr(codepoint), list(pymupdf.Rect(box) * ~matrix))
                  for codepoint, _, _, box in span["chars"] if not chr(codepoint).isspace()]
                 for span in page.get_texttrace() if span["type"] == 0 and span["opacity"] > 0]
+
+
+def test_raw_capture_retains_spaces_with_larger_font_metrics():
+    """Space ascenders must not become NUL gaps between fully captured ordinary words."""
+    with pymupdf.open() as document:
+        page = document.new_page(width=400, height=500)
+        page.insert_text((100, 150), "Alpha", fontsize=10)
+        page.insert_text((125, 150), " ", fontsize=12)
+        page.insert_text((129, 150), "beta", fontsize=10)
+        cache = {"spaces": {}, "texts": {}}
+        rectangle = fragment_trace._painted_rectangle(document, 0, [95, 347, 170, 360], cache)
+        matrix, bounds = _page_space(page, {})
+        clip = pymupdf.Rect(rectangle) * matrix
+        lines = _page_text(page, bounds, {})
+        spaces = [glyph for line in lines for glyph in line["characters"] if glyph["text"].isspace()]
+        assert any(glyph["box"].y0 < 138 for glyph in spaces)
+        assert all(clip.contains(glyph["box"]) for glyph in spaces)
+        assert _matched_characters(lines, [clip], "Alpha beta")
 
 
 def _union(characters):

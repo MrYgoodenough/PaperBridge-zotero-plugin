@@ -7,7 +7,9 @@ import json
 import pymupdf
 import pytest
 
-from backend.alignment import _layout_text, _page_space, _visible_text, build_mapping, load_mapping, write_mapping
+from backend.alignment import (
+    _clips, _layout_text, _page_space, _page_text, _visible_text, build_mapping, load_mapping, write_mapping,
+)
 
 
 def _pdf(path, text, *, crop=False, rotation=0, hidden=False, overlay=False, user_unit=1, opacity=1):
@@ -37,6 +39,216 @@ def _pair(tmp_path, **options):
     candidate["source"] = _pdf(source, candidate["source_text"], **options)
     candidate["target"] = _pdf(output, candidate["target_text"], **options)
     return source, output, candidate
+
+
+def _compound_pdf(path, literal="fi", text="Ales are visible", **options):
+    """Encode one real Helvetica glyph as multiple Unicode characters via ToUnicode."""
+    location = _pdf(path, text, **options)
+    with pymupdf.open(path) as document:
+        font = document[0].get_fonts()[0][0]
+        cmap = document.get_new_xref()
+        document.update_object(cmap, "<<>>")
+        document.update_stream(cmap, (
+            "/CIDInit /ProcSet findresource begin 12 dict begin begincmap\n"
+            "/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def\n"
+            "/CMapName /CompoundTest def /CMapType 2 def\n"
+            "1 begincodespacerange <00> <FF> endcodespacerange\n"
+            f"1 beginbfchar <41> <{literal.encode('utf-16-be').hex()}> endbfchar\n"
+            "endcmap CMapName currentdict /CMap defineresource pop end end\n"
+        ).encode("ascii"))
+        document.xref_set_key(font, "ToUnicode", f"{cmap} 0 R")
+        document.saveIncr()
+    return location
+
+
+@pytest.mark.parametrize("literal", ["fi", "fl", "Th", "ffi"])
+def test_compound_unicode_keeps_literals_and_shared_paint_geometry(tmp_path, literal):
+    """Real ToUnicode continuations use the full lead paint box, not invented advances."""
+    source, output, candidate = _pair(tmp_path)
+    candidate["source"] = _compound_pdf(source, literal)
+    candidate["source_text"] = literal + "les are visible"
+    candidate["target"] = _compound_pdf(output, literal, text="A")
+    candidate["target_text"] = literal
+    originals = source.read_bytes(), output.read_bytes()
+    with pymupdf.open(source) as document:
+        page = document[0]
+        trace = page.get_texttrace()[0]["chars"]
+        raw = page.get_text("rawdict")["blocks"][0]["lines"][0]["spans"][0]["chars"]
+        assert trace[0][1] >= 0
+        assert tuple(chr(char[0]) for char in trace[:len(literal)]) == tuple(literal)
+        for index in range(1, len(literal)):
+            assert trace[index][1] == -1 and trace[index][2] == trace[0][2]
+            assert raw[index]["c"] == literal[index]
+            assert raw[index]["origin"][0] == raw[0]["bbox"][2]
+            assert raw[index]["bbox"][0] == raw[index]["bbox"][2]
+        assert trace[1][2] != raw[1]["origin"]
+    mapping = build_mapping(source, output, [candidate])
+    assert len(mapping["units"]) == 1, mapping["metadata"]
+    assert mapping["schema_version"] == 2
+    assert mapping["generator_version"] == "fragment-trace-2"
+    with pymupdf.open(output) as document:
+        page = document[0]
+        paint = pymupdf.Rect(page.get_texttrace()[0]["chars"][0][3])
+        assert mapping["units"][0]["target"]["rects"][0] == pytest.approx(
+            list(paint * ~page.transformation_matrix))
+    for side, path in (("source", source), ("target", output)):
+        with pymupdf.open(path) as document:
+            page = document[0]
+            matrix, bounds = _page_space(page, {})
+            clips = [pymupdf.Rect(rect) * matrix for rect in mapping["units"][0][side]["rects"]]
+            assert _visible_text(page, clips, bounds, {}) == candidate[f"{side}_text"]
+    sidecar = tmp_path / "compound.json"
+    write_mapping(sidecar, mapping)
+    assert load_mapping(sidecar, source, output)["available"]
+    assert (source.read_bytes(), output.read_bytes()) == originals
+
+
+@pytest.mark.parametrize("compound,literal", [("fi", "f"), ("fi", "i"), ("ffi", "ff"), ("ffi", "fi")])
+def test_compound_unicode_cannot_match_only_one_member(tmp_path, compound, literal):
+    """A captured substring cannot claim half of one physically painted compound glyph."""
+    source, output, candidate = _pair(tmp_path)
+    candidate["source"] = _compound_pdf(source, compound, text="A")
+    candidate["source_text"] = literal
+    mapping = build_mapping(source, output, [candidate])
+    assert mapping["units"] == []
+    assert mapping["metadata"]["exclusion_reasons"] == {"source_unsupported_text_geometry": 1}
+
+
+@pytest.mark.parametrize("failure", ["hidden", "transparent", "overlay", "repeat", "raw_clip", "paint_clip"])
+def test_compound_unicode_still_requires_unique_fully_visible_glyphs(tmp_path, failure):
+    """Compound support must not relax hidden, overpainted, repeated or partial-glyph proof."""
+    source, output, candidate = _pair(tmp_path)
+    options = {"hidden": failure == "hidden", "opacity": 0 if failure == "transparent" else 1,
+               "overlay": failure == "overlay"}
+    text = "A A" if failure == "repeat" else "A"
+    candidate["source"] = _compound_pdf(source, text=text, **options)
+    candidate["source_text"] = "fi"
+    if failure in {"raw_clip", "paint_clip"}:
+        with pymupdf.open(source) as document:
+            page = document[0]
+            inverse = ~page.transformation_matrix
+            raw = page.get_text("rawdict")["blocks"][0]["lines"][0]["spans"][0]["chars"]
+            # A virtual tail has no separate paint, but partial real paint must be rejected.
+            clip = pymupdf.Rect(raw[0]["bbox"])
+            if failure == "raw_clip":
+                clip.x0 += 1
+            else:
+                clip = pymupdf.Rect(page.get_texttrace()[0]["chars"][0][3])
+                clip.x1 -= 1
+            candidate["source"]["rects"] = [list(clip * inverse)]
+            assert "fi" not in _visible_text(page, [pymupdf.Rect(clip.x0 + 1, clip.y0, clip.x1, clip.y1)],
+                                             _page_space(page, {})[1], {})
+    mapping = build_mapping(source, output, [candidate])
+    assert mapping["units"] == []
+    reason = "source_ambiguous_text" if failure == "repeat" else "source_text_not_found"
+    assert mapping["metadata"]["exclusion_reasons"] == {reason: 1}
+
+
+def test_tilted_compound_unicode_is_not_given_axis_aligned_geometry(tmp_path):
+    """A real tilted compound stays unavailable instead of guessing continuation corners."""
+    source, output, candidate = _pair(tmp_path)
+    candidate["source"] = _compound_pdf(source, text="A")
+    candidate["source_text"] = "fi"
+    with pymupdf.open(source) as document:
+        page = document[0]
+        for stream in page.get_contents():
+            document.update_stream(stream, b"")
+        page.insert_text((100, 150), "A", fontsize=12,
+                         morph=(pymupdf.Point(100, 150), pymupdf.Matrix(30)))
+        assert page.get_texttrace()[0]["dir"] != (1.0, 0.0)
+        document.saveIncr()
+    mapping = build_mapping(source, output, [candidate])
+    assert mapping["units"] == []
+    assert mapping["metadata"]["exclusion_reasons"] == {"source_text_not_found": 1}
+
+
+def test_compound_virtual_raw_width_does_not_expand_paint_geometry(tmp_path, monkeypatch):
+    """Model the real IEEE metric-width continuation while retaining genuine ToUnicode paint."""
+    source, output, candidate = _pair(tmp_path)
+    candidate["source"] = _compound_pdf(source, text="A")
+    candidate["source_text"] = "fi"
+    get_text = pymupdf.Page.get_text
+    with pymupdf.open(source) as document:
+        page = document[0]
+        paint = pymupdf.Rect(page.get_texttrace()[0]["chars"][0][3])
+        # Full actual paint is enough; the virtual continuation's font metric is not paint.
+        candidate["source"]["rects"] = [list(paint * ~page.transformation_matrix)]
+
+    def virtual_width(page, *args, **kwargs):
+        """Change only an extractor metric, not literal, origin or any PDF paint evidence."""
+        raw = get_text(page, *args, **kwargs)
+        if args and args[0] == "rawdict":
+            chars = raw["blocks"][0]["lines"][0]["spans"][0]["chars"]
+            if chars[0]["c"] == "f":
+                box = list(chars[1]["bbox"])
+                box[2] += 1
+                chars[1]["bbox"] = tuple(box)
+        return raw
+
+    monkeypatch.setattr(pymupdf.Page, "get_text", virtual_width)
+    mapping = build_mapping(source, output, [candidate])
+    assert len(mapping["units"]) == 1, mapping["metadata"]
+    with pymupdf.open(source) as document:
+        page, clips = _clips(document, mapping["units"][0]["source"], {})
+        assert _visible_text(page, clips, _page_space(page, {})[1], {}) == "fi"
+
+
+@pytest.mark.parametrize("failure", ["glyph_id", "origin", "span", "raw_origin", "nul", "direction"])
+def test_compound_unicode_rejects_unproven_continuations(tmp_path, monkeypatch, failure):
+    """Only same-span, same-origin gid=-1 evidence can associate a raw continuation."""
+    source, output, candidate = _pair(tmp_path)
+    candidate["source"] = _compound_pdf(source, text="A")
+    candidate["source_text"] = "fi"
+    get_trace, get_text = pymupdf.Page.get_texttrace, pymupdf.Page.get_text
+
+    def altered_trace(page):
+        """Remove exactly one required piece of the genuine compound trace evidence."""
+        spans = get_trace(page)
+        # build_mapping opens hashed bytes; limit the change by the fixture's unique lead.
+        if spans[0]["chars"][0][0] != ord("f"):
+            return spans
+        span = spans[0]
+        chars = list(span["chars"])
+        codepoint, glyph, origin, bbox = chars[1]
+        if failure == "glyph_id":
+            chars[1] = (codepoint, 34, origin, bbox)
+        elif failure == "origin":
+            chars[1] = (codepoint, glyph, (origin[0] + 1, origin[1]), bbox)
+        elif failure == "span":
+            continuation = copy.deepcopy(span)
+            continuation["chars"] = (chars.pop(),)
+            spans.append(continuation)
+        elif failure == "direction":
+            span["dir"] = (0.0, 1.0)
+        span["chars"] = tuple(chars)
+        return spans
+
+    def altered_raw(page, *args, **kwargs):
+        """Keep every raw character literal, including an explicit unpaintable NUL."""
+        raw = get_text(page, *args, **kwargs)
+        if args and args[0] == "rawdict":
+            chars = raw["blocks"][0]["lines"][0]["spans"][0]["chars"]
+            if chars[0]["c"] == "f":
+                if failure == "raw_origin":
+                    box = list(chars[1]["bbox"])
+                    box[0] += 1
+                    box[2] += 1
+                    chars[1]["bbox"] = tuple(box)
+                elif failure == "nul":
+                    chars[1]["c"] = "\0"
+        return raw
+
+    monkeypatch.setattr(pymupdf.Page, "get_texttrace", altered_trace)
+    monkeypatch.setattr(pymupdf.Page, "get_text", altered_raw)
+    mapping = build_mapping(source, output, [candidate])
+    assert mapping["units"] == []
+    assert mapping["metadata"]["exclusion_reasons"] == {"source_text_not_found": 1}
+    if failure == "nul":
+        with pymupdf.open(source) as document:
+            page = document[0]
+            lines = _page_text(page, _page_space(page, {})[1], {})
+            assert lines[0]["characters"][1]["text"] == "\0"
+            assert not lines[0]["characters"][1]["visible"]
 
 
 def test_verified_pair_and_atomic_roundtrip(tmp_path):

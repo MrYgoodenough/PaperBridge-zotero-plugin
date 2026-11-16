@@ -11,7 +11,7 @@ import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1] / "backend"))
 from engine import localize_cache
 localize_cache()
-from deepseek import DeepSeekTranslator
+from deepseek import DeepSeekTranslator, preserves_dimensions
 
 
 def translator(tmp_path, **options):
@@ -67,6 +67,33 @@ def test_broken_placeholders_are_not_cached(tmp_path,monkeypatch):
     with pytest.raises(ValueError,match="占位符"):
         engine.translate_items([{"id":0,"input":"Formula {v0}"}])
     assert engine.paragraph_cache.get("Formula {v0}") is None
+
+
+def test_dimensionality_matches_chinese_but_rejects_changed_cached_claim(tmp_path, monkeypatch):
+    """Do not reuse a known 3D-to-2D error; only a newly valid response replaces it."""
+    source = "Compare 2D estimates with 3D flow and 3D measurements."
+    correct = "比较二维估计、三维流动和三维测量。"
+    wrong = "比较二维估计、二维流动和三维测量。"
+    assert preserves_dimensions(source, correct)
+    assert not preserves_dimensions(source, wrong)
+    assert preserves_dimensions("A <style id='1'>3-D</style> model", "一个<style id='1'>三维</style>模型")
+    engine = translator(tmp_path)
+    engine.paragraph_cache.put(source, wrong)
+    calls = []
+    monkeypatch.setattr(engine, "request_completion", lambda messages: calls.append(messages) or response([
+        {"id": 0, "text": correct}]))
+    assert engine.translate_items([{"id": 0, "input": source}]) == [{"id": 0, "output": correct}]
+    assert len(calls) == 1 and engine.paragraph_cache_hits == 0
+    assert engine.paragraph_cache.get(source) == correct
+
+
+def test_changed_provider_dimensionality_remains_partial_and_uncached(tmp_path, monkeypatch):
+    """A failed scientific quantity guard never silently saves a wrong dimensional label."""
+    engine = translator(tmp_path)
+    monkeypatch.setattr(engine, "request_completion", lambda _: response([{"id": 0, "text": "二维流动"}]))
+    with pytest.raises(ValueError, match="科学维度"):
+        engine.translate_items([{"id": 0, "input": "3D flow"}])
+    assert engine.paragraph_cache.get("3D flow") is None
 
 
 def test_numeric_string_ids_do_not_trigger_a_retry(tmp_path,monkeypatch):

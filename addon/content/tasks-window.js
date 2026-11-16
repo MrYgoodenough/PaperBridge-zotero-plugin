@@ -1,6 +1,8 @@
 /** Render per-owner task outcomes without exposing prompts or credentials. */
-/* global Zotero */
+/** Bind task controls to the existing main-window controller. */
 window.addEventListener("load", () => {
+  // Standalone chrome dialogs do not inherit the opener's Zotero binding.
+  const Zotero = window.opener.Zotero;
   // Dialog arguments reference the existing addon controller, not a second queue.
   const bridge = window.arguments[0].bridge;
   const tasks = bridge.tasks;
@@ -116,7 +118,7 @@ window.addEventListener("load", () => {
         await Zotero.Reader.open(attachment.id);
       }],
       save: ["保存译文", () => tasks.save(record)],
-      file: ["保留 PDF 的位置", () => tasks.revealOutput(record)],
+      file: ["打开文件位置", () => tasks.revealOutput(record)],
       retry: ["重试翻译…", async () => {
         await tasks.retry(record);
         if (!window.closed) window.focusSource(record.sourceID);
@@ -176,7 +178,11 @@ window.addEventListener("load", () => {
       view.phase.textContent = phase;
       view.percent.textContent = percent == null ? "" : percent + "%";
       view.metrics.textContent = [countsText(counts, true), elapsedText(record, status, true)].filter(Boolean).join(" · ");
-      const notices = [record.lastError, record.errorHint,
+      // Keep raw failures in details, but never hide that an action needs attention.
+      const errorNotice = record.errorHint || (record.lastError
+        ? record.saveState === "import_failed" ? "译文未能保存，可单独重试保存。"
+          : "任务存在异常，请查看详情后重试。" : "");
+      const notices = [errorNotice,
         record.state === "done" && quality === "partial" ? "译文不完整，请对照原文核对。" : "",
         record.state === "done" && quality === "unknown" ? "译文完整性尚未确认，请核对后使用。" : "",
         usage?.billing_uncertain ? "部分请求用量未知，可能已计费。" : ""];
@@ -186,6 +192,7 @@ window.addEventListener("load", () => {
       view.details.textContent = `执行：${states[record.state] || record.state || "未知"}\n` +
         `配置：${record.profile || "deepseek"} · ${record.baseURL || "未记录 API 地址"}\n` +
         (record.errorCode ? `错误类别：${record.errorCode}\n` : "") +
+        (record.lastError ? `错误：${record.lastError}\n` : "") +
         `阶段：${phase}${status?.stage ? " · " + status.stage : ""}\n` +
         `${countsText(counts)}${status?.cached ? "\n整篇 PDF 缓存复用（不是本次新译段落）。" : ""}\n` +
         `${elapsedText(record, status)}\n` +
@@ -221,7 +228,10 @@ window.addEventListener("load", () => {
       || record.saveState === "import_failed" || (record.state === "done" && (record.saveState !== "imported" || record.quality?.status !== "complete"))).length;
     document.getElementById("summary").textContent = [records.length ? `${records.length} 个任务` : "",
       active ? `${active} 进行中` : "", saved ? `${saved} 已保存` : "", attention ? `${attention} 待处理` : ""].filter(Boolean).join(" · ");
-    const messages = [actionError, tasks.lastError, preparingSelection ? "正在准备论文…"
+    const errors = [...new Set([actionError, tasks.lastError].filter(Boolean))].join("\n");
+    document.getElementById("action-error").textContent = errors;
+    document.getElementById("action-details").hidden = !errors;
+    const messages = [errors ? "操作未完成，请展开错误详情查看原因。" : "", preparingSelection ? "正在准备论文…"
       : !records.length ? "暂无翻译任务。在论文上选择“翻译并分屏”即可开始。" : ""];
     const statusElement = document.getElementById("status");
     statusElement.textContent = [...new Set(messages.filter(Boolean))].join("\n");

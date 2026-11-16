@@ -1,87 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Provider settings and a local, allowlisted diagnostic ZIP export. -->
+<!-- Essential provider drafts with optional advanced controls and local support. -->
 <window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge 设置" width="650" height="760">
+  <html:link rel="stylesheet" href="chrome://paperbridge/content/ui.css"/>
   <html:style>
-    :root { color-scheme: light dark; background-color: Canvas; color: CanvasText; }
-    body { font: 15px "Songti SC", "SimSun", serif; box-sizing:border-box; width:100%; height:100vh; overflow-y:auto; overflow-x:hidden; margin:0; padding:24px; background-color: Canvas; color: CanvasText; }
-    [hidden] { display:none !important; }
-    h1 { font-size: 23px; margin: 0 0 6px; } p { color: light-dark(#62666e,#bbb); line-height:1.6; }
-    label { display: block; margin: 16px 0 6px; font-weight: 550; }
-    input, select { box-sizing: border-box; min-width:0; max-width:100%; width: 100%; padding: 9px 10px; border: 1px solid #8886; border-radius:6px; background: light-dark(#fff,#333); color:inherit; font:inherit; }
-    input[type="checkbox"] { width:auto; margin-right:8px; }
-    details { margin-top:16px; padding:12px; border:1px solid #8886; border-radius:6px; } summary { cursor:pointer; }
-    .row { display: flex; flex-wrap:wrap; gap: 14px; } .row > div { flex:1; min-width:0; }
-    button { padding: 9px 14px; border:1px solid #8886; border-radius:6px; font:inherit; cursor:pointer; }
-    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; } #save { background:#2963d8;color:white;border-color:#2963d8; }
-    label, p, small { overflow-wrap:anywhere; } button { max-width:100%; }
-    @media (max-width:480px) { body { padding:16px; } }
-    #status, #diagnostics-status { white-space:pre-wrap; font-size:13px; } small { display:block; color:light-dark(#666,#aaa);margin-top:6px; }
+    /* The content scrolls independently of the persistent save/close footer. */
+    :root { display: flex; flex-direction: column; overflow: hidden; }
+    body { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; margin: 0; overflow: hidden; }
+    .settings-content { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 22px 24px; }
+    h1 { font-size: 24px; line-height: 1.3; margin: 0 0 5px; letter-spacing: -.4px; }
+    h2 { font-size: 16px; margin: 0 0 14px; }
+    p { margin: 6px 0 12px; }
+    .subtitle { color: var(--text-muted); margin-bottom: 18px; }
+    .card { margin: 14px 0; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    label { display: block; margin: 14px 0 6px; font-weight: 600; }
+    .card > label:first-of-type { margin-top: 0; }
+    input, select { width: 100%; }
+    .secondary-label { color: var(--text-muted); font-size: 13px; }
+    .checkbox-label { display: flex; align-items: baseline; gap: 8px; font-weight: 400; }
+    input[type="checkbox"] { flex: none; width: auto; margin: 0; }
+    small { display: block; margin-top: 6px; color: var(--text-muted); font-size: 12px; }
+    label, p, small, summary { overflow-wrap: anywhere; }
+    .privacy-notice { padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); color: var(--text); font-size: 12px; }
+    summary { font-weight: 600; }
+    .section-hint { margin: 4px 0 0; }
+    .section-content { margin-top: 16px; }
+    .subsection { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .subsection > summary { font-size: 13px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .support-label { margin: 0 0 4px; font-size: 13px; font-weight: 600; }
+    .technical { white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; color: var(--text-muted); font-size: 12px; }
+    #usage:empty, #diagnostics-status:empty, #diagnostics-path:empty, #status:empty { display: none; }
+    /* Errors remain visible even when advanced/support sections are collapsed. */
+    .settings-footer { flex: none; padding: 12px 24px; background: var(--surface); border-top: 1px solid var(--border); }
+    .footer-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    #save { min-width: 120px; }
+    #status, #diagnostics-status { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
+    #status { max-height: 30vh; overflow-y: auto; margin: 0 0 10px; padding: 9px 12px; border-radius: 7px; background: var(--surface-soft); }
+    #status.success { color: var(--success); background: var(--success-soft); }
+    #status.warning { color: var(--warning); background: var(--warning-soft); }
+    #status.error { color: var(--error); background: var(--error-soft); }
+    @media (max-width: 480px) {
+      .settings-content { padding: 16px 12px; }
+      .card { padding: 14px; }
+      .settings-footer { padding: 12px; }
+      .footer-actions > button { flex: 1; min-width: 0; }
+    }
   </html:style>
   <html:body>
-    <html:h1>PaperBridge</html:h1>
-    <html:p>论文全文翻译，原文与译文并排阅读。保留 PDF 的公式、图像与表格结构。</html:p>
-    <html:small>中文译文使用嵌入式宋体，标题与正文随原文层级排版。</html:small>
-    <html:label for="profile">翻译服务配置</html:label>
-    <html:select id="profile"><html:option value="deepseek" selected="selected">DeepSeek（默认）</html:option><html:option value="compatible">OpenAI 兼容（高级，可选）</html:option></html:select>
-    <html:small>切换不会自动保存。每套配置和密钥的草稿独立保留在本窗口；保存只写入当前配置，关闭会丢弃未保存的草稿。</html:small>
-    <html:div id="deepseek-settings">
-      <html:label for="key">DeepSeek API Key</html:label>
-      <html:input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…"/>
-      <html:label for="baseURL">DeepSeek API 地址</html:label>
-      <html:input id="baseURL" type="url" autocomplete="off" spellcheck="false" placeholder="https://api.deepseek.com"/>
-      <html:label for="model">DeepSeek 模型</html:label>
-      <html:input id="model" autocomplete="off" spellcheck="false" placeholder="deepseek-flash"/>
-      <html:small>默认 DeepSeek 配置不变：JSON 模式开启、禁用思考，max_tokens 为 8192。</html:small>
-    </html:div>
-    <html:div id="compatible-settings" hidden="hidden">
-      <html:label for="compatibleKey">OpenAI 兼容 API Key（独立密钥）</html:label>
-      <html:input id="compatibleKey" type="password" autocomplete="off" spellcheck="false" placeholder="由服务商提供；不会沿用 DeepSeek 密钥"/>
-      <html:label for="compatibleBaseURL">兼容 API 基础地址</html:label>
-      <html:input id="compatibleBaseURL" type="url" autocomplete="off" spellcheck="false" placeholder="https://api.example.com/v1"/>
-      <html:label for="compatibleModel">兼容模型名称</html:label>
-      <html:input id="compatibleModel" autocomplete="off" spellcheck="false" placeholder="填写服务商提供的模型标识"/>
-      <html:small>仅支持 OpenAI 兼容接口，不支持服务商专有协议。兼容性未经验证；请自行核对服务商文档、隐私政策及收费。</html:small>
-      <html:details id="compatible-capabilities">
-        <html:summary>高级：兼容接口能力</html:summary>
-        <html:label for="compatibleJSON"><html:input id="compatibleJSON" type="checkbox" checked="checked"/>发送 JSON 模式参数（json_mode）</html:label>
-        <html:small>服务商不支持 JSON 模式时可关闭；插件仍要求返回符合翻译格式的内容。</html:small>
-        <html:label for="compatibleMaxTokens">单次请求输出上限（max_tokens）</html:label>
-        <html:input id="compatibleMaxTokens" type="number" min="1" max="2147483647" step="1" value="8192"/>
-        <html:small>默认 8192，请按模型限制调整；兼容配置绝不发送禁用思考参数（thinking_disabled）。</html:small>
+    <html:main class="settings-content">
+      <html:h1>PaperBridge</html:h1>
+      <html:p class="subtitle">设置论文翻译服务，开始原文与译文并排阅读。</html:p>
+
+      <html:section class="card" aria-labelledby="translation-heading">
+        <html:h2 id="translation-heading">翻译设置</html:h2>
+        <html:label for="profile">翻译服务</html:label>
+        <html:select id="profile" title="两套配置与密钥独立，不会借用另一服务的密钥。">
+          <html:option value="deepseek" selected="selected">DeepSeek（默认）</html:option>
+          <html:option value="compatible">OpenAI 兼容服务</html:option>
+        </html:select>
+        <html:small>切换保留本窗口草稿；保存仅写入当前服务，关闭丢弃未保存项。</html:small>
+        <html:div id="deepseek-settings">
+          <html:label for="key">API Key</html:label>
+          <html:input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…"
+                      title="存于 Zotero 登录管理器，不写入偏好设置；清空并保存只删除当前服务密钥。"/>
+          <html:label class="secondary-label" for="model">模型</html:label>
+          <html:input id="model" autocomplete="off" spellcheck="false" placeholder="deepseek-flash"
+                      title="默认 deepseek-flash；JSON 模式开启，禁用思考，输出上限 8192。"/>
+        </html:div>
+        <html:div id="compatible-settings" hidden="hidden">
+          <html:label for="compatibleKey">API Key（兼容服务）</html:label>
+          <html:input id="compatibleKey" type="password" autocomplete="off" spellcheck="false" placeholder="由所选服务商提供"
+                      title="独立存于 Zotero 登录管理器，不沿用 DeepSeek 密钥；清空并保存只删除此密钥。"/>
+          <html:label class="secondary-label" for="compatibleModel">模型</html:label>
+          <html:input id="compatibleModel" autocomplete="off" spellcheck="false" placeholder="服务商提供的模型标识"/>
+          <html:small>仅支持 OpenAI 兼容接口，兼容性未经验证；请在高级设置中核对地址与能力。</html:small>
+        </html:div>
+        <html:label for="language">目标语言</html:label>
+        <html:select id="language" aria-describedby="language-note">
+          <html:option value="zh-CN">简体中文</html:option>
+          <html:option value="zh-TW">繁體中文（支持未完成）</html:option>
+          <html:option value="ja">日本語（支持未完成）</html:option>
+        </html:select>
+        <html:small id="language-note">仅简体中文有完整交付基线；繁体与日文的离线字体和端到端支持尚未实现。</html:small>
+      </html:section>
+
+      <html:p class="privacy-notice">论文文本会发送至所选服务，请核对地址、密钥与服务商隐私政策。费用由服务商收取，插件无法核实账单；失败或未知请求也可能收费，重试可能重复计费。</html:p>
+
+      <html:details id="advanced-settings" class="card">
+        <html:summary>高级设置</html:summary>
+        <html:small class="section-hint">API 地址、兼容能力、页码与本地 Python</html:small>
+        <html:div class="section-content">
+          <html:div id="deepseek-advanced">
+            <html:label for="baseURL">DeepSeek API 地址</html:label>
+            <html:input id="baseURL" type="url" autocomplete="off" spellcheck="false" placeholder="https://api.deepseek.com"/>
+          </html:div>
+          <html:div id="compatible-advanced" hidden="hidden">
+            <html:label for="compatibleBaseURL">兼容 API 基础地址</html:label>
+            <html:input id="compatibleBaseURL" type="url" autocomplete="off" spellcheck="false" placeholder="https://api.example.com/v1"/>
+            <html:details id="compatible-capabilities" class="subsection">
+              <html:summary>兼容接口能力</html:summary>
+              <html:label class="checkbox-label" for="compatibleJSON">
+                <html:input id="compatibleJSON" type="checkbox" checked="checked"
+                            title="不支持 JSON 模式的服务可关闭；返回内容仍须符合翻译格式。"/>发送 JSON 模式参数
+              </html:label>
+              <html:label for="compatibleMaxTokens">单次输出上限（max_tokens）</html:label>
+              <html:input id="compatibleMaxTokens" type="number" min="1" max="2147483647" step="1" value="8192"
+                          title="默认 8192，请按模型限制调整。兼容配置不发送 thinking_disabled 参数。"/>
+            </html:details>
+          </html:div>
+          <html:small>仅 HTTPS 基础地址；不含账号、密码、查询或片段，不追加 /chat/completions。</html:small>
+          <html:label for="pages">页码范围</html:label>
+          <html:input id="pages" placeholder="留空翻译全文，例如 1-3,5" title="从第 1 页开始；多个范围用英文逗号分隔。"/>
+          <html:div id="python-settings">
+            <html:label for="pythonPath">本机 Python 路径</html:label>
+            <html:input id="pythonPath" placeholder="留空自动检测 Python 3.12"
+                        title="填写 Python 可执行文件的完整路径，例如 /usr/bin/python3.12 或 C:\Python312\python.exe。"/>
+            <html:small>本机版需同架构 Python 3.12；第三方依赖随安装包提供，不自动下载。</html:small>
+          </html:div>
+          <html:small>页码、语言与 Python 为全局设置；已入队任务仍使用入队时的配置。</html:small>
+        </html:div>
       </html:details>
-    </html:div>
-    <html:small>API 地址必须使用 HTTPS，不得包含账号、密码、查询参数或片段；使用基础地址，不要追加 /chat/completions。</html:small>
-    <html:small>两套密钥分别保存在 Zotero 登录管理器中，不写入偏好设置。清空密钥后保存只删除当前配置的密钥。论文文本将发送至所选服务，请确认地址和密钥属于同一服务商。</html:small>
-    <html:small>费用由服务商收取，插件无法核实价格或实际账单；失败或结果未知的请求也可能已收费，重试可能重复计费。</html:small>
-    <html:label for="language">目标语言（全局）</html:label>
-    <html:select id="language"><html:option value="zh-CN">简体中文</html:option><html:option value="zh-TW">繁體中文</html:option><html:option value="ja">日本語</html:option></html:select>
-    <html:small>本轮仅简体中文有完整交付基线；繁体/日文保留切换接口，对应离线字体与端到端支持尚未实现。</html:small>
-    <html:div class="row">
-      <html:div><html:label for="pages">页码范围（全局，空白表示全文）</html:label><html:input id="pages" placeholder="例如 1-3,5"/></html:div>
-    </html:div>
-    <html:div id="python-settings"><html:label for="pythonPath">本机 Python 路径（全局，本机版使用）</html:label>
-    <html:input id="pythonPath" placeholder="例如 /opt/homebrew/bin/python3.12 或 C:\Python312\python.exe"/>
-    <html:small>本机版需要与系统架构一致的 Python 3.12，留空检测常见位置；第三方依赖随 XPI 提供。</html:small></html:div>
-    <html:small>排版依赖随安装包提供，插件不自动下载资源。</html:small>
-    <html:div id="runtime-terms" hidden="hidden">
-      <html:div class="actions"><html:button id="runtime-terms-view">Windows 运行库条款</html:button></html:div>
-      <html:small id="runtime-terms-status" role="status"/>
-    </html:div>
-    <html:small>任务入队时冻结所选配置、密钥、目标语言与页码；之后保存或切换配置不会改变已排队或运行中的任务。</html:small>
-    <html:div class="actions"><html:button id="save">保存设置</html:button><html:button id="test">检查本地引擎</html:button><html:button id="service-check">检查服务（短请求）</html:button><html:button id="data">数据目录</html:button><html:button id="close">关闭</html:button></html:div>
-    <html:small>两种检查都不保存设置。引擎检查使用已保存的 Python 配置，不调用服务商；服务检查使用当前配置草稿，确认后仅发送一条公开样例请求（输出上限 512 tokens、无自动重试），可能收费，不验证真实论文语义质量。</html:small>
-    <html:p id="status" role="status"/>
-    <html:p id="usage"/>
-    <html:details id="diagnostics">
-      <html:summary>脱敏诊断包</html:summary>
-      <html:small>只导出版本、平台、任务计数及固定阶段/错误码事件；不含密钥、token、PDF、论文文本、用户绝对路径、原始日志或凭据库。不保存当前设置，不调用服务商，不自动上传。引擎无法启动时仍可导出仅含插件侧信息的本地 ZIP。</html:small>
-      <html:div class="actions"><html:button id="diagnostics-export">一键导出诊断 ZIP</html:button><html:button id="diagnostics-open" hidden="hidden">打开文件位置</html:button></html:div>
-      <html:p id="diagnostics-status" role="status"/>
-      <html:small id="diagnostics-path" style="overflow-wrap:anywhere;user-select:text"/>
-    </html:details>
-    <html:small id="locations" style="overflow-wrap:anywhere"/>
-    <html:small>删除规则：插件不会因论文条目或原 PDF 被移除而永久删除 Zotero 附件。失去关联的译文结果仍保留，仅可丢弃的临时缓存可能被清理。</html:small>
+
+      <html:details id="support-settings" class="card">
+        <html:summary>检查与支持</html:summary>
+        <html:small class="section-hint">引擎、服务、用量、数据目录与脱敏诊断</html:small>
+        <html:div class="section-content">
+          <html:p class="support-label">本地引擎</html:p>
+          <html:small>使用已保存的 Python 配置，不调用服务商；修改路径后请先保存。</html:small>
+          <html:div class="actions"><html:button id="test">检查本地引擎</html:button></html:div>
+          <html:details id="engine-details" class="subsection" hidden="hidden">
+            <html:summary>引擎技术详情</html:summary>
+            <html:p id="engine-info" class="technical"/>
+          </html:details>
+          <html:div id="runtime-terms" class="subsection" hidden="hidden">
+            <html:div class="actions"><html:button id="runtime-terms-view">Windows 运行库条款</html:button></html:div>
+            <html:small id="runtime-terms-status" role="status"/>
+          </html:div>
+          <html:div class="subsection">
+            <html:p class="support-label">服务连通性</html:p>
+            <html:small>使用当前草稿，确认后仅发一条公开样例（最多 512 输出 tokens），不重试、不保存、不验证论文质量。</html:small>
+            <html:div class="actions"><html:button id="service-check" title="可能收费；执行前需要明确确认。">检查服务（可能收费）</html:button></html:div>
+          </html:div>
+          <html:details class="subsection">
+            <html:summary>数据目录与最近用量</html:summary>
+            <html:div class="actions"><html:button id="data">打开数据目录</html:button></html:div>
+            <html:small id="locations" class="technical"/>
+            <html:p id="usage" class="technical">暂无最近任务用量记录。</html:p>
+            <html:small>用量为请求计数与原始 token 记录，不是账单。条目或原 PDF 移除后译文附件仍保留，仅可丢弃的临时缓存可能被清理。</html:small>
+          </html:details>
+          <html:details id="diagnostics" class="subsection">
+            <html:summary>脱敏诊断包</html:summary>
+            <html:small>本地 ZIP 仅含版本、平台、任务计数与固定阶段/错误码；不含密钥、token、PDF、正文、用户绝对路径、原始日志或凭据库。不保存设置、不调用服务、不上传；引擎不可用时仍可导出插件侧信息。</html:small>
+            <html:div class="actions"><html:button id="diagnostics-export">导出诊断 ZIP</html:button><html:button id="diagnostics-open" hidden="hidden">打开文件位置</html:button></html:div>
+            <html:p id="diagnostics-status" role="status" aria-live="polite"/>
+            <html:small id="diagnostics-path" class="technical"/>
+          </html:details>
+        </html:div>
+      </html:details>
+    </html:main>
+    <html:footer class="settings-footer">
+      <html:p id="status" role="status" aria-live="polite"/>
+      <html:div class="footer-actions"><html:button id="close" title="关闭并丢弃未保存草稿。">关闭</html:button><html:button id="save" class="primary">保存设置</html:button></html:div>
+    </html:footer>
   </html:body>
   <script src="chrome://paperbridge/content/settings.js"/>
 </window>
