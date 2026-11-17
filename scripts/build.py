@@ -146,6 +146,7 @@ with zipfile.ZipFile(output, "a", zipfile.ZIP_DEFLATED, compresslevel=ZIP_COMPRE
                 write_bytes(archive, prefix + path.relative_to(folder).as_posix(), contents)
 with output.open("rb") as stream:
     digest = hashlib.file_digest(stream,"sha256").hexdigest()
+# Keep the checksum for local verification only; never upload it to GitHub Releases.
 output.with_suffix(".xpi.sha256").write_text(f"{digest}  {output.name}\n", encoding="utf-8", newline="\n")
 # Inspect completed bytes, not the stage's estimates or unverified license names.
 inventory_path = output.with_suffix(".xpi.inventory.json")

@@ -51,7 +51,7 @@ PRIVATE_FILENAMES = (
 )
 # certifi/cacert.pem is the sole intentional public-certificate exception.
 PRIVATE_SUFFIXES = {".pyc", ".pyo", ".db", ".sqlite", ".sqlite3", ".key", ".pem", ".p12", ".pfx"}
-# GitHub metadata and checksum requests should finish without fetching the XPI body.
+# Public metadata requests should finish without fetching the XPI body.
 HTTP_TIMEOUT = 30
 # A generous metadata-only limit prevents an accidental large asset GET.
 MAX_REMOTE_BYTES = 1024 * 1024
@@ -287,21 +287,14 @@ def verify_online(result):
     _require(asset.get("size") == result["xpiSize"], "GitHub XPI size differs from the local XPI.")
     _read_public(result["updateLink"], head=True, label=f"Public XPI {result['xpiName']}",
                  missing_hint="The advertised exact-tag XPI download is not publicly reachable.")
-    checksum_url = result["updateLink"] + ".sha256"
-    checksum_asset = _uploaded_asset(release, result["xpiName"] + ".sha256", checksum_url)
-    checksum = _read_public(checksum_url, label=f"Public checksum {result['xpiName']}.sha256",
-                            missing_hint="The matching .xpi.sha256 sidecar must be separately uploaded to this exact release.")
-    _check_checksum(checksum, result["xpiName"], result["sha256"])
-    _require(checksum_asset.get("size") == len(checksum)
-             and checksum_asset.get("digest") == "sha256:" + hashlib.sha256(checksum).hexdigest(),
-             "GitHub checksum asset size/digest is missing or mismatched.")
 
 
 def main(argv=None):
     """Print separate local/publication results and never claim client update success."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--xpi", type=Path, required=True, help="Explicit completed build.py XPI")
-    parser.add_argument("--sha256", type=Path, required=True, help="Explicit matching .xpi.sha256 sidecar")
+    parser.add_argument("--sha256", type=Path, required=True,
+                        help="Matching local .xpi.sha256 file; not a public release asset")
     parser.add_argument("--feed", type=Path, required=True, help="Explicit platform/mode draft update JSON")
     parser.add_argument("--source-manifest", type=Path, default=SOURCE_MANIFEST, help="Expected source addon manifest")
     parser.add_argument("--report", type=Path, help="Write verification status and actual package inventory JSON")

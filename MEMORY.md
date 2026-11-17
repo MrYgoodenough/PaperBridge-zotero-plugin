@@ -28,9 +28,10 @@
 
 - Linux glibc ≥ 2.34，默认 stage `.cache/package/linux-x64`；image-only OpenCV 4.12 的兼容工具链/install 在 `.cache/opencv-linux-x64`，不得用 Ubuntu 24.04 默认 glibc 2.38 产物替换。Windows 沿用既有官方 OpenCV wheel/CPython 3.12.13，Linux CPython 3.12.16。
 - `build.py` 每次生成 payload，固定 ZIP 元数据/压缩级别，保留原许可字节和 nested runtime.json。验收绑定完成 XPI SHA，不只 backend build ID；原生 Linux/Windows 分别构建 bundled/local。修改任意生产资产后重建对应包。
-- `package_sources.py` 从已提交快照绑定四包全部生产文件（含 CSS），同行提供 303 上游归档和 4 个 Linux build inputs。缓存 `agent/codex/licensing-p0-1-20261116-003659/source-cache` 保留；源码 ZIP、manifest、checksum 同地公开，不用无范围 written offer。法律合规仍 unknown，不将普通编译元数据不确定性当作已发现缺失义务。
+- `package_sources.py` 从已提交快照绑定四包全部生产文件（含 CSS），同行提供 303 上游归档和 4 个 Linux build inputs。缓存 `agent/codex/licensing-p0-1-20261116-003659/source-cache` 保留；源码 ZIP、manifest 同地公开，本地 checksum 保留，不用无范围 written offer。法律合规仍 unknown，不将普通编译元数据不确定性当作已发现缺失义务。
 - 用户已确认 Community 2026 的合法使用和 section 8 分发责任，不重复索取。三 DLL/原始条款保持原字节；Windows 初次引擎启用只确认 `msvc-community-2026-v1` 一次，拒绝只停引擎，设置可重开；后台/诊断不弹窗，Linux 豁免。
-- Linux/Windows 独立平台/模式 feeds，0.3.7 的四个 XPI、inventory、checksum 及 corresponding sources 共 15 个资产已公开并通过匿名可达/摘要核对；包位于 `dist/release-0.3.7-freeze07/`。Release 用 `make_latest=false`，仓库 Latest 仍为独立 macOS 0.4.2，不改其资产/通道。Git 操作在 master 快进，不建分支/worktree，不强推；API 不用 gh。公开元数据验证不等于 Zotero 从旧版本自动升级实测。
+- Linux/Windows 独立平台/模式 feeds，0.3.7 的四个 XPI、四个 inventory、对应源码 ZIP/manifest 共 **10** 个资产公开；包位于 `dist/release-0.3.7-freeze07/`。所有 Release 不再提供独立 `.sha256`，未来禁止上传，构建仍生成本地校验文件；`verify_release.py --online` 核对实际本地包、feed、GitHub XPI digest/size 与下载可达性，不请求公开 checksum。冻结 XPI/源码 ZIP 与标签不因后续工具/政策改动而重写。
+- Release 用 `make_latest=false`，仓库 Latest 仍为独立 macOS 0.4.2，不改其资产/通道。公开版本与各附件用途见 `docs/release-versions.md`；0.3.5/0.3.6 仅开发候选。GitHub TODO #1 已同步 0.3.7 交付及未完成验收，发布时继续维护且不以勾选比例表示完成度。Git 操作在 master 快进，不建分支/worktree，不强推；API 不用 gh。公开元数据验证不等于 Zotero 从旧版本自动升级实测。
 
 ## 安全接续与证据
 

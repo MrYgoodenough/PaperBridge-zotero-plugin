@@ -7,7 +7,8 @@ Each channel keeps its platform and Python mode; the XPI download URL and SHA-25
 must match the corresponding public release asset.
 
 Replace a channel with its verified build-output draft only after the exact-tag
-XPI and matching checksum are publicly available. Do not use repository-wide
+XPI is publicly available with a matching GitHub asset digest. Keep checksum files
+local; do not upload independent `.sha256` assets. Do not use repository-wide
 `releases/latest` as a platform fallback. See [release verification](../docs/releasing.md).
 
 The separately released macOS 0.4.2 implementation is not merged here; its assets

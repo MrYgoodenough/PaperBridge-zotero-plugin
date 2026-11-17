@@ -115,7 +115,9 @@ proof of missing obligations**. Resolve identified source/input/notice omissions
 Compiler options, optional Rust linkage/tiktoken locks, SBOM or bit-identical rebuild
 evidence gaps are not extra gates by themselves.
 
-Rebind after source/doc or XPI changes. With authorization, publish ZIP/manifest/
-checksum beside exact XPIs at the same download location, without extra source
+Rebind after source/doc or XPI changes. With authorization, publish ZIP/manifest
+beside exact XPIs at the same download location, without extra source
 charges: [releasing](releasing.md). Use **`make_latest=false`**, preserving unrelated
 assets/channels and Latest.
+Keep generated `.sha256` files local; public integrity uses GitHub asset digests
+and the delivered manifest, not independent checksum download assets.

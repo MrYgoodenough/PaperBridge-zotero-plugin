@@ -20,6 +20,7 @@ Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容�
 Windows 包首次启用排版引擎时需同意随包提供的 Microsoft DLL 条款；相同条款只确认一次，无需安装 Visual Studio、注册微软账号或另装运行库。暂不接受仍可阅读原文和已有译文。
 
 更新前备份 Zotero profile/数据目录，正常退出后操作。Linux/Windows 使用独立的平台/模式更新通道，不以仓库 Latest 判断适用版本。
+历史版本与下载文件的区别见[版本选择](docs/release-versions.md)。
 
 ## 翻译与阅读
 

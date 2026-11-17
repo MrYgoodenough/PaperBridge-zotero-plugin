@@ -355,15 +355,11 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
     assert document["localVerification"] == "consistent" and document["publication"] == "not_checked"
     assert document["automaticUpdate"] == "not_tested" and document["inventory"] == result["inventory"]
     verifier.urlopen.assert_not_called()
-    checksum = artifacts[1].read_bytes()
     release = {
         "tag_name": "v" + result["version"], "draft": False, "published_at": "2026-01-01T00:00:00Z",
         "assets": [
             {"name": result["xpiName"], "state": "uploaded", "browser_download_url": result["updateLink"],
              "size": result["xpiSize"], "digest": "sha256:" + result["sha256"]},
-            {"name": result["xpiName"] + ".sha256", "state": "uploaded",
-             "browser_download_url": result["updateLink"] + ".sha256", "size": len(checksum),
-             "digest": "sha256:" + hashlib.sha256(checksum).hexdigest()},
         ],
     }
     calls = []
@@ -383,8 +379,6 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
             contents = json.dumps(public_feed).encode()
         elif url.startswith("https://api.github.com/repos/"):
             contents = json.dumps(release).encode()
-        elif url == result["updateLink"] + ".sha256":
-            contents = checksum
         else:
             assert url == result["updateLink"] and method == "HEAD"
             contents = b""
@@ -398,14 +392,14 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
     assert "PUBLISHED-METADATA-VERIFIED" in output.out and not output.err
     assert "AUTOMATIC-UPDATE-NOT-TESTED" in output.out
     assert json.loads(report.read_bytes())["publication"] == "metadata_verified"
-    assert [method for _, method in calls] == ["GET", "GET", "HEAD", "GET"]
+    assert [method for _, method in calls] == ["GET", "GET", "HEAD"]
+    assert not any(url.endswith(".sha256") for url, _ in calls)
     api_url = calls[1][0]
     assert api_url.endswith("/releases/tags/v" + result["version"])
     for url, label, hint in (
         (result["updateUrl"], "master/updates/linux-x64.json", "dist/updates contains local drafts only"),
         (api_url, "GitHub release metadata for v" + result["version"], "exact tag is publicly readable"),
         (result["updateLink"], "Public XPI " + result["xpiName"], "exact-tag XPI download"),
-        (result["updateLink"] + ".sha256", "Public checksum " + result["xpiName"], "separately uploaded"),
     ):
         http_failures[url] = 404
         assert verifier.main(argv + ["--online"]) == 1
@@ -449,9 +443,9 @@ def test_cli_distinguishes_local_public_and_untested_updates(build_release, monk
     assert verifier.main(argv + ["--online"]) == 1
     assert "not publicly published" in capsys.readouterr().err
     release["draft"] = False
-    release["assets"][1]["digest"] = None
+    release["assets"][0]["size"] += 1
     assert verifier.main(argv + ["--online"]) == 1
-    assert "checksum asset size/digest" in capsys.readouterr().err
+    assert "XPI size differs" in capsys.readouterr().err
 
 
 def test_verification_report_cannot_overwrite_inputs(build_release, capsys):
@@ -476,8 +470,8 @@ def test_public_http_errors_do_not_echo_request_or_response(monkeypatch, status)
         private_url, status, "private-response-body", {}, BytesIO(b"private-response-body"),
     )))
     with pytest.raises(verifier.VerificationError) as error:
-        verifier._read_public(private_url, label="Public checksum", missing_hint="Upload the matching sidecar.")
+        verifier._read_public(private_url, label="Public asset", missing_hint="Upload the verified asset.")
     message = str(error.value)
-    assert "Public checksum" in message and f"HTTP {status}" in message
-    assert ("Upload the matching sidecar." in message) == (status == 404)
+    assert "Public asset" in message and f"HTTP {status}" in message
+    assert ("Upload the verified asset." in message) == (status == 404)
     assert private_url not in message and "private-response" not in message

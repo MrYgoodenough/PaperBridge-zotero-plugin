@@ -400,7 +400,8 @@ def build_bundle(xpis, output, cache, download, manifest_path):
                 "build-inputs/ preserves available local build configuration; xpis/ has fresh byte inventories.\n"
                 "Read project/docs/licensing.md for build instructions, limits and release obligations.\n"
                 "Verify with: python -B project/scripts/package_sources.py --verify <this-zip>\n"
-                "The files index excludes bundle-manifest.json itself; the external .sha256 binds the ZIP.\n"
+                "The files index excludes bundle-manifest.json itself; GitHub's asset digest binds the public ZIP.\n"
+                "The generated .sha256 file is for local verification only, not a release asset.\n"
             ).encode(), files)
             for entry, path, verified, matches in sources:
                 name = f"upstream/{entry['id']}/{entry['filename']}"
