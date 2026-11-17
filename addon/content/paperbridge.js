@@ -1,11 +1,13 @@
 /** Zotero commands and paired PDF reading; task execution lives in tasks.js. */
-/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, TranslationTasks, FragmentAlignment, Components, rootURI */
+/* global Zotero, Services, Cc, Ci, ChromeUtils, IOUtils, PathUtils, TranslationTasks, TranslationReader, FragmentAlignment, Components, rootURI */
 // One bridge is shared by all Zotero windows in the addon scope.
 var PaperBridge = {
   jobs: new Map(),
   // Only the initiating reader command may wait and auto-open its saved result.
   readerWaits: new Set(),
   splits: new Map(),
+  // Concurrent close commands share the same final-save and disposal operation.
+  closingSplits: new Map(),
   // Reopening an attachment waits for the previous pane's final native annotation write.
   annotationWrites: new Map(),
   buttons: new Set(),
@@ -23,6 +25,8 @@ var PaperBridge = {
     this.storageRoot = PathUtils.join(Zotero.DataDirectory.dir,"storage");
     this.alive = true;
     await this.library.load();
+    try { await this.formulaCache?.load(); }
+    catch (error) { this.warn("公式缓存暂不可用，翻译和已有 PDF 阅读不受影响。", error); }
     this.tasks = new TranslationTasks(this);
     /** Resume retained local work without submitting a new translation. */
     this.runtime.terms.onAccepted = () => {
@@ -34,19 +38,30 @@ var PaperBridge = {
       this.library.schedule();
     };
     await this.tasks.resume();
-    this.toolbarHandler = event => this.toolbar(event);
+    this.toolbarHandler = event => {
+      this.toolbar(event);
+      this.formulas?.attach(event.reader).catch(error => Zotero.logError(error));
+    };
     this.contextHandler = ({ reader, append }) => {
-      if (reader._type !== "pdf") return;
+      if (reader._type !== "pdf" || reader._paperbridgeEmbedded) return;
       append({ label: "PaperBridge 翻译并分屏", onCommand: () => this.action(() => this.translate(reader)) });
       append({ label: "PaperBridge：打开已有译文", onCommand: () => this.action(() => this.openExisting(reader)) });
       append({ label: "PaperBridge：取消翻译", onCommand: () => this.action(() => this.cancel(reader.itemID)) });
     };
     Zotero.Reader.registerEventListener("renderToolbar", this.toolbarHandler, id);
     Zotero.Reader.registerEventListener("createViewContextMenu", this.contextHandler, id);
+    this.formulaPopupHandler = event => this.formulas?.popup(event);
+    this.formulaMenuHandler = event => this.formulas?.menu(event);
+    Zotero.Reader.registerEventListener("renderTextSelectionPopup", this.formulaPopupHandler, id);
+    Zotero.Reader.registerEventListener("createViewContextMenu", this.formulaMenuHandler, id);
     this.observer = {
       notify: (event, type, ids) => {
         if (type === "tab" && event === "close") ids.forEach(tab => this.closeSplit(tab));
-        if (type === "item" && ["trash","delete","modify"].includes(event)) this.library.schedule();
+        if (type === "item" && ["add","trash","delete","modify"].includes(event)) {
+          // Library scheduling crosses the transaction boundary before cache ownership queries.
+          this.formulaReconcile = this.library.schedule().then(() => this.formulaCache?.reconcile())
+            .catch(error => Zotero.logError(error));
+        }
       }
     };
     this.notifier = Zotero.Notifier.registerObserver(this.observer,["tab","item"],"paperbridge");
@@ -60,6 +75,7 @@ var PaperBridge = {
         if (host && !doc.querySelector(".paperbridge-translate")) {
           this.toolbar({ reader, doc, append: node => host.append(node) });
         }
+        await this.formulas?.attach(reader);
       } catch (error) {
         // Private reader changes must not disable the library queue or saved artifacts.
         Zotero.logError(error);
@@ -70,20 +86,39 @@ var PaperBridge = {
   /** Release readers and leave backend interruptions available for explicit recovery. */
   async stop() {
     this.alive = false;
-    this.runtime.terms.onAccepted = null;
-    this.runtime.terms.window?.close();
-    this.taskWindow?.close();
+    const errors = [];
+    /** Continue shutdown when one optional window, native reader or write fails. */
+    const settle = async task => {
+      try { await task(); }
+      catch (error) { errors.push(error); Zotero.logError(error); }
+    };
+    await settle(() => { this.runtime.terms.onAccepted = null; this.runtime.terms.window?.close(); });
+    await settle(() => this.taskWindow?.close());
+    await settle(() => this.formulaCacheWindow?.close());
     // The backend records interrupted work on shutdown; never silently resubmit it.
-    if (this.tasks?.refreshing) await this.tasks.refreshing.catch(error => Zotero.logError(error));
-    for (const tab of [...this.splits.keys()]) this.closeSplit(tab);
-    await Promise.all(this.annotationWrites.values());
-    Zotero.Notifier.unregisterObserver(this.notifier);
-    await this.library.settled();
-    Zotero.Reader._unregisterEventListenerByPluginID(this.id);
-    for (const win of Zotero.getMainWindows()) this.removeMenus(win);
-    for (const button of this.buttons) button.remove();
+    await settle(() => this.tasks?.refreshing);
+    // Invoke all closes before awaiting so every live frame can supply its final snapshot.
+    await Promise.all([...this.splits.keys()].map(tab => settle(() => this.closeSplit(tab))));
+    await settle(() => Promise.allSettled([...this.closingSplits.values(), ...this.annotationWrites.values()]));
+    await settle(() => this.formulas?.stop());
+    await settle(() => Zotero.Notifier.unregisterObserver(this.notifier));
+    await settle(() => this.library.settled());
+    await settle(() => this.formulaReconcile);
+    await settle(() => this.formulaCache?.settled());
+    await settle(() => Zotero.Reader._unregisterEventListenerByPluginID(this.id));
+    for (const win of Zotero.getMainWindows()) await settle(() => this.removeMenus(win));
+    for (const button of this.buttons) await settle(() => button.remove());
     this.buttons.clear();
-    await this.runtime.stop();
+    await settle(() => this.runtime.stop());
+    if (errors.length) this.warn("停用时部分资源未能正常保存或关闭；其他清理已继续。", errors[0]);
+  },
+
+  /** Warn about an optional failure without rejecting basic translation or reading. */
+  warn(message, error) {
+    Zotero.logError(error);
+    const win = Zotero.getMainWindow();
+    try { if (win && !win.closed) Services.prompt.alert(win, "PaperBridge", message + "\n" + error.message); }
+    catch (displayError) { Zotero.logError(displayError); }
   },
 
   /** Report a failed command without terminating the addon. */
@@ -106,6 +141,7 @@ var PaperBridge = {
       ["翻译并分屏", () => this.translate()],
       ["批量翻译所选论文（仅保存）", () => this.tasks.batch()],
       ["任务列表…", async () => this.showTasks()],
+      ["公式缓存…", async () => this.showFormulaCache()],
       ["打开已有译文分屏", () => this.openExisting()],
       ["取消当前论文翻译", async () => this.cancel((await this.source())?.id)],
       ["设置…", async () => this.settings()]
@@ -144,7 +180,7 @@ var PaperBridge = {
 
   /** Add a compact translation command to PDF toolbars. */
   toolbar({ reader, doc, append }) {
-    if (reader._type !== "pdf" || doc.querySelector(".paperbridge-translate")) return;
+    if (reader._type !== "pdf" || reader._paperbridgeEmbedded || doc.querySelector(".paperbridge-translate")) return;
     const button = doc.createElement("button");
     button.className = "toolbar-button paperbridge-translate";
     button.textContent = "翻译";
@@ -160,6 +196,17 @@ var PaperBridge = {
   settings() {
     Zotero.getMainWindow().openDialog("chrome://paperbridge/content/settings.xhtml", "paperbridge-settings",
       "chrome,centerscreen,resizable", { bridge: this });
+  },
+
+  /** Reuse the local formula cache dialog without starting the engine or a provider. */
+  showFormulaCache() {
+    if (this.formulaCacheWindow && !this.formulaCacheWindow.closed) {
+      this.formulaCacheWindow.focus();
+      return this.formulaCacheWindow;
+    }
+    this.formulaCacheWindow = Zotero.getMainWindow().openDialog("chrome://paperbridge/content/formula-cache.xhtml", "paperbridge-formula-cache",
+      "chrome,centerscreen,resizable", { bridge: this });
+    return this.formulaCacheWindow;
   },
 
   /** Focus a source in the shared progress/task view without opening PDF readers. */
@@ -379,6 +426,8 @@ var PaperBridge = {
 
   /** Reuse an open pair, replacing the right reader only for a different translation. */
   async split(source, translated) {
+    try { await this.formulaCache?.link(source, translated); }
+    catch (error) { this.warn("公式缓存配对未能保存；PDF 分屏仍可使用。", error); }
     Zotero.debug("PaperBridge: opening source reader");
     const win = Zotero.getMainWindow();
     let reader = await Zotero.Reader.open(source.id);
@@ -395,7 +444,7 @@ var PaperBridge = {
       await existing.ready;
       return;
     }
-    this.closeSplit(reader.tabID);
+    await this.closeSplit(reader.tabID);
     const container = reader._iframe.parentElement;
     const originalStyle = container.getAttribute("style") || "";
     const leftStyle = reader._iframe.getAttribute("style") || "";
@@ -426,7 +475,7 @@ var PaperBridge = {
   annotationMessage(state, error) {
     if (this.splits.get(state.reader.tabID) !== state) {
       // A final save failure still needs a visible warning after its pane closes.
-      if (this.alive) Services.prompt.alert(Zotero.getMainWindow(), "PaperBridge", "译文批注未能保存：" + error.message);
+      this.warn("译文批注或阅读状态未能保存：", error);
       return;
     }
     const doc = state.browser.contentWindow?.document;
@@ -443,7 +492,7 @@ var PaperBridge = {
     message.textContent = "译文批注暂不可写；PDF 仍可阅读：" + error.message;
   },
 
-  /** Lazily load the independent native adapter without changing bootstrap dependencies. */
+  /** Lazily load the legacy single-owner adapter when the native contract is unavailable. */
   async translatedAnnotationOptions(state, frame) {
     await this.annotationWrites.get(state.translated.id);
     if (this.splits.get(state.reader.tabID) !== state) return {};
@@ -469,6 +518,42 @@ var PaperBridge = {
     }
   },
 
+  /** Create the existing compatibility reader only after native resources are released. */
+  async loadLegacySplit(state, frame, win) {
+    const { reader, translated } = state;
+    const bytes = await IOUtils.read(await translated.getFilePathAsync());
+    if (this.splits.get(reader.tabID) !== state) return;
+    const ftl = [];
+    for (const locale of [...Services.locale.appLocalesAsBCP47].reverse()) {
+      for (const name of ["branding/brand", "zotero", "reader"]) {
+        const url = `resource://app/localization/${locale}/${name}.ftl`;
+        try { ftl.push(Zotero.File.getContentsFromURL(url)); } catch (error) { Zotero.debug(`PaperBridge locale unavailable: ${url}`); }
+      }
+    }
+    const annotationOptions = await this.translatedAnnotationOptions(state, frame);
+    if (this.splits.get(reader.tabID) !== state) return;
+    const options = {
+      type: "pdf", data: { buf: bytes }, annotations: [], readOnly: true,
+      primaryViewState: { pageIndex: reader._internalReader._state.primaryViewState?.pageIndex || 0, scale: "page-width" },
+      sidebarOpen: false, sidebarWidth: 200, showContextPaneToggle: false,
+      bottomPlaceholderHeight: null, rtl: Zotero.rtl, fontSize: Zotero.Prefs.get("fontSize"),
+      ftl, showAnnotations: false, enableReadAloud: false,
+      onChangeViewState() {}, onChangeViewStats() {}, onSaveAnnotations() {}, onDeleteAnnotations() {},
+      onSaveCustomThemes() {}, onSetLightTheme() {}, onSetDarkTheme() {},
+      onOpenLink: url => Zotero.launchURL(url),
+      onOpenContextMenu: () => {}, onSetDataTransferAnnotations: () => {},
+      onToggleSidebar: () => {}, onChangeSidebarWidth: () => {}, onChangeSidebarView: () => {},
+      onTextSelectionAnnotationModeChange: () => {}, onToolbarShiftTab: () => {}, onIframeTab: () => {},
+      onConfirm: (title, text) => Services.prompt.confirm(win, title, text),
+      ...annotationOptions
+    };
+    state.right = frame.wrappedJSObject.createReader(Components.utils.cloneInto(options, frame, { cloneFunctions: true }));
+    state.annotations?.connect(state.right);
+    Zotero.debug("PaperBridge: translation reader created");
+    state.right.setTitle("译文 · " + translated.getField("title"));
+    await state.right._primaryView.initializedPromise;
+  },
+
   /** Initialize only the still-current pair, without letting stale work close its replacement. */
   async loadSplit(state, loaded, win) {
     const { reader, translated, browser } = state;
@@ -477,38 +562,34 @@ var PaperBridge = {
       if (this.splits.get(reader.tabID) !== state) return;
       Zotero.debug("PaperBridge: translation reader frame loaded");
       const frame = browser.contentWindow;
-      frame.addEventListener("error", event => Zotero.logError(event.error || event.message));
-      const bytes = await IOUtils.read(await translated.getFilePathAsync());
+      const onError = event => Zotero.logError(event.error || event.message);
+      frame.addEventListener("error", onError);
+      state.cleanups.push(() => frame.removeEventListener?.("error", onError));
+      await this.annotationWrites.get(translated.id);
       if (this.splits.get(reader.tabID) !== state) return;
-      const ftl = [];
-      for (const locale of [...Services.locale.appLocalesAsBCP47].reverse()) {
-        for (const name of ["branding/brand", "zotero", "reader"]) {
-          const url = `resource://app/localization/${locale}/${name}.ftl`;
-          try { ftl.push(Zotero.File.getContentsFromURL(url)); } catch (error) { Zotero.debug(`PaperBridge locale unavailable: ${url}`); }
+      if (typeof TranslationReader !== "undefined" && TranslationReader.supported(state, translated)) {
+        try {
+          await TranslationReader.open(this, state, translated);
+        } catch (error) {
+          if (this.splits.get(reader.tabID) !== state) throw error;
+          this.formulas?.detach(state.translationReader);
+          try { await TranslationReader.close(state); }
+          catch (closeError) { Zotero.logError(closeError); }
+          if (this.splits.get(reader.tabID) !== state) return;
+          delete state.translationReader;
+          delete state.nativeOpening;
+          state.right = null;
+          state.closing = false;
+          this.warn("原生译文阅读器接口暂不可用，已切换兼容阅读模式。", error);
         }
       }
-      const annotationOptions = await this.translatedAnnotationOptions(state, frame);
       if (this.splits.get(reader.tabID) !== state) return;
-      const options = {
-        type: "pdf", data: { buf: bytes }, annotations: [], readOnly: true,
-        primaryViewState: { pageIndex: reader._internalReader._state.primaryViewState?.pageIndex || 0, scale: "page-width" },
-        sidebarOpen: false, sidebarWidth: 200, showContextPaneToggle: false,
-        bottomPlaceholderHeight: null, rtl: Zotero.rtl, fontSize: Zotero.Prefs.get("fontSize"),
-        ftl, showAnnotations: false, enableReadAloud: false,
-        onChangeViewState() {}, onChangeViewStats() {}, onSaveAnnotations() {}, onDeleteAnnotations() {},
-        onSaveCustomThemes() {}, onSetLightTheme() {}, onSetDarkTheme() {},
-        onOpenLink: url => Zotero.launchURL(url),
-        onOpenContextMenu: () => {}, onSetDataTransferAnnotations: () => {},
-        onToggleSidebar: () => {}, onChangeSidebarWidth: () => {}, onChangeSidebarView: () => {},
-        onTextSelectionAnnotationModeChange: () => {}, onToolbarShiftTab: () => {}, onIframeTab: () => {},
-        onConfirm: (title, text) => Services.prompt.confirm(win, title, text),
-        ...annotationOptions
-      };
-      state.right = frame.wrappedJSObject.createReader(Components.utils.cloneInto(options, frame, { cloneFunctions: true }));
-      state.annotations?.connect(state.right);
-      Zotero.debug("PaperBridge: translation reader created");
-      state.right.setTitle("译文 · " + translated.getField("title"));
-      await state.right._primaryView.initializedPromise;
+      if (!state.translationReader) await this.loadLegacySplit(state, frame, win);
+      if (this.splits.get(reader.tabID) !== state) return;
+      if (state.translationReader) {
+        try { await this.formulas?.attach(state.translationReader); }
+        catch (error) { Zotero.logError(error); }
+      }
       if (this.splits.get(reader.tabID) !== state) return;
       this.splitControls(state, frame.document);
       this.bindSync(state);
@@ -518,7 +599,7 @@ var PaperBridge = {
       rightApp.pdfViewer.currentScaleValue = "page-width";
       this.syncPosition(state, 0);
     } catch (error) {
-      if (this.splits.get(reader.tabID) === state) this.closeSplit(reader.tabID);
+      if (this.splits.get(reader.tabID) === state) await this.closeSplit(reader.tabID);
       throw error;
     }
   },
@@ -528,7 +609,20 @@ var PaperBridge = {
     // Keep navigation and search usable when each pane is narrower than a full reader.
     for (const target of [state.reader._iframeWindow.document, doc]) {
       const style = target.createElement("style");
-      style.textContent = "@media (max-width:700px){.toolbar .center.tools{display:none!important}.toolbar #read-aloud,.toolbar #navigateBack{display:none!important}.toolbar .start{gap:2px!important}.toolbar .divider{margin:0 2px!important}}";
+      style.textContent = `@media (max-width:700px) {
+        .toolbar {height:76px!important;min-height:76px;flex-wrap:wrap;align-content:center;gap:2px}
+        .toolbar .center.tools {display:flex!important;order:3;flex:1 0 100%;justify-content:center;height:32px;overflow-x:auto}
+        .toolbar #read-aloud,.toolbar #navigateBack {display:none!important}
+        .toolbar .start {gap:2px!important}
+        .toolbar .divider {margin:0 2px!important}
+        #split-view,.split-view,.sidebar-resizer,#sidebarContainer {top:76px}
+      }
+      @media (max-width:420px) {
+        .toolbar #zoomIn,.toolbar #zoomOut,.toolbar #zoomAuto,.toolbar #readingMode {display:none!important}
+      }
+      @media (max-width:300px) {
+        .toolbar #previous,.toolbar #next,.toolbar .start .divider {display:none!important}
+      }`;
       if (target === doc) {
         // Scope the new palette to our controls, leaving native PDF and text layers untouched.
         style.textContent += `
@@ -564,10 +658,6 @@ var PaperBridge = {
               --pb-accent:#9bbcff; --pb-soft:#2c3a54;
             }
           }`;
-      }
-      if (target === doc && state.annotations) {
-        // Keep Zotero's actual annotation tools reachable even in a narrow translated pane.
-        style.textContent += "@media (max-width:700px){.toolbar{overflow-x:auto}.toolbar .center.tools{display:flex!important}.toolbar .start,.toolbar .center,.toolbar .end{flex-shrink:0}}";
       }
       target.head.append(style);
       state.cleanups.push(() => style.remove());
@@ -661,9 +751,24 @@ var PaperBridge = {
   /** Dispose every reader hook even if one private cleanup API has changed. */
   closeSplit(tabID) {
     const state = this.splits.get(tabID);
-    if (!state) return;
-    if (state.annotations) {
-      state.annotationSave = state.annotations.close();
+    if (!state) return this.closingSplits.get(tabID) || Promise.resolve();
+    this.splits.delete(tabID);
+    state.closing = true;
+    try { if (state.translationReader) this.formulas?.detach(state.translationReader); }
+    catch (error) { Zotero.logError(error); }
+    let write;
+    try {
+      // Both adapters snapshot synchronously before the parent tab can destroy its frame.
+      write = state.translationReader ? TranslationReader.close(state) : state.annotations?.close();
+    } catch (error) { write = Promise.reject(error); }
+    const saved = Promise.resolve(write).catch(error => {
+      try { this.annotationMessage(state, error); }
+      catch (displayError) { Zotero.logError(displayError); }
+    });
+    if (state.translationReader || state.annotations) {
+      const previous = this.annotationWrites.get(state.translated.id);
+      // A second pane of the same attachment must not hide an earlier outstanding write.
+      state.annotationSave = previous ? Promise.all([previous, saved]) : saved;
       this.annotationWrites.set(state.translated.id, state.annotationSave);
       state.annotationSave.then(() => {
         if (this.annotationWrites.get(state.translated.id) === state.annotationSave) {
@@ -671,15 +776,27 @@ var PaperBridge = {
         }
       });
     }
-    this.splits.delete(tabID);
-    const cleanups = [...state.cleanups, () => state.right?._primaryView?.destroy(),
-      () => state.browser.remove(), () => state.divider.remove(),
-      () => state.container.setAttribute("style", state.originalStyle),
-      () => state.reader._iframe.setAttribute("style", state.leftStyle),
-      () => state.leftFlex === null ? state.reader._iframe.removeAttribute("flex")
-        : state.reader._iframe.setAttribute("flex", state.leftFlex)];
-    for (const cleanup of cleanups) {
-      try { cleanup(); } catch (error) { Zotero.logError(error); }
-    }
+    /** Restore the host layout even if a detached frame refuses one cleanup. */
+    const dispose = () => {
+      const cleanups = [...state.cleanups,
+        () => { if (!state.translationReader) state.right?._primaryView?.destroy(); },
+        () => state.browser.remove(), () => state.divider.remove(),
+        () => state.container.setAttribute("style", state.originalStyle),
+        () => state.reader._iframe.setAttribute("style", state.leftStyle),
+        () => state.leftFlex === null ? state.reader._iframe.removeAttribute("flex")
+          : state.reader._iframe.setAttribute("flex", state.leftFlex)];
+      for (const cleanup of cleanups) {
+        try { cleanup(); } catch (error) { Zotero.logError(error); }
+      }
+    };
+    // Keep native content alive through its flush; legacy saves own privileged snapshots.
+    if (!state.translationReader) dispose();
+    const closing = (state.annotationSave || saved).then(() => {
+      if (state.translationReader) dispose();
+    }).finally(() => {
+      if (this.closingSplits.get(tabID) === closing) this.closingSplits.delete(tabID);
+    });
+    this.closingSplits.set(tabID, closing);
+    return closing;
   }
 };

@@ -97,7 +97,7 @@
     state.sync=true;state.active=0;
     reader.navigate({pageIndex:1});
     await Zotero.Promise.delay(1000);
-    bridge.closeSplit(reader.tabID);
+    await bridge.closeSplit(reader.tabID);
     report.cleanup = !bridge.splits.has(reader.tabID);
     await bridge.split(source,translated);
     await bridge.translate(reader);

@@ -1,19 +1,33 @@
-<!-- Build, verify and publish exact Linux/Windows artifacts without changing unrelated channels. -->
+<!-- Candidate build and release policy while preserving frozen packages and platform channels. -->
 # Linux/Windows packaging and release
 
-Target **0.3.7**: Linux/Windows **bundled** and **local-Python** variants. This guide
-does not assert completed builds, native tests or publication. No macOS integration,
-build or replacement: preserve its assets/channels and repository-wide **Latest**.
+Published baseline: Linux/Windows **freeze07 0.3.7**, **bundled** and **local-Python**
+variants, plus the separate macOS **0.4.2** release. Their packages, tags and feeds
+remain unchanged; do not compare version numbers across platforms or replace the
+macOS assets/channels or repository-wide **Latest**.
 
-Before building, align `addon/manifest.json`, `backend/server.py`'s health version,
-`pyproject.toml` and the project's `uv.lock` entry. Keep BabelDOC **0.6.4** /
-PyMuPDF **1.26.7**; no engine migration.
+`master` has absorbed PR #3's formula selection/hover copying and local JSON cache,
+plus attachment-backed `TranslationReader` primary with one unsupported-interface
+`TranslationAnnotations` fallback, never dual writes. Task recovery, sync markers,
+reading assets and existing reading controls remain. This is **unpublished source**;
+source metadata stays **0.3.7** for now, not a replacement 0.3.7 release. No macOS
+build, three-platform merged-package native/upgrade acceptance or paid formula-quality
+acceptance is asserted here. Formula conversion remains paired DeepSeek-only Key/URL,
+fixed `deepseek-flash`, with native/cached results preferred.
+
+Before authorizing a new release, align `addon/manifest.json`, `backend/server.py`'s
+health version, `pyproject.toml` and the project's `uv.lock` entry to the approved
+version; never rewrite the frozen v0.3.7 artifacts. Keep BabelDOC **0.6.4** /
+PyMuPDF **1.26.7**; this source increment adds no dependencies or engine migration.
 
 ## Build on the target OS
 
 Use the project's `.venv`. Remove interfering `PYTHONHOME`, `PYTHONPATH` or
 native-library overrides; `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` avoids foreign test
 plugins. Host Chinese fonts are required; machine font caches are not shipped.
+
+Examples below build local candidates with the current 0.3.7 source metadata, not
+published freeze07 replacements. Use the approved new identity before publication.
 
 Linux:
 
@@ -22,7 +36,7 @@ set -e
 sh scripts/setup.sh
 .venv/bin/python -B scripts/stage_runtime.py
 for mode in bundled local; do
-  .venv/bin/python -B scripts/build.py --python "$mode" --output-dir dist/release-0.3.7
+  .venv/bin/python -B scripts/build.py --python "$mode" --output-dir dist/candidate-pr3
 done
 ```
 
@@ -34,7 +48,7 @@ $py = '.\.venv\Scripts\python.exe'
 & $py -B scripts/stage_runtime.py
 if ($LASTEXITCODE -ne 0) { throw 'Runtime staging failed' }
 foreach ($mode in @('bundled', 'local')) {
-  & $py -B scripts/build.py --python $mode --output-dir dist/release-0.3.7
+  & $py -B scripts/build.py --python $mode --output-dir dist/candidate-pr3
   if ($LASTEXITCODE -ne 0) { throw 'Package build failed' }
 }
 ```
@@ -62,10 +76,10 @@ Collect all four packages/drafts together and verify from the frozen source chec
 ```sh
 set -e
 for channel in linux-x64 linux-x64-local-python windows-x64 windows-x64-local-python; do
-  xpi="dist/release-0.3.7/paperbridge-0.3.7-$channel.xpi"
+  xpi="dist/candidate-pr3/paperbridge-0.3.7-$channel.xpi"
   .venv/bin/python -B scripts/verify_release.py \
     --xpi "$xpi" --sha256 "$xpi.sha256" \
-    --feed "dist/release-0.3.7/updates/$channel.json" --report "$xpi.verification.json"
+    --feed "dist/candidate-pr3/updates/$channel.json" --report "$xpi.verification.json"
 done
 ```
 
@@ -89,6 +103,11 @@ does not prove native reproducibility. Bind to **finished XPI SHA256**, not buil
 
 ## Acceptance and authorized publication
 
+Existing freeze07 Linux/Windows create/reopen evidence remains scoped to those exact
+packages and their earlier reader integration; controlled PDF.js selections are not
+physical mouse/drag proof. It does not certify the new primary/fallback, formula cache,
+three-platform merged packages or genuine old-to-new upgrades.
+
 1. Freeze shipped source/notices/native inputs. Rebuild affected XPIs after changes;
    acceptance belongs to exact hashes, not filenames/version or earlier runs.
 2. Use native AddonManager file installation/update with stopped-profile backups.
@@ -96,6 +115,9 @@ does not prove native reproducibility. Bind to **finished XPI SHA256**, not buil
    reading/notes/annotations and normal-exit cold reopen with the same profile/data,
    new PID. Paid requests need authorization; fixtures/cache replay are not quality acceptance.
    Check Windows DLL consent/refusal; Linux must stay exempt.
+   For this increment, distinguish attachment-backed primary from the single
+   unsupported-interface fallback, check no dual writes, and exercise native/cache-first
+   formula copying separately from explicitly authorized paid conversion quality.
 3. Complete [corresponding-source delivery](source-delivery-readiness.md): the
    **303 archives**, **four Linux build inputs**, modifications, native evidence and
    original notices for the exact four XPIs. Keep user-confirmed Community 2026

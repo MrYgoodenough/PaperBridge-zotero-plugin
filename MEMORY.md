@@ -1,9 +1,17 @@
 <!-- Current shared baseline, safe development entry points and unresolved product boundaries. -->
 # 当前开发基线
 
-- 主分支 `master`，共享源码及已公开 Linux/Windows 版本 **0.3.7**；`v0.3.7` 固定生产提交 `3f85caf61303245b880803eceeb977f4124630ec`。版本同步 addon manifest、server VERSION、pyproject 和 uv.lock。四条稳定通道绑定最终 freeze07 四包及下述 v16 引擎/v5 提示；旧 freeze05/v14 与 freeze06/v15 四包不能代表当前源码验收。后续 feed/记忆/报告提交不改变冻结生产身份。
-- 固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。不顺带升级引擎。独立 macOS **0.4.2** 专属源码未取得：不合流、逆向提取、重建覆盖或推进其发布；共享代码继续跨平台。
+- 主分支 `master` 为吸收 macOS 增量后的**未发布共享源码**，版本元数据暂仍为 **0.3.7**（addon manifest、server VERSION、pyproject、uv.lock 一致），不代表旧安装包新增了功能。已公开 Linux/Windows **0.3.7** 的 `v0.3.7` 固定生产提交 `3f85caf61303245b880803eceeb977f4124630ec`；四条稳定通道仍绑定 freeze07 四包及下述 v16 引擎/v5 提示。旧 freeze05/v14 与 freeze06/v15 四包不能代表该公开基线；后续源码合流不重写冻结包、源码 ZIP 或标签。
+- 固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。不顺带升级引擎。
+- 独立 macOS **0.4.2** 的第一方源码由 [PR #3](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/pull/3) 提供，头提交 `272d85e52bf653d084191e705cabe60ef1188f62`、共同基线 `b51a82f`；功能增量已吸收到共享实现，保留合流前 `bbf1f0d` 的任务/阅读/引擎修复。既有 macOS 发布包及通道仍独立且不覆盖；共享新版本号和三平台安装包发布需另行确定。
 - 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。Windows 用项目实际有效的环境，不借用其他产品的 Python。
+
+## 共享公式与原生译文阅读器
+
+- `formulas.js` / `formula-cache.js` 负责选区与显示公式悬停复制、本机 JSON 和晚配对合并；工具菜单/设置可管理缓存。缓存位于 Zotero 数据目录 `paperbridge/formula-cache`，只清理本模块 JSON，按存活论文/PDF 引用保留，不等于跨设备云同步。优先复用原生 LaTeX/缓存；转写固定使用已保存的 **DeepSeek Key 与基础地址配对**、`deepseek-flash`，不借用当前 compatible 配置。缓存写入失败不阻断已取得 LaTeX 的复制。
+- `/formulas/regions` 复用包内模型进行 CPU 本地检测，后台启动为非交互；失败不写成永久空页，悬停重试有界。`formula_regions.py` 保留旋转 CropBox/MediaBox 的原始 PDF user-space 坐标，初始化失败可重试；`formulas.py` 拒绝带明确 provider error 的部分 LaTeX。没有新增依赖或升级 BabelDOC；科学依赖用例在 `check_offline.py` 的现有 full-only 边界中保留完整验收。
+- `reader.js` 的 attachment-backed `TranslationReader` 是共享原生首选，`annotations.js` 的 `TranslationAnnotations` 仅在接口不支持时作为兼容 fallback；同一译文 pane **只有一个批注 owner**。embedded reader 不作为可选择的 Zotero tab，不显示整篇翻译命令；原生菜单/权限/批注属于译文附件。关闭在首个 await 前截取 debounce 编辑，等待本附件写入/状态 flush，并在失败时仍释放注册、factory、observer、view 和原分屏布局。保留 source itemID 恢复、同 pair 复用、stale 初始化保护、flex 恢复及任务中断/重试语义。
+- 合流候选的 Linux Zotero **10.0.8** 隔离原生阅读、受信输入创建高亮/下划线/笔记、关闭/重开、删除和真实进程重启已验证，未使用日常资料库；受信 Gecko 事件不是物理鼠标/键盘验收。Windows/macOS 合流包、公式真实转写质量/检测召回及安装升级仍未验收。共享源码 CI、候选 Linux 依赖 smoke 和维护者旧包证据不能替代这些边界；后续发布需重建并绑定实际三平台产物。
 
 ## 翻译、身份与结果
 

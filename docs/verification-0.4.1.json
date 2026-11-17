@@ -1,0 +1,101 @@
+{
+  "version": "0.4.1",
+  "date": "2026-11-12",
+  "platform": "macOS Apple Silicon",
+  "zotero_compatibility": "9.0–10.*",
+  "zotero_tested": "10.0.9",
+  "backend_tests": {
+    "passed": 53,
+    "failed": 0
+  },
+  "javascript_tests": {
+    "coordinate_sync": "passed",
+    "formula_clipboard": "passed",
+    "syntax": "passed"
+  },
+  "integration": {
+    "version": "10.0.9",
+    "plugin": "0.4.1",
+    "checks": {
+      "packagedEngine": true,
+      "rightEditable": true,
+      "rightRegistered": true,
+      "annotationToolbarVisible": true,
+      "highlightSavedToTranslation": true,
+      "underlineSavedToTranslation": true,
+      "noteSavedToTranslation": true,
+      "sourceAnnotationsUntouched": true,
+      "immediateCloseFlush": true,
+      "cleanup": true,
+      "annotationsRestored": true,
+      "forwardSync": true,
+      "reverseSync": true,
+      "independentScroll": true,
+      "inlineLatexClipboard": true,
+      "displayLatexClipboard": true,
+      "formulaPopupButtons": true,
+      "formulaContextMenu": true,
+      "deletePersisted": true,
+      "deleteRestored": true,
+      "tabCloseFlush": true,
+      "tabCloseCleanup": true,
+      "standaloneTranslationTab": true,
+      "standaloneAnnotations": true,
+      "nativeAnnotationUpdates": true,
+      "renderedFormulaPopup": true,
+      "clipboardUnchangedOnFailure": true,
+      "pluginStopFlush": true,
+      "pluginStopCleanup": true,
+      "engineStop": true
+    },
+    "engine": {
+      "version": "0.4.1",
+      "root": "<PROJECT_ROOT>/.runtime/zotero10-data/paperbridge/engine",
+      "engine": "BabelDOC 0.6.4",
+      "python": "<PROJECT_ROOT>/.runtime/zotero10-data/paperbridge/engine/python/bin/python3.12"
+    },
+    "sourceID": 65,
+    "translatedID": 66,
+    "ok": true,
+    "tabID": "tab-SjlrSdjb",
+    "layout": {
+      "rightWidth": 497,
+      "toolbarHeight": 76,
+      "formulaButtons": [
+        "复制公式 $…$",
+        "复制公式 $$…$$"
+      ]
+    }
+  },
+  "integration_fixture": "Two separate Zotero attachment copies of the public pi0-v3.pdf; tests verify the native reader and annotation plumbing, without invoking paid full-paper translation.",
+  "provider_verification": {
+    "status": "not_completed",
+    "reason": "Project test API key returned HTTP 401 on the first real DeepSeek formula request; real model transcription accuracy not verified.",
+    "successful_requests": 0
+  },
+  "annotation_correspondence": "Deferred; annotations are saved independently to each PDF attachment.",
+  "package": {
+    "file": "dist/paperbridge-0.4.1-macos-arm64.xpi",
+    "bytes": 181425505,
+    "MiB": 173.02,
+    "sha256": "ef77cee74ab79d6468595b29f574c42d05cd957aeba954cf88b1111f742b255d",
+    "entries": 6505,
+    "integrity": "passed",
+    "source_matches": "passed",
+    "credentials_and_test_files_excluded": true,
+    "zoteroRange": "9.0–10.*",
+    "runtimePythonMode": "bundled"
+  },
+  "process_files": [
+    ".runtime/zotero10-profile/",
+    ".runtime/zotero10-data/",
+    ".runtime/zotero10-console.log",
+    ".cache/package/"
+  ],
+  "git_commit_created": false,
+  "source_publication": {
+    "date": "2026-11-16",
+    "branch": "codex/macos-0.4.2-source",
+    "local_paths_redacted": true
+  }
+}

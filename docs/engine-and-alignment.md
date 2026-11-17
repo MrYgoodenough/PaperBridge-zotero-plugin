@@ -1,9 +1,11 @@
-<!-- Capture, portable reading assets and geometry-maintenance entry points. -->
+<!-- Portable reading assets, attachment-backed hosting and local formula cache boundaries. -->
 # 引擎与可信阅读映射
 
 ## 设计边界
 
 生产基线为 BabelDOC **0.6.4** / PyMuPDF **1.26.7**。翻译任务、缓存、PDF 附件和映射是不同资产：阅读已有结果不依赖翻译 worker、凭据或 Python 引擎。
+
+`master` 已吸收 PR #3 的公式与附件宿主增量，仍保留任务恢复、同步标记/阅读资产、旧 sidecar 和阅读控制。该增量尚未发布，源码版本标记暂为 **0.3.7**；已发布 Linux/Windows freeze07 0.3.7 与独立 macOS 0.4.2 的包、tags、feeds 不变。
 
 最小映射单位是**同身份、已应用的翻译请求片段**，不是词/句语义对齐。可信表示两份最终 PDF 的字面文本与几何证据成立，不代表译文语义正确。跨页、移页/合并、隐藏/覆盖文字、重复字面及不支持的几何继续排除，不能为提高覆盖率猜配。
 
@@ -46,12 +48,19 @@
 
 ## 阅读交互
 
+- 译文 reader 优先采用 attachment-backed `TranslationReader`，旧 `TranslationAnnotations` 仅在接口不支持时作为单一 fallback，不双写；批注始终归属真实译文附件，见[批注契约](annotations.md)。
 - `alignment.js` 提供双向显式定位：点击/拖选松开仅记录落点，按钮才导航。普通链接、批注和选区不被抢占。
 - schema 2 按四边形命中，逐行显示短暂高亮；行间空白和短末行外不命中。不同单元重叠拒绝定位；schema 1 保留旧矩形行为。
 - 默认关闭的悬停采用原生 CSS Custom Highlights，按可信区域筛选完整文本项 Range，`priority=-1`。横排仅补偿原生字体上下留白，要求中心及主要高度仍在同一可信行内；不扩大横向、旋转或倾斜边界，不改变后端字面/几何验证。不改 textLayer opacity、PDF、canvas 或 selection；不跳页、不改页同步。
 - 同步和悬停开关常显；显式定位、选区笔记与批注汇总集中在默认收起的“阅读工具”中。主题样式仅作用于插件控件，不重设原生 PDF 或文字层。
 - 缩放/旋转/重绘撤销旧几何，关闭分屏清理自有监听、timer 和 registry。可选原生接口缺失只停用对应功能。
 - 同一附件对重复打开复用分屏与初始化 promise，保留页码、缩放、宽度和同步状态；不同译本重新建立对应状态。
+
+## 公式转写与本机缓存
+
+公式选区转写与悬停复制优先复用原生结果/已有缓存。未缓存的转写只使用配对的 DeepSeek Key/URL，固定 `deepseek-flash`，不继承其他兼容服务的模型或能力配置；转换可能收费，结构检查不代表数学语义正确。
+
+`backend/formula_regions.py` 使用既有 bundled 布局模型做本地页级检测，`backend/formulas.py` 只发送选区文字和字形几何。区域/字形为原 PDF user-space，页码从 0 开始，保留旋转页的 CropBox/MediaBox 原点；无文字层公式没有 bundled OCR。结果 JSON 是本机持久缓存，与可同步的 alignment JSON 附件、原生批注及任务成果分开，不宣称跨设备同步，也不替代旧阅读恢复路径。
 
 ## 改动入口与验证
 
@@ -64,7 +73,9 @@
 | PDF 保存、可选映射失败提示 | `addon/content/library.js`、`tasks.js` |
 | 发现译本、普通阅读降级 | `addon/content/paperbridge.js` |
 | 命中、逐行高亮、双向定位 | `addon/content/alignment.js` |
+| 附件宿主与单一批注 fallback | `addon/content/paperbridge.js`、`annotations.js` |
+| 本地公式区域与选区 LaTeX 转写 | `backend/formula_regions.py`、`formulas.py` |
 
 离线入口为 `scripts/check_offline.py`。`prepare_representative_hover.py` 只重放已授权论文缓存。原生合并套件为 `tests/assets_packaged.js` / `lifecycle_asset_packaged.js`：生产者保存附件，接收者无任务/sidecar/引擎，仅用相同附件字节阅读；故障明确降级；真进程冷重开复核。
 
-改生产代码后须重建 XPI 并核对精确 hash。同版本旧包、引擎 build ID、mocks 或轻量 CI 不能替代对应包的原生验收。macOS 专属源码不在本轮合流/验收范围，共享实现仍保持兼容。
+改生产代码后须重建 XPI 并核对精确 hash。同版本旧包、引擎 build ID、mocks 或轻量 CI 不能替代对应包的原生验收。当前源码增量没有新增依赖或升级引擎；macOS 构建、新合流包三平台原生/升级及付费公式质量仍未验收，不能沿用旧包记录宣称完成。

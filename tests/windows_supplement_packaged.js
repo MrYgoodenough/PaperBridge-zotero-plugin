@@ -112,6 +112,20 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
     return result;
   }
 
+  /** Require one translated annotation owner and expose its actual pending writes. */
+  function annotationWrites(split) {
+    const native = split.translationReader;
+    const legacy = split.annotations;
+    verify(!!native !== !!legacy, 'Split has exactly one translated annotation owner');
+    if (native) {
+      verify(native.itemID === split.translated.id && typeof split.pendingWrites?.[Symbol.iterator] === 'function',
+        'Native annotation owner and write queue belong to the translated attachment');
+      return Promise.all(split.pendingWrites);
+    }
+    verify(typeof legacy.pending?.then === 'function', 'Legacy annotation owner exposes its persistence queue');
+    return legacy.pending;
+  }
+
   /** Hash only fixture bytes or inert metadata, never credentials or account information. */
   function checksum(bytes) {
     const hash = Cc['@mozilla.org/security/hash;1'].createInstance(Ci.nsICryptoHash);
@@ -331,7 +345,8 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
     }
     const reader = [...readers].find(value => value.itemID === fixture.source.id);
     pair = bridge.splits.get(reader?.tabID);
-    verify(pair?.alignment && pair.annotations && !pair.right._state.readOnly, 'Production note buttons and editable native annotations are ready');
+    verify(pair?.alignment && !pair.right._state.readOnly, 'Production note buttons and editable native annotations are ready');
+    await ready(annotationWrites(pair), 'Translated annotation owner persistence queue did not finish');
     await ready(pair.right._primaryView.initializedPromise, 'Translated native reader did not initialize');
     await wait(() => pair.apps[1]?.pdfDocument && pair.frames[1]?.document, 'Translated PDF application did not load');
     verify(saved.pageIndex < pair.apps[1].pdfDocument.numPages, 'Fixture page exists in the actual PDF');
@@ -851,10 +866,9 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       for (const reader of readers) {
         await cleanupStep(async () => {
           const split = bridge.splits.get(reader.tabID);
+          await ready(bridge.closeSplit(reader.tabID), 'Owned split did not fully close and save');
           if (split) {
-            bridge.closeSplit(reader.tabID);
-            await ready(split.annotationSave, 'Owned split close-save did not finish');
-            await ready(split.annotations?.pending, 'Owned native annotation writes did not finish');
+            await ready(annotationWrites(split), 'Owned native annotation writes did not finish');
           }
         });
         await cleanupStep(() => { if (Zotero.Reader._readers.includes(reader)) reader.close(); });

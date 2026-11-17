@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Native cache viewer; actions affect local formula JSON only, never PDF or translation data. -->
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+ xmlns:html="http://www.w3.org/1999/xhtml" title="PaperBridge · 公式缓存" width="800" height="650">
+ <html:style>
+  :root {color-scheme:light dark;background:Canvas;color:CanvasText}
+  body {font:14px system-ui;margin:20px;display:flex;flex-direction:column;gap:12px}
+  h1 {font-size:21px;margin:0} p {margin:0;line-height:1.6}
+  .layout {display:grid;grid-template-columns:250px 1fr;gap:12px;min-height:330px}
+  #documents {max-height:400px;overflow:auto;border:1px solid #8885;border-radius:6px}
+  #documents button {display:block;text-align:start;width:100%;border:0;border-bottom:1px solid #8884;border-radius:0;overflow-wrap:anywhere}
+  #documents button[aria-pressed=true] {background:Highlight;color:HighlightText}
+  #details {width:100%;height:100%;box-sizing:border-box;resize:none;background:Canvas;color:CanvasText;border:1px solid #8885;border-radius:6px;padding:12px;font:13px ui-monospace,monospace;white-space:pre}
+  button {padding:8px 12px;border:1px solid #8886;border-radius:5px;font:inherit;cursor:pointer;background:ButtonFace;color:ButtonText}
+  .actions {display:flex;gap:8px;flex-wrap:wrap} small {color:GrayText;overflow-wrap:anywhere}
+  #status {min-height:22px} [hidden] {display:none!important}
+ </html:style>
+ <html:body>
+  <html:h1>公式缓存</html:h1>
+  <html:p>每篇原 PDF 与已关联译文共用本机 JSON。关闭阅读器、重启和升级后继续复用，不代表云同步。</html:p>
+  <html:small id="location"/>
+  <html:div class="layout"><html:div id="documents" aria-label="已缓存 PDF"/><html:textarea id="details" readonly="readonly" aria-label="所选 PDF 的缓存内容"/></html:div>
+  <html:div class="actions"><html:button id="refresh">刷新</html:button><html:button id="clear" disabled="disabled">清除所选公式缓存</html:button><html:button id="clear-all">清除全部公式缓存</html:button><html:button id="close">关闭</html:button></html:div>
+  <html:p id="status" role="status"/>
+  <html:small>手动清除只删除公式结果和长公式区域缓存，不修改 PDF、标注、笔记或全文翻译缓存。</html:small>
+ </html:body>
+ <script src="chrome://paperbridge/content/formula-cache-ui.js"/>
+</window>

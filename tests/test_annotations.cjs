@@ -223,6 +223,20 @@ test('a pending write completes before close flush, and bridge reopen awaits tha
   await replacement.annotations.close();
 });
 
+test('a failed legacy close snapshot still unregisters its annotation observer', async () => {
+  const f = fixture();
+  const pane = await f.open();
+  const cyclic = annotation('BROKEN01');
+  cyclic.self = cyclic;
+  pane.reader._state.annotations = [cyclic];
+  await pane.controller.close();
+  assert.equal(f.observers.size, 0);
+  assert.equal(pane.controller.closed, true);
+  assert.equal(pane.controller.failed, true);
+  assert.equal(f.calls.writes.length, 0);
+  assert.ok(f.calls.errors.length);
+});
+
 test('a disposed iframe acknowledgement cannot fail a pending write or skip the close snapshot', async () => {
   const f = fixture();
   const pane = await f.open();

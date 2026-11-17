@@ -143,6 +143,12 @@
             <html:div class="actions"><html:button id="service-check" title="可能收费；执行前需要明确确认。">检查服务（可能收费）</html:button></html:div>
           </html:div>
           <html:details class="subsection">
+            <html:summary>公式复制与本机缓存</html:summary>
+            <html:small>选区或悬停显示公式可复制为 LaTeX。优先使用原生 LaTeX 和本机缓存；需要转写时固定使用已保存的 DeepSeek Key、基础地址与 deepseek-flash，不借用兼容服务配置。后台区域检测不调用服务商。</html:small>
+            <html:div class="actions"><html:button id="formula-cache">管理公式缓存</html:button></html:div>
+            <html:small>缓存保存在本机，不随 Zotero 云同步；清除不会删除 PDF 或批注。</html:small>
+          </html:details>
+          <html:details class="subsection">
             <html:summary>数据目录与最近用量</html:summary>
             <html:div class="actions"><html:button id="data">打开数据目录</html:button></html:div>
             <html:small id="locations" class="technical"/>

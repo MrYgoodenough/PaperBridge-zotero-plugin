@@ -1,4 +1,4 @@
-<!-- Project purpose, supported use and concise build/redistribution guidance. -->
+<!-- Project purpose, published installation options and current unpublished source scope. -->
 # PaperBridge · 论文对照翻译
 
 Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容服务，保留 PDF 排版、公式与图表，将译文保存为原生附件，并提供原文/译文分屏阅读、可信片段定位、原生批注和独立笔记。
@@ -13,7 +13,9 @@ Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容�
 | --- | --- | --- |
 | Linux x64 | 0.3.7 | [自带 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-linux-x64.xpi) · [本地 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-linux-x64-local-python.xpi) |
 | Windows x64 | 0.3.7 | [自带 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-windows-x64.xpi) · [本地 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-windows-x64-local-python.xpi) |
-| macOS Apple Silicon | 独立 0.4.2 | [独立发布](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)；专属源码不在本轮合流/重建范围 |
+| macOS Apple Silicon | 独立 0.4.2 | [独立发布](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)；既有安装包和更新通道保持独立 |
+
+当前 `master` 已吸收 PR #3 的公式与阅读宿主增量，**尚未发布**，源码版本标记暂保留 **0.3.7**。上表 Linux/Windows freeze07 0.3.7、独立 macOS 0.4.2 的安装包、标签和更新通道均未改变；新合流包的三平台原生、升级及付费公式质量验收尚未完成。
 
 自带版包含解释器、依赖、版面模型和 tokenizer，安装后不联网补引擎资源。本地版仅借用同架构 CPython **3.12**，依赖和模型仍随包提供，不修改系统 Python。Linux 需要 glibc ≥ 2.34，并安装思源宋体等简体中文衬线字体。
 
@@ -36,9 +38,13 @@ Windows 包首次启用排版引擎时需同意随包提供的 Microsoft DLL 条
 - verified 映射保存为独立 Zotero JSON 附件：只含身份、PDF 哈希和有限几何，没有原/译全文。另一设备下载相同附件字节后，可不启动 Python、不调用 API 地打开可信对照。
 - 新映射采用逐行四边形，减少整段大框对行间空白和短末行外区域的误命中。无法可靠追踪、跨页、歧义或无映射的区域不猜配；旧矩形兼容读取。
 - 默认关闭的 **段落高亮** 使用原生 CSS 文本高亮，两侧悬停联动但不跳页、不改变选区。映射缺失、损坏、未下载或 PDF 换字节时，精确功能明确降级，普通阅读/页同步保留；不会收费补映射。
-- 译文批注属于译文附件。**选区存笔记 / 批注汇总笔记**创建独立 Zotero note，带附件/物理页回链及引用。不复制原译双向批注，不修改 PDF。
+- 译文批注属于译文附件。当前源码优先使用绑定真实附件的 Zotero 阅读宿主；仅在接口不支持时使用单一兼容 fallback，不双写。**选区存笔记 / 批注汇总笔记**创建独立 Zotero note，带附件/物理页回链及引用。不复制原译双向批注，不修改 PDF。
 
 详细维护边界见[映射与阅读](docs/engine-and-alignment.md)、[笔记](docs/notes.md)和[原生批注](docs/annotations.md)。
+
+### 公式 LaTeX（未发布源码增量）
+
+支持公式选区转写与悬停复制，优先复用原生结果或本机 JSON 缓存。转写仅使用配对的 **DeepSeek Key/URL**，固定 **deepseek-flash**，不借用其他兼容服务配置；未命中的转换可能收费，结果仍需人工复核。公式缓存为本机数据，不等同于可同步的阅读映射附件。
 
 ## 数据、字体与费用
 
@@ -52,7 +58,7 @@ Windows 包首次启用排版引擎时需同意随包提供的 Microsoft DLL 条
 
 ## 开发与构建
 
-共享基线固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，不顺带升级引擎。项目 Python 位于 `.venv`，Windows 操作使用 PowerShell。
+共享基线固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，本次源码增量不新增生产依赖或升级引擎。项目 Python 位于 `.venv`，Windows 操作使用 PowerShell；不据此宣称 macOS 合流构建已完成。
 
 Linux：
 

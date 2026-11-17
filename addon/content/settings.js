@@ -263,6 +263,10 @@ window.addEventListener("load", function initializeSettings() {
   get("save").addEventListener("click", handleSave);
   get("test").addEventListener("click", check);
   get("service-check").addEventListener("click", check);
+  /** Open optional local caches without saving either provider draft. */
+  get("formula-cache").addEventListener("click", function openFormulaCache() {
+    bridge.showFormulaCache();
+  });
   get("locations").textContent = `译文：${bridge.storageRoot}/<附件 key>/translated.pdf\n缓存与引擎：${bridge.runtime.base}`;
   if (bridge.library.lastError) setStatus("上次缓存清理未完成：" + bridge.library.lastError, "warning");
   const recorded = bridge.pref("lastUsage");

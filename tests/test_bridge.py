@@ -246,6 +246,55 @@ def test_public_version_matches_package_metadata():
     assert bridge.VERSION == manifest["version"] == project["project"]["version"] == package["version"]
 
 
+@pytest.mark.parametrize("endpoint", ["latex", "regions"])
+def test_formula_endpoints_keep_auth_and_bounded_object_requests(store, monkeypatch, endpoint):
+    """Route selected content locally without inference, providers or weakening authentication."""
+    import formulas
+    import formula_regions
+    seen = []
+
+    def result(payload):
+        """Validate the mocked module boundary without loading a model or a credential."""
+        if endpoint == "latex":
+            formulas.selection_payload(payload)
+        elif not isinstance(payload.get("source_path"), str) or not isinstance(payload.get("page_index"), int):
+            raise ValueError("Invalid region request")
+        seen.append(payload)
+        return {"latex": r"\frac{x^2}{y_i}"} if endpoint == "latex" else {"regions": []}
+
+    monkeypatch.setattr(formulas if endpoint == "latex" else formula_regions,
+                        "convert" if endpoint == "latex" else "detect", result)
+    server = bridge.ThreadingHTTPServer(("127.0.0.1", 0), bridge.Handler)
+    server.token, server.store = "test-token", store
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    url = f"http://127.0.0.1:{server.server_port}/formulas/{endpoint}"
+    headers = {"Authorization": "Bearer test-token", "Content-Type": "application/json"}
+    payload = {"source_path": "offline.pdf", "page_index": 0}
+    if endpoint == "latex":
+        # Real glyph selections can legitimately exceed the ordinary 16 KiB body limit.
+        payload = {"text": "x2/yi", "glyphs": [{"c": "x", "rect": [0, 1, 2, 3], "page": 0}] * 400}
+        assert len(json.dumps(payload).encode()) > 16384
+    try:
+        data = json.dumps(payload).encode()
+        with pytest.raises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(urllib.request.Request(url, data=data))
+        assert error.value.code == 401
+        assert not seen
+        with urllib.request.urlopen(urllib.request.Request(url, data=data, headers=headers)) as response:
+            expected = {"latex": r"\frac{x^2}{y_i}"} if endpoint == "latex" else {"regions": []}
+            assert json.load(response) == expected
+        assert seen == [payload]
+        for invalid in (b"[]", b"{}", b" " * ((bridge.FORMULA_REQUEST_LIMIT if endpoint == "latex" else 16384) + 1)):
+            with pytest.raises(urllib.error.HTTPError) as error:
+                urllib.request.urlopen(urllib.request.Request(url, data=invalid, headers=headers))
+            assert error.value.code == 400
+        assert seen == [payload]
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
 def test_authenticated_local_recovery_and_diagnostics(store, tmp_path, monkeypatch):
     """Exercise the real HTTP routes without model calls or private diagnostic fields."""
     monkeypatch.setattr(bridge, "RUNTIME", tmp_path / "runtime")

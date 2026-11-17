@@ -21,10 +21,15 @@ async function startup({ id, version, rootURI }) {
   Services.scriptloader.loadSubScript(rootURI + "content/tasks.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/alignment.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/reading-assets.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/reader.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/formula-cache.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "content/formulas.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "content/paperbridge.js", scope);
   scope.PaperBridge.runtime = new scope.BundledRuntime(rootURI, version);
   scope.PaperBridge.library = new scope.TranslationLibrary(scope.PaperBridge);
   scope.PaperBridge.alignmentAssets = new scope.AlignmentAssets(scope.PaperBridge);
+  scope.PaperBridge.formulaCache = new scope.FormulaCache(scope.PaperBridge);
+  scope.PaperBridge.formulas = new scope.FormulaClipboard(scope.PaperBridge);
   Zotero.PaperBridge = scope.PaperBridge;
   Zotero.PaperBridge.ready = Zotero.PaperBridge.start(id);
   await Zotero.PaperBridge.ready;
@@ -42,8 +47,11 @@ function onMainWindowUnload({ window }) {
 
 /** Stop workers and release addon registrations. */
 async function shutdown() {
-  await Zotero.PaperBridge?.stop();
-  delete Zotero.PaperBridge;
-  chromeHandle?.destruct();
-  scope = null;
+  try {
+    await Zotero.PaperBridge?.stop();
+  } finally {
+    delete Zotero.PaperBridge;
+    try { chromeHandle?.destruct(); }
+    finally { scope = null; }
+  }
 }

@@ -62,6 +62,20 @@
     throw new Error(typeof message === "function" ? message() : message);
   }
 
+  /** Require one translated annotation owner and expose its actual pending writes. */
+  function annotationWrites(split) {
+    const native = split.translationReader;
+    const legacy = split.annotations;
+    check(!!native !== !!legacy, "Split has exactly one translated annotation owner");
+    if (native) {
+      check(native.itemID === split.translated.id && typeof split.pendingWrites?.[Symbol.iterator] === "function",
+        "Native annotation owner and write queue belong to the translated attachment");
+      return Promise.all(split.pendingWrites);
+    }
+    check(typeof legacy.pending?.then === "function", "Legacy annotation owner exposes its persistence queue");
+    return legacy.pending;
+  }
+
   /** Compare native paths without depending on Windows letter case or separators. */
   function samePath(left, right) {
     const normalize = value => {
@@ -393,6 +407,7 @@
     await bridge.split(source, target);
     state = [...bridge.splits.values()].find(split => split.reader.itemID === source.id);
     check(!!state?.alignment?.control && !!state.apps?.[1], "Parent exposes initialized split.alignment controller");
+    await annotationWrites(state);
     await until(() => state.alignment.mapping && !state.alignment.button.disabled && !state.alignment.targetButton.disabled,
       () => "Integrated map unavailable: " + state.alignment.status.textContent);
     check(validationCalls === previousCalls && [1,2].includes(state.alignment.mapping.schema_version),
@@ -400,13 +415,14 @@
     return { sourceCalls: observeNavigation(state, 0), targetCalls: observeNavigation(state, 1) };
   }
 
-  /** Close while retaining inspectable references to prove immediate cleanup. */
-  function closeSplit() {
+  /** Await full pane cleanup while retaining references for disposal assertions. */
+  async function closeSplit() {
     if (!state) return;
     const split = state;
     const alignment = split.alignment;
     const overlay = alignment.highlight;
-    bridge.closeSplit(split.reader.tabID);
+    await bridge.closeSplit(split.reader.tabID);
+    await annotationWrites(split);
     check(!bridge.splits.has(split.reader.tabID) && alignment.disposed && !alignment.control.isConnected
       && !split.browser.isConnected && !overlay?.isConnected && alignment.highlightTimer == null
       && alignment.point === null && alignment.sourcePoint === null && alignment.pending === null && alignment.mapping === null
@@ -726,7 +742,7 @@
     const highlight = await selectNoteText(split, pageIndex, "highlight");
     const annotation = await until(() => split.translated.getAnnotations().find(item =>
       !previousKeys.has(item.key) && item.annotationType === "highlight"), "Trusted native highlight was not persisted");
-    await split.annotations.pending;
+    await annotationWrites(split);
     const annotationJSON = await Zotero.Annotations.toJSON(annotation);
     // Native annotation text uses NFKC (including full-width punctuation); keep both observed strings.
     check(annotation.parentID === split.translated.id && annotationJSON.position.pageIndex === pageIndex
@@ -924,7 +940,7 @@
     await rendered(state.apps[0].pdfViewer, state.apps[0].pdfViewer.currentPageNumber - 1);
     state.apps[1].pdfViewer.pagesRotation = targetRotation;
     await rendered(state.apps[1].pdfViewer, state.apps[1].pdfViewer.currentPageNumber - 1);
-    const oldAlignment = closeSplit();
+    const oldAlignment = await closeSplit();
     observers = await openMapped(source, target);
     check(state.alignment !== oldAlignment && oldAlignment.disposed, "Reopen creates a fresh validated controller");
     check(report.noteRecords.every(record => {
@@ -943,12 +959,13 @@
     navigate(state, 0, { page: reverseFragment.unit.source.page, rects: [reverseFragment.rect] });
     await rendered(state.apps[0].pdfViewer, reverseFragment.unit.source.page);
     await localize(state, reverseFragment, observers.sourceCalls, observers.targetCalls, "reopened source→target", false, 0);
-    closeSplit();
+    await closeSplit();
 
     await bridge.library.update(record, { alignment_path: null });
     const fallback = await bridge.loadAlignment({ source, translated: target });
     await bridge.split(source, target);
     state = [...bridge.splits.values()].find(split => split.reader.itemID === source.id);
+    await annotationWrites(state);
     await until(() => state?.alignment?.status.textContent === fallback.reason, "Old/no-map status did not resolve");
     setSync(state, false);
     await state.reader.navigate({ pageIndex: fragment.unit.source.page });
@@ -960,7 +977,7 @@
       && state.apps[0].pdfViewer.currentPageNumber === fragment.unit.source.page + 1
       && state.apps[1].pdfViewer.currentPageNumber === fragment.unit.target.page + 1,
     "Old/no-map attachment shows visible nonfatal status while both real PDFs remain navigable", { reason: fallback.reason });
-    closeSplit();
+    await closeSplit();
     await bridge.library.update(record, { alignment_path: mappingPath });
 
     await openMapped(source, target);
@@ -992,7 +1009,7 @@
       && originalFixtures.mapping.output_sha256 === validated.mapping.output_sha256
       && finalSidecar.length === initialSidecar.length && finalSidecar.every((byte, index) => byte === initialSidecar[index]),
     "Original fixture PDFs and sidecar remain untouched");
-    closeSplit();
+    await closeSplit();
     const jobsAfter = await bridge.request("/jobs");
     const finalJobs = Array.isArray(jobsAfter) ? jobsAfter : jobsAfter.jobs;
     check(report.jobsPostAttempts === 0 && Array.isArray(finalJobs) && finalJobs.length === 0,
@@ -1007,7 +1024,7 @@
     if (!isolated) return;
     // Finish isolated cleanup before restoring the request guard or writing final evidence.
     try {
-      if (state && bridge?.splits.has(state.reader.tabID)) closeSplit();
+      if (state && bridge?.splits.has(state.reader.tabID)) await closeSplit();
       if (record) await bridge.library.update(record, { alignment_path: mappingPath });
       if (bridge) await bridge.library.settled();
       if (temporaryDir) await IOUtils.remove(temporaryDir, { recursive: true });

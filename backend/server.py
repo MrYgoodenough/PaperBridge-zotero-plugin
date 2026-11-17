@@ -31,6 +31,8 @@ RUNTIME = Path(os.environ.get("PAPERBRIDGE_STATE_DIR",ROOT / ".runtime"))
 JOBS = RUNTIME / "jobs"
 # Public plugin version.
 VERSION = "0.3.7"
+# Selected glyph geometry may exceed the ordinary small control-request limit.
+FORMULA_REQUEST_LIMIT = 256 * 1024
 # Independently versioned on-disk records.
 RECORD_VERSION = 1
 # Active attempts must never restart automatically after losing their worker.
@@ -747,6 +749,12 @@ class Handler(BaseHTTPRequestHandler):
                 data = self.body()
                 # This validates local evidence only; it never submits or retries a model job.
                 return self.respond(200, load_mapping(data.get("mapping_path"), data.get("source_path"), data.get("output_path")))
+            if self.command == "POST" and path == "/formulas/regions":
+                from formula_regions import detect
+                return self.respond(200, detect(self.body()))
+            if self.command == "POST" and path == "/formulas/latex":
+                from formulas import convert
+                return self.respond(200, convert(self.body(FORMULA_REQUEST_LIMIT)))
             if self.command == "POST" and path in {"/cache/describe","/cache/prune"}:
                 size = int(self.headers.get("Content-Length", "0"))
                 if not 0 < size <= 8 * 1024 * 1024:

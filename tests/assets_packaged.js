@@ -53,6 +53,20 @@ var PAPERBRIDGE_ASSETS_TEST_PROMISE = (async () => {
     throw new Error(typeof message === "function" ? message() : message);
   }
 
+  /** Require one translated annotation owner and expose its actual pending writes. */
+  function annotationWrites(split) {
+    const native = split.translationReader;
+    const legacy = split.annotations;
+    check(!!native !== !!legacy, "Split has exactly one translated annotation owner");
+    if (native) {
+      check(native.itemID === split.translated.id && typeof split.pendingWrites?.[Symbol.iterator] === "function",
+        "Native annotation owner and write queue belong to the translated attachment");
+      return Promise.all(split.pendingWrites);
+    }
+    check(typeof legacy.pending?.then === "function", "Legacy annotation owner exposes its persistence queue");
+    return legacy.pending;
+  }
+
   /** Hash native file bytes using the production engine-independent implementation. */
   function hashFile(path) { return bridge.alignmentAssets.constructor.hashFile(path); }
 
@@ -351,11 +365,14 @@ var PAPERBRIDGE_ASSETS_TEST_PROMISE = (async () => {
     await reader._initPromise; await bridge.openExisting(reader);
     split = [...bridge.splits.values()].find(value => value.source.key === source.key && value.translated.key === translated.key);
     check(!!split, "Product command opens the known downloaded PDF pair without a local translation job");
+    await annotationWrites(split);
     await interactions();
     if (config.phase === "receive") await degradation(source, translated, asset);
     check(report.engineStarts === 0 && report.backendRequests === 0 && !bridge.runtime.process,
       "Reading/hash verification/navigation/hover cause zero engine starts or API requests");
-    bridge.closeSplit(split.reader.tabID); split = null;
+    await bridge.closeSplit(split.reader.tabID);
+    await annotationWrites(split);
+    split = null;
     if (config.exportDirectory) {
       await checkpoint("native-webdav-export");
       report.export = await nativeHelper("reading_asset_webdav.js").ReadingAssetWebDAV.exportProducer({
@@ -401,7 +418,7 @@ var PAPERBRIDGE_ASSETS_TEST_PROMISE = (async () => {
   finally {
     if (isolated) {
       try {
-        if (split) bridge.closeSplit(split.reader.tabID);
+        if (split) await bridge.closeSplit(split.reader.tabID);
         if (bridge && originalEnsure) bridge.runtime.ensure = originalEnsure;
         if (bridge && originalRequest) bridge.request = originalRequest;
         await bridge?.library.settled();

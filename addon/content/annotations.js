@@ -210,10 +210,15 @@ var TranslationAnnotations = class {
   close() {
     if (this.closed) return this.pending;
     // Official Reader has no public flush API; read its state without replacing any methods.
-    const state = this.reader?._state?.annotations;
-    const snapshot = state && JSON.parse(JSON.stringify(state));
-    this.closed = true;
-    if (this.observerID !== undefined) Zotero.Notifier.unregisterObserver(this.observerID);
+    let snapshot;
+    try {
+      const state = this.reader?._state?.annotations;
+      snapshot = state && JSON.parse(JSON.stringify(state));
+    } catch (error) { this.fail(error); }
+    finally {
+      this.closed = true;
+      if (this.observerID !== undefined) Zotero.Notifier.unregisterObserver(this.observerID);
+    }
     return this.enqueue(async () => {
       if (this.failed || this.readOnly() || !snapshot) return;
       const present = new Set(snapshot.map(annotation => annotation.id));

@@ -68,6 +68,20 @@
     await until(() => { if (failure) throw failure; return done; }, name);
   }
 
+  /** Require one translated annotation owner and expose its actual pending writes. */
+  function annotationWrites(split) {
+    const native = split.translationReader;
+    const legacy = split.annotations;
+    check(!!native !== !!legacy, "Split has exactly one translated annotation owner");
+    if (native) {
+      check(native.itemID === split.translated.id && typeof split.pendingWrites?.[Symbol.iterator] === "function",
+        "Native annotation owner and write queue belong to the translated attachment");
+      return Promise.all(split.pendingWrites);
+    }
+    check(typeof legacy.pending?.then === "function", "Legacy annotation owner exposes its persistence queue");
+    return legacy.pending;
+  }
+
   /** Compare real profile paths with the host's case sensitivity. */
   function samePath(left, right) {
     const a = PathUtils.normalize(left), b = PathUtils.normalize(right);
@@ -312,8 +326,8 @@
   async function close() {
     if (!split) return;
     const current = split;
-    bridge.closeSplit(current.reader.tabID);
-    await ready(current.annotationSave, "Native annotation save after split closure");
+    await ready(bridge.closeSplit(current.reader.tabID), "Full split closure and native annotation save finish");
+    await ready(annotationWrites(current), "Translated annotation persistence queue settles after close");
     await ready(Promise.all(bridge.annotationWrites.values()), "All suite annotation writes settle");
     current.reader.close();
     await until(() => !Zotero.Reader._readers.includes(current.reader), "Suite source reader closes");
@@ -413,6 +427,7 @@
       const reader = Zotero.Reader._readers.find(item => item.itemID === source.id);
       opened.add(reader);
       split = bridge.splits.get(reader.tabID);
+      await ready(annotationWrites(split), "Translated annotation owner persistence queue settles: " + entry.id);
       await until(() => split.alignment?.mapping && !split.alignment.hoverButton.disabled, "Integrated mapping is ready");
       split.frames.forEach(frame => frame.addEventListener("error", event => {
         report.rendererErrors.push({ message: event.message || String(event.error) });
@@ -544,7 +559,11 @@
       if (isolated) {
         await close();
         await ready(Promise.all(bridge?.annotationWrites.values() || []), "Pending annotation writes finish before quit");
-        for (const reader of opened) if (reader && Zotero.Reader._readers.includes(reader)) reader.close();
+        for (const reader of opened) {
+          if (!reader) continue;
+          await ready(bridge.closeSplit(reader.tabID), "Remaining suite split fully closes");
+          if (Zotero.Reader._readers.includes(reader)) reader.close();
+        }
         await bridge?.library.settled();
       }
     } catch (error) {

@@ -117,6 +117,20 @@
     await until(() => { if (failure) throw failure; return done; }, message);
   }
 
+  /** Require one translated annotation owner and expose its actual pending writes. */
+  function annotationWrites(split) {
+    const native = split.translationReader;
+    const legacy = split.annotations;
+    check(!!native !== !!legacy, "Split has exactly one translated annotation owner");
+    if (native) {
+      check(native.itemID === split.translated.id && typeof split.pendingWrites?.[Symbol.iterator] === "function",
+        "Native annotation owner and write queue belong to the translated attachment");
+      return Promise.all(split.pendingWrites);
+    }
+    check(typeof legacy.pending?.then === "function", "Legacy annotation owner exposes its persistence queue");
+    return legacy.pending;
+  }
+
   /** Compare native paths with Windows case normalization. */
   function samePath(left, right) {
     if (!left || !right) return false;
@@ -239,8 +253,9 @@
     const reader = Zotero.Reader._readers.find(item => item.itemID === source.id);
     if (reader) nativeReaders.add(reader);
     state = reader && bridge.splits.get(reader.tabID);
-    check(!!state?.alignment?.control && !!state.apps?.[1] && !!state.annotations,
-      "Parent exposes real hover controller and translated native annotation adapter");
+    check(!!state?.alignment?.control && !!state.apps?.[1],
+      "Parent exposes real hover controller and translated reader");
+    await ready(annotationWrites(state), "Translated annotation owner persistence queue settles");
     if (expectMapping) {
       await until(() => state.alignment.mapping && !state.alignment.hoverButton.disabled,
         "Integrated hover mapping is available");
@@ -574,8 +589,8 @@
   async function close() {
     if (!state) return;
     const previous = state;
-    bridge.closeSplit(previous.reader.tabID);
-    await ready(previous.annotationSave, "Close-time translated native annotation save finishes");
+    await ready(bridge.closeSplit(previous.reader.tabID), "Full translated split close and native save finish");
+    await ready(annotationWrites(previous), "Translated annotation persistence queue settles after close");
     check(!bridge.splits.has(previous.reader.tabID), "Closed split releases lifecycle state");
     state = null;
   }
@@ -776,7 +791,7 @@
       return item?.annotationText === created.text
         && JSON.stringify(JSON.parse(item.annotationPosition)) === JSON.stringify(created.position);
     }, "Native selection reaches the real annotation database");
-    await ready(state.annotations.pending, "Native selection persistence queue settles");
+    await ready(annotationWrites(state), "Native selection persistence queue settles");
     // Deselect through a real blank-page click, not native annotation callbacks.
     const viewBox = Array.from(state.apps[1].pdfViewer.getPageView(0).viewport.viewBox);
     const blank = screenPoint(state, 1, 0, [(viewBox[0] + viewBox[2]) / 2, (viewBox[1] + viewBox[3]) / 2]);
@@ -860,8 +875,7 @@
         for (const split of [...(bridge?.splits.values() || [])]) {
           if (split.source?.id === source?.id && split.translated?.id === translated?.id) {
             nativeReaders.add(split.reader);
-            bridge.closeSplit(split.reader.tabID);
-            await ready(split.annotationSave, "Partially initialized split save finishes");
+            await ready(bridge.closeSplit(split.reader.tabID), "Partially initialized split fully closes and saves");
           }
         }
         await ready(Promise.all(bridge?.annotationWrites.values() || []), "All native annotation writes finish before quit");

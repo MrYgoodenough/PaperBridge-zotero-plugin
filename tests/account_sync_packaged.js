@@ -40,6 +40,20 @@ var PAPERBRIDGE_ACCOUNT_SYNC_PROMISE = (async () => {
     throw new Error(message);
   }
 
+  /** Require one translated annotation owner and expose its actual pending writes. */
+  function annotationWrites(split) {
+    const native = split.translationReader;
+    const legacy = split.annotations;
+    check(!!native !== !!legacy, "Split has exactly one translated annotation owner");
+    if (native) {
+      check(native.itemID === split.translated.id && typeof split.pendingWrites?.[Symbol.iterator] === "function",
+        "Native annotation owner and write queue belong to the translated attachment");
+      return Promise.all(split.pendingWrites);
+    }
+    check(typeof legacy.pending?.then === "function", "Legacy annotation owner exposes its persistence queue");
+    return legacy.pending;
+  }
+
   /** Hash native file bytes without loading a large XPI into the JavaScript heap. */
   function sha256(path) {
     const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
@@ -313,10 +327,11 @@ var PAPERBRIDGE_ACCOUNT_SYNC_PROMISE = (async () => {
       readers.add(native);
       const split = bridge.splits.get(native.tabID);
       await until(() => split.alignment.mapping && split.apps.every(app => app.pdfDocument), "Downloaded native split did not load trusted geometry");
+      await annotationWrites(split);
       check(!!split.sync && !split.alignment.button.disabled && !split.alignment.targetButton.disabled,
         "Downloaded PDFs open with page sync and both precise controls enabled");
-      bridge.closeSplit(native.tabID);
-      await split.annotationSave;
+      await bridge.closeSplit(native.tabID);
+      await annotationWrites(split);
       native.close();
       await until(() => !Zotero.Reader._readers.includes(native), "The test-owned native reader did not close normally");
     }
@@ -392,7 +407,10 @@ var PAPERBRIDGE_ACCOUNT_SYNC_PROMISE = (async () => {
     Zotero.logError(error);
   } finally {
     if (authorized) {
-      for (const native of readers) if (Zotero.Reader._readers.includes(native)) native.close();
+      for (const native of readers) {
+        await bridge.closeSplit(native.tabID);
+        if (Zotero.Reader._readers.includes(native)) native.close();
+      }
       for (const action of restore.reverse()) action();
       await IOUtils.writeUTF8(config.reportPath, JSON.stringify(report, null, 2));
       if (config.quit) Services.startup.quit(Ci.nsIAppStartup.eAttemptQuit);

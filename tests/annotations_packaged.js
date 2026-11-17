@@ -61,8 +61,13 @@
     };
     state.browser.contentWindow.addEventListener('error', observeError);
     state.cleanups.push(() => state.browser.contentWindow.removeEventListener('error', observeError));
-    check(!!state.annotations && !state.right._state.readOnly && state.right._state.showAnnotations,
+    check(!!(state.translationReader || state.annotations) && !state.right._state.readOnly && state.right._state.showAnnotations,
       "Translated reader uses native editable annotations");
+    if (state.translationReader) {
+      check(state.translationReader.itemID === translated.id && !state.annotations
+        && Zotero.Reader._readers.includes(state.translationReader),
+      "Embedded native reader is the sole translated-attachment annotation owner");
+    }
     await until(() => {
       const page = state.apps[1].pdfViewer.getPageView(0);
       return page?.renderingState === renderingFinished && page.div.querySelector('.textLayer span');
@@ -73,8 +78,7 @@
   /** Close through the normal split lifecycle and await its native persistence write. */
   async function close() {
     const previous = state;
-    bridge.closeSplit(previous.reader.tabID);
-    await ready(previous.annotationSave, 'Native annotation close-save did not finish');
+    await ready(bridge.closeSplit(previous.reader.tabID), 'Native annotation close-save and disposal did not finish');
     check(!bridge.splits.has(previous.reader.tabID), "Closed split releases its original lifecycle state");
     state = null;
   }
@@ -239,7 +243,7 @@
       evidence.editorHTMLAfterInput = editor.innerHTML;
       evidence.rendererTextAfterInput = editor.parentElement.querySelector('.renderer')?.innerText;
       evidence.readOnly = state.right._state.readOnly;
-      evidence.adapterFailed = state.annotations.failed;
+      evidence.adapterFailed = state.annotations?.failed || state.right._state.readOnly;
       evidence.noteKey = key;
       report.stage = 'native-note-comment-input';
       report.nativeDebug = Zotero.Debug.getConsoleViewerOutput().slice(-80);
