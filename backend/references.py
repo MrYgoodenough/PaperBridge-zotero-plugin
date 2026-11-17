@@ -1,4 +1,4 @@
-"""Keep bibliography sections as original PDF regions, before LLM batching."""
+"""Keep bibliography source regions in column order within actual page section bands."""
 from bisect import bisect_right
 import re
 from statistics import median
@@ -67,8 +67,28 @@ def _column_edges(page, lines):
     return [page.rect.x0, *gutters, page.rect.x1]
 
 
+def _shared_column_break(heading, lines, edges, first_column):
+    """Recognize a narrow section heading in an aligned gap across subsequent columns."""
+    _, top, _, bottom = heading["bbox"]
+    before, after = [], []
+    for column in range(first_column, len(edges) - 1):
+        local = [line["bbox"] for line in lines if line is not heading
+                 and edges[column] <= line["bbox"][0] < line["bbox"][2] <= edges[column + 1]]
+        if any(box[1] < bottom and box[3] > top for box in local):
+            return False
+        previous = max((box[3] for box in local if box[3] <= top), default=None)
+        following = min((box[1] for box in local if box[1] >= bottom), default=None)
+        if previous is None or following is None:
+            return False
+        before.append(previous)
+        after.append(following)
+    # Both the preceding prose and the following entries must share the source gap.
+    tolerance = bottom - top
+    return max(before) - min(before) <= tolerance and max(after) - min(after) <= tolerance
+
+
 def reference_regions(document):
-    """Track reference spans in column reading order without protecting later scientific sections."""
+    """Track column flow within section bands, leaving surrounding scientific prose translatable."""
     regions = {}
     active = False
     for page_number,page in enumerate(document):
@@ -86,34 +106,41 @@ def reference_regions(document):
             full = columns > 1 and x0 < edges[1] and x1 > edges[-2]
             column = bisect_right(edges[1:-1], x0)
             y = max(0, y0 - page.rect.y0 - HEADING_PADDING)
-            events.append((column*height+y,kind,full,y))
-        events.sort()
-        start = 0 if active else None
-        floor, ceiling = 0,height
-        spans = []
-        for position,kind,full,y in events:
-            if kind=="start" and not active:
-                active = True
-                start = position
-                if full:
-                    floor = max(0,y)
-            elif kind=="stop" and active:
-                if full:
-                    ceiling = max(0,y)
-                    position = columns*height
-                spans.append((start,position))
-                start = None
-                active = False
-        if active:
-            spans.append((start,columns*height))
+            events.append((column,kind,full,y,line))
+        boundaries = {0, height}
+        for column,kind,full,y,line in events:
+            if full or (kind == "start"
+                        and any(other_column > column and other_kind == "stop" and other_y < y
+                                for other_column,other_kind,_,other_y,_ in events)
+                        and _shared_column_break(line, lines, edges, column)):
+                boundaries.add(y)
+        boundaries = sorted(boundaries)
         boxes = []
-        for beginning,end in spans:
-            for column in range(columns):
-                top = max(beginning-column*height,floor,0)
-                bottom = min(end-column*height,ceiling,height)
-                if bottom<=top:
-                    continue
-                boxes.append((edges[column],page.rect.y0+top,edges[column+1],page.rect.y0+bottom))
+        for band_top,band_bottom in zip(boundaries,boundaries[1:]):
+            band_height = band_bottom - band_top
+            # Reading order restarts across columns below a shared section boundary.
+            ordered = sorted((column*band_height+y-band_top,kind)
+                             for column,kind,_,y,_ in events if band_top <= y < band_bottom)
+            start = 0 if active else None
+            spans = []
+            for position,kind in ordered:
+                if kind == "start" and not active:
+                    active = True
+                    start = position
+                elif kind == "stop" and active:
+                    spans.append((start,position))
+                    start = None
+                    active = False
+            if active:
+                spans.append((start,columns*band_height))
+            for beginning,end in spans:
+                for column in range(columns):
+                    top = max(beginning-column*band_height,0)
+                    bottom = min(end-column*band_height,band_height)
+                    if bottom <= top:
+                        continue
+                    boxes.append((edges[column],page.rect.y0+band_top+top,
+                                  edges[column+1],page.rect.y0+band_top+bottom))
         if boxes:
             regions[page_number] = boxes
     return regions

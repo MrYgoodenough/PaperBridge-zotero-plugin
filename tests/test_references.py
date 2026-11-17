@@ -77,6 +77,54 @@ def test_shifted_columns_keep_later_right_references_active():
         assert len(regions[1]) == 2 and all(box[1] == 0 for box in regions[1])
 
 
+def test_references_below_both_columns_do_not_absorb_earlier_endmatter():
+    """A shared lower bibliography band follows, rather than precedes, right-column prose."""
+    with pymupdf.open() as document:
+        first = document.new_page(width=612, height=792)
+        for x in (50, 320):
+            for y in range(80, 651, 30):
+                first.insert_text((x, y), "Scientific results remain translatable.", fontsize=9)
+            for y in (710, 740, 770):
+                first.insert_text((x, y), "Author et al. Reference entry, 2025.", fontsize=9)
+        first.insert_text((320, 200), "Data availability", fontsize=9)
+        first.insert_text((320, 290), "Author contributions", fontsize=9)
+        first.insert_text((320, 380), "Funding", fontsize=9)
+        first.insert_text((50, 680), "References", fontsize=9)
+        second = document.new_page(width=612, height=792)
+        for x in (50, 320):
+            for y in range(80, 651, 30):
+                second.insert_text((x, y), "Author et al. Continuing reference, 2025.", fontsize=9)
+        regions = reference_regions(document)
+        assert set(regions) == {0, 1}
+        assert len(regions[0]) == 2 and all(box[1] > 660 for box in regions[0])
+        assert not any(pymupdf.Point(400, 250) in pymupdf.Rect(box) for box in regions[0])
+        assert all(any(pymupdf.Point(x, 750) in pymupdf.Rect(box) for box in regions[0])
+                   for x in (100, 400))
+        assert len(regions[1]) == 2 and all(box[1] == 0 for box in regions[1])
+
+
+def test_right_column_methods_still_stop_left_column_references():
+    """Earlier y does not move a later-column Methods section before continuous references."""
+    with pymupdf.open() as document:
+        first = document.new_page(width=612, height=792)
+        for y in range(80, 441, 30):
+            first.insert_text((50, y), "Scientific results remain translatable.", fontsize=9)
+        first.insert_text((50, 470), "References", fontsize=9)
+        for y in range(500, 771, 30):
+            first.insert_text((50, y), "Author et al. Reference entry, 2025.", fontsize=9)
+        for y in (80, 110, 140):
+            first.insert_text((320, y), "Author et al. Continuing reference, 2025.", fontsize=9)
+        first.insert_text((320, 200), "STAR+METHODS", fontsize=9)
+        for y in range(230, 771, 30):
+            first.insert_text((320, y), "Scientific methods remain translatable.", fontsize=9)
+        second = document.new_page(width=612, height=792)
+        second.insert_text((50, 80), "Continuation of scientific methods.", fontsize=9)
+        regions = reference_regions(document)
+        assert set(regions) == {0}
+        assert any(pymupdf.Point(400, 100) in pymupdf.Rect(box) for box in regions[0])
+        assert not any(pymupdf.Point(400, 300) in pymupdf.Rect(box) for box in regions[0])
+
+
 def test_single_column_hanging_indents_do_not_create_columns():
     """Different left indents with overlapping text widths remain one reading column."""
     with pymupdf.open() as document:

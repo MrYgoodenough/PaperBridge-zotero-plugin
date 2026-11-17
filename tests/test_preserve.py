@@ -6,7 +6,8 @@ import pymupdf
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
-from preserve import ProtectedLayoutModel, restore_regions, exclude_protected_characters, metadata_regions
+from preserve import (ProtectedLayoutModel, restore_regions, exclude_protected_characters,
+                      exclude_clipped_characters, metadata_regions)
 from types import SimpleNamespace
 
 
@@ -19,6 +20,19 @@ def test_graphic_labels_are_excluded_before_translation():
     page = SimpleNamespace(pdf_character=[figure, body])
     assert exclude_protected_characters(page, 500, [(50,80,350,210)]) == 1
     assert page.pdf_character == [body]
+
+
+def test_form_bbox_excludes_only_wholly_clipped_source_glyphs():
+    """Hidden figure-Form prose is not a translated duplicate or a typesetting collision obstacle."""
+    def glyph(owner, x, y):
+        """Use already transformed IL coordinates, as supplied by the native source parser."""
+        return SimpleNamespace(xobj_id=owner, box=SimpleNamespace(x=x, y=y, x2=x+4, y2=y+4))
+    inside, edge, hidden = glyph(1, 12, 12), glyph(1, 8, 12), glyph(1, 12, 40)
+    page_text, unknown_owner = glyph(0, 12, 40), glyph(3, 12, 40)
+    page = SimpleNamespace(pdf_character=[inside, edge, hidden, page_text, unknown_owner],
+                           pdf_xobject=[SimpleNamespace(xobj_id=1, box=SimpleNamespace(x=10, y=10, x2=30, y2=30))])
+    assert exclude_clipped_characters(page) == 1
+    assert page.pdf_character == [inside, edge, page_text, unknown_owner]
 
 
 def test_original_vector_labels_restored_without_changing_body(tmp_path):
@@ -223,6 +237,27 @@ def test_bibliographic_metadata_does_not_protect_title_or_body():
         # A body email without the opening author style is not a preservation signal.
         page.insert_text((80, 275), "Contact support@example.org for data.", fontsize=11)
         assert metadata_regions(doc)[0] == boxes
+
+
+@pytest.mark.parametrize("heading", ["Abstract", "Summary", "S u m m a r y", None])
+def test_summary_and_unlabelled_body_are_not_institution_metadata(heading):
+    """An unrelated correspondence email cannot turn an interior institution word into metadata."""
+    with pymupdf.open() as doc:
+        page = doc.new_page(width=600, height=800)
+        page.insert_text((80, 60), "Research title", fontsize=16)
+        page.insert_text((80, 105), "Alice Researcher, Bob Author", fontsize=10)
+        page.insert_text((80, 130), "Department of Science, Example University", fontsize=9)
+        page.insert_text((80, 144), "e-mail: alice@example.org", fontsize=9)
+        if heading:
+            page.insert_text((80, 190), heading, fontname="hebo", fontsize=12)
+        page.insert_text((80, 220), "Scientific publication describes evidence from the\n"
+                         "laboratory and clinic. This is scientific body prose.", fontsize=10)
+        page.insert_text((80, 450), "Laboratory measurements remain scientific body prose.", fontsize=10)
+        page.insert_text((350, 730), "Correspondence: author@example.org", fontsize=8)
+        protected = "\n".join(page.get_text(clip=pymupdf.Rect(box)) for box in metadata_regions(doc)[0])
+        assert "Department of Science" in protected and "Alice Researcher" in protected
+        assert "Scientific publication" not in protected and "laboratory and clinic" not in protected
+        assert "Laboratory measurements" not in protected
 
 
 @pytest.mark.parametrize("nonzero_origin", [False, True])

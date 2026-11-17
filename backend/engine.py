@@ -247,6 +247,7 @@ async def _translate(request, quality):
             translator.fragment_trace.write(folder / "translated.pdf", folder / "alignment.json", quality)
             quality.write(artifact_exists=True)
             translator.write_usage(excluded_graphic_characters=layout_model.excluded_characters,
+                                   excluded_clipped_characters=layout_model.excluded_clipped_characters,
                                    excluded_reference_characters=layout_model.excluded_reference_characters,
                                    excluded_metadata_characters=layout_model.excluded_metadata_characters)
             return

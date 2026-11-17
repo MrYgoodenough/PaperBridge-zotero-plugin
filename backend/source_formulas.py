@@ -35,7 +35,7 @@ def formula_spans(text):
             index += 1
             continue
         stack, previous, previous_end = [], None, first.start()
-        relation = numeric = greek = single_letter = operation = False
+        relation = numeric = greek = single_letter = roman_word = operation = False
         operands, operations = [], []
         balanced_end = None
         cursor = index
@@ -53,6 +53,8 @@ def formula_spans(text):
                 numeric |= value[0].isdigit() or value.startswith(".")
                 greek |= bool(re.search(r"[Α-Ωα-ω]", value))
                 single_letter |= len(value) == 1 and value.isalpha()
+                # A number alone cannot declare an ordinary Roman word as a named variable.
+                roman_word |= value.isascii() and value.isalpha() and len(value) > 1
                 operands.append(value)
                 previous = "operand"
             elif value in CLOSING:
@@ -76,7 +78,7 @@ def formula_spans(text):
             else:
                 break
             previous_end = token.end()
-            if not stack and previous == "operand" and operation:
+            if not stack and previous == "operand" and operation and (relation or not roman_word):
                 balanced_end = token.end()
             cursor += 1
         # Counts in "10-fold" do not turn the accompanying prose into a formula either.

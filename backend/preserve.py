@@ -1,5 +1,6 @@
 """Preserve source backgrounds, protected vectors and reliable links in native page coordinates."""
 import json
+import math
 import re
 import unicodedata
 from collections import Counter
@@ -47,13 +48,13 @@ PAGE_COORDINATE_TOLERANCE = 0.01
 REDACTION_POINT_RADIUS = 0.01
 # Short marginal words are not reliable page furniture; printed integer page numbers are.
 FURNITURE_MIN_CHARACTERS = 8
-# Identify both an inline IEEE abstract and a spaced Elsevier abstract heading.
-ABSTRACT_HEADING = re.compile(r"^a\s*b\s*s\s*t\s*r\s*a\s*c\s*t\b", re.I)
+# Abstract and Summary both end frontmatter, including inline or spaced headings.
+ABSTRACT_HEADING = re.compile(r"^(?:a\s*b\s*s\s*t\s*r\s*a\s*c\s*t|s\s*u\s*m\s*m\s*a\s*r\s*y)\b", re.I)
 # Indexed institutions are an independent signal of author metadata.
 AFFILIATION_START = re.compile(
     r"^(?:(?:\d{1,2}|[a-z])\s*)?(?:(?:CAS\s+)?key\s+)?"
     r"(?:department|departamento|school|institute|centre|center|division|university|universidad|laboratory|college)\b", re.I)
-# Adjacent name and institution blocks remain separate from the paper's title.
+# Nearby names, institutions and contact lines form metadata, separate from the research title.
 AUTHOR_BLOCK_GAP = 20
 # Small bibliographic blocks must not absorb large research titles.
 AUTHOR_BLOCK_FONT_LIMIT = 14
@@ -205,10 +206,15 @@ def metadata_regions(document):
                     if all(any(line is member for member in members) for line in intervening):
                         boxes.append(tuple(rectangle))
         if index < AUTHOR_PAGE_LIMIT and any(AUTHOR_EMAIL.search(value) for value in text.values()):
+            # An institution word inside prose is not the start of an affiliation block.
+            emails = [line for line in lines if AUTHOR_EMAIL.search(text[id(line)])]
             affiliations = [block for block in blocks
-                            if any(AFFILIATION_START.match(text[id(line)]) for line in block["lines"])
-                            and (not abstracts or block["bbox"][3] < min(abstracts)
-                                 or AUTHOR_EMAIL.search(" ".join(text[id(line)] for line in block["lines"])))]
+                            if AFFILIATION_START.match(" ".join(text[id(line)] for line in block["lines"]))
+                            and (block["bbox"][3] < min(abstracts, default=page.rect.height * AUTHOR_OPENING_END)
+                                 or AUTHOR_EMAIL.search(" ".join(text[id(line)] for line in block["lines"]))
+                                 or any(0 <= email["bbox"][1] - block["bbox"][3] <= AUTHOR_BLOCK_GAP
+                                        and block["bbox"][0] <= email["bbox"][0] < block["bbox"][2]
+                                        for email in emails))]
             for block in affiliations:
                 boxes.append(tuple(block["bbox"]))
                 # Names may share the institution block, or immediately precede it.
@@ -267,6 +273,40 @@ def exclude_protected_characters(page, height, boxes):
     return original_count - len(page.pdf_character)
 
 
+def exclude_clipped_characters(page):
+    """Discard glyphs wholly outside their transformed Form BBox; they cannot paint in the source."""
+    clips = {}
+    for form in getattr(page, "pdf_xobject", []):
+        box = getattr(form, "box", None)
+        if box is None or not getattr(form, "xobj_id", None):
+            continue
+        coordinates = [getattr(box, key) for key in ("x", "y", "x2", "y2")]
+        if not all(value is not None and math.isfinite(value) for value in coordinates):
+            continue
+        rectangle = pymupdf.Rect(coordinates)
+        if not rectangle.is_empty:
+            clips[form.xobj_id] = rectangle
+    if not clips:
+        return 0
+
+    def visible(character):
+        """Keep partial edge glyphs and unknown owners; only a proven outside Form is excluded."""
+        clip = clips.get(getattr(character, "xobj_id", None))
+        if clip is None:
+            return True
+        visual = getattr(character, "visual_bbox", None)
+        box = getattr(visual, "box", None) or character.box
+        coordinates = [getattr(box, key) for key in ("x", "y", "x2", "y2")]
+        if not all(value is not None and math.isfinite(value) for value in coordinates):
+            return True
+        rectangle = pymupdf.Rect(coordinates)
+        return rectangle.is_empty or clip.intersects(rectangle)
+
+    original_count = len(page.pdf_character)
+    page.pdf_character = [character for character in page.pdf_character if visible(character)]
+    return original_count - len(page.pdf_character)
+
+
 def _order_text_backgrounds(page, source_page, layout, protected_boxes):
     """Keep original white line fills behind their entire text block before reflow."""
     curves = [curve for curve in getattr(page, "pdf_curve", [])
@@ -319,6 +359,7 @@ class ProtectedLayoutModel:
         self.model = model
         self.regions = {}
         self.excluded_characters = 0
+        self.excluded_clipped_characters = 0
         self.references = references or {}
         self.excluded_reference_characters = 0
         self.metadata = metadata or {}
@@ -337,6 +378,8 @@ class ProtectedLayoutModel:
             with pymupdf.open(source_path) as source:
                 original_transforms = {index: _unrotated_transform(page) for index, page in enumerate(source)}
         for page, layout in self.model.handle_document(pages, document, config, save_debug_image):
+            # Cropped figure Forms can retain unrelated full-page text in their content streams.
+            self.excluded_clipped_characters += exclude_clipped_characters(page)
             # BabelDOC normalizes MediaBox/CropBox before detection, then restores them on output.
             working_transform = _unrotated_transform(document[page.page_number])
             original_transform = original_transforms.get(page.page_number, working_transform)

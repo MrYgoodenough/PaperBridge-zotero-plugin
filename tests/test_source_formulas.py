@@ -1,8 +1,8 @@
-"""Check complete mathematical source spans without importing the full PDF engine."""
+"""Check source expressions and ownership without importing the full PDF engine."""
 
 from types import SimpleNamespace
 
-from backend.source_formulas import formula_spans, multiline_offset
+from backend.source_formulas import formula_spans, merge_formula_groups, multiline_offset
 
 
 def expressions(text):
@@ -27,6 +27,48 @@ def test_prose_hyphens_citations_and_counts_are_not_expressions():
     """Ordinary words and parenthetical citation years do not become math placeholders."""
     assert expressions("high-order, t-test, concurrent selec- tion, and/or methods (Smith, 2020)") == []
     assert expressions("10-fold, 20-year-old and CD4-positive cells") == []
+
+
+def test_arithmetic_does_not_promote_plain_words_to_variables():
+    """A nearby number cannot make a prose operand mathematical, even across a source wrap."""
+    for text in ("8× deeper than before", "4×faster", "3 *\n wider", "6 / methods", "2 + extra"):
+        assert expressions(text) == []
+    assert expressions("2×x + additional terms") == ["2×x"]
+
+
+def test_scientific_operands_and_named_relations_remain_complete():
+    """Keep Greek, indexed identifiers and numeric notation without consuming following prose."""
+    for formula in ("2×x", "2×x_i", "2×x2", "2×Rβn", "αβ/2", "2×1.5e-3", "nvar×2 = 5000"):
+        assert expressions(formula + " then stop") == [formula]
+
+
+def test_merge_keeps_wrapped_prose_and_existing_formula_owners():
+    """Use actual IL objects to keep wrapped words out without dismantling classified math."""
+    from babeldoc.format.pdf.document_il import (
+        Box, PdfCharacter, PdfFormula, PdfLine, PdfParagraph, PdfParagraphComposition, PdfStyle, VisualBbox,
+    )
+    # Positive detector IDs must not be replaced by synthetic merged ownership.
+    owner_id = 7
+
+    def characters(text, x, y):
+        """Build source glyphs whose positioning supplies the otherwise absent word space."""
+        output = []
+        for index, char in enumerate(text):
+            box = Box(x + index * 5, y, x + (index + 1) * 5, y + 10)
+            output.append(PdfCharacter(char_unicode=char, box=box, visual_bbox=VisualBbox(box),
+                                       pdf_style=PdfStyle(font_size=10), formula_layout_id=owner_id))
+        return output
+
+    for formula_text in ("8×", "2×nvar"):
+        formula = PdfFormula(pdf_character=characters(formula_text, 100, 20))
+        prose = PdfLine(pdf_character=characters("wider", 0, 0))
+        compositions = [PdfParagraphComposition(pdf_formula=formula), PdfParagraphComposition(pdf_line=prose)]
+        paragraph = PdfParagraph(pdf_paragraph_composition=compositions)
+        assert merge_formula_groups(paragraph) is False
+        assert paragraph.pdf_paragraph_composition is compositions
+        assert paragraph.pdf_paragraph_composition[0].pdf_formula is formula
+        assert paragraph.pdf_paragraph_composition[1].pdf_line is prose
+        assert all(character.formula_layout_id == owner_id for character in formula.pdf_character)
 
 
 def test_independent_expressions_keep_their_boundaries():
