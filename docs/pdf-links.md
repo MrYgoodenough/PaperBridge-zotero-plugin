@@ -15,8 +15,10 @@ annotations; therefore links must be restored separately within that same writeo
   even if preprocessing removed their annotations.
 - On selected pages, source-derived hotspots outside restored rectangles are removed.
   URI links may then be relocated onto their exact visible destination URL, including
-  wrapped lines, or a unique unchanged source/final label. Ambiguous or translated
-  prose is not guessed. A producer's moved or otherwise distinct link is retained.
+  wrapped lines. URI and internal citation links can use a unique unchanged
+  source/final label. Ambiguous or translated prose is not guessed, including a
+  translated license label without a literal URL. A producer's moved or otherwise
+  distinct link is retained.
 - An inherited internal destination keeps its exact view when its target page is
   unselected or its point lies in a restored rectangle. Otherwise only the target
   page is reliable: the link uses an actual PDF `/Fit` destination, not a made-up

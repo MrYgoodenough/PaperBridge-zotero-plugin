@@ -1,14 +1,14 @@
 <!-- Current shared baseline, safe development entry points and unresolved product boundaries. -->
 # 当前开发基线
 
-- 主分支 `master`，共享源码 **0.3.7**；版本同步 addon manifest、server VERSION、pyproject 和 uv.lock。修复后的 Linux/Windows 四包须按最终哈希重新验收，公开稳定通道在发布完成前仍为 0.3.4；不能把源码推送当作发货。
+- 主分支 `master`，共享源码 **0.3.7**；版本同步 addon manifest、server VERSION、pyproject 和 uv.lock。Linux/Windows 最终包必须绑定下述 v15 引擎/v5 提示；旧 freeze05/v14 四包不能代表当前源码验收。公开稳定通道在发布完成前仍为 0.3.4；不能把源码推送当作发货。
 - 固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。不顺带升级引擎。独立 macOS **0.4.2** 专属源码未取得：不合流、逆向提取、重建覆盖或推进其发布；共享代码继续跨平台。
 - 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。Windows 用项目实际有效的环境，不借用其他产品的 Python。
 
 ## 翻译、身份与结果
 
-- prompt `paperbridge-compact-v4-fragments`：相邻/跨页碎片保持独立 ID，不转移文本/标签、不补造后文；已有比较之后的短残缺条件用实际源字符串分开请求，只在同一原段落内重组，逐项保留占位符，防止模型为流畅而漏掉谓语。普通拉丁词内连字符不成为假公式；真实公式、样式和科学维度仍校验。改变 prompt 不复用旧段落来证明新提示质量。
-- 整篇排版身份 `babeldoc-0.6.4-protected-v14-source-layout`；源行/嵌套图注统一归属，原词尾宽度/URL 断行规则直接修正；`source_formulas.py` 用实际源字形合并完整表达式，多行公式按行顶对齐，纯数字乘法不把普通多字母正文声明为变量。原/工作页真实变换决定保护框，旋转页裁切/链接使用未旋转坐标；正文白底置于整段译文之前，原遮盖及图表不猜改。
+- prompt `paperbridge-compact-v5-anaphora`：相邻/跨页碎片保持独立 ID，不转移文本/标签、不补造后文；已有比较之后的短残缺条件用实际源字符串分开请求，只在同一原段落内重组，逐项保留占位符。each 等省略指代只依赖同一输入中的先行词，数值不能换到错误实体。普通拉丁词内连字符不成为假公式；真实公式、样式和科学维度仍校验。改变 prompt 不复用旧段落来证明新提示质量。
+- 整篇排版身份 `babeldoc-0.6.4-protected-v15-clipped-restoration`；源行/嵌套图注统一归属，原词尾宽度/URL 断行规则直接修正；`source_formulas.py` 用实际源字形合并完整表达式，多行公式按行顶对齐，纯数字乘法不把普通多字母正文声明为变量。每个保护区在独立副本上清除完全在裁剪区外的文字再恢复，避免隐藏整页原文进入局部复制/搜索，保留边缘字形、原字体和图形。旋转页裁切/链接使用未旋转坐标；正文白底置于整段译文之前，原遮盖及图表不猜改。唯一不变标签支持 URI/内部引用定位；译后标签、歧义和不可见热点不猜配。
 - `preserve.py` 在分段前仅剔除完全处于其已变换 Form BBox 外的不可见字形，防止裁图中残留的整页文字生成重复段落、错误收费及排版碰撞；不靠最小字号或删可见正文掩盖问题。Abstract/Summary 都终止前言，机构词必须位于真实块开头，尾部机构依赖局部联系邮箱。`references.py` 只在实际跨列共享间隙分段重启列阅读顺序，避免尾部参考文献误吞右栏科学结论。
 - 仅缩小与本地 Songti 缓存字节相同的新字体程序，保留 glyph ID、ToUnicode/编码/宽度表；禁止通用 `subset_fonts(fallback=True)` 重建原出版字体字典。源端隐式 Symbol 编码只在工作副本显式化，原 PDF 保持不变。
 - 执行、quality、PDF 导入与映射导出分开；`complete` 只代表观察到的段落应用，不是整篇语义认可。未知账单和 provider 格式/占位符拒绝如实保留，不用自动重试美化结果。

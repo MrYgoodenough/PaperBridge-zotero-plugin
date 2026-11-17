@@ -440,12 +440,10 @@ def _inside_region(rectangle, regions):
     return not rectangle.is_empty and any(rectangle in region for region in regions)
 
 
-def _literal_uri_anchors(source_page, translated_page, link, source_anchor):
-    """Relocate an exact visible URL or unique unchanged label, never guess translated prose."""
-    if link["kind"] != pymupdf.LINK_URI:
-        return []
+def _literal_link_anchors(source_page, translated_page, link, source_anchor):
+    """Relocate an exact visible URL or unique unchanged label, including internal citations."""
     uri = link.get("uri", "")
-    if uri:
+    if link["kind"] == pymupdf.LINK_URI and uri:
         source_matches = source_page.search_for(uri)
         target_matches = translated_page.search_for(uri)
         if target_matches and any(match.intersects(source_anchor) for match in source_matches):
@@ -470,7 +468,7 @@ def _restore_links(source, translated, original_links, rectangles):
         for link in links:
             anchor = link["from"] * source[page_index].derotation_matrix
             if page_index in rectangles and not _inside_region(anchor, rectangles[page_index]):
-                anchors = _literal_uri_anchors(source[page_index], page, link, anchor)
+                anchors = _literal_link_anchors(source[page_index], page, link, anchor)
             else:
                 anchors = [anchor]
             target = _goto_page(link)
@@ -550,21 +548,45 @@ def _restoration_rectangles(boxes, page_bounds):
     return rectangles
 
 
-def _redact_protected_text(page, rectangles):
-    """Remove labels by character center, matching input protection rather than font overhang."""
-    has_redactions = False
+def _redact_region_text(page, rectangles, *, keep_inside=False):
+    """Remove protected labels or wholly outside source glyphs without clipping edge overhangs."""
+    runs, retained = [], []
     for block in page.get_text("rawdict")["blocks"]:
         for line in block.get("lines", []):
+            run = []
             for span in line["spans"]:
                 for character in span["chars"]:
                     bounds = pymupdf.Rect(character["bbox"])
                     center = (bounds.tl + bounds.br) / 2
-                    if any(rectangle.contains(center) for rectangle in rectangles):
+                    remove = (not any(rectangle.intersects(bounds) for rectangle in rectangles)
+                              if keep_inside else any(rectangle.contains(center) for rectangle in rectangles))
+                    if remove:
                         radius = REDACTION_POINT_RADIUS
                         point = pymupdf.Rect(center.x - radius, center.y - radius,
                                             center.x + radius, center.y + radius)
-                        page.add_redact_annot(point, fill=(1, 1, 1))
-                        has_redactions = True
+                        if keep_inside:
+                            run.append(point)
+                        else:
+                            runs.append([point])
+                    elif keep_inside:
+                        retained.append(bounds)
+                        if run:
+                            runs.append(run)
+                            run = []
+            if run:
+                runs.append(run)
+    has_redactions = False
+    for run in runs:
+        area = pymupdf.Rect(run[0])
+        for point in run[1:]:
+            area |= point
+        # Thousands of individual source redactions are quadratic; safe line runs need one each.
+        candidates = run if keep_inside and any(area.intersects(box) for box in retained) else [area]
+        for point in candidates:
+            if keep_inside and any(point.intersects(box) for box in retained):
+                continue  # An edge glyph's overlapping font box must remain intact.
+            page.add_redact_annot(point, fill=(1, 1, 1))
+            has_redactions = True
     if has_redactions:
         page.apply_redactions(images=0, graphics=0)
 
@@ -592,10 +614,15 @@ def restore_regions(source_path, translated_path, output_path, regions):
                 page.set_rotation(0)
                 source_page.set_rotation(0)
                 # Whole-region redaction erases prose when only its font bbox touches the clip.
-                _redact_protected_text(page, rectangles[page_index])
+                _redact_region_text(page, rectangles[page_index])
                 for rectangle in rectangles[page_index]:
                     page.draw_rect(rectangle, color=None, fill=(1, 1, 1), overlay=True)
-                    page.show_pdf_page(rectangle, source, page_index, clip=rectangle, overlay=True)
+                    # Form clipping hides pixels but can leave a whole source page in copy/search text.
+                    # Prune only outside text on a disposable copy; original fonts, vectors and PDF stay intact.
+                    with pymupdf.open() as clipped:
+                        clipped.insert_pdf(source, from_page=page_index, to_page=page_index)
+                        _redact_region_text(clipped[0], [rectangle], keep_inside=True)
+                        page.show_pdf_page(rectangle, clipped, 0, clip=rectangle, overlay=True)
                     count += 1
             finally:
                 page.set_rotation(rotation)

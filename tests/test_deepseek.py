@@ -38,6 +38,8 @@ def test_fixed_prefix_and_compact_request(tmp_path):
     assert a[0]==b[0] and a[0]["role"]=="system"
     assert "do not drop a subject, predicate, comparison" in a[0]["content"]
     assert "comparison before its dangling condition" in a[0]["content"]
+    assert "only antecedents in the same item" in a[0]["content"]
+    assert "each component has N layers, not each layer" in a[0]["content"]
     assert a[1]["content"].startswith('{"title":"Stable paper title","paragraphs":')
     assert "layout_label" not in a[1]["content"] and "Structure Rules" not in a[0]["content"]
 

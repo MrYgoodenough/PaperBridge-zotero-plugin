@@ -197,6 +197,35 @@ def test_ambiguous_non_url_label_does_not_invent_a_link(tmp_path):
         assert document[0].get_links() == []
 
 
+def test_unchanged_internal_citation_moves_with_its_visible_label(tmp_path):
+    """Retain a unique native citation after reflow without restoring invisible source body text."""
+    source, translated, output = [tmp_path / name for name in ("source.pdf", "translated.pdf", "output.pdf")]
+    with pymupdf.open() as document:
+        page = document.new_page(width=300, height=300)
+        page.insert_text((55, 80), "Figure label")
+        page.insert_text((55, 190), "Smith, 2024")
+        document.new_page(width=300, height=300)
+        page = document[0]
+        page.insert_link({"kind": pymupdf.LINK_GOTO, "from": page.search_for("Smith, 2024")[0],
+                          "page": 1, "to": pymupdf.Point(0, 0)})
+        document.save(source)
+    with pymupdf.open(source) as document:
+        page = document[0]
+        for link in page.get_links():
+            page.delete_link(link)
+        page.add_redact_annot((40, 40, 260, 210))
+        page.apply_redactions()
+        page.insert_text((55, 240), "Smith, 2024")
+        document.save(translated)
+    restore_regions(source, translated, output, {0: [FIGURE]})
+    with pymupdf.open(output) as document:
+        page = document[0]
+        assert page.get_text().count("Smith, 2024") == 1
+        link, = page.get_links()
+        assert link["kind"] == pymupdf.LINK_GOTO and link["page"] == 1
+        assert tuple(link["from"]) == tuple(page.search_for("Smith, 2024")[0])
+
+
 @pytest.mark.parametrize("rotation", [0, 90])
 def test_untouched_page_keeps_original_fit_view_and_rotated_hotspot(tmp_path, rotation):
     """Restore stripped links without inventing XYZ coordinates or rotating hotspots twice."""

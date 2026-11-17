@@ -60,6 +60,8 @@ def test_original_vector_labels_restored_without_changing_body(tmp_path):
         text = target[0].get_text()
         assert "Translated body" in text and "E = mc2" in text
         assert "Garbled figure label" not in text
+        assert "Original body" not in text
+        assert text.count("E = mc2") == 1
         assert target[0].rect == source[0].rect
 
 
