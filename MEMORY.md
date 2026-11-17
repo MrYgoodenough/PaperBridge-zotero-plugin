@@ -4,7 +4,7 @@
 - 主分支 `master` 为吸收 macOS 增量后的**未发布共享源码**，版本元数据暂仍为 **0.3.7**（addon manifest、server VERSION、pyproject、uv.lock 一致），不代表旧安装包新增了功能。已公开 Linux/Windows **0.3.7** 的 `v0.3.7` 固定生产提交 `3f85caf61303245b880803eceeb977f4124630ec`；四条稳定通道仍绑定 freeze07 四包及下述 v16 引擎/v5 提示。旧 freeze05/v14 与 freeze06/v15 四包不能代表该公开基线；后续源码合流不重写冻结包、源码 ZIP 或标签。
 - 固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。不顺带升级引擎。
 - 独立 macOS **0.4.2** 的第一方源码由 [PR #3](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/pull/3) 提供，头提交 `272d85e52bf653d084191e705cabe60ef1188f62`、共同基线 `b51a82f`；功能增量已吸收到共享实现，保留合流前 `bbf1f0d` 的任务/阅读/引擎修复。既有 macOS 发布包及通道仍独立且不覆盖；共享新版本号和三平台安装包发布需另行确定。
-- 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。Windows 用项目实际有效的环境，不借用其他产品的 Python。
+- 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。轻量 CI 只安装 pytest/PyMuPDF/httpx，须在真实最小依赖环境验证；完整 `.venv` 下的 lightweight 通过不能替代它。使用 BabelDOC IL 或科学依赖的用例属于 `FULL_ONLY_CASES`，完整模式仍必须运行。Windows 用项目实际有效的环境，不借用其他产品的 Python。
 
 ## 共享公式与原生译文阅读器
 
@@ -45,6 +45,7 @@
 
 - 日常 Linux Zotero `/home/scq/.local/opt/zotero/zotero`，profile `/home/scq/.zotero/zotero/ylkmnjtn.default`，data `/home/scq/Zotero`。不要与项目内隔离测试混淆，正常停机备份后才升级；不强杀、不改锁/SQLite/NSS制造通过。
 - Windows SSH `desktop-hz`，Zotero `D:\Zotero\zotero.exe`，原工程 `E:\ZoteroPlugin\PaperBridge-zotero-plugin`。有效 Python `.runtime\windows-p1-validation-20261114\.venv\Scripts\python.exe`。不改原工程工作文件/HEAD/stash及原备份；原生 UI 用登录 Interactive Session，不用 SSH Session 0。
+- 当前 Linux 检出未配置 GitHub 写入凭据；可使用 `desktop-hz` 既有 Git 凭据从独立临时 bare 对象仓库推送已核验提交，不改 Windows 原检出的 HEAD/工作区，不导出或将凭据写入仓库。Git HTTP verbose 变量须移除而非赋值 `0`，并保持凭据 trace redaction。
 - Windows 日常 profile `C:\Users\LostPatrol_2\AppData\Roaming\Zotero\Zotero\Profiles\dljrawap.default`、data `E:\0syncthing\Zotero` 未获日常升级/同步授权。Linux 日常 metadata-only 同步已成功，但 Windows 接收/文件/多译本/group 云验收仍未完成；不全库上传。
 - 日常 Linux 已存在的 metadata helper 读 `agent/codex/account-metadata-v10-20261117-005536/native-helper/account-linux-v9-metac-options.json`，其 report 已存在，禁止重放。该目录保留一致停机备份及安全接续证据，不删；实际账号同步只用官方 Runner，`getAPIKey()` 可能写 OSKeyStore，不当纯读取或导出 NSS。
 - 新版本真实测试/财务/原生和清理证据集中在 `agent/codex/real-release-20261117`。两批 **20 篇 / 306 页**最终 v16 均 terminal done，结构应用结果 **2 complete / 18 partial**，不是全文语义通过；2411 个真实请求的账本已闭合，未知用量为 0，费用仍是官方费率估算而非账户 invoice。本次授权不延伸到任务完成后的新付费探测。原始输入、已收费/失败成果、ledger、字体/段落 cache 和 source archives 保留；隔离 engine 可重建，但不可按临时文件猜删其余数据。

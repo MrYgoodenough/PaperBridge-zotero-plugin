@@ -29,6 +29,7 @@ FULL_ONLY_CASES = (
     "test_formula_regions.py::test_local_regions_extract_complete_formula_in_pdf_coordinates",
     "test_formula_regions.py::test_rotated_cropped_regions_keep_pdf_origins",
     "test_formula_regions.py::test_failed_model_initialization_can_retry",
+    "test_source_formulas.py::test_merge_keeps_wrapped_prose_and_existing_formula_owners",
     "test_verify_providers.py::test_one_request_each_and_original_error_sanitized",
     "test_fonts.py::test_subset_local_program_keeps_publisher_encoding_and_visible_glyphs",
     "test_fonts.py::test_implicit_symbol_font_keeps_rendering_and_repairs_source_parsing",
