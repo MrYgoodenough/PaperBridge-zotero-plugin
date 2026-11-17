@@ -18,10 +18,10 @@ Linux/Windows 与独立 macOS 版本分别维护，**不能仅按版本号大小
 
 - `linux-x64.xpi` / `windows-x64.xpi`：对应系统的自带 Python 版，通常选它。
 - `*-local-python.xpi`：借用本机同架构 CPython 3.12；依赖和模型仍随包提供，不是本地翻译模型。
-- `*.xpi.inventory.json`：开发者用的安装包成员/哈希/依赖清单，不是另一个插件。
-- `*-corresponding-sources.zip` 与 `*.manifest.json`：对应源码与交付清单，不用于 Zotero 插件安装。
+- `*-corresponding-sources.zip`：用于对应源码交付，不用于 Zotero 插件安装；内部包含交付清单与四包 inventory。
 - GitHub 自动生成的 **Source code (zip/tar.gz)**：标签处的仓库快照，不等同于包含固定上游归档和构建输入的 corresponding-sources ZIP。
 
-Release 不提供独立 `.sha256` 文件；构建仍保留本地校验文件。发布验证使用
-实际包哈希、平台 feed 的 `update_hash`、GitHub asset digest 及交付清单。
+Release 仅保留安装包与必要的对应源码 ZIP，不提供独立 `.sha256`、inventory
+或外置 manifest；这些文件在本地仍保留。发布验证使用实际包哈希、平台 feed
+的 `update_hash`、GitHub asset digest 及源码 ZIP 内的交付清单。
 更新前正常退出并备份 Zotero；具体支持边界与验包流程见[发布指南](releasing.md)。

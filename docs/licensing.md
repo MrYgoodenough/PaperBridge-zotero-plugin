@@ -74,8 +74,8 @@ Match exact addon/backend membership/bytes; only build-time manifest
 Use project `.venv` Python and the pinned cache via the
 [source-generation commands](source-delivery-readiness.md#generate-against-the-frozen-four-xpis),
 then [verify the handoff](source-delivery-readiness.md#verify-the-complete-handoff),
-including the external ZIP/manifest and local checksum. Do not upload independent
-`.sha256` files to Releases. Retain original archives,
+including the source ZIP's internal `bundle-manifest.json` and local checksum.
+Keep external checksums/inventories/manifests local, not Release assets. Retain original archives,
 project/shipped sources, notices and inputs, not XPIs/extracted native binaries.
 Rebind after source/doc/notice/XPI changes.
 

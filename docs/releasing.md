@@ -42,7 +42,7 @@ foreach ($mode in @('bundled', 'local')) {
 Channels: `linux-x64`, `linux-x64-local-python`, `windows-x64`,
 `windows-x64-local-python`. Outputs: `paperbridge-0.3.7-<channel>.xpi`, its
 `.sha256`/`.inventory.json`, and **local draft** `updates/<channel>.json`.
-The `.sha256` file is for local verification only, not a GitHub Release asset.
+The `.sha256` and `.inventory.json` files stay local, not GitHub Release assets.
 Local mode ships dependencies/assets but uses an installed Python 3.12 interpreter.
 
 `--stage-dir PATH` selects a separate stage. `--platform` selects an existing
@@ -101,13 +101,15 @@ does not prove native reproducibility. Bind to **finished XPI SHA256**, not buil
    original notices for the exact four XPIs. Keep user-confirmed Community 2026
    section 8 responsibilities/DLL-only consent. `licenseCompliance=unknown` is not
    legal clearance; resolve identified omissions, not speculative new obligations.
-4. Only with release authorization, publish exact XPI/inventory and source
-   ZIP/manifest assets at the matching version tag, then enable only matching approved
+4. Only with release authorization, publish exact XPI and corresponding-source
+   ZIP assets at the matching version tag, then enable only matching approved
    `master/updates/<channel>.json` drafts after the assets are reachable. Release
    creation/update must explicitly use **`make_latest=false`** (GitHub API field
    `"make_latest": "false"`). Preserve repository-wide Latest and all unrelated assets/feeds.
-   Never upload independent `.sha256` files or wildcard-upload the whole output
-   directory. Keep local checksums; verify public XPI digests against feed hashes.
+   Keep checksums, XPI inventories and the external source manifest local; the source
+   ZIP already contains `bundle-manifest.json` and inventories. Preserve GitHub's
+   automatic Source code archives; never wildcard-upload the whole output directory.
+   Verify public XPI digests against feed hashes.
    Update the GitHub TODO issue with delivered scope and remaining limitations.
 5. Run `--online`, then test `AddonManager.findUpdates`, installation and cold restart
    (`scripts/prepare_nonmac_test.py --suite update`). Use a genuinely newer version;

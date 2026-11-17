@@ -13,7 +13,7 @@
 
 ## GitHub 发布规范
 
-+ Release 不上传独立 `.sha256` 文件，包括 XPI 和源码 ZIP 的校验文件；禁止用通配符把整个产物目录上传。构建仍可生成并保留本地 `.sha256` 用于验包。
-+ 发布完整性使用实际本地哈希、更新清单 `update_hash`、inventory/manifest 及 GitHub asset digest 验证，不依赖公开 `.sha256` 下载。
++ Release 仅上传供安装的 XPI 和必要的 corresponding-sources ZIP，保留 GitHub 自动生成的 Source code；不上传独立 `.sha256`、`.inventory.json` 或源码 ZIP 的外置 `.manifest.json`。禁止用通配符把整个产物目录上传，本地校验文件及清单继续生成并保留。
++ 发布完整性使用实际本地哈希、更新清单 `update_hash`、本地 inventory、源码 ZIP 内的 `bundle-manifest.json` 及 GitHub asset digest 验证，不依赖公开校验文件或外置清单下载。
 + 发布时同步 GitHub TODO issue，区分已交付、限定验收和未完成；不把 PDF 已生成、结构 complete 或脚本通过当作全文语义接受。
 + Linux/Windows 共享版本与独立 macOS 版本分开说明；不跨平台比较版本号，不以仓库 Latest 替代各平台更新通道。

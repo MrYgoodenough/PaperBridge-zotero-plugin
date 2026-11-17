@@ -56,8 +56,9 @@ work of the Independent JPEG Group. OpenSSL is developed by the OpenSSL Project.
 `licenses/source-manifest.json` adds pinned source archives, native hashes,
 build inputs and specific unresolved scope. The separate source ZIP binds only
 the exact XPI hashes in its `bundle-manifest.json`; it does not contain an XPI
-or certify legal compliance. Publish a regenerated source ZIP, manifest and
-checksum beside the completed packages, without an extra source charge.
+or certify legal compliance. Publish the corresponding source ZIP beside the
+completed packages, without an extra source charge. Its manifest and XPI inventories
+are inside the ZIP; keep external manifests, inventories and checksums local.
 Full sources alongside the executable are the delivery method, not repository
 links or a written offer. Preserve AGPL/GPL and Berkeley DB clause-3 required
 sources/build inputs and any applicable modified-service source access.
