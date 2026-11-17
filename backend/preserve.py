@@ -585,7 +585,9 @@ def _redact_region_text(page, rectangles, *, keep_inside=False):
         for point in candidates:
             if keep_inside and any(point.intersects(box) for box in retained):
                 continue  # An edge glyph's overlapping font box must remain intact.
-            page.add_redact_annot(point, fill=(1, 1, 1))
+            # Outside-clip removal must not paint fills that geometry readers mistake for body occlusion.
+            fill = None if keep_inside else (1, 1, 1)
+            page.add_redact_annot(point, fill=fill)
             has_redactions = True
     if has_redactions:
         page.apply_redactions(images=0, graphics=0)

@@ -8,6 +8,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 from preserve import (ProtectedLayoutModel, restore_regions, exclude_protected_characters,
                       exclude_clipped_characters, metadata_regions)
+from alignment import build_mapping
 from types import SimpleNamespace
 
 
@@ -36,7 +37,7 @@ def test_form_bbox_excludes_only_wholly_clipped_source_glyphs():
 
 
 def test_original_vector_labels_restored_without_changing_body(tmp_path):
-    """Restore exact source vectors without overwriting translated body text."""
+    """Restore exact source vectors while keeping translated body text visibly mappable."""
     original, translated, output = [tmp_path / name for name in ["source.pdf", "translated.pdf", "protected.pdf"]]
     doc = pymupdf.open()
     page = doc.new_page(width=400, height=500)
@@ -63,6 +64,12 @@ def test_original_vector_labels_restored_without_changing_body(tmp_path):
         assert "Original body" not in text
         assert text.count("E = mc2") == 1
         assert target[0].rect == source[0].rect
+    # Source-copy cleanup must not add invisible outside-clip fills that look like body occlusion.
+    body = {"page": 0, "rects": [[55, 150, 300, 200]]}
+    mapping = build_mapping(original, output, [{"id": "body", "applied": True,
+        "source_text": "Original body", "target_text": "Translated body",
+        "source": body, "target": body}])
+    assert len(mapping["units"]) == 1, mapping["metadata"]
 
 
 @pytest.mark.parametrize("rotation", [90, 270])
