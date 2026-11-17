@@ -1,7 +1,7 @@
 <!-- Current shared baseline, safe development entry points and unresolved product boundaries. -->
 # 当前开发基线
 
-- 主分支 `master`，共享源码 **0.3.7**；版本同步 addon manifest、server VERSION、pyproject 和 uv.lock。Linux/Windows 最终包必须绑定下述 v16 引擎/v5 提示；旧 freeze05/v14 与 freeze06/v15 四包不能代表当前源码验收。公开稳定通道在发布完成前仍为 0.3.4；不能把源码推送当作发货。
+- 主分支 `master`，共享源码及已公开 Linux/Windows 版本 **0.3.7**；`v0.3.7` 固定生产提交 `3f85caf61303245b880803eceeb977f4124630ec`。版本同步 addon manifest、server VERSION、pyproject 和 uv.lock。四条稳定通道绑定最终 freeze07 四包及下述 v16 引擎/v5 提示；旧 freeze05/v14 与 freeze06/v15 四包不能代表当前源码验收。后续 feed/记忆/报告提交不改变冻结生产身份。
 - 固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。不顺带升级引擎。独立 macOS **0.4.2** 专属源码未取得：不合流、逆向提取、重建覆盖或推进其发布；共享代码继续跨平台。
 - 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。Windows 用项目实际有效的环境，不借用其他产品的 Python。
 
@@ -30,7 +30,7 @@
 - `build.py` 每次生成 payload，固定 ZIP 元数据/压缩级别，保留原许可字节和 nested runtime.json。验收绑定完成 XPI SHA，不只 backend build ID；原生 Linux/Windows 分别构建 bundled/local。修改任意生产资产后重建对应包。
 - `package_sources.py` 从已提交快照绑定四包全部生产文件（含 CSS），同行提供 303 上游归档和 4 个 Linux build inputs。缓存 `agent/codex/licensing-p0-1-20261116-003659/source-cache` 保留；源码 ZIP、manifest、checksum 同地公开，不用无范围 written offer。法律合规仍 unknown，不将普通编译元数据不确定性当作已发现缺失义务。
 - 用户已确认 Community 2026 的合法使用和 section 8 分发责任，不重复索取。三 DLL/原始条款保持原字节；Windows 初次引擎启用只确认 `msvc-community-2026-v1` 一次，拒绝只停引擎，设置可重开；后台/诊断不弹窗，Linux 豁免。
-- Linux/Windows 独立平台/模式 feeds，仅精确资产公开后启用；创建 release 用 `make_latest=false`，不改仓库已有 Latest 或 macOS。Git 操作在 master 快进，不建分支/worktree，不强推；API 不用 gh。
+- Linux/Windows 独立平台/模式 feeds，0.3.7 的四个 XPI、inventory、checksum 及 corresponding sources 共 15 个资产已公开并通过匿名可达/摘要核对；包位于 `dist/release-0.3.7-freeze07/`。Release 用 `make_latest=false`，仓库 Latest 仍为独立 macOS 0.4.2，不改其资产/通道。Git 操作在 master 快进，不建分支/worktree，不强推；API 不用 gh。公开元数据验证不等于 Zotero 从旧版本自动升级实测。
 
 ## 安全接续与证据
 
@@ -38,5 +38,6 @@
 - Windows SSH `desktop-hz`，Zotero `D:\Zotero\zotero.exe`，原工程 `E:\ZoteroPlugin\PaperBridge-zotero-plugin`。有效 Python `.runtime\windows-p1-validation-20261114\.venv\Scripts\python.exe`。不改原工程工作文件/HEAD/stash及原备份；原生 UI 用登录 Interactive Session，不用 SSH Session 0。
 - Windows 日常 profile `C:\Users\LostPatrol_2\AppData\Roaming\Zotero\Zotero\Profiles\dljrawap.default`、data `E:\0syncthing\Zotero` 未获日常升级/同步授权。Linux 日常 metadata-only 同步已成功，但 Windows 接收/文件/多译本/group 云验收仍未完成；不全库上传。
 - 日常 Linux 已存在的 metadata helper 读 `agent/codex/account-metadata-v10-20261117-005536/native-helper/account-linux-v9-metac-options.json`，其 report 已存在，禁止重放。该目录保留一致停机备份及安全接续证据，不删；实际账号同步只用官方 Runner，`getAPIKey()` 可能写 OSKeyStore，不当纯读取或导出 NSS。
-- 新版本真实测试/财务/原生和清理证据集中在 `agent/codex/real-release-20261117`，本次授权不延伸到任务完成后的新付费探测。历史已收费成果/ledger与原始输入保留；旧免费重排/重复测试引擎/缓存可清理。过时公开运行文档归档到该目录，不回填旧失败。
+- 新版本真实测试/财务/原生和清理证据集中在 `agent/codex/real-release-20261117`。两批 **20 篇 / 306 页**最终 v16 均 terminal done，结构应用结果 **2 complete / 18 partial**，不是全文语义通过；2411 个真实请求的账本已闭合，未知用量为 0，费用仍是官方费率估算而非账户 invoice。本次授权不延伸到任务完成后的新付费探测。原始输入、已收费/失败成果、ledger、字体/段落 cache 和 source archives 保留；隔离 engine 可重建，但不可按临时文件猜删其余数据。
+- freeze07 的 Linux/Windows bundled/local 原生 create/reopen 验收均完成；Windows 最终证据为 `continuation/windows-final06-receipts/`。完整选区通过实际 PDF.js controlled Range、原生按钮及官方 serializer/Annotation API 保存，不冒称物理鼠标拖选/高亮已测；真实旧版到新版自动升级和 Windows 日常跨设备接收仍未完成。
 - 仍有限制：provider 可能返回缺标记/合并片段，保留 partial/unknown；未读段落不冒充语义接受。繁体/日文、完整术语规则、精确双向批注、真实跨设备文件同步尚未完整交付。维护指南见 `docs/`；根 TODO 不自行改，task 文件只由用户提供，过程放 agent/codex，每次新简报放 agent/report。

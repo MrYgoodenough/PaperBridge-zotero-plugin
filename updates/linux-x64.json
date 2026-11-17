@@ -3,9 +3,9 @@
     "paperbridge@local.dev": {
       "updates": [
         {
-          "version": "0.3.4",
-          "update_link": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.4/paperbridge-0.3.4-linux-x64.xpi",
-          "update_hash": "sha256:077ee68e74bed3fa91e7b0cff0008f904fa141b966c6db795c32c7b1909bf865",
+          "version": "0.3.7",
+          "update_link": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-linux-x64.xpi",
+          "update_hash": "sha256:a5d0a55526f31f9a4c7a570a642d0048f3bce81a43cf4de3a2c7fe4282156fac",
           "applications": {
             "zotero": {
               "strict_min_version": "9.0",
