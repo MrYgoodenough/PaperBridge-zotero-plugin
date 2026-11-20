@@ -151,6 +151,9 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
         if (Date.now() > deadline) throw new Error("New settings diagnostic control did not load");
         await Zotero.Promise.delay(100);
       }
+      // Follow the visible support section before opening its nested diagnostic controls.
+      const support = dialog.document.getElementById("support-settings");
+      if (support && !support.open) await clickControl(dialog, support.querySelector("summary"));
       const disclosure = dialog.document.getElementById("diagnostics");
       if (disclosure && !disclosure.open) await clickControl(dialog, disclosure.querySelector("summary"));
       await clickControl(dialog, dialog.document.getElementById("diagnostics-export"));
