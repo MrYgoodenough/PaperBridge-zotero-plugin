@@ -1,15 +1,21 @@
-<!-- Source and notice delivery bound to exact Linux/Windows artifacts. -->
-# Linux/Windows corresponding-source delivery
+<!-- Source and notice delivery bound to exact platform/mode artifacts. -->
+# Corresponding-source delivery
 
-For frozen **0.3.7** Linux/Windows bundled + local-Python packages, not a claim of
-build/native/publication success. No macOS integration/replacement; preserve its
-assets/channels and repository-wide Latest.
+Prepare **unpublished 0.4.3** Linux x64 / Windows x64 / macOS arm64 candidates,
+each in bundled and local-Python modes. Deliver only the platforms/modes actually
+bound to the ZIP; a four-package Linux/Windows handoff cannot certify macOS.
+This is not native acceptance or publication authorization. Preserve frozen
+**0.3.7**, independent macOS **0.4.2**, their assets/channels and repository Latest;
+do not regenerate their historical source ZIPs from current working-tree sources.
 
 ## Deliver the actual inputs
 
-`addon/licenses/source-manifest.json` declares **303 pinned archives** and **four
-Linux build inputs** for BabelDOC **0.6.4** / PyMuPDF **1.26.7**. Verify hashes,
-sizes and required-member probes for the four XPIs; count alone is not coverage.
+`addon/licenses/source-manifest.json` declares pinned archives and platform-specific
+native/build evidence for BabelDOC **0.6.4** / PyMuPDF **1.26.7**. The frozen
+Linux/Windows baseline used 303 archives and four Linux inputs. New macOS scope
+must follow its actual distributions, interpreter and OpenCV build, not a blanket
+platform addition. Verify hashes, sizes and required-member probes for every
+selected XPI; count alone is not coverage.
 
 - Deliver project/dependency sources, modifications, interfaces, licenses and build
   inputs. Commit required project sources/tests/docs/workflows before freezing. Review
@@ -20,6 +26,9 @@ sizes and required-member probes for the four XPIs; count alone is not coverage.
   `opencv-native-gcc10.cmake`, `toolchain-provenance.json` and `opencv-build.json`.
   Match each `localBuildInputs` hash/size using originals or
   `addon/licenses/supplemental/build-inputs/linux-opencv/` copies.
+- For macOS, retain the original standalone CPython metadata/notices and exact
+  source recipes, plus actual image-only OpenCV configuration/build evidence.
+  Match sanitized/signed shipped native hashes separately from original build outputs.
 - Ship `LICENSE`, `NOTICE.md`, all `addon/licenses/` and dependency notices/`.libs`.
   Match actual CPython/native/model/tokenizer hashes and source-tree/shipped notices,
   not names/versions alone.
@@ -40,36 +49,43 @@ agreement, without restricting AGPL/other open-source code. End users need no Vi
 Studio/purchased license for consent. EULAs/consent do not grant redistribution:
 [Windows MSVC](windows-msvc-redistribution.md).
 
-## Generate against the frozen four XPIs
+## Generate against completed candidate XPIs
 
-Use project Python and four frozen XPIs in `FINAL`. These commands reuse the pinned
-cache without downloads/provider requests.
+Freeze committed source/notices first, rebuild affected XPIs, then use project
+Python and the completed candidates in `FINAL`. Populate `CACHE` with verified
+archives (existing Linux/Windows cache can be reused). The six-package commands
+below need actual macOS packages and matching evidence; do not substitute an old
+macOS release. They do not download archives or make provider requests.
 
 Linux:
 
 ```sh
 set -e
-export FINAL=/absolute/path/to/frozen-four-package-directory
-export OUT="$FINAL/paperbridge-0.3.7-linux-windows-source.zip"
+export FINAL=/absolute/path/to/completed-candidate-directory
+export CACHE=/absolute/path/to/verified-source-cache
+export OUT="$FINAL/paperbridge-0.4.3-corresponding-sources.zip"
 .venv/bin/python -B scripts/package_sources.py \
-  --cache agent/codex/licensing-p0-1-20261116-003659/source-cache \
-  --xpi "$FINAL/paperbridge-0.3.7-linux-x64.xpi" \
-  --xpi "$FINAL/paperbridge-0.3.7-linux-x64-local-python.xpi" \
-  --xpi "$FINAL/paperbridge-0.3.7-windows-x64.xpi" \
-  --xpi "$FINAL/paperbridge-0.3.7-windows-x64-local-python.xpi" --output "$OUT"
+  --cache "$CACHE" \
+  --xpi "$FINAL/paperbridge-0.4.3-linux-x64.xpi" \
+  --xpi "$FINAL/paperbridge-0.4.3-linux-x64-local-python.xpi" \
+  --xpi "$FINAL/paperbridge-0.4.3-windows-x64.xpi" \
+  --xpi "$FINAL/paperbridge-0.4.3-windows-x64-local-python.xpi" \
+  --xpi "$FINAL/paperbridge-0.4.3-macos-arm64.xpi" \
+  --xpi "$FINAL/paperbridge-0.4.3-macos-arm64-local-python.xpi" --output "$OUT"
 .venv/bin/python -B scripts/package_sources.py --verify "$OUT"
 ```
 
 Windows PowerShell:
 
 ```powershell
-$env:FINAL = (Resolve-Path 'dist/release-0.3.7').Path
-$env:OUT = Join-Path $env:FINAL 'paperbridge-0.3.7-linux-windows-source.zip'
+$env:FINAL = (Resolve-Path 'dist/candidate-0.4.3').Path
+$env:CACHE = 'C:\absolute\path\to\verified-source-cache'
+$env:OUT = Join-Path $env:FINAL 'paperbridge-0.4.3-corresponding-sources.zip'
 $py = '.\.venv\Scripts\python.exe'
-$sourceArgs = @('-B', 'scripts/package_sources.py', '--cache',
-  'agent/codex/licensing-p0-1-20261116-003659/source-cache')
-foreach ($channel in @('linux-x64', 'linux-x64-local-python', 'windows-x64', 'windows-x64-local-python')) {
-  $sourceArgs += @('--xpi', (Join-Path $env:FINAL "paperbridge-0.3.7-$channel.xpi"))
+$sourceArgs = @('-B', 'scripts/package_sources.py', '--cache', $env:CACHE)
+foreach ($channel in @('linux-x64', 'linux-x64-local-python', 'windows-x64',
+                       'windows-x64-local-python', 'macos-arm64', 'macos-arm64-local-python')) {
+  $sourceArgs += @('--xpi', (Join-Path $env:FINAL "paperbridge-0.4.3-$channel.xpi"))
 }
 & $py @sourceArgs --output $env:OUT
 if ($LASTEXITCODE -ne 0) { throw 'Source generation failed' }

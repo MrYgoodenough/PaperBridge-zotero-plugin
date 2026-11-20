@@ -1,4 +1,4 @@
-# Manual native runtime candidates only; no release assets, feeds or Zotero acceptance.
+# Manual native candidates and isolated Mac Zotero checks; no public release/feed writes.
 name: Release candidate
 
 on:
@@ -14,9 +14,16 @@ on:
           - windows
           - macos
           - all
+      reuse_macos_run:
+        description: "Optional prior native Mac run (attempt 1) to reuse its exact runtime bytes"
+        type: string
+        required: false
+        default: ""
 
 permissions:
   contents: read
+  # Native-stage reuse downloads only this repository's existing candidate artifacts.
+  actions: read
 
 jobs:
   candidate:
@@ -53,6 +60,7 @@ jobs:
       PB_PYTHON: ${{ matrix.target == 'windows' && '.venv/Scripts/python.exe' || '.venv/bin/python' }}
       PB_STAGED_PYTHON: ${{ matrix.target == 'linux' && '.cache/package/linux-x64/python/bin/python3.12' || matrix.target == 'windows' && '.cache/package/windows-x64/python/python.exe' || '.cache/package/macos-arm64/python/bin/python3.12' }}
       PB_SITE_PACKAGES: ${{ matrix.target == 'windows' && 'python/Lib/site-packages' || 'python/lib/python3.12/site-packages' }}
+      PB_REUSE_MACOS_RUN: ${{ inputs.reuse_macos_run }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -95,8 +103,48 @@ jobs:
         if: matrix.target == 'macos'
         run: |
           sh scripts/setup.sh
-          "$PB_PYTHON" -B scripts/warmup.py
-          sh scripts/build_opencv.sh
+          if test -z "$PB_REUSE_MACOS_RUN"; then
+            "$PB_PYTHON" -B scripts/warmup.py
+            sh scripts/build_opencv.sh
+          fi
+      - name: Download the selected prior native Mac bundled runtime
+        if: matrix.target == 'macos' && inputs.reuse_macos_run != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: candidate-macos-arm64-bundled-${{ inputs.reuse_macos_run }}-1
+          run-id: ${{ inputs.reuse_macos_run }}
+          github-token: ${{ github.token }}
+          path: .candidate-reuse/macos-xpi
+      - name: Download its original native build inputs
+        if: matrix.target == 'macos' && inputs.reuse_macos_run != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: candidate-macos-arm64-build-inputs-${{ inputs.reuse_macos_run }}-1
+          run-id: ${{ inputs.reuse_macos_run }}
+          github-token: ${{ github.token }}
+          path: .candidate-reuse/macos-inputs
+      - name: Restore exact Mac native bytes, retaining original build provenance
+        if: matrix.target == 'macos' && inputs.reuse_macos_run != ''
+        run: |
+          "$PB_PYTHON" -B - <<'PY'
+          """Reuse one previously built runtime, not a simulated or newly relinked Mac stage."""
+          import os
+          from pathlib import Path
+          import shutil
+          import subprocess
+          import sys
+
+          assert os.environ["PB_REUSE_MACOS_RUN"].isdigit()
+          packages = list(Path(".candidate-reuse/macos-xpi").glob("*.xpi"))
+          assert len(packages) == 1
+          evidence = Path("dist/candidate-native")
+          shutil.copytree(".candidate-reuse/macos-inputs/candidate-native", evidence)
+          with (evidence / "stage-restore.json").open("w", encoding="utf-8") as output:
+              subprocess.run([sys.executable, "-B", "scripts/restore_candidate_stage.py",
+                              "--xpi", str(packages[0]), "--inventory", str(packages[0]) + ".inventory.json",
+                              "--platform", "macos-arm64", "--output", ".cache/package/macos-arm64"],
+                             stdout=output, check=True)
+          PY
       - name: Check locked engine and source identity
         run: |
           git diff --exit-code -- pyproject.toml uv.lock addon/manifest.json backend/server.py
@@ -119,7 +167,7 @@ jobs:
           assert version("pymupdf") == "1.26.7"
           PY
       - name: Retain small macOS native build inputs
-        if: matrix.target == 'macos'
+        if: matrix.target == 'macos' && inputs.reuse_macos_run == ''
         run: |
           "$PB_PYTHON" -I -B - <<'PY'
           """Preserve original build evidence outside the sanitized runtime, not its large cache."""
@@ -171,6 +219,7 @@ jobs:
       - name: Full offline contracts (no provider calls)
         run: '"$PB_PYTHON" -B scripts/check_offline.py --mode full'
       - name: Stage real native dependencies, layout model and tokenizer
+        if: matrix.target != 'macos' || inputs.reuse_macos_run == ''
         run: '"$PB_PYTHON" -B scripts/stage_runtime.py'
       - name: Isolated staged interpreter and native CPU inference
         run: |
@@ -256,6 +305,8 @@ jobs:
                   "sha256": hashlib.sha256(extensions[0].read_bytes()).hexdigest(),
               }
               proof["sourceHandoff"] = "not_completed"
+              if os.environ.get("PB_REUSE_MACOS_RUN"):
+                  proof["reusedNativeRun"] = os.environ["PB_REUSE_MACOS_RUN"]
           Path("dist").mkdir(exist_ok=True)
           Path("dist/candidate-stage.json").write_text(json.dumps(proof, indent=2) + "\n", encoding="utf-8")
           PY
@@ -270,7 +321,7 @@ jobs:
           import sys
           version = json.loads(Path("addon/manifest.json").read_bytes())["version"]
           platform = os.environ["PB_PLATFORM"]
-          lines = [f"## {version} {platform} candidate", "No publication/feed changes or native Zotero acceptance."]
+          lines = [f"## {version} {platform} candidate", "No publication/feed changes; Mac Zotero receipts are a separate later step."]
           for mode in ("bundled", "local"):
               subprocess.run([sys.executable, "-B", "scripts/build.py", "--python", mode], check=True)
               suffix = "-local-python" if mode == "local" else ""
@@ -308,6 +359,18 @@ jobs:
             dist/candidate-stage.json
           if-no-files-found: error
           compression-level: 0
+          retention-days: 3
+      - name: Actual macOS Zotero create and cold-reopen acceptance
+        if: matrix.target == 'macos'
+        run: bash scripts/check_native_macos.sh
+      - name: Retain native Zotero receipts and failures
+        if: ${{ always() && matrix.target == 'macos' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-macos-zotero-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/candidate-native-zotero/
+          if-no-files-found: warn
+          compression-level: 6
           retention-days: 3
       - name: Save small macOS build evidence even if a later check fails
         if: ${{ always() && matrix.target == 'macos' }}

@@ -85,7 +85,7 @@ async function runTests(){
     "upgrade": "upgrade_packaged.js"}[options.suite])).as_uri())).replace("PROJECT_ROOT_LITERAL",json.dumps(str(ROOT)))
 if options.suite != "packaged":
     bootstrap = bootstrap.replace("packaged-test.json", options.suite + "-test.json")
-if options.suite == "hover":
+if options.suite in {"hover", "annotations"}:
     hover_options = {"isolated": True, "expectedProfileDirectory": str(PROFILE),
         "expectedDataDirectory": str(DATA), "fixtureDirectory": str(ROOT / ".runtime/alignment-fixture"),
         "reportPath": str(ROOT / f".runtime/{run_name}-result.json"),

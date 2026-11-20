@@ -38,9 +38,9 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
   }
 
   /** Await real reader/UI work without treating timeout as success. */
-  async function until(predicate, message) {
+  async function until(predicate, message, timeoutOverride) {
     // Native PDF decoding, text layers and internal navigation can take several seconds.
-    const timeoutMilliseconds = 45000;
+    const timeoutMilliseconds = timeoutOverride ?? 45000;
     const deadline = Date.now() + timeoutMilliseconds;
     do {
       const result = await predicate();
@@ -502,7 +502,14 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
     if (!isolated) throw new Error("Refusing upgrade checks outside the explicit isolated profile/data pair");
     await checkpoint("native-engine-start");
     bridge = Zotero.PaperBridge;
-    await bridge.ready;
+    // Fresh-profile hydration can be slow, but a stuck startup must still report and quit normally.
+    const startupWaitMilliseconds = 180000;
+    let bridgeReady = false, startupError;
+    Promise.resolve(bridge.ready).then(() => { bridgeReady = true; }, error => {
+      startupError = error || new Error("Native addon rejected startup");
+    });
+    await until(() => { if (startupError) throw startupError; return bridgeReady; },
+      "Native addon initialization did not finish", startupWaitMilliseconds);
     const { AddonManager } = ChromeUtils.importESModule("resource://gre/modules/AddonManager.sys.mjs");
     const addon = await AddonManager.getAddonByID("paperbridge@local.dev");
     check(addon?.isActive && addon.version === config.expectedVersion,

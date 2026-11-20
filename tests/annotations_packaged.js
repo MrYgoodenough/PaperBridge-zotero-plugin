@@ -11,7 +11,7 @@
   // Enter this through the native editor, then verify the exact persisted comment after restart.
   const noteCommentText = 'Native annotation comment survives reopen and process restart.';
   const report = { ok: false, phase: config.phase, zoteroVersion: Zotero.version,
-    nativeUI: true, providerCalls: 0, checks: [], errors: [], inputs: [] };
+    nativeUI: true, processID: Services.appinfo.processID, providerCalls: 0, checks: [], errors: [], inputs: [] };
   // Native tab teardown belongs to Zotero; these are only this isolated suite's readers.
   const nativeReaders = new Set();
   let isolated = false, bridge, state, source, translated;

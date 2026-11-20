@@ -78,9 +78,15 @@ cross-compilation/native acceptance**. Preserve installers before reusing names;
 budget disk space for both variants.
 
 Manual `.github/workflows/release-candidate.yml` accepts `target_os=linux`, `windows`,
-`macos` or `all` (the three supported native architectures). It checks native dependencies/builds both modes,
-without provider requests or public release/feed writes. Save artifacts before
-expiry; runner checks/lightweight CI do not certify native Zotero or translation.
+`macos` or `all` (the three supported native architectures). It checks native
+dependencies and builds both modes, without provider requests or public release/feed
+writes. Mac also runs the unchanged annotation create/cold-reopen suite in official
+Zotero 10.0.8 with separate native receipts. These are controlled Gecko inputs, not
+physical mouse/keyboard or translation-semantic acceptance. Save artifacts before expiry.
+Optional `reuse_macos_run` restores a prior attempt-1 Mac bundled XPI's exact runtime
+and original build inputs, then rebuilds current source/notices and repeats real native
+checks. It does not substitute Linux repackaging for Mac execution; each receipt still
+belongs to its finished XPI hash. Lightweight/source CI alone is not native acceptance.
 
 ## Verify completed bytes
 
@@ -150,8 +156,10 @@ three-platform merged packages or genuine old-to-new upgrades.
    unsupported-interface fallback, check no dual writes, and exercise native/cache-first
    formula copying separately from explicitly authorized paid conversion quality.
 3. Complete [corresponding-source delivery](source-delivery-readiness.md): the
-   **303 archives**, **four Linux build inputs**, modifications, native evidence and
-   original notices for the exact four XPIs. Keep user-confirmed Community 2026
+   applicable pinned archives, platform-specific build inputs, modifications,
+   native evidence and original notices for every selected platform/mode XPI.
+   A Linux/Windows-only handoff does not cover the new macOS candidate.
+   Keep user-confirmed Community 2026
    section 8 responsibilities/DLL-only consent. `licenseCompliance=unknown` is not
    legal clearance; resolve identified omissions, not speculative new obligations.
 4. Only with release authorization, publish exact XPI and corresponding-source

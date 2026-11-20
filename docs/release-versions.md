@@ -24,7 +24,7 @@ Linux/Windows 与独立 macOS 版本分别维护，**不能仅按版本号大小
 
 - `linux-x64.xpi` / `windows-x64.xpi`：对应系统的自带 Python 版，通常选它。
 - `*-local-python.xpi`：借用本机同架构 CPython 3.12；依赖和模型仍随包提供，不是本地翻译模型。
-- `*-corresponding-sources.zip`：用于对应源码交付，不用于 Zotero 插件安装；内部包含交付清单与四包 inventory。
+- `*-corresponding-sources.zip`：用于对应源码交付，不用于 Zotero 插件安装；内部包含交付清单及它所覆盖的平台/模式包 inventory，不以文件名暗示额外平台已完成。
 - GitHub 自动生成的 **Source code (zip/tar.gz)**：标签处的仓库快照，不等同于包含固定上游归档和构建输入的 corresponding-sources ZIP。
 
 Release 仅保留安装包与必要的对应源码 ZIP，不提供独立 `.sha256`、inventory
