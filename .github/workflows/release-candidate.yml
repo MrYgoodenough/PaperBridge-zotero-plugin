@@ -21,10 +21,10 @@ permissions:
 jobs:
   candidate:
     name: Native candidate (${{ matrix.target }})
-    # GitHub lists macos-15 as native arm64, unlike macos-15-intel; do not use a moving latest label.
+    # Use the current fixed arm64 image; macos-15 may remain queued despite valid public labels.
     # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
     # https://github.com/actions/runner-images/blob/main/README.md#available-images
-    runs-on: ${{ matrix.target == 'linux' && 'ubuntu-24.04' || matrix.target == 'windows' && 'windows-2022' || 'macos-15' }}
+    runs-on: ${{ matrix.target == 'linux' && 'ubuntu-24.04' || matrix.target == 'windows' && 'windows-2022' || 'macos-26' }}
     timeout-minutes: 90
     defaults:
       run:
