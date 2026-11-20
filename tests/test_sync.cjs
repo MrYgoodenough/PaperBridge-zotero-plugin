@@ -1,4 +1,4 @@
-/** Exercise paired-reader reuse and PDF coordinates without a native Zotero profile. */
+/** Exercise paired-reader reuse, browser activity and PDF coordinates without a native Zotero profile. */
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
@@ -20,11 +20,11 @@ const nextTurn = () => new Promise(setImmediate);
 /** Ignore APIs unrelated to the paired-reader lifecycle. */
 function noop() {}
 
-/** Supply only layout attributes, disposal, and automatic browser loading. */
+/** Supply only layout attributes, lifecycle listeners and automatic browser loading. */
 function element() {
   const attributes = {};
   return {
-    style: { cssText: '' }, removed: false,
+    style: { cssText: '' }, removed: false, listeners: new Map(),
     /** Store attributes and restore inline styles during closeSplit. */
     setAttribute(name, value) {
       attributes[name] = value;
@@ -34,12 +34,26 @@ function element() {
     getAttribute(name) { return attributes[name] ?? null; },
     /** Restore an originally absent flex attribute. */
     removeAttribute(name) { delete attributes[name]; },
-    append: noop,
+    /** Model a newly attached XUL sibling's inactive default without a full DOM tree. */
+    append(...children) {
+      for (const child of children) {
+        child.parentElement = this;
+        if ('docShellIsActive' in child) child.docShellIsActive = false;
+      }
+    },
     /** Record disposal without maintaining an unrelated DOM tree. */
     remove() { this.removed = true; },
-    /** Deliver load asynchronously, after split has stored its state. */
+    /** Track native lifecycle listeners and deliver load after split stores its state. */
     addEventListener(type, handler) {
+      if (!this.listeners.has(type)) this.listeners.set(type, new Set());
+      this.listeners.get(type).add(handler);
       if (type === 'load') queueMicrotask(() => handler({ target: this.contentDocument }));
+    },
+    /** Expose actual listener removal rather than relying on the closing guard. */
+    removeEventListener(type, handler) { this.listeners.get(type)?.delete(handler); },
+    /** Deliver only the requested stub event to registered listeners. */
+    dispatchEvent(event) {
+      for (const handler of this.listeners.get(event.type) || []) handler(event);
     },
   };
 }
@@ -82,6 +96,8 @@ function fixture(firstReady = Promise.resolve()) {
     createXULElement(tag) {
       const browser = element();
       if (tag !== 'browser') return browser;
+      // Fresh sibling browsers are inactive until the real split activates them after append.
+      browser.docShellIsActive = false;
       calls.browsers++;
       const right = { destroyed: false, setTitle: noop, _primaryView: {
         initializedPromise: calls.browsers === 1 ? firstReady : Promise.resolve(),
@@ -160,6 +176,35 @@ test('restored source tabs resolve by item ID rather than the selected unrelated
   await f.bridge.split(f.source, f.translated);
   assert.strictEqual(f.bridge.splits.get(f.reader.tabID)?.reader, f.reader);
   assert.equal(f.bridge.splits.has(unrelated.tabID), false);
+});
+
+test('sibling browser inherits host activity and stays usable when activity is unknown', async () => {
+  for (const hostActive of [true, false, undefined]) {
+    const f = fixture();
+    f.reader._iframe.docShellIsActive = hostActive;
+    await f.bridge.split(f.source, f.translated);
+    const state = f.bridge.splits.get(f.reader.tabID);
+    assert.equal(state.browser.docShellIsActive, hostActive !== false);
+    await f.bridge.closeSplit(f.reader.tabID);
+  }
+});
+
+test('tab deselect/reselect updates sibling activity and close removes the container listener', async () => {
+  const f = fixture();
+  f.reader._iframe.docShellIsActive = true;
+  await f.bridge.split(f.source, f.translated);
+  const state = f.bridge.splits.get(f.reader.tabID);
+  const container = state.container;
+  assert.equal(container.listeners.get('tab-selection-change')?.size, 1);
+  // Keep the host property unchanged: event.detail.selected must drive the sibling.
+  container.dispatchEvent({ type: 'tab-selection-change', detail: { selected: false } });
+  assert.equal(state.browser.docShellIsActive, false);
+  container.dispatchEvent({ type: 'tab-selection-change', detail: { selected: true } });
+  assert.equal(state.browser.docShellIsActive, true);
+  await f.bridge.closeSplit(f.reader.tabID);
+  assert.equal(container.listeners.get('tab-selection-change')?.size, 0);
+  container.dispatchEvent({ type: 'tab-selection-change', detail: { selected: false } });
+  assert.equal(state.browser.docShellIsActive, true);
 });
 
 test('the same attachment IDs reuse the pair without reloading or resetting position and zoom', async () => {

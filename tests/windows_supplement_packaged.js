@@ -8,6 +8,8 @@
 var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, checkpoint, until, report, state } = {}) {
   // Native decoding, editor startup and save debounce need a bounded readiness window.
   const timeoutMilliseconds = 60000;
+  // Real translated pages can spend longer on their first PDF.js canvas/font draw than UI controls.
+  const pageRenderTimeoutMilliseconds = 180000;
   // Native selection moves are throttled; polling must not outrun the real reader.
   const pollMilliseconds = 100, stableLayoutSamples = 3, movementMilliseconds = 60;
   // Keep drag endpoints away from native reader auto-scroll edges.
@@ -90,11 +92,12 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
   }
 
   /** Wait for observed native readiness; reuse the parent's bounded waiter when supplied. */
-  async function wait(predicate, message) {
+  async function wait(predicate, message, timeoutOverride) {
     evidence.waiting = message;
     try {
-      if (until) return await until(predicate, message);
-      const deadline = Date.now() + timeoutMilliseconds;
+      const timeout = timeoutOverride ?? timeoutMilliseconds;
+      if (until) return await until(predicate, message, timeout);
+      const deadline = Date.now() + timeout;
       do {
         const result = await predicate();
         if (result) return result;
@@ -441,10 +444,13 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       const canvas = view?.div.querySelector('canvas');
       evidence.pageReadiness = { pageIndex: saved.pageIndex, currentPage: app.pdfViewer.currentPageNumber,
         renderingState: view?.renderingState, canvasWidth: canvas?.width, canvasHeight: canvas?.height,
-        textSpans: view?.div.querySelectorAll('.textLayer span').length, viewport: [frame.innerWidth, frame.innerHeight] };
+        textSpans: view?.div.querySelectorAll('.textLayer span').length, viewport: [frame.innerWidth, frame.innerHeight],
+        documentVisibility: doc.visibilityState, docShellActive: pair.browser.docShellIsActive,
+        hostDocShellActive: pair.reader._iframe.docShellIsActive, frameFocused: doc.hasFocus(),
+        nativeReaderUninitialized: !!pair.translationReader?._isUninitialized };
       return view?.renderingState === renderingFinished && canvas?.width > 0 && canvas.height > 0
         && view.div.querySelector('.textLayer span') && view;
-    }, 'Actual native PDF canvas/text layer did not render');
+    }, 'Actual native PDF canvas/text layer did not render', pageRenderTimeoutMilliseconds);
     const span = [...page.div.querySelectorAll('.textLayer span')].find(value =>
       !value.childElementCount && value.textContent.trim().length > minimumTextLength
         && (!config.noteSelectionText || value.textContent.includes(config.noteSelectionText))

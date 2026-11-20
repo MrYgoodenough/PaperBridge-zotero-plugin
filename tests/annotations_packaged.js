@@ -1,17 +1,20 @@
 /** Optional native annotation suite, injected only into a disposable Zotero profile/data pair. */
 /* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, PAPERBRIDGE_ANNOTATIONS_TEST */
 (async () => {
-  // The caller must supply both isolated directories and synthetic PDF fixture paths.
+  // Synthetic PDFs exercise native UI/rendering only, never semantic translation acceptance.
   const config = PAPERBRIDGE_ANNOTATIONS_TEST;
   // Allow real reader layout, native selection and the upstream save debounce to settle.
   const waitMilliseconds = 60000;
   const pollMilliseconds = 100;
   // PDF.js reports a fully rendered page with RenderingStates.FINISHED = 3.
   const renderingFinished = 3;
+  // Zotero's permanent library tab is selected through its real tab controller.
+  const libraryTabID = 'zotero-pane';
   // Enter this through the native editor, then verify the exact persisted comment after restart.
   const noteCommentText = 'Native annotation comment survives reopen and process restart.';
   const report = { ok: false, phase: config.phase, zoteroVersion: Zotero.version,
-    nativeUI: true, providerCalls: 0, checks: [], errors: [], inputs: [] };
+    nativeUI: true, syntheticFixture: true, semanticAcceptance: false,
+    providerCalls: 0, checks: [], errors: [], inputs: [] };
   // Native tab teardown belongs to Zotero; these are only this isolated suite's readers.
   const nativeReaders = new Set();
   let isolated = false, bridge, state, source, translated;
@@ -48,6 +51,56 @@
     await until(() => { if (failure) throw failure; return completed; }, message);
   }
 
+  /** Read actual Gecko browser activity and visibility without driving the renderer. */
+  function readerActivity() {
+    return { selectedTab: Zotero.getMainWindow().Zotero_Tabs.selectedID, hostTab: state.reader.tabID,
+      hostDocShellActive: state.reader._iframe.docShellIsActive, docShellActive: state.browser.docShellIsActive,
+      docShellVisible: state.browser.docShell.QueryInterface(Ci.nsIBaseWindow).visibility,
+      documentVisibility: state.frames[1].document.visibilityState };
+  }
+
+  /** Exercise real tab hiding/reselection and second-page rendering on every split open. */
+  async function tabRendering() {
+    const tabs = Zotero.getMainWindow().Zotero_Tabs;
+    const viewer = state.apps[1].pdfViewer;
+    const initial = await until(() => {
+      const activity = readerActivity();
+      return activity.selectedTab === activity.hostTab && activity.hostDocShellActive === true
+        && activity.docShellActive === true && activity.docShellVisible === true
+        && activity.documentVisibility === 'visible' && activity;
+    }, 'Selected host did not activate the translated docShell');
+    check(initial.docShellActive && initial.docShellVisible && initial.documentVisibility === 'visible',
+      'Selected host starts with an active, visible translated docShell', initial);
+    tabs.select(libraryTabID);
+    const hidden = await until(() => {
+      const activity = readerActivity();
+      return activity.selectedTab === libraryTabID && activity.hostDocShellActive === false
+        && activity.docShellActive === false && activity.documentVisibility === 'hidden' && activity;
+    }, 'Real library tab selection did not deactivate the translated docShell');
+    check(hidden.docShellActive === false && hidden.documentVisibility === 'hidden',
+      'Real library tab selection deactivates and hides the translated document', hidden);
+    tabs.select(state.reader.tabID);
+    viewer.scrollPageIntoView(Components.utils.cloneInto({ pageNumber: 2 }, state.frames[1]));
+    const rendered = await until(() => {
+      const page = viewer.getPageView(1);
+      const canvas = page?.div.querySelector('canvas');
+      const evidence = { ...readerActivity(), currentPage: viewer.currentPageNumber, pages: viewer.pagesCount,
+        renderingState: page?.renderingState, canvasWidth: canvas?.width, canvasHeight: canvas?.height,
+        textSpans: page?.div.querySelectorAll('.textLayer span').length };
+      report.pageReadiness = evidence;
+      return evidence.selectedTab === evidence.hostTab && evidence.hostDocShellActive === true
+        && evidence.docShellActive === true && evidence.docShellVisible === true
+        && evidence.documentVisibility === 'visible' && evidence.currentPage === 2
+        && evidence.renderingState === renderingFinished && evidence.canvasWidth > 0
+        && evidence.canvasHeight > 0 && evidence.textSpans > 0 && evidence;
+    }, 'Reselected host did not render synthetic translated page 2');
+    check(rendered.docShellActive && rendered.docShellVisible && rendered.renderingState === renderingFinished
+      && rendered.canvasWidth > 0 && rendered.canvasHeight > 0 && rendered.textSpans > 0,
+      'Real host tab reselection renders translated page 2 with canvas and text layer', rendered);
+    // Restore the unchanged first-page selection targets before any existing annotation actions.
+    viewer.scrollPageIntoView(Components.utils.cloneInto({ pageNumber: 1 }, state.frames[1]));
+  }
+
   /** Open the actual split and wait for the translated page's text layer. */
   async function open() {
     await ready(bridge.split(source, translated), 'Native split initialization did not finish');
@@ -68,10 +121,18 @@
         && Zotero.Reader._readers.includes(state.translationReader),
       "Embedded native reader is the sole translated-attachment annotation owner");
     }
-    await until(() => {
-      const page = state.apps[1].pdfViewer.getPageView(0);
-      return page?.renderingState === renderingFinished && page.div.querySelector('.textLayer span');
-    }, "Synthetic translated page did not render");
+    // Isolate right-page rendering from the source pane's first-page restoration on tab selection.
+    const sync = state.sync;
+    state.sync = false;
+    try {
+      await tabRendering();
+      await until(() => {
+        const page = state.apps[1].pdfViewer.getPageView(0);
+        const canvas = page?.div.querySelector('canvas');
+        return state.apps[1].pdfViewer.currentPageNumber === 1 && page?.renderingState === renderingFinished
+          && canvas?.width > 0 && canvas.height > 0 && page.div.querySelector('.textLayer span');
+      }, "Synthetic translated page did not render");
+    } finally { state.sync = sync; }
     return state;
   }
 

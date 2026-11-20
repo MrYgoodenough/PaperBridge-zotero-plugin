@@ -467,6 +467,14 @@ var PaperBridge = {
     }, { capture: true }));
     browser.setAttribute("src", "resource://zotero/reader/reader.html");
     container.append(divider, browser);
+    // Zotero manages only ReaderTab browsers; an inactive sibling releases rendered PDF pages.
+    browser.docShellIsActive = reader._iframe.docShellIsActive !== false;
+    /** Keep the embedded PDF responsive while its host tab is selected. */
+    const onTabSelection = event => {
+      if (!state.closing) browser.docShellIsActive = !!event.detail.selected;
+    };
+    container.addEventListener("tab-selection-change", onTabSelection);
+    state.cleanups.push(() => container.removeEventListener("tab-selection-change", onTabSelection));
     state.ready = this.loadSplit(state, loaded, win);
     await state.ready;
   },

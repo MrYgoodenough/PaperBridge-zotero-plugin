@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run real backend and unchanged annotation suites in an official, isolated macOS Zotero.
+# Run real backend and synthetic annotation/rendering suites in an official, isolated macOS Zotero.
 set -euo pipefail
 # Resolve only this checkout; neither /Applications nor daily profiles are used.
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -151,6 +151,9 @@ try:
             for index, text in enumerate(lines):
                 # Use 12-point text, a 72-point inset and 34-point spacing; lower-left stays blank.
                 page.insert_text((72, 72 + index * 34), text, fontsize=12)
+            # Page two probes native tab/rendering recovery, not semantic translation acceptance.
+            page = document.new_page(width=612, height=792)
+            page.insert_text((72, 72), f"Synthetic {kind} second-page rendering fixture", fontsize=12)
             document.save(fixture / f"{kind}.pdf")
     for variant in summary["variants"]:
         run_id = variant["runID"]
@@ -160,7 +163,7 @@ try:
             raise RuntimeError("Create requires a fresh isolated profile/data pair")
         variant.update(profile=str(profile), data=str(data))
         previous_pid = None
-        for phase, expected in (("create", 23), ("reopen", 9)):
+        for phase, expected in (("create", 29), ("reopen", 12)):
             prefix = artifact / f"{run_id}-{phase}"
             result = {"phase": phase, "ok": False, "expectedChecks": expected, "actualChecks": None,
                       "pid": None, "pidExited": False, "previousPID": previous_pid, "exitCode": None}
