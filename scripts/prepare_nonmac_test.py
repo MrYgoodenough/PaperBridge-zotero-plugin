@@ -18,12 +18,14 @@ HELPER_ID = "paperbridge-tests@local.dev"
 
 
 def platform_id():
-    """Select only native Linux/Windows artifacts for this acceptance task."""
+    """Select only the actual supported native host's candidate artifacts."""
     if sys.platform == "win32" and platform.machine().lower() in {"amd64", "x86_64"}:
         return "windows-x64"
     if sys.platform == "linux" and platform.machine().lower() in {"amd64", "x86_64"}:
         return "linux-x64"
-    raise ValueError("This acceptance helper supports native Linux/Windows only")
+    if sys.platform == "darwin" and platform.machine().lower() == "arm64":
+        return "macos-arm64"
+    raise ValueError("This acceptance helper requires native Linux/Windows x64 or macOS arm64")
 
 
 def prepare(options):
@@ -249,7 +251,7 @@ async function helperCheckpoint(stage) {
                            "ROOT_PATH": json.dumps(str(ROOT)), "TEST_GLOBAL": global_name}.items():
             bootstrap = bootstrap.replace(key, value)
         compatibility = source_manifest["applications"]["zotero"]
-        manifest = {"manifest_version": 2, "name": "PaperBridge isolated non-macOS acceptance", "version": "1.0",
+        manifest = {"manifest_version": 2, "name": "PaperBridge isolated native acceptance", "version": "1.0",
                     "applications": {"zotero": {"id": HELPER_ID,
                         "strict_min_version": compatibility["strict_min_version"],
                         "strict_max_version": compatibility["strict_max_version"],

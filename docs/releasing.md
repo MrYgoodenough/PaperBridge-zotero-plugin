@@ -40,6 +40,13 @@ for mode in bundled local; do
 done
 ```
 
+For actual macOS installation/backend and reader acceptance, run
+`scripts/check_native_macos.sh` with `--bundled-xpi` and `--local-xpi` pointing at
+those completed packages. It uses a private official Zotero installation and fresh
+profiles, verifies native file installation, real health/build/mode, Microsoft-terms
+exemption, cold restart and persisted native annotations. It blocks fee-bearing
+requests and never kills a timed-out client; it does not certify translation semantics.
+
 Windows PowerShell:
 
 ```powershell

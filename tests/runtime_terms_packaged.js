@@ -1,4 +1,4 @@
-/** Verify native Windows runtime consent and Linux exemption in disposable profiles. */
+/** Verify native Windows runtime consent and Linux/macOS exemption in disposable profiles. */
 /* global Zotero, Services, IOUtils, PathUtils, Cc, Ci, Components, ChromeUtils,
           PAPERBRIDGE_TEST_ROOT, PAPERBRIDGE_RUNTIME_TERMS_TEST */
 var PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE = (async () => {
@@ -29,7 +29,7 @@ var PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE = (async () => {
     snapshots: [], nativeInput: [], requests: [], termsWindowOpens: 0, forbiddenRequests: 0,
     scope: "Exact candidate native installation, runtime consent/exemption, local health and optional synthetic PDF only",
     exclusions: ["No translation/provider requests or account sync", "No prior reading/notes reacceptance",
-      "No simulated Windows result on Linux", "Host must confirm normal process exit and review screenshots"] };
+      "No simulated Windows result on another platform", "Host must confirm normal process exit and review screenshots"] };
   let isolated = false, ownsReport = false, bridge, manager, originalRequest, observer, saved, candidate;
   let stage = "isolation", packagedText = "", termsBytesSha256;
 
@@ -574,10 +574,10 @@ var PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE = (async () => {
       await health();
     } else {
       check(!bridge.runtime.terms.required() && saved.acceptanceIdentity === null,
-        "Linux cold reopen remains exempt; no Windows acceptance is claimed");
-      check(!Services.prefs.prefHasUserValue(agreementPref), "Linux cold reopen has no persisted Windows acceptance preference");
+        "Non-Windows cold reopen remains exempt; no Windows acceptance is claimed");
+      check(!Services.prefs.prefHasUserValue(agreementPref), "Non-Windows cold reopen has no persisted Windows acceptance preference");
       await health();
-      await snapshot(Zotero.getMainWindow(), "linux-reopen");
+      await snapshot(Zotero.getMainWindow(), "exempt-reopen");
     }
   }
 
@@ -590,8 +590,10 @@ var PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE = (async () => {
         "Only this launch's helper checkpoint can be replaced; earlier phase evidence is retained");
     }
     ownsReport = true;
-    check(["WINNT", "Linux"].includes(Services.appinfo.OS), "Suite runs only on actual native Windows or Linux");
-    check(config.expectedPlatform === (Services.appinfo.OS === "WINNT" ? "windows-x64" : "linux-x64"),
+    // Native OS identity must match the package; an emulated platform does not certify it.
+    const nativePlatforms = { WINNT: "windows-x64", Linux: "linux-x64", Darwin: "macos-arm64" };
+    check(Object.hasOwn(nativePlatforms, Services.appinfo.OS), "Suite runs only on actual native Windows, Linux or macOS");
+    check(config.expectedPlatform === nativePlatforms[Services.appinfo.OS],
       "Configured candidate platform matches the real host OS");
     check(!Services.prefs.getBoolPref("extensions.zotero.sync.autoSync", true), "Isolated suite has account auto-sync disabled");
     await checkpoint("candidate-inspection");
@@ -634,12 +636,12 @@ var PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE = (async () => {
     if (config.phase === "reopen") await reopen();
     else if (Services.appinfo.OS === "WINNT") await windowsCreate();
     else {
-      check(!bridge.runtime.terms.required() && bridge.runtime.terms.accepted(), "Actual Linux runtime is exempt from Microsoft terms");
-      check(!Services.prefs.prefHasUserValue(agreementPref), "Linux exemption does not write a Windows agreement preference");
+      check(!bridge.runtime.terms.required() && bridge.runtime.terms.accepted(), "Actual non-Windows runtime is exempt from Microsoft terms");
+      check(!Services.prefs.prefHasUserValue(agreementPref), "Non-Windows exemption does not write a Windows agreement preference");
       await optionalPDF();
       await health();
-      check(report.termsWindowOpens === 0, "Linux native create opened no terms windows");
-      await snapshot(Zotero.getMainWindow(), "linux-create");
+      check(report.termsWindowOpens === 0, "Non-Windows native create opened no terms windows");
+      await snapshot(Zotero.getMainWindow(), "exempt-create");
     }
     check(report.forbiddenRequests === 0, "No fee-bearing request was attempted during this phase");
     Services.prefs.savePrefFile(null);

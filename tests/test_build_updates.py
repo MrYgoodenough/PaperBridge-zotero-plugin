@@ -272,3 +272,32 @@ def test_native_annotation_preparation_keeps_its_own_configuration(tmp_path, mon
         if suite == "annotations":
             assert '"phase": "create"' in bootstrap and '"quit": true' in bootstrap
         assert 'user_pref("extensions.zotero.firstRun2", false);' in (profile / "user.js").read_text()
+
+
+def test_native_mac_runtime_preparation_binds_the_selected_package(tmp_path, monkeypatch):
+    """Check Mac preparation metadata and deferred native installation, not simulated UI acceptance."""
+    script = tmp_path / "scripts/prepare_nonmac_test.py"
+    script.parent.mkdir()
+    script.write_bytes((ROOT / "scripts/prepare_nonmac_test.py").read_bytes())
+    addon = tmp_path / "addon/manifest.json"
+    addon.parent.mkdir()
+    addon.write_bytes((ROOT / "addon/manifest.json").read_bytes())
+    package = tmp_path / "fixture.xpi"
+    manifest = json.loads(addon.read_bytes())
+    build = {"platform": "macos-arm64", "pythonMode": "bundled", "buildId": "fixture-build"}
+    with zipfile.ZipFile(package, "w") as archive:
+        archive.writestr("manifest.json", addon.read_bytes())
+        archive.writestr("runtime/macos-arm64/runtime.json", json.dumps(build))
+    monkeypatch.setattr(sys, "platform", "darwin")
+    monkeypatch.setattr(platform, "machine", lambda: "arm64")
+    monkeypatch.setattr(sys, "argv", [str(script), "--suite", "runtime-terms", "--run-id", "mac-fixture",
+                                    "--phase", "create", "--xpi", str(package)])
+    runpy.run_path(str(script), run_name="__main__")
+    config = json.loads((tmp_path / ".runtime/runtime-terms-mac-fixture-options.json").read_bytes())
+    assert config["expectedPlatform"] == build["platform"] and config["expectedMode"] == build["pythonMode"]
+    assert config["expectedBuildId"] == build["buildId"] and config["expectedVersion"] == manifest["version"]
+    assert config["candidateSha256"] == hashlib.sha256(package.read_bytes()).hexdigest()
+    profile = tmp_path / ".runtime/runtime-terms-mac-fixture-profile"
+    assert not (profile / "extensions/paperbridge@local.dev.xpi").exists()
+    assert (profile / "extensions/paperbridge-tests@local.dev.xpi").is_file()
+    assert 'user_pref("extensions.zotero.sync.autoSync", false);' in (profile / "user.js").read_text()

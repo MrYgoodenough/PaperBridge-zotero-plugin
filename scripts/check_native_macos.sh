@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run unchanged annotation create/reopen suites in an official, isolated macOS Zotero.
+# Run real backend and unchanged annotation suites in an official, isolated macOS Zotero.
 set -euo pipefail
 # Resolve only this checkout; neither /Applications nor daily profiles are used.
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -75,6 +75,45 @@ def logged(command, path):
                        timeout=INSTALL_TIMEOUT, check=True)
 
 
+def configure_gui(profile):
+    """Apply hosted-runner rendering and update preferences only to this disposable profile."""
+    with (profile / "user.js").open("a", encoding="utf-8") as prefs:
+        for key in ("extensions.zotero.firstRun2", "app.update.enabled", "extensions.update.enabled"):
+            prefs.write(f"\nuser_pref({json.dumps(key)}, false);\n")
+        # Hosted Mac VMs use Gecko's supported software renderer, not a simulated GUI.
+        for key in ("gfx.webrender.software", "layers.acceleration.disabled"):
+            prefs.write(f"\nuser_pref({json.dumps(key)}, true);\n")
+
+
+def launch_native(profile, prefix, report, result, suite):
+    """Retain actual launcher/native identities and receipts; never kill a timed-out client."""
+    command = ["open", "-W", "-n", str(app), "--args", "-no-remote", "-profile", str(profile)]
+    with Path(str(prefix) + "-launch.log").open("w", encoding="utf-8") as log:
+        log.write(shlex.join(command) + "\n")
+        log.flush()
+        process = subprocess.Popen(command, cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT)
+        result["pid"] = process.pid
+        try:
+            result["exitCode"] = process.wait(timeout=PHASE_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            result["error"] = "Zotero did not exit normally; left running without kill or profile/lock changes"
+    result["pidExited"] = process.poll() is not None
+    native = {}
+    if report.exists():
+        shutil.copyfile(report, Path(str(prefix) + ".json"))
+        native = json.loads(report.read_text())
+    helper_error = root / f".runtime/{suite}-test.json"
+    if not native and helper_error.is_file():
+        shutil.copyfile(helper_error, Path(str(prefix) + "-helper-error.json"))
+    result.update(nativePID=native.get("processID"), nativePIDExited=False)
+    if isinstance(result["nativePID"], int) and result["nativePID"] > 0:
+        try:
+            os.kill(result["nativePID"], 0)
+        except ProcessLookupError:
+            result["nativePIDExited"] = True
+    return native
+
+
 # Missing native reports remain unknown, never fabricated provider/check successes.
 summary = {"ok": False, "status": "error", "sourceCommit": None, "zoteroVersion": None,
            "officialURL": OFFICIAL_URL, "providerCalls": None, "physicalInput": False, "inputMethod": "Gecko trusted only",
@@ -131,42 +170,12 @@ try:
             if variant["variant"] == "local":
                 command.extend(["--local-python", str(root / ".venv/bin/python")])
             logged(command, Path(str(prefix) + "-prepare.log"))
-            # Disable first-run browser guidance and automatic updates only in this test profile.
-            with (profile / "user.js").open("a", encoding="utf-8") as prefs:
-                for key in ("extensions.zotero.firstRun2", "app.update.enabled", "extensions.update.enabled"):
-                    prefs.write(f"\nuser_pref({json.dumps(key)}, false);\n")
-                # Hosted Mac VMs lack GPU WebRender; Gecko's supported software renderer keeps UI tests real.
-                for key in ("gfx.webrender.software", "layers.acceleration.disabled"):
-                    prefs.write(f"\nuser_pref({json.dumps(key)}, true);\n")
-            # LaunchServices initializes the native GUI session; open's PID is not the actual Zotero PID.
-            command = ["open", "-W", "-n", str(app), "--args", "-no-remote", "-profile", str(profile)]
-            with Path(str(prefix) + "-launch.log").open("w", encoding="utf-8") as log:
-                log.write(shlex.join(command) + "\n")
-                log.flush()
-                process = subprocess.Popen(command, cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT)
-                result["pid"] = process.pid
-                try:
-                    result["exitCode"] = process.wait(timeout=PHASE_TIMEOUT)
-                except subprocess.TimeoutExpired:
-                    result["error"] = "Zotero did not exit normally; left running without kill or profile/lock changes"
-            result["pidExited"] = process.poll() is not None
+            configure_gui(profile)
             report = root / f".runtime/annotations-{run_id}-{phase}.json"
-            native = {}
-            if report.exists():
-                shutil.copyfile(report, Path(str(prefix) + ".json"))
-                native = json.loads(report.read_text())
-            helper_error = root / ".runtime/packaged-test.json"
-            if not native and helper_error.is_file():
-                shutil.copyfile(helper_error, Path(str(prefix) + "-helper-error.json"))
+            native = launch_native(profile, prefix, report, result, "annotations")
             checks = native.get("checks", [])
             result.update(actualChecks=len(checks) if native else None,
-                          providerCalls=native.get("providerCalls"), zoteroVersion=native.get("zoteroVersion"),
-                          nativePID=native.get("processID"), nativePIDExited=False)
-            if isinstance(result["nativePID"], int) and result["nativePID"] > 0:
-                try:
-                    os.kill(result["nativePID"], 0)
-                except ProcessLookupError:
-                    result["nativePIDExited"] = True
+                          providerCalls=native.get("providerCalls"), zoteroVersion=native.get("zoteroVersion"))
             result["ok"] = (result["exitCode"] == 0 and result["pidExited"] and result["nativePIDExited"]
                             and result["nativePID"] != previous_pid
                             and native.get("ok") is True and native.get("stage") == "complete"
@@ -179,10 +188,52 @@ try:
                 summary["errors"].append(f"{run_id} {phase} failed; see retained native report/launch log")
                 break
             previous_pid = result["nativePID"]
+    for variant in summary["variants"]:
+        # Short suite IDs retain native run/variant uniqueness without exceeding the existing guard.
+        run_id = "mac-engine-" + hashlib.sha256(variant["runID"].encode()).hexdigest()[:12]
+        profile = root / f".runtime/runtime-terms-{run_id}-profile"
+        if profile.exists() or (root / f".runtime/runtime-terms-{run_id}-data").exists():
+            raise RuntimeError("Backend acceptance requires fresh disposable directories")
+        variant["enginePhases"] = []
+        previous_pid = None
+        for phase in ("create", "reopen"):
+            prefix = artifact / f"{run_id}-{phase}"
+            result = {"phase": phase, "ok": False, "previousPID": previous_pid, "exitCode": None}
+            variant["enginePhases"].append(result)
+            command = [str(root / ".venv/bin/python"), "-I", "-B", "scripts/prepare_nonmac_test.py",
+                       "--suite", "runtime-terms", "--run-id", run_id, "--phase", phase,
+                       "--xpi", variant["xpi"], "--expected-version", version]
+            if variant["variant"] == "local":
+                command.extend(["--local-python", str(root / ".venv/bin/python")])
+            logged(command, Path(str(prefix) + "-prepare.log"))
+            configure_gui(profile)
+            report = root / f".runtime/runtime-terms-{run_id}-{phase}.json"
+            native = launch_native(profile, prefix, report, result, "runtime-terms")
+            checks = native.get("checks", [])
+            result.update(actualChecks=len(checks) if native else None, health=native.get("health"),
+                          forbiddenRequests=native.get("forbiddenRequests"))
+            result["ok"] = (result["exitCode"] == 0 and result["pidExited"] and result["nativePIDExited"]
+                            and result["nativePID"] != previous_pid and native.get("os") == "Darwin"
+                            and native.get("ok") is True and native.get("stage") == "complete"
+                            and bool(checks) and all(check.get("ok") is True for check in checks)
+                            and not native.get("errors") and native.get("forbiddenRequests") == 0
+                            and native.get("health", {}).get("version") == version)
+            # The suite blocks fee-bearing routes and verifies an empty real job store before success.
+            result["providerCalls"] = 0 if result["ok"] else None
+            if not result["pidExited"]:
+                raise RuntimeError(result["error"])
+            if not result["ok"]:
+                summary["errors"].append(f"{run_id} {phase} backend failed; see retained native report")
+                break
+            previous_pid = result["nativePID"]
     phases = [phase for variant in summary["variants"] for phase in variant["phases"]]
-    summary["providerCalls"] = sum(phase["providerCalls"] for phase in phases) if all(
-        phase.get("providerCalls") is not None for phase in phases) else None
-    summary["ok"] = len(phases) == 4 and all(phase["ok"] for phase in phases) and not summary["errors"]
+    engines = [phase for variant in summary["variants"] for phase in variant["enginePhases"]]
+    summary["nativeBackendStartup"] = len(engines) == 4 and all(phase["ok"] for phase in engines)
+    observations = phases + engines
+    summary["providerCalls"] = sum(phase["providerCalls"] for phase in observations) if all(
+        phase.get("providerCalls") is not None for phase in observations) else None
+    summary["ok"] = (len(phases) == 4 and all(phase["ok"] for phase in phases)
+                     and summary["nativeBackendStartup"] and not summary["errors"])
     summary["status"] = "ok" if summary["ok"] else "error"
 except Exception as error:
     summary["errors"].append(f"{type(error).__name__}: {error}")

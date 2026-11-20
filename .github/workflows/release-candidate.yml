@@ -360,7 +360,7 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 3
-      - name: Actual macOS Zotero create and cold-reopen acceptance
+      - name: Actual macOS Zotero backend, reader and cold-reopen acceptance
         if: matrix.target == 'macos'
         run: bash scripts/check_native_macos.sh
       - name: Retain native Zotero receipts and failures
