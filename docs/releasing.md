@@ -40,13 +40,6 @@ for mode in bundled local; do
 done
 ```
 
-For actual macOS installation/backend and reader acceptance, run
-`scripts/check_native_macos.sh` with `--bundled-xpi` and `--local-xpi` pointing at
-those completed packages. It uses a private official Zotero installation and fresh
-profiles, verifies native file installation, real health/build/mode, Microsoft-terms
-exemption, cold restart and persisted native annotations. It blocks fee-bearing
-requests and never kills a timed-out client; it does not certify translation semantics.
-
 Windows PowerShell:
 
 ```powershell
@@ -72,6 +65,13 @@ for mode in bundled local; do
 done
 ```
 
+For actual macOS installation/backend and reader acceptance, run
+`scripts/check_native_macos.sh` with `--bundled-xpi` and `--local-xpi` pointing at
+those completed packages. It uses a private official Zotero installation and fresh
+profiles, verifies native file installation, real health/build/mode, Microsoft-terms
+exemption, cold restart and persisted native annotations. It blocks fee-bearing
+requests and never kills a timed-out client; it does not certify translation semantics.
+
 Channels: `linux-x64`, `linux-x64-local-python`, `windows-x64`,
 `windows-x64-local-python`, `macos-arm64`, `macos-arm64-local-python`.
 Outputs: `paperbridge-0.4.3-<channel>.xpi`, its
@@ -87,8 +87,9 @@ budget disk space for both variants.
 Manual `.github/workflows/release-candidate.yml` accepts `target_os=linux`, `windows`,
 `macos` or `all` (the three supported native architectures). It checks native
 dependencies and builds both modes, without provider requests or public release/feed
-writes. Mac also runs the unchanged annotation create/cold-reopen suite in official
-Zotero 10.0.8 with separate native receipts. These are controlled Gecko inputs, not
+writes. Mac also runs real native backend/file-install create/cold-reopen and the
+unchanged annotation suite in official Zotero 10.0.8, with separate native receipts.
+These are controlled Gecko inputs, not
 physical mouse/keyboard or translation-semantic acceptance. Save artifacts before expiry.
 Optional `reuse_macos_run` restores a prior attempt-1 Mac bundled XPI's exact runtime
 and original build inputs, then rebuilds current source/notices and repeats real native
