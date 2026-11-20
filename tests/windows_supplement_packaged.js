@@ -10,6 +10,8 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
   const timeoutMilliseconds = 60000;
   // Real translated pages can spend longer on their first PDF.js canvas/font draw than UI controls.
   const pageRenderTimeoutMilliseconds = 180000;
+  // The retained scikit-learn PDF has overlapping header runs; probe an unambiguous body term instead.
+  const defaultNoteSelectionText = 'Scikit-learn';
   // Native selection moves are throttled; polling must not outrun the real reader.
   const pollMilliseconds = 100, stableLayoutSamples = 3, movementMilliseconds = 60;
   // Keep drag endpoints away from native reader auto-scroll edges.
@@ -451,13 +453,13 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       return view?.renderingState === renderingFinished && canvas?.width > 0 && canvas.height > 0
         && view.div.querySelector('.textLayer span') && view;
     }, 'Actual native PDF canvas/text layer did not render', pageRenderTimeoutMilliseconds);
+    const expected = config.noteSelectionText || defaultNoteSelectionText;
     const span = [...page.div.querySelectorAll('.textLayer span')].find(value =>
       !value.childElementCount && value.textContent.trim().length > minimumTextLength
-        && (!config.noteSelectionText || value.textContent.includes(config.noteSelectionText))
+        && value.textContent.includes(expected)
         && value.getBoundingClientRect().width > minimumTextWidth
         && value.getBoundingClientRect().width + endPadding < frame.innerWidth);
     verify(!!span, 'Fixture contains a selectable real native text line');
-    const expected = config.noteSelectionText || span.textContent.trim();
     const node = span.firstChild, offset = node.textContent.indexOf(expected);
     // Measure a real in-text term without installing a Selection; whitespace endpoints can cross native pages.
     const measurement = doc.createRange();
@@ -482,6 +484,7 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
         && bounds.right + endPadding < frame.innerWidth && bounds.top > edgeMargin
         && bounds.bottom < frame.innerHeight - edgeMargin && bounds.height > 0 && bounds;
     }, 'Actual PDF line did not settle inside the viewport; no off-screen drag performed');
+    // The native end caret must pass the final glyph; this interior body term avoids ambiguous headers.
     const x = box.left + startInset, endX = box.right + endPadding, y = box.top + box.height / 2;
     verify(doc.elementFromPoint(x, y)?.closest('.page')?.isSameNode(page.div), 'Native drag starts on the rendered PDF page');
     const events = [];
@@ -509,7 +512,11 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
       (evidence.inputs ||= []).push(input);
       const selected = type === 'pointer' ? await wait(() => doc.getSelection()?.toString().trim(),
         'Native PDF mouse drag did not produce a text selection') : expected;
-      Object.assign(input, { textChecksum: textChecksum(selected), actualText: selected });
+      const selection = doc.getSelection();
+      Object.assign(input, { textChecksum: textChecksum(selected), actualText: selected,
+        anchorPage: selection?.anchorNode?.parentElement?.closest('.page')?.dataset.pageNumber,
+        focusPage: selection?.focusNode?.parentElement?.closest('.page')?.dataset.pageNumber,
+        nativeRanges: JSON.parse(JSON.stringify(pair.right._primaryView._selectionRanges || [])) });
       verify(selected === expected, 'Actual selected text matches the exact rendered fixture text',
         { expected, actual: selected });
       return selected;
@@ -623,14 +630,16 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
 
   /** Follow the saved backlink from its actual native editor and verify the resulting reader. */
   async function backlink(record) {
-    verify(!Zotero.Reader._readers.some(reader => reader.itemID === pair.translated.id && !readers.has(reader)),
+    // The fixture's embedded annotation owner is registered, but must not stand in for a protocol-opened reader.
+    verify(!Zotero.Reader._readers.some(reader => reader.itemID === pair.translated.id
+      && reader !== pair.translationReader && !readers.has(reader)),
       'PDF backlink cannot reuse a parent-owned translated reader');
     const note = await Zotero.Items.getByLibraryAndKeyAsync(saved.libraryID, record.key);
     verify(note?.isNote(), 'Saved backlink belongs to the retained native note');
     await Zotero.Notes.open(note.id, null, { openInWindow: true });
     await editor(note, 'editor-backlink-' + record.kind, record.targetBacklink);
     const native = await wait(() => {
-      const reader = Zotero.Reader._readers.find(value => value.itemID === pair.translated.id);
+      const reader = Zotero.Reader._readers.find(value => value.itemID === pair.translated.id && !value._paperbridgeEmbedded);
       if (reader) readers.add(reader);
       for (const window of Services.wm.getEnumerator('zotero:reader')) {
         if (window.reader?.itemID === pair.translated.id) windows.add(window);
@@ -643,7 +652,8 @@ var PAPERBRIDGE_WINDOWS_SUPPLEMENT = async function ({ bridge, config, check, ch
     await wait(() => view._iframeWindow?.PDFViewerApplication?.pdfViewer.currentPageNumber === saved.pageIndex + 1
       && (!record.annotationKey || native._internalReader._state.selectedAnnotationIDs?.includes(record.annotationKey)),
     'Saved PDF backlink did not reach its actual translated page/highlight');
-    verify(true, 'Saved note backlink navigates to the real translated PDF page/annotation',
+    verify(native !== pair.translationReader && !native._paperbridgeEmbedded,
+      'Saved note backlink navigates to the real translated PDF page/annotation',
       { method: 'Trusted mouse clicks in the native note editor and its link popup', noteKey: record.key,
         attachmentKey: pair.translated.key, readerItemID: native.itemID,
         actualPageNumber: view._iframeWindow.PDFViewerApplication.pdfViewer.currentPageNumber,
