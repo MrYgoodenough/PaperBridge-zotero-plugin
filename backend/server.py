@@ -33,6 +33,10 @@ JOBS = RUNTIME / "jobs"
 VERSION = "0.4.3"
 # Selected glyph geometry may exceed the ordinary small control-request limit.
 FORMULA_REQUEST_LIMIT = 256 * 1024
+# Discard unused HTTP bodies in small chunks instead of allocating an oversized request.
+HTTP_BODY_CHUNK_SIZE = 64 * 1024
+# Bound idle reads of incomplete rejected bodies without changing normal request timeouts.
+HTTP_BODY_DRAIN_TIMEOUT = 10
 # Independently versioned on-disk records.
 RECORD_VERSION = 1
 # Active attempts must never restart automatically after losing their worker.
@@ -700,6 +704,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def respond(self, code, value):
         """Send an uncached JSON response to the authenticated loopback client."""
+        # Closing TCP with unread request bytes can replace the JSON error with a macOS RST.
+        self.discard_body()
         data = json.dumps(value, ensure_ascii=False).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -708,18 +714,44 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def discard_body(self):
+        """Consume rejected or ignored request bytes without decoding or retaining them."""
+        remaining = getattr(self, "_unread_body_bytes", 0)
+        if not remaining:
+            return
+        timeout = self.connection.gettimeout()
+        try:
+            self.connection.settimeout(HTTP_BODY_DRAIN_TIMEOUT)
+            while remaining:
+                chunk = self.rfile.read(min(remaining, HTTP_BODY_CHUNK_SIZE))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+        except OSError:
+            # A disconnected/incomplete client must not hold the service thread forever.
+            pass
+        finally:
+            self._unread_body_bytes = 0
+            self.connection.settimeout(timeout)
+
     def body(self, limit=16384):
         """Read one bounded JSON object, rejecting invalid input without a traceback."""
         size = int(self.headers.get("Content-Length", "0"))
         if not 0 < size <= limit:
             raise ValueError("Invalid request size")
-        value = json.loads(self.rfile.read(size))
+        data = self.rfile.read(size)
+        self._unread_body_bytes = max(0, size - len(data))
+        value = json.loads(data)
         if not isinstance(value, dict):
             raise ValueError("Request must be a JSON object")
         return value
 
     def dispatch(self):
         """Route authenticated cache and durable-job operations without enabling CORS."""
+        try:
+            self._unread_body_bytes = max(0, int(self.headers.get("Content-Length", "0")))
+        except ValueError:
+            self._unread_body_bytes = 0
         # No CORS. A web page must not control the local filesystem bridge.
         if self.headers.get("Origin") or self.headers.get("Host") not in {f"127.0.0.1:{self.server.server_port}", f"localhost:{self.server.server_port}"}:
             return self.respond(403, {"error": "Forbidden origin or host"})

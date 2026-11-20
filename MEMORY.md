@@ -13,6 +13,7 @@
 
 - `formulas.js` / `formula-cache.js` 负责选区与显示公式悬停复制、本机 JSON 和晚配对合并；工具菜单/设置可管理缓存。缓存位于 Zotero 数据目录 `paperbridge/formula-cache`，只清理本模块 JSON，按存活论文/PDF 引用保留，不等于跨设备云同步。优先复用原生 LaTeX/缓存；转写固定使用已保存的 **DeepSeek Key 与基础地址配对**、`deepseek-flash`，不借用当前 compatible 配置。缓存写入失败不阻断已取得 LaTeX 的复制。
 - `/formulas/regions` 复用包内模型进行 CPU 本地检测，后台启动为非交互；失败不写成永久空页，悬停重试有界。`formula_regions.py` 保留旋转 CropBox/MediaBox 的原始 PDF user-space 坐标，初始化失败可重试；`formulas.py` 拒绝带明确 provider error 的部分 LaTeX。没有新增依赖或升级 BabelDOC；科学依赖用例在 `check_offline.py` 的现有 full-only 边界中保留完整验收。
+- `server.Handler` 在响应前以小块丢弃未消费的请求体；拒绝大请求、认证失败或忽略 body 的控制路由不能直接带未读字节关闭 TCP，否则 Darwin 客户端可能收到连接重置而不是 JSON 错误。普通 JSON/公式请求仍按原限额验证，拒绝输入不执行 provider，丢弃阶段只限制空闲读取时间，不改变普通请求超时。
 - `reader.js` 的 attachment-backed `TranslationReader` 是共享原生首选，`annotations.js` 的 `TranslationAnnotations` 仅在接口不支持时作为兼容 fallback；同一译文 pane **只有一个批注 owner**。embedded reader 不作为可选择的 Zotero tab，不显示整篇翻译命令；原生菜单/权限/批注属于译文附件。关闭在首个 await 前截取 debounce 编辑，等待本附件写入/状态 flush，并在失败时仍释放注册、factory、observer、view 和原分屏布局。保留 source itemID 恢复、同 pair 复用、stale 初始化保护、flex 恢复及任务中断/重试语义。
 - 合流候选的 Linux Zotero **10.0.8** 隔离原生阅读、受信输入创建高亮/下划线/笔记、关闭/重开、删除和真实进程重启已验证，未使用日常资料库；受信 Gecko 事件不是物理鼠标/键盘验收。Windows/macOS 合流包、公式真实转写质量/检测召回及安装升级仍未验收。共享源码 CI、候选 Linux 依赖 smoke 和维护者旧包证据不能替代这些边界；后续发布需重建并绑定实际三平台产物。
 
