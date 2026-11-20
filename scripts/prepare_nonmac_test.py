@@ -121,7 +121,8 @@ def prepare(options):
     if options.case_manifest:
         config["caseManifest"] = str(options.case_manifest.resolve())
         if options.suite == "upgrade":
-            cases = json.loads(options.case_manifest.read_text(encoding="utf-8"))["cases"]
+            # Windows PowerShell UTF-8 JSON commonly includes a BOM; preserve the actual fixture data.
+            cases = json.loads(options.case_manifest.read_text(encoding="utf-8-sig"))["cases"]
             config.update(sourcePDF=cases[0]["source_pdf"], translatedPDF=cases[0]["translated_pdf"],
                           notePageIndex=cases[0]["selected_pages_one_based"][0] - 1,
                           notePaperTitle=cases[0].get("title"),
@@ -264,6 +265,9 @@ async function helperCheckpoint(stage) {
                  "extensions.zotero.firstRun2": False, "extensions.autoDisableScopes": 0,
                  "extensions.enabledScopes": 15, "extensions.startupScanScopes": 15,
                  "xpinstall.signatures.required": False, "browser.shell.checkDefaultBrowser": False}
+        if sys.platform == "win32":
+            # Optional Word installation must not block a disposable PaperBridge acceptance profile.
+            prefs["extensions.zoteroWinWordIntegration.skipInstallation"] = True
         if runtime_terms:
             # This fresh profile must never attempt account sync during the consent exercise.
             prefs["extensions.zotero.sync.autoSync"] = False

@@ -6,9 +6,12 @@
 - 独立 macOS **0.4.2** 的第一方源码由 [PR #3](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/pull/3) 提供，头提交 `272d85e52bf653d084191e705cabe60ef1188f62`、共同基线 `b51a82f`；功能增量已吸收到共享实现，保留合流前 `bbf1f0d` 的任务/阅读/引擎修复。既有 macOS 发布包及通道仍独立且不覆盖；0.4.3 只是新共享候选身份，正式发布/稳定更新另需授权。
 - 已按 GitHub asset digest 核对旧 macOS 0.4.2 XPI（SHA-256 `6cbc0a5b43a3ab034a5dc0558f8029d8dbcb3f706275a7afe90ba25707b5d285`）：实际 manifest 的 `update_url` 是 `example.invalid` 占位地址，内置 CPython 为 3.12.14。它不能靠新增 Mac feed 自动迁移，需一次手动安装新版接入；此限制不阻塞注明手动升级方式的 Release，但不能宣称旧包自动升级已实现。
 - 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。轻量 CI 只安装 pytest/PyMuPDF/httpx，须在真实最小依赖环境验证；完整 `.venv` 下的 lightweight 通过不能替代它。使用 BabelDOC IL 或科学依赖的用例属于 `FULL_ONLY_CASES`，完整模式仍必须运行。Windows 用项目实际有效的环境，不借用其他产品的 Python。
+- 已确认的历史 CI 根因包括轻量依赖边界、辅助测试入口/设置 disclosure 和原生 runner 配置，以及真实 Darwin HTTP 未消费 body 导致连接 reset（共享 `server.Handler` 已修复）。看当前提交对应的 run，不以历史红色记录代表现状；不跳过完整引擎断言换绿灯。
 - 手动 `release-candidate.yml` 的 `all` 包含 Linux x64 / Windows x64 / macOS arm64；Mac 使用固定原生 `macos-26` 并拒绝 Rosetta（OpenCV 最低部署目标仍为 macOS 13），Windows CPython 固定 3.12.13、Linux/Mac 3.12.16。构建与 CPU forward 不是 Zotero 原生验收或发布授权；独立复制 stage，不改 freeze07 或 `.cache/package` 原暂存。Mac OpenCV 脚本保存实际配置/原始归档/架构/hash，未取得构建证据的旧 stage 只警告，不让其他基本功能失效。
+- 当前 Mac 候选依赖的最低 wheel tag 并不统一：orjson `macosx_15_0_arm64`，NumPy/ONNX Runtime `macosx_14_0_arm64`。OpenCV target 13 不能证明整包支持 macOS 13/14；原生实测为 macOS 26。发布前说明实际最低系统范围，若承诺 13/14 则另行适配/验证，不暗改范围或新增 Intel 验收门禁。
 - `restore_candidate_stage.py` 只恢复已校验 bundled XPI 的原生字节/执行权限，不执行外平台二进制。Mac 候选工作流可用 `reuse_macos_run` 保留同一原生 stage/原始构建证据并重建新源码/notices；实际 Zotero 10.0.8 的 create/reopen 结果单独绑定最终 XPI SHA 和真实 native PID，受控 Gecko 输入不是物理操作。CI Mac VM 使用 LaunchServices/软件 WebRender，不改插件生产偏好、签名、锁或 NSS；未通过不能冒称原生验收。
-- Mac 上游/真实 native 源与 notice 范围已加入交付 manifest（319 个固定归档、15 个 build inputs，保留原 L/W 303 归档身份）。三平台现有 ONNX Runtime 1.31.1 的短 revision `6af1a93`/对应 tag 仍未取得可验证源，不能宣称完整原生源码闭合；它不是已发现的 runtime bug，也不以另一版本源替代。Rust 编译器/optional linkage 等 generic unknown 不新增为绝对门禁。
+- 当前 `candidate02` 六包在真实 Zotero 10.0.8 完成阅读/批注 create/cold-reopen，三平台两个模式的实际后端 health 与冷启动也有绑定最终 XPI SHA 的限定证据；Linux 0.3.7→0.4.3 原生文件安装升级已完成。证据入口为 `agent/codex/current-release-prep-path.txt`，不替代自动更新、物理输入或全文语义验收，不更改旧公开包。
+- Mac 上游/真实 native 源与 notice 范围已加入交付 manifest（319 个固定归档、15 个 build inputs，保留原 L/W 303 归档身份）；四个 copyleft package 的 pinned sources/notices 已有实物覆盖。三平台 ONNX Runtime 1.31.1 的短 revision `6af1a93`/对应 tag 仍未取得可验证源，不以 ONNX 1.23.2 或另一 Runtime 版本替代。Berkeley DB 自身来源/条款已提供，其 clause 3 的必要 accompanying-software 范围仍需确认。只把明确必须交付的 source/notice 缺口当发布阻塞；这些不是已发现的 runtime bug，固定 `partial/false` 或 compiler/optional-link unknown 不自行新增门禁，也不宣称法律或完整原生源码已闭合。
 - `scripts/probe_formulas.py` 可用显式 PDF、零基页码、backend/cache 路径做免费 CPU 区域检测。它阻止 Python 外连、禁用 ONNX telemetry、把模型复制到临时私有 cache；不写原 PDF/模型/用户 cache，不做 provider、LaTeX 转写或召回/语义验收。输出放新 JSON，不覆盖既有证据。
 
 ## 共享公式与原生译文阅读器
@@ -43,7 +46,7 @@
 - Linux glibc ≥ 2.34，默认 stage `.cache/package/linux-x64`；image-only OpenCV 4.12 的兼容工具链/install 在 `.cache/opencv-linux-x64`，不得用 Ubuntu 24.04 默认 glibc 2.38 产物替换。Windows 沿用既有官方 OpenCV wheel/CPython 3.12.13，Linux CPython 3.12.16。
 - `build.py` 每次生成 payload，固定 ZIP 元数据/压缩级别，保留原许可字节和 nested runtime.json。验收绑定完成 XPI SHA，不只 backend build ID；原生 Linux/Windows 分别构建 bundled/local。修改任意生产资产后重建对应包。
 - `package_sources.py` 从已提交快照绑定四包全部生产文件（含 CSS），同行提供 303 上游归档和 4 个 Linux build inputs。缓存 `agent/codex/licensing-p0-1-20261116-003659/source-cache` 保留；源码 ZIP 同地公开，其内部 `bundle-manifest.json` 与四个 inventory 保留，本地外置清单/checksum 保留，不用无范围 written offer。法律合规仍 unknown，不将普通编译元数据不确定性当作已发现缺失义务。
-- 用户已确认 Community 2026 的合法使用和 section 8 分发责任，不重复索取。三 DLL/原始条款保持原字节；Windows 初次引擎启用只确认 `msvc-community-2026-v1` 一次，拒绝只停引擎，设置可重开；后台/诊断不弹窗，Linux 豁免。
+- 用户已确认 Community 2026 的合法使用和 section 8 分发责任，不重复索取。三 DLL/原始条款保持原字节；Windows 初次引擎启用只确认 `msvc-community-2026-v1` 一次，拒绝只停引擎，设置可重开；后台/诊断不弹窗，Linux/macOS 豁免。
 - Linux/Windows 独立平台/模式 feeds，0.3.7 仅四个 XPI 与对应源码 ZIP 共 **5** 个上传资产公开，GitHub 自动 Source code 不动；包位于 `dist/release-0.3.7-freeze07/`。用户确认保留对应源码 ZIP，其余独立校验/清单只本地保存，未来不上传；`verify_release.py --online` 核对实际本地包、feed、GitHub XPI digest/size 与下载可达性，不依赖这些 sidecar。冻结 XPI/源码 ZIP 与标签不因后续工具/政策改动而重写。
 - Release 用 `make_latest=false`，仓库 Latest 仍为独立 macOS 0.4.2，不改其资产/通道。公开版本与各附件用途见 `docs/release-versions.md`；0.3.5/0.3.6 仅开发候选。GitHub TODO #1 已同步 0.3.7 交付及未完成验收，发布时继续维护且不以勾选比例表示完成度。Git 操作在 master 快进，不建分支/worktree，不强推；API 不用 gh。公开元数据验证不等于 Zotero 从旧版本自动升级实测。
 
@@ -51,6 +54,7 @@
 
 - 日常 Linux Zotero `/home/scq/.local/opt/zotero/zotero`，profile `/home/scq/.zotero/zotero/ylkmnjtn.default`，data `/home/scq/Zotero`。不要与项目内隔离测试混淆，正常停机备份后才升级；不强杀、不改锁/SQLite/NSS制造通过。
 - Windows SSH `desktop-hz`，Zotero `D:\Zotero\zotero.exe`，原工程 `E:\ZoteroPlugin\PaperBridge-zotero-plugin`。有效 Python `.runtime\windows-p1-validation-20261114\.venv\Scripts\python.exe`。不改原工程工作文件/HEAD/stash及原备份；原生 UI 用登录 Interactive Session，不用 SSH Session 0。
+- Windows 隔离验收使用本项目 `agent\codex\r043` 的短 plain-source 拷贝；过深测试 dataDir 曾导致同一候选解包失败，短目录后真实后端通过，不宣称长路径支持。`prepare_nonmac_test.py` / `prepare_packaged_test.py` 仅在 disposable Windows profile 设置官方 `extensions.zoteroWinWordIntegration.skipInstallation`，避免无关 Word 首次安装弹窗阻塞；不改日常 Office 设置，不跳过 PaperBridge 的真实运行库条款/后端断言。UTF-8 Gecko 回执在 PowerShell 读取时须显式 `-Encoding UTF8`。
 - 当前 Linux 检出未配置 GitHub 写入凭据；可使用 `desktop-hz` 既有 Git 凭据从独立临时 bare 对象仓库推送已核验提交，不改 Windows 原检出的 HEAD/工作区，不导出或将凭据写入仓库。Git HTTP verbose 变量须移除而非赋值 `0`，并保持凭据 trace redaction。
 - Windows 日常 profile `C:\Users\LostPatrol_2\AppData\Roaming\Zotero\Zotero\Profiles\dljrawap.default`、data `E:\0syncthing\Zotero` 未获日常升级/同步授权。Linux 日常 metadata-only 同步已成功，但 Windows 接收/文件/多译本/group 云验收仍未完成；不全库上传。
 - 日常 Linux 已存在的 metadata helper 读 `agent/codex/account-metadata-v10-20261117-005536/native-helper/account-linux-v9-metac-options.json`，其 report 已存在，禁止重放。该目录保留一致停机备份及安全接续证据，不删；实际账号同步只用官方 Runner，`getAPIKey()` 可能写 OSKeyStore，不当纯读取或导出 NSS。

@@ -122,6 +122,9 @@ prefs = {"extensions.zotero.dataDir":str(DATA),"extensions.zotero.useDataDir":Tr
 if options.suite in {"hover", "annotations"}:
     # First-run guidance can open a browser over the disposable native test renderer.
     prefs["extensions.zotero.firstRun2"] = False
+if sys.platform == "win32":
+    # Skip unrelated Office installation only in this disposable test profile, never daily preferences.
+    prefs["extensions.zoteroWinWordIntegration.skipInstallation"] = True
 DATA.mkdir(exist_ok=True)
 (PROFILE / "user.js").write_text("\n".join(f"user_pref({json.dumps(k)}, {json.dumps(v)});" for k,v in prefs.items()))
 for name in ["addonStartup.json.lz4","extensions.json"]:

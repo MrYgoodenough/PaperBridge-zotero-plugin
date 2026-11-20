@@ -271,7 +271,10 @@ def test_native_annotation_preparation_keeps_its_own_configuration(tmp_path, mon
         assert ('PAPERBRIDGE_HOVER_TEST:' in bootstrap) == (suite == "hover")
         if suite == "annotations":
             assert '"phase": "create"' in bootstrap and '"quit": true' in bootstrap
-        assert 'user_pref("extensions.zotero.firstRun2", false);' in (profile / "user.js").read_text()
+        preferences = (profile / "user.js").read_text()
+        assert 'user_pref("extensions.zotero.firstRun2", false);' in preferences
+        assert ('user_pref("extensions.zoteroWinWordIntegration.skipInstallation", true);' in preferences) == (
+            sys.platform == "win32")
 
 
 def test_native_mac_runtime_preparation_binds_the_selected_package(tmp_path, monkeypatch):
@@ -301,3 +304,4 @@ def test_native_mac_runtime_preparation_binds_the_selected_package(tmp_path, mon
     assert not (profile / "extensions/paperbridge@local.dev.xpi").exists()
     assert (profile / "extensions/paperbridge-tests@local.dev.xpi").is_file()
     assert 'user_pref("extensions.zotero.sync.autoSync", false);' in (profile / "user.js").read_text()
+    assert 'extensions.zoteroWinWordIntegration.skipInstallation' not in (profile / "user.js").read_text()
