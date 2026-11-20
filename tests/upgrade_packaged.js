@@ -120,13 +120,13 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
   async function clickControl(window, element) {
     window.focus();
     Services.focus.activeWindow = window;
-    await until(() => window.document.hasFocus(), "Native diagnostic dialog did not receive focus");
+    await until(() => window.document.hasFocus(), "Native dialog did not receive focus");
     element.scrollIntoView({ block: "nearest", inline: "nearest" });
     const box = element.getBoundingClientRect();
     const x = box.left + box.width / 2, y = box.top + box.height / 2;
     const hit = window.document.elementFromPoint(x, y);
     check(box.width > 0 && box.height > 0 && x >= 0 && x < window.innerWidth && y >= 0 && y < window.innerHeight
-      && (hit === element || element.contains(hit)), "Native diagnostic control is visible and hit-testable");
+      && (hit === element || element.contains(hit)), "Native dialog control is visible and hit-testable");
     let trusted = false;
     /** Observe the actual dialog click without intercepting production behavior. */
     function observe(event) { trusted = event.isTrusted; }
@@ -134,7 +134,37 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
     const utilities = window.windowUtils || window.docShell.domWindowUtils;
     utilities.sendMouseEvent("mousedown", x, y, 0, 1, 0);
     utilities.sendMouseEvent("mouseup", x, y, 0, 1, 0);
-    check(trusted, "Native diagnostic control receives trusted mouse input");
+    check(trusted, "Native dialog control receives trusted mouse input");
+  }
+
+  /** Accept the released baseline's real first-run Windows dialog before testing upgrade preservation. */
+  async function baselineRuntimeTerms() {
+    if (Services.appinfo.OS !== "WINNT") return;
+    const terms = bridge.runtime.terms;
+    if (config.phase !== "create") {
+      check(terms.accepted(), "Actual Windows upgrade preserves the baseline runtime agreement");
+      report.nativeRuntimeTerms = { accepted: true, scope: "Persisted baseline acceptance" };
+      return;
+    }
+    check(!terms.accepted(), "Fresh Windows baseline has no seeded runtime consent");
+    const packagedText = await terms.readText();
+    let finished = false, decision, failure;
+    terms.show().then(value => { decision = value; finished = true; }, error => { failure = error; });
+    const dialog = await until(() => {
+      if (failure) throw failure;
+      return terms.window?.document.documentURI === "chrome://paperbridge/content/runtime-terms.xhtml"
+        && terms.window.document.getElementById("terms-accept") && terms.window;
+    }, "Released baseline runtime agreement did not open");
+    const displayedText = await until(() => dialog.document.getElementById("terms-text")?.textContent,
+      "Released baseline runtime agreement did not load offline text");
+    check(displayedText === packagedText && packagedText.length > 0,
+      "Released Windows baseline displays its entire packaged runtime agreement");
+    await clickControl(dialog, dialog.document.getElementById("terms-accept"));
+    await until(() => { if (failure) throw failure; return finished; }, "Native baseline agreement did not settle");
+    check(decision === true && terms.accepted(), "Only native baseline acceptance enables the Windows engine");
+    Services.prefs.savePrefFile(null);
+    report.nativeRuntimeTerms = { accepted: true, displayedTextSha256: textDigest(displayedText),
+      method: "windowUtils.sendMouseEvent", trusted: true, scope: "Isolated baseline first-run consent" };
   }
 
   /** Exercise the real settings button and read the generated allowlisted ZIP. */
@@ -519,6 +549,9 @@ var PAPERBRIDGE_UPGRADE_TEST_PROMISE = (async () => {
       "Native AddonManager registers and activates the exact selected addon version");
     report.nativeAddon = { id: addon.id, version: addon.version, active: addon.isActive };
     report.zoteroVersion = Zotero.version;
+    await checkpoint("native-baseline-runtime-terms");
+    await baselineRuntimeTerms();
+    await checkpoint("native-engine-start");
     report.health = await bridge.request("/health");
     check(bridge.runtime.version === config.expectedVersion && report.health.version === config.expectedVersion,
       "Installed addon and actual native engine match the selected XPI version");

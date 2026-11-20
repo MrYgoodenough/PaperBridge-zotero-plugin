@@ -120,8 +120,9 @@ for x in m['xpis']:
     assert path.stat().st_size == x['bytes']
 ```
 
-Check four platform/mode pairs, `fromCommitOnly`, **303** verified sources and
-**four** retained Linux inputs. Require zero
+Check all **six** selected platform/mode pairs and `fromCommitOnly`. The current
+three-platform manifest binds **319** verified sources and **15** retained build
+inputs; the original Linux/Windows 303 archives keep their identities. Require zero
 `projectSourceSnapshotMismatches`/`deliveryFilesMissingOrChanged` and matching native
 artifacts/source-tree/shipped notices. Fonts need byte-specific grant/modification/
 reserved-name review, not filename/header-based permission.
@@ -136,5 +137,5 @@ beside exact XPIs at the same download location, without extra source
 charges: [releasing](releasing.md). Use **`make_latest=false`**, preserving unrelated
 assets/channels and Latest.
 Keep generated `.sha256`, XPI inventories and the external `.manifest.json` local.
-The ZIP retains `bundle-manifest.json` and all four inventories; public integrity
+The ZIP retains `bundle-manifest.json` and all selected XPI inventories; public integrity
 uses GitHub asset digests and the internal manifest, not standalone sidecars.

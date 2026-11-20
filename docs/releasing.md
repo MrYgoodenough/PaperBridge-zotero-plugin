@@ -55,6 +55,13 @@ foreach ($mode in @('bundled', 'local')) {
 
 macOS Apple Silicon:
 
+Check the complete dependency set before declaring the minimum macOS version.
+The current candidate's orjson wheel declares `macosx_15_0_arm64`; NumPy and
+ONNX Runtime declare `macosx_14_0_arm64`. OpenCV's deployment target of 13 does
+not make the whole package macOS 13/14 compatible. Native acceptance on macOS 26
+alone also does not certify older releases. If macOS 13/14 is an advertised target,
+adapt and verify those dependencies first; do not silently narrow the release scope.
+
 ```sh
 set -e
 sh scripts/setup.sh
