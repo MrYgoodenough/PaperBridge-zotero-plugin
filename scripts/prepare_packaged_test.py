@@ -85,7 +85,7 @@ async function runTests(){
     "upgrade": "upgrade_packaged.js"}[options.suite])).as_uri())).replace("PROJECT_ROOT_LITERAL",json.dumps(str(ROOT)))
 if options.suite != "packaged":
     bootstrap = bootstrap.replace("packaged-test.json", options.suite + "-test.json")
-if options.suite in {"hover", "annotations"}:
+if options.suite == "hover":
     hover_options = {"isolated": True, "expectedProfileDirectory": str(PROFILE),
         "expectedDataDirectory": str(DATA), "fixtureDirectory": str(ROOT / ".runtime/alignment-fixture"),
         "reportPath": str(ROOT / f".runtime/{run_name}-result.json"),
@@ -119,8 +119,8 @@ prefs = {"extensions.zotero.dataDir":str(DATA),"extensions.zotero.useDataDir":Tr
     "extensions.paperbridge.pythonPath": options.local_python,
     "extensions.autoDisableScopes":0,"extensions.enabledScopes":15,"extensions.startupScanScopes":15,
     "xpinstall.signatures.required":False,"browser.shell.checkDefaultBrowser":False}
-if options.suite == "hover":
-    # First-run guidance opens the system browser, occluding the native test renderer on Windows.
+if options.suite in {"hover", "annotations"}:
+    # First-run guidance can open a browser over the disposable native test renderer.
     prefs["extensions.zotero.firstRun2"] = False
 DATA.mkdir(exist_ok=True)
 (PROFILE / "user.js").write_text("\n".join(f"user_pref({json.dumps(k)}, {json.dumps(v)});" for k,v in prefs.items()))

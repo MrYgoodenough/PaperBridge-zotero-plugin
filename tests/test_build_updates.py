@@ -247,3 +247,28 @@ def test_source_package_versions_agree():
     lock = tomllib.loads((ROOT / "uv.lock").read_text(encoding="utf-8"))
     own_versions = [package["version"] for package in lock["package"] if package["name"] == project["name"]]
     assert own_versions == [project["version"]] == [manifest["version"]]
+
+
+def test_native_annotation_preparation_keeps_its_own_configuration(tmp_path, monkeypatch):
+    """Inject the annotation config, not hover config, while suppressing first-run browser guidance."""
+    script = tmp_path / "scripts/prepare_packaged_test.py"
+    script.parent.mkdir()
+    script.write_bytes((ROOT / "scripts/prepare_packaged_test.py").read_bytes())
+    addon = tmp_path / "addon/manifest.json"
+    addon.parent.mkdir()
+    addon.write_bytes((ROOT / "addon/manifest.json").read_bytes())
+    package = tmp_path / "fixture.xpi"
+    with zipfile.ZipFile(package, "w") as archive:
+        archive.writestr("manifest.json", addon.read_bytes())
+    for suite in ("annotations", "hover"):
+        monkeypatch.setattr(sys, "argv", [str(script), "--suite", suite, "--run-id", "fixture",
+                                        "--phase", "create", "--xpi", str(package)])
+        runpy.run_path(str(script), run_name="__main__")
+        profile = tmp_path / f".runtime/{suite}-fixture-profile"
+        with zipfile.ZipFile(profile / "extensions/paperbridge-tests@local.dev.xpi") as archive:
+            bootstrap = archive.read("bootstrap.js").decode()
+        assert ('PAPERBRIDGE_ANNOTATIONS_TEST:' in bootstrap) == (suite == "annotations")
+        assert ('PAPERBRIDGE_HOVER_TEST:' in bootstrap) == (suite == "hover")
+        if suite == "annotations":
+            assert '"phase": "create"' in bootstrap and '"quit": true' in bootstrap
+        assert 'user_pref("extensions.zotero.firstRun2", false);' in (profile / "user.js").read_text()
