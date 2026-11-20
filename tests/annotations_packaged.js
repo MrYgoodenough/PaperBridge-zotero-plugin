@@ -11,7 +11,7 @@
   // Enter this through the native editor, then verify the exact persisted comment after restart.
   const noteCommentText = 'Native annotation comment survives reopen and process restart.';
   const report = { ok: false, phase: config.phase, zoteroVersion: Zotero.version,
-    nativeUI: true, processID: Services.appinfo.processID, providerCalls: 0, checks: [], errors: [], inputs: [] };
+    nativeUI: true, providerCalls: 0, checks: [], errors: [], inputs: [] };
   // Native tab teardown belongs to Zotero; these are only this isolated suite's readers.
   const nativeReaders = new Set();
   let isolated = false, bridge, state, source, translated;
@@ -274,6 +274,7 @@
     isolated = config.isolated === true && samePath(profile, config.expectedProfileDirectory)
       && samePath(Zotero.DataDirectory.dir, config.expectedDataDirectory);
     if (!isolated) throw new Error("Refusing annotation test outside the caller's explicit isolated profile/data pair");
+    report.processID = Services.appinfo.processID;
     if (!['create', 'reopen'].includes(config.phase)) throw new Error("Expected phase create or reopen");
     Zotero.Debug.setStore(true);
     bridge = await until(() => Zotero.PaperBridge, "Packaged PaperBridge did not start");
