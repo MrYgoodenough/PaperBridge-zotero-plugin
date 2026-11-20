@@ -1,5 +1,5 @@
 <!-- Candidate build and release policy while preserving frozen packages and platform channels. -->
-# Linux/Windows packaging and release
+# Three-platform packaging and release
 
 Published baseline: Linux/Windows **freeze07 0.3.7**, **bundled** and **local-Python**
 variants, plus the separate macOS **0.4.2** release. Their packages, tags and feeds
@@ -10,9 +10,9 @@ macOS assets/channels or repository-wide **Latest**.
 plus attachment-backed `TranslationReader` primary with one unsupported-interface
 `TranslationAnnotations` fallback, never dual writes. Task recovery, sync markers,
 reading assets and existing reading controls remain. This is **unpublished source**;
-source metadata stays **0.3.7** for now, not a replacement 0.3.7 release. No macOS
-build, three-platform merged-package native/upgrade acceptance or paid formula-quality
-acceptance is asserted here. Formula conversion remains paired DeepSeek-only Key/URL,
+source metadata is **0.4.3 candidate**, not a published replacement. A candidate
+build is not three-platform merged-package native/upgrade or paid formula-quality
+acceptance. Formula conversion remains paired DeepSeek-only Key/URL,
 fixed `deepseek-flash`, with native/cached results preferred.
 
 Before authorizing a new release, align `addon/manifest.json`, `backend/server.py`'s
@@ -26,7 +26,7 @@ Use the project's `.venv`. Remove interfering `PYTHONHOME`, `PYTHONPATH` or
 native-library overrides; `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` avoids foreign test
 plugins. Host Chinese fonts are required; machine font caches are not shipped.
 
-Examples below build local candidates with the current 0.3.7 source metadata, not
+Examples below build local candidates with the current 0.4.3 source metadata, not
 published freeze07 replacements. Use the approved new identity before publication.
 
 Linux:
@@ -53,30 +53,43 @@ foreach ($mode in @('bundled', 'local')) {
 }
 ```
 
+macOS Apple Silicon:
+
+```sh
+set -e
+sh scripts/setup.sh
+sh scripts/build_opencv.sh
+.venv/bin/python -B scripts/stage_runtime.py
+for mode in bundled local; do
+  .venv/bin/python -B scripts/build.py --python "$mode" --output-dir dist/candidate-pr3
+done
+```
+
 Channels: `linux-x64`, `linux-x64-local-python`, `windows-x64`,
-`windows-x64-local-python`. Outputs: `paperbridge-0.3.7-<channel>.xpi`, its
+`windows-x64-local-python`, `macos-arm64`, `macos-arm64-local-python`.
+Outputs: `paperbridge-0.4.3-<channel>.xpi`, its
 `.sha256`/`.inventory.json`, and **local draft** `updates/<channel>.json`.
 The `.sha256` and `.inventory.json` files stay local, not GitHub Release assets.
 Local mode ships dependencies/assets but uses an installed Python 3.12 interpreter.
 
 `--stage-dir PATH` selects a separate stage. `--platform` selects an existing
-Linux/Windows stage with matching `runtime.json.platform`: **not
+Linux/Windows/macOS stage with matching `runtime.json.platform`: **not
 cross-compilation/native acceptance**. Preserve installers before reusing names;
 budget disk space for both variants.
 
-Manual `.github/workflows/release-candidate.yml` accepts `target_os=linux`, `windows`
-or `all` (Linux + Windows only). It checks native dependencies/builds both modes,
+Manual `.github/workflows/release-candidate.yml` accepts `target_os=linux`, `windows`,
+`macos` or `all` (the three supported native architectures). It checks native dependencies/builds both modes,
 without provider requests or public release/feed writes. Save artifacts before
 expiry; runner checks/lightweight CI do not certify native Zotero or translation.
 
 ## Verify completed bytes
 
-Collect all four packages/drafts together and verify from the frozen source checkout:
+Collect the selected platform/mode packages and drafts, then verify from the frozen source checkout:
 
 ```sh
 set -e
-for channel in linux-x64 linux-x64-local-python windows-x64 windows-x64-local-python; do
-  xpi="dist/candidate-pr3/paperbridge-0.3.7-$channel.xpi"
+for channel in linux-x64 linux-x64-local-python windows-x64 windows-x64-local-python macos-arm64 macos-arm64-local-python; do
+  xpi="dist/candidate-pr3/paperbridge-0.4.3-$channel.xpi"
   .venv/bin/python -B scripts/verify_release.py \
     --xpi "$xpi" --sha256 "$xpi.sha256" \
     --feed "dist/candidate-pr3/updates/$channel.json" --report "$xpi.verification.json"
@@ -102,6 +115,24 @@ growth/missing baselines only warn, with no size gate. Fixed ZIP metadata/compre
 does not prove native reproducibility. Bind to **finished XPI SHA256**, not build ID.
 
 ## Acceptance and authorized publication
+
+### Which work blocks a release?
+
+- Exact source/version/package identity, required corresponding sources/notices and
+  working installation/backend/reader persistence on each advertised platform are
+  necessary. A successful build or an old package's receipt does not replace them.
+- Automatic delivery must be checked before enabling that stable feed. It is not
+  required for a clearly documented manual-install release. An old Mac package with
+  a placeholder update URL needs one manual newer install to join the new channel;
+  publishing a feed cannot rewrite an installed add-on's URL.
+- Paid formula conversion quality and full-text semantic acceptance remain explicit
+  limits until authorized and tested. Native/cache-first copying can be checked
+  without provider calls; untested quality must not be advertised as accepted.
+- Intel Mac, every long-term TODO, bit-identical native reproduction and generic
+  `licenseCompliance=unknown` are not new gates for the currently supported scope.
+  Specifically identified missing source/input/notice coverage remains actionable.
+- Candidate builds/draft feeds are executable preparation. Public asset upload and
+  stable-feed replacement require separate release authorization.
 
 Existing freeze07 Linux/Windows create/reopen evidence remains scoped to those exact
 packages and their earlier reader integration; controlled PDF.js selections are not

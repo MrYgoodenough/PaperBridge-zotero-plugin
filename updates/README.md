@@ -11,5 +11,7 @@ XPI is publicly available with a matching GitHub asset digest. Keep checksum fil
 local; do not upload independent `.sha256` assets. Do not use repository-wide
 `releases/latest` as a platform fallback. See [release verification](../docs/releasing.md).
 
-The separately released macOS 0.4.2 implementation is not merged here; its assets
-and update channels are not replaced by these files.
+The macOS 0.4.2 source increment has been absorbed into the unpublished 0.4.3
+candidate. Its existing assets/channels are not replaced by these files.
+Candidate feeds stay under the build output directory until their exact packages
+are accepted and public release is authorized; never enable a missing Mac asset.

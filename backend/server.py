@@ -30,7 +30,7 @@ RUNTIME = Path(os.environ.get("PAPERBRIDGE_STATE_DIR",ROOT / ".runtime"))
 # Durable records and immutable artifact folders share the existing cache root.
 JOBS = RUNTIME / "jobs"
 # Public plugin version.
-VERSION = "0.3.7"
+VERSION = "0.4.3"
 # Selected glyph geometry may exceed the ordinary small control-request limit.
 FORMULA_REQUEST_LIMIT = 256 * 1024
 # Independently versioned on-disk records.

@@ -18,7 +18,7 @@ Linux/Windows 与独立 macOS 版本分别维护，**不能仅按版本号大小
 
 `master` 已吸收 PR #3 的公式选区/悬停复制、本机 JSON 缓存与 attachment-backed `TranslationReader` primary；旧 `TranslationAnnotations` 仅在接口不支持时作为单一 fallback，不双写。公式转写保持 DeepSeek-only Key/URL 与固定 `deepseek-flash`，原生结果/缓存优先，缓存不是跨设备云同步资产。
 
-源码版本标记暂保留 **0.3.7**，不表示新的 0.3.7 安装包已经发布。已发布 Linux/Windows **freeze07 0.3.7** 和独立 macOS **0.4.2** 的安装包、tags、feeds 均未改变。旧包限定验收历史不能替代新合流包的三平台原生、升级或付费公式质量验收；本次也不宣称 macOS 构建已完成。
+共享源码版本为 **0.4.3 候选版，尚未发布**。已发布 Linux/Windows **freeze07 0.3.7** 和独立 macOS **0.4.2** 的安装包、tags、feeds 均未改变。候选构建及旧包限定验收历史不能替代新包的三平台原生、升级或付费公式质量验收；已安装旧包的更新地址也不会因源码版本变化而改变。
 
 ## 同一 Release 为什么有多个文件
 

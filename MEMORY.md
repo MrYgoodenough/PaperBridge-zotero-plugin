@@ -1,10 +1,13 @@
 <!-- Current shared baseline, safe development entry points and unresolved product boundaries. -->
 # 当前开发基线
 
-- 主分支 `master` 为吸收 macOS 增量后的**未发布共享源码**，版本元数据暂仍为 **0.3.7**（addon manifest、server VERSION、pyproject、uv.lock 一致），不代表旧安装包新增了功能。已公开 Linux/Windows **0.3.7** 的 `v0.3.7` 固定生产提交 `3f85caf61303245b880803eceeb977f4124630ec`；四条稳定通道仍绑定 freeze07 四包及下述 v16 引擎/v5 提示。旧 freeze05/v14 与 freeze06/v15 四包不能代表该公开基线；后续源码合流不重写冻结包、源码 ZIP 或标签。
+- 主分支 `master` 为吸收 macOS 增量后的**未发布 0.4.3 候选源码**（addon manifest、server VERSION、pyproject、uv.lock 一致），不代表旧安装包新增了功能，也不授权公开发布。已公开 Linux/Windows **0.3.7** 的 `v0.3.7` 固定生产提交 `3f85caf61303245b880803eceeb977f4124630ec`；四条稳定通道仍绑定 freeze07 四包及下述 v16 引擎/v5 提示。旧 freeze05/v14 与 freeze06/v15 四包不能代表该公开基线；候选准备不重写冻结包、源码 ZIP 或标签。
 - 固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，默认 `deepseek-flash`。不顺带升级引擎。
-- 独立 macOS **0.4.2** 的第一方源码由 [PR #3](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/pull/3) 提供，头提交 `272d85e52bf653d084191e705cabe60ef1188f62`、共同基线 `b51a82f`；功能增量已吸收到共享实现，保留合流前 `bbf1f0d` 的任务/阅读/引擎修复。既有 macOS 发布包及通道仍独立且不覆盖；共享新版本号和三平台安装包发布需另行确定。
+- 独立 macOS **0.4.2** 的第一方源码由 [PR #3](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/pull/3) 提供，头提交 `272d85e52bf653d084191e705cabe60ef1188f62`、共同基线 `b51a82f`；功能增量已吸收到共享实现，保留合流前 `bbf1f0d` 的任务/阅读/引擎修复。既有 macOS 发布包及通道仍独立且不覆盖；0.4.3 只是新共享候选身份，正式发布/稳定更新另需授权。
+- 已按 GitHub asset digest 核对旧 macOS 0.4.2 XPI（SHA-256 `6cbc0a5b43a3ab034a5dc0558f8029d8dbcb3f706275a7afe90ba25707b5d285`）：实际 manifest 的 `update_url` 是 `example.invalid` 占位地址，内置 CPython 为 3.12.14。它不能靠新增 Mac feed 自动迁移，需一次手动安装新版接入；此限制不阻塞注明手动升级方式的 Release，但不能宣称旧包自动升级已实现。
 - 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。轻量 CI 只安装 pytest/PyMuPDF/httpx，须在真实最小依赖环境验证；完整 `.venv` 下的 lightweight 通过不能替代它。使用 BabelDOC IL 或科学依赖的用例属于 `FULL_ONLY_CASES`，完整模式仍必须运行。Windows 用项目实际有效的环境，不借用其他产品的 Python。
+- 手动 `release-candidate.yml` 的 `all` 包含 Linux x64 / Windows x64 / macOS arm64；Mac 使用固定原生 `macos-15` 并拒绝 Rosetta，Windows CPython 固定 3.12.13、Linux/Mac 3.12.16。构建与 CPU forward 不是 Zotero 原生验收或发布授权；独立复制 stage，不改 freeze07 或 `.cache/package` 原暂存。Mac OpenCV 脚本保存实际配置/原始归档/架构/hash，未取得构建证据的旧 stage 只警告，不让其他基本功能失效。
+- `scripts/probe_formulas.py` 可用显式 PDF、零基页码、backend/cache 路径做免费 CPU 区域检测。它阻止 Python 外连、禁用 ONNX telemetry、把模型复制到临时私有 cache；不写原 PDF/模型/用户 cache，不做 provider、LaTeX 转写或召回/语义验收。输出放新 JSON，不覆盖既有证据。
 
 ## 共享公式与原生译文阅读器
 

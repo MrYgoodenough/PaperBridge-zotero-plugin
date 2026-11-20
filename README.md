@@ -15,7 +15,7 @@ Zotero 论文翻译插件：使用 DeepSeek 或 OpenAI Chat Completions 兼容�
 | Windows x64 | 0.3.7 | [自带 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-windows-x64.xpi) · [本地 Python](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/download/v0.3.7/paperbridge-0.3.7-windows-x64-local-python.xpi) |
 | macOS Apple Silicon | 独立 0.4.2 | [独立发布](https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/releases/tag/v0.4.2)；既有安装包和更新通道保持独立 |
 
-当前 `master` 已吸收 PR #3 的公式与阅读宿主增量，**尚未发布**，源码版本标记暂保留 **0.3.7**。上表 Linux/Windows freeze07 0.3.7、独立 macOS 0.4.2 的安装包、标签和更新通道均未改变；新合流包的三平台原生、升级及付费公式质量验收尚未完成。
+当前 `master` 已吸收 PR #3 的公式与阅读宿主增量，正在准备 **0.4.3 候选版，尚未发布**。上表 Linux/Windows freeze07 0.3.7、独立 macOS 0.4.2 的安装包、标签和更新通道均未改变；候选源码和构建检查不等同于三平台原生、升级或付费公式质量验收。
 
 自带版包含解释器、依赖、版面模型和 tokenizer，安装后不联网补引擎资源。本地版仅借用同架构 CPython **3.12**，依赖和模型仍随包提供，不修改系统 Python。Linux 需要 glibc ≥ 2.34，并安装思源宋体等简体中文衬线字体。
 

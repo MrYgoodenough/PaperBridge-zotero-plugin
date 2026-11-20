@@ -5,13 +5,14 @@ on:
   workflow_dispatch:
     inputs:
       target_os:
-        description: "Native candidate target (no macOS build or public release)"
+        description: "Native candidate target (no public release)"
         type: choice
         required: true
         default: linux
         options:
           - linux
           - windows
+          - macos
           - all
 
 permissions:
@@ -20,7 +21,10 @@ permissions:
 jobs:
   candidate:
     name: Native candidate (${{ matrix.target }})
-    runs-on: ${{ matrix.target == 'linux' && 'ubuntu-24.04' || 'windows-2022' }}
+    # GitHub lists macos-15 as native arm64, unlike macos-15-intel; do not use a moving latest label.
+    # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+    # https://github.com/actions/runner-images/blob/main/README.md#available-images
+    runs-on: ${{ matrix.target == 'linux' && 'ubuntu-24.04' || matrix.target == 'windows' && 'windows-2022' || 'macos-15' }}
     timeout-minutes: 90
     defaults:
       run:
@@ -28,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ${{ fromJSON(inputs.target_os == 'all' && '["linux","windows"]' || format('["{0}"]', inputs.target_os)) }}
+        target: ${{ fromJSON(inputs.target_os == 'all' && '["linux","windows","macos"]' || format('["{0}"]', inputs.target_os)) }}
     env:
       PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
       PYTHONDONTWRITEBYTECODE: "1"
@@ -41,21 +45,33 @@ jobs:
       # Enforce the existing setup.ps1 sync too, without changing either setup script.
       UV_LOCKED: "true"
       UV_MANAGED_PYTHON: "true"
-      PB_PLATFORM: ${{ matrix.target == 'linux' && 'linux-x64' || 'windows-x64' }}
-      PB_PYTHON: ${{ matrix.target == 'linux' && '.venv/bin/python' || '.venv/Scripts/python.exe' }}
-      PB_STAGED_PYTHON: ${{ matrix.target == 'linux' && '.cache/package/linux-x64/python/bin/python3.12' || '.cache/package/windows-x64/python/python.exe' }}
-      PB_SITE_PACKAGES: ${{ matrix.target == 'linux' && 'python/lib/python3.12/site-packages' || 'python/Lib/site-packages' }}
+      # Keep the accepted interpreter patch versions and their corresponding-source inputs.
+      PB_PYTHON_VERSION: ${{ matrix.target == 'windows' && '3.12.13' || '3.12.16' }}
+      UV_PYTHON: ${{ matrix.target == 'windows' && '3.12.13' || '3.12.16' }}
+      # Select real native stage paths, never build.py's cross-host repackaging option.
+      PB_PLATFORM: ${{ matrix.target == 'linux' && 'linux-x64' || matrix.target == 'windows' && 'windows-x64' || 'macos-arm64' }}
+      PB_PYTHON: ${{ matrix.target == 'windows' && '.venv/Scripts/python.exe' || '.venv/bin/python' }}
+      PB_STAGED_PYTHON: ${{ matrix.target == 'linux' && '.cache/package/linux-x64/python/bin/python3.12' || matrix.target == 'windows' && '.cache/package/windows-x64/python/python.exe' || '.cache/package/macos-arm64/python/bin/python3.12' }}
+      PB_SITE_PACKAGES: ${{ matrix.target == 'windows' && 'python/Lib/site-packages' || 'python/lib/python3.12/site-packages' }}
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+      - name: Require a native macOS arm64 runner
+        if: matrix.target == 'macos'
+        run: |
+          test "$RUNNER_OS:$RUNNER_ARCH:$(uname -s):$(uname -m)" = "macOS:ARM64:Darwin:arm64"
+          # Rosetta is not a native candidate even when an arm64 SDK is available.
+          test "$(sysctl -in sysctl.proc_translated)" != "1"
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
           package-manager-cache: false
       - uses: astral-sh/setup-uv@v10.3.3
         with:
-          python-version: "3.12"
+          # This uv catalog identifies the pinned standalone builds, including macOS 20261026.
+          version: "0.13.7"
+          python-version: ${{ env.PB_PYTHON_VERSION }}
           activate-environment: true
           no-project: true
           enable-cache: false
@@ -75,22 +91,88 @@ jobs:
           $font = Join-Path $env:WINDIR "Fonts/NotoSerifSC-VF.ttf"
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/google/fonts/8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5/ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf" -OutFile $font
           & .\scripts\setup.ps1
+      - name: macOS existing setup, assets and native image-only OpenCV
+        if: matrix.target == 'macos'
+        run: |
+          sh scripts/setup.sh
+          "$PB_PYTHON" -B scripts/warmup.py
+          sh scripts/build_opencv.sh
       - name: Check locked engine and source identity
         run: |
           git diff --exit-code -- pyproject.toml uv.lock addon/manifest.json backend/server.py
           "$PB_PYTHON" -I -B - <<'PY'
           """Require real installed pinned dependencies, not fixture substitutions."""
           from importlib.metadata import version
+          import os
+          import platform
           import sys
-          assert sys.version_info[:2] == (3, 12)
+          # These are the runtime platforms the native builder actually supports.
+          native = {
+              "linux-x64": ("linux", {"x86_64", "amd64"}),
+              "windows-x64": ("win32", {"x86_64", "amd64"}),
+              "macos-arm64": ("darwin", {"arm64"}),
+          }
+          system, machines = native[os.environ["PB_PLATFORM"]]
+          assert sys.platform == system and platform.machine().lower() in machines
+          assert platform.python_version() == os.environ["PB_PYTHON_VERSION"]
           assert version("babeldoc") == "0.6.4"
           assert version("pymupdf") == "1.26.7"
+          PY
+      - name: Retain small macOS native build inputs
+        if: matrix.target == 'macos'
+        run: |
+          "$PB_PYTHON" -I -B - <<'PY'
+          """Preserve original build evidence outside the sanitized runtime, not its large cache."""
+          import hashlib
+          import json
+          from pathlib import Path
+          import platform
+          import shutil
+          import subprocess
+          import sys
+          import sysconfig
+
+          evidence = Path("dist/candidate-native")
+          evidence.mkdir(parents=True, exist_ok=True)
+          compact = Path(".cache/opencv-install")
+          for name in ("opencv-build.json", "opencv-build-information.txt", "CMakeCache.txt"):
+              shutil.copy2(compact / name, evidence / name)
+          for name in ("config.py", "config-3.12.py"):
+              shutil.copy2(compact / "cv2" / name, evidence / f"opencv-{name}")
+
+          base = Path(sys.base_prefix).resolve()
+          executable = Path(sys._base_executable).resolve()
+          identity = {
+              "version": sys.version, "basePrefix": str(base), "executable": str(executable),
+              "executableSha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
+              "executableBytes": executable.stat().st_size, "architecture": platform.machine(),
+              "pythonAbi": sysconfig.get_config_var("SOABI"), "build": list(platform.python_build()),
+              "compiler": platform.python_compiler(), "configArgs": sysconfig.get_config_var("CONFIG_ARGS"),
+              "uv": subprocess.check_output(["uv", "--version"], text=True).strip(), "files": [],
+          }
+          # Keep the catalog URL as identity evidence, not an asserted downloaded-archive hash.
+          downloads = json.loads(subprocess.check_output([
+              "uv", "--offline", "python", "list", platform.python_version(),
+              "--only-downloads", "--show-urls", "--output-format", "json",
+          ], text=True))
+          identity["uvDownloadCatalog"] = [item for item in downloads if item["key"] == base.name]
+          # install_only builds may lack PYTHON.json; retain any actual metadata without inventing it.
+          inputs = [Path(sysconfig.get_config_h_filename()), Path(sysconfig.get_makefile_filename()),
+                    base / "PYTHON.json", base.parent / "PYTHON.json"]
+          for index, source in enumerate(inputs):
+              if not source.is_file():
+                  continue
+              target = evidence / f"cpython-{index}-{source.name}"
+              shutil.copy2(source, target)
+              identity["files"].append({"sourcePath": str(source), "file": target.name,
+                                        "sha256": hashlib.sha256(target.read_bytes()).hexdigest()})
+          (evidence / "cpython-build.json").write_text(json.dumps(identity, indent=2) + "\n", encoding="utf-8")
           PY
       - name: Full offline contracts (no provider calls)
         run: '"$PB_PYTHON" -B scripts/check_offline.py --mode full'
       - name: Stage real native dependencies, layout model and tokenizer
         run: '"$PB_PYTHON" -B scripts/stage_runtime.py'
-      - name: Isolated staged interpreter and model load
+      - name: Isolated staged interpreter and native CPU inference
         run: |
           "$PB_STAGED_PYTHON" -I -S -B - <<'PY'
           """Exercise the real stage without host site-packages, network or Zotero."""
@@ -99,11 +181,13 @@ jobs:
           import json
           import os
           from pathlib import Path
+          import platform
           import socket
           import sys
 
           stage = Path.cwd() / ".cache/package" / os.environ["PB_PLATFORM"]
           assert Path(sys.base_prefix).resolve() == (stage / "python").resolve()
+          assert platform.python_version() == os.environ["PB_PYTHON_VERSION"]
           sys.path[:0] = [str(stage / os.environ["PB_SITE_PACKAGES"]), str(stage / "backend")]
           os.environ["TIKTOKEN_CACHE_DIR"] = str(stage / ".cache/babeldoc/tiktoken")
 
@@ -128,19 +212,50 @@ jobs:
           assert version("babeldoc") == "0.6.4" and version("pymupdf") == "1.26.7"
           assert cv2.cvtColor(np.zeros((2, 2, 3), dtype=np.uint8), cv2.COLOR_BGR2GRAY).shape == (2, 2)
           model = stage / ".cache/babeldoc/models/doclayout_yolo_docstructbench_imgsz1024.onnx"
-          session = ort.InferenceSession(str(model), providers=["CPUExecutionProvider"])
+          # Two CPU workers bound the smoke on the three-core Mac runner.
+          options = ort.SessionOptions()
+          options.intra_op_num_threads = 2
+          session = ort.InferenceSession(str(model), sess_options=options, providers=["CPUExecutionProvider"])
+          assert session.get_providers() == ["CPUExecutionProvider"]
+          assert len(session.get_inputs()) == 1
+          model_input = session.get_inputs()[0]
+          assert model_input.type == "tensor(float)"
+          # A blank 1024-pixel RGB page exercises the pinned layout model's real native kernels.
+          input_shape = (1, 3, 1024, 1024)
+          outputs = session.run(None, {model_input.name: np.zeros(input_shape, dtype=np.float32)})
+          assert outputs and all(output.size and np.isfinite(output).all() for output in outputs)
           tokenizer = tiktoken.encoding_for_model("gpt-4o")
           assert tokenizer.encode("PaperBridge offline candidate")
           with model.open("rb") as stream:
               model_sha = hashlib.file_digest(stream, "sha256").hexdigest()
           proof = {
               "sourceCommit": os.environ["GITHUB_SHA"], "runtime": json.loads((stage / "runtime.json").read_bytes()),
-              "check": "native_imports_and_model_load", "network": "blocked_for_check",
+              "check": "native_imports_and_cpu_inference", "network": "blocked_for_check",
               "zoteroAcceptance": "not_tested", "translationSemantics": "not_tested",
               "model": {"path": model.relative_to(stage).as_posix(), "bytes": model.stat().st_size, "sha256": model_sha},
               "onnxruntime": ort.__version__, "providers": session.get_providers(), "opencv": cv2.__version__,
               "tokenizerEncoding": tokenizer.name,
+              "inference": {"input": model_input.name, "inputShape": list(input_shape),
+                            "outputShapes": [list(output.shape) for output in outputs], "finite": True},
           }
+          if os.environ["PB_PLATFORM"] == "macos-arm64":
+              assert sys.platform == "darwin" and platform.machine() == "arm64"
+              assert cv2.__version__ == "4.12.0"
+              evidence = Path("dist/candidate-native")
+              proof["pythonBuild"] = json.loads((evidence / "cpython-build.json").read_bytes())
+              proof["nativeBuildInputs"] = [
+                  {"path": path.relative_to("dist").as_posix(), "bytes": path.stat().st_size,
+                   "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+                  for path in sorted(evidence.iterdir()) if path.is_file()
+              ]
+              extensions = list((stage / os.environ["PB_SITE_PACKAGES"] / "cv2").rglob("cv2*.so"))
+              assert len(extensions) == 1
+              # Sanitizing and signing Mach-O can change the original source-build extension hash.
+              proof["stagedOpenCV"] = {
+                  "path": extensions[0].relative_to(stage).as_posix(),
+                  "sha256": hashlib.sha256(extensions[0].read_bytes()).hexdigest(),
+              }
+              proof["sourceHandoff"] = "not_completed"
           Path("dist").mkdir(exist_ok=True)
           Path("dist/candidate-stage.json").write_text(json.dumps(proof, indent=2) + "\n", encoding="utf-8")
           PY
@@ -193,4 +308,15 @@ jobs:
             dist/candidate-stage.json
           if-no-files-found: error
           compression-level: 0
+          retention-days: 3
+      - name: Save small macOS build evidence even if a later check fails
+        if: ${{ always() && matrix.target == 'macos' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-macos-arm64-build-inputs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            dist/candidate-native/
+            dist/candidate-stage.json
+          if-no-files-found: warn
+          compression-level: 6
           retention-days: 3

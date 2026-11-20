@@ -114,7 +114,7 @@ def stage_packages(destination):
 
 
 def compact_opencv(install=None):
-    """Locate the native image-only build before replacing any staged runtime."""
+    """Locate and verify the native image-only build before replacing any staged runtime."""
     if sys.platform not in {"darwin", "linux"}:
         return None
     default = ".cache/opencv-install" if sys.platform == "darwin" else ".cache/opencv-linux-x64/install"
@@ -122,31 +122,37 @@ def compact_opencv(install=None):
     script = "build_opencv.sh" if sys.platform == "darwin" else "build_opencv_linux.sh"
     if not (compact / "cv2").is_dir():
         raise SystemExit(f"Run scripts/{script} to build the image-only OpenCV module first")
-    if sys.platform == "linux":
-        provenance_path = compact / "opencv-build.json"
+    provenance_path = compact / "opencv-build.json"
+    label = "macOS" if sys.platform == "darwin" else "Linux"
+    # Existing macOS installs remain usable; new candidates always provide native build evidence.
+    if sys.platform == "linux" or provenance_path.is_file():
         if not provenance_path.is_file():
-            raise SystemExit(f"Missing Linux OpenCV build provenance; rerun scripts/{script}")
+            raise SystemExit(f"Missing {label} OpenCV build provenance; rerun scripts/{script}")
         provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
         extensions = list((compact / "cv2").rglob("cv2*.so"))
         if (provenance.get("platform") != PLATFORM or provenance.get("version") != OPENCV_VERSION
                 or provenance.get("modules") != OPENCV_MODULES
                 or provenance.get("pythonAbi") != sysconfig.get_config_var("SOABI")
+                or (sys.platform == "darwin" and provenance.get("architecture") != "arm64")
                 or len(extensions) != 1):
-            raise SystemExit(f"Linux OpenCV build does not match this runtime; rerun scripts/{script}")
+            raise SystemExit(f"{label} OpenCV build does not match this runtime; rerun scripts/{script}")
         if hashlib.sha256(extensions[0].read_bytes()).hexdigest() != provenance.get("extensionSha256"):
-            raise SystemExit(f"Linux OpenCV extension changed since its build; rerun scripts/{script}")
+            raise SystemExit(f"{label} OpenCV extension changed since its build; rerun scripts/{script}")
+    else:
+        print(f"WARNING: macOS OpenCV has no build provenance; rerun scripts/{script} for source handoff.", file=sys.stderr)
     return compact
 
 
 def stage_opencv(destination, compact):
-    """Copy only the native image-only module and make its loader relocatable."""
+    """Copy the image-only module with a relocatable loader and available build evidence."""
     shutil.copytree(compact / "cv2", destination / "cv2", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (destination / "cv2/config.py").write_text("BINARIES_PATHS = []\n", encoding="utf-8")
     (destination / "cv2/config-3.12.py").write_text(
         "PYTHON_EXTENSIONS_PATHS = [os.path.join(LOADER_DIR, 'python-3.12')] + PYTHON_EXTENSIONS_PATHS\n",
         encoding="utf-8")
     package = {"name": "opencv-image-only", "version": OPENCV_VERSION, "modules": OPENCV_MODULES}
-    if sys.platform == "linux":
+    # Keep actual native build evidence for both source-built platforms, outside the cv2 package.
+    if (compact / "opencv-build.json").is_file():
         package["build"] = json.loads((compact / "opencv-build.json").read_text(encoding="utf-8"))
     return package
 
