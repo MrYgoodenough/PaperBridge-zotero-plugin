@@ -1,0 +1,26 @@
+{
+  "version": "4.12.0",
+  "platform": "macos-arm64",
+  "architecture": "arm64",
+  "modules": [
+    "core",
+    "imgproc",
+    "imgcodecs",
+    "python3"
+  ],
+  "sourceArchiveUrl": "https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.12.0",
+  "sourceArchiveSha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
+  "sourceArchiveBytes": 95254890,
+  "python": "3.12.16",
+  "pythonAbi": "cpython-312-darwin",
+  "numpy": "2.5.4",
+  "cmake": "4.4.4",
+  "buildType": "MinSizeRel",
+  "deploymentTarget": "13.0",
+  "buildMacOS": "26.7.2",
+  "extensionPath": "cv2/python-3.12/cv2.cpython-312-darwin.so",
+  "extensionSha256": "b2f7e814e872988ac73da26e0b8e3065009fb45e5a89404de8fff457cd4a4ce7",
+  "extensionBytes": 7424248,
+  "cmakeCacheSha256": "38cfdf8d3d79a7701def5fced77a5b93c5a8e9a63098142070a2a00ae0815bef",
+  "buildInformationSha256": "b53d53829194169e49686322c6b5e527d86f5a0e671cf2379e7c87fa02ddaa7a"
+}

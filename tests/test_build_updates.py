@@ -210,6 +210,36 @@ def test_build_size_baseline_is_advisory_only(build_tree, monkeypatch):
     assert json.loads(inventory_path.read_bytes())["sizeTrend"]["status"] == "unknown" and xpi.is_file()
 
 
+def test_repack_refreshes_source_built_extension_size(build_tree, monkeypatch):
+    """Keep final hash/size evidence valid when a restored Mac extension already has its signed hash."""
+    stage = build_tree / ".cache/package/macos-arm64"
+    relative = "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.test.so"
+    extension = stage / relative
+    extension.parent.mkdir(parents=True)
+    extension.write_bytes(b"Synthetic relocated native extension")
+    digest = hashlib.sha256(extension.read_bytes()).hexdigest()
+    size = extension.stat().st_size
+    metadata = json.loads((stage / "runtime.json").read_bytes())
+    metadata["packages"] = [{"name": "opencv-image-only", "version": "4.12.0", "build": {
+        "platform": "macos-arm64", "version": "4.12.0", "extensionSha256": digest,
+        "extensionBytes": size + 1}}]
+    (stage / "runtime.json").write_text(json.dumps(metadata), encoding="utf-8")
+    script = build_tree / "scripts/build.py"
+    monkeypatch.setattr(sys, "platform", "darwin")
+    monkeypatch.setattr(platform, "machine", Mock(return_value="arm64"))
+    monkeypatch.setattr(sys, "argv", [str(script), "--python", "bundled"])
+    runpy.run_path(str(script), run_name="__main__")
+    version = json.loads((build_tree / "addon/manifest.json").read_bytes())["version"]
+    xpi = build_tree / f"dist/paperbridge-{version}-macos-arm64.xpi"
+    with zipfile.ZipFile(xpi) as archive:
+        build = json.loads(archive.read("runtime/macos-arm64/runtime.json"))["packages"][0]["build"]
+        assert build["extensionSha256"] == digest and build["extensionBytes"] == size
+        assert build["unsanitizedExtensionBytes"] == size + 1
+    inventory = json.loads(xpi.with_suffix(".xpi.inventory.json").read_bytes())
+    assert any(dependency["name"] == "opencv-image-only" and dependency["version"] == "4.12.0"
+               for dependency in inventory["dependencies"])
+
+
 def test_source_package_versions_agree():
     """Keep the addon, project metadata and own lock entry on the same source version."""
     manifest = json.loads((ROOT / "addon/manifest.json").read_bytes())

@@ -7,6 +7,8 @@
 - 已按 GitHub asset digest 核对旧 macOS 0.4.2 XPI（SHA-256 `6cbc0a5b43a3ab034a5dc0558f8029d8dbcb3f706275a7afe90ba25707b5d285`）：实际 manifest 的 `update_url` 是 `example.invalid` 占位地址，内置 CPython 为 3.12.14。它不能靠新增 Mac feed 自动迁移，需一次手动安装新版接入；此限制不阻塞注明手动升级方式的 Release，但不能宣称旧包自动升级已实现。
 - 常规验证入口：本项目 `.venv/bin/python -B scripts/check_offline.py --mode full`，清理继承的 `PYTHONPATH/PYTHONHOME/LD_*`；不要改系统 Python/ROS2。轻量 CI 只安装 pytest/PyMuPDF/httpx，须在真实最小依赖环境验证；完整 `.venv` 下的 lightweight 通过不能替代它。使用 BabelDOC IL 或科学依赖的用例属于 `FULL_ONLY_CASES`，完整模式仍必须运行。Windows 用项目实际有效的环境，不借用其他产品的 Python。
 - 手动 `release-candidate.yml` 的 `all` 包含 Linux x64 / Windows x64 / macOS arm64；Mac 使用固定原生 `macos-26` 并拒绝 Rosetta（OpenCV 最低部署目标仍为 macOS 13），Windows CPython 固定 3.12.13、Linux/Mac 3.12.16。构建与 CPU forward 不是 Zotero 原生验收或发布授权；独立复制 stage，不改 freeze07 或 `.cache/package` 原暂存。Mac OpenCV 脚本保存实际配置/原始归档/架构/hash，未取得构建证据的旧 stage 只警告，不让其他基本功能失效。
+- `restore_candidate_stage.py` 只恢复已校验 bundled XPI 的原生字节/执行权限，不执行外平台二进制。Mac 候选工作流可用 `reuse_macos_run` 保留同一原生 stage/原始构建证据并重建新源码/notices；实际 Zotero 10.0.8 的 create/reopen 结果单独绑定最终 XPI SHA 和真实 native PID，受控 Gecko 输入不是物理操作。CI Mac VM 使用 LaunchServices/软件 WebRender，不改插件生产偏好、签名、锁或 NSS；未通过不能冒称原生验收。
+- Mac 上游/真实 native 源与 notice 范围已加入交付 manifest（319 个固定归档、15 个 build inputs，保留原 L/W 303 归档身份）。三平台现有 ONNX Runtime 1.31.1 的短 revision `6af1a93`/对应 tag 仍未取得可验证源，不能宣称完整原生源码闭合；它不是已发现的 runtime bug，也不以另一版本源替代。Rust 编译器/optional linkage 等 generic unknown 不新增为绝对门禁。
 - `scripts/probe_formulas.py` 可用显式 PDF、零基页码、backend/cache 路径做免费 CPU 区域检测。它阻止 Python 外连、禁用 ONNX telemetry、把模型复制到临时私有 cache；不写原 PDF/模型/用户 cache，不做 provider、LaTeX 转写或召回/语义验收。输出放新 JSON，不覆盖既有证据。
 
 ## 共享公式与原生译文阅读器

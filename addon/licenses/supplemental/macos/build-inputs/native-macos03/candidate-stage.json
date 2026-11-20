@@ -1,0 +1,468 @@
+{
+  "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+  "runtime": {
+    "version": "0.4.3",
+    "platform": "macos-arm64",
+    "python": "3.12.16",
+    "packages": [
+      {
+        "name": "annotated-types",
+        "version": "0.8.0"
+      },
+      {
+        "name": "anyio",
+        "version": "4.15.1"
+      },
+      {
+        "name": "BabelDOC",
+        "version": "0.6.4"
+      },
+      {
+        "name": "backports.zstd",
+        "version": "1.8.0"
+      },
+      {
+        "name": "bitarray",
+        "version": "3.12.3"
+      },
+      {
+        "name": "bitstring",
+        "version": "4.4.0"
+      },
+      {
+        "name": "certifi",
+        "version": "2026.10.23"
+      },
+      {
+        "name": "cffi",
+        "version": "2.1.1"
+      },
+      {
+        "name": "chardet",
+        "version": "7.7.0"
+      },
+      {
+        "name": "charset-normalizer",
+        "version": "3.5.2"
+      },
+      {
+        "name": "click",
+        "version": "8.5.0"
+      },
+      {
+        "name": "cloudpickle",
+        "version": "3.1.2"
+      },
+      {
+        "name": "ConfigArgParse",
+        "version": "1.8.0"
+      },
+      {
+        "name": "cryptography",
+        "version": "50.0.2"
+      },
+      {
+        "name": "distro",
+        "version": "1.9.0"
+      },
+      {
+        "name": "filelock",
+        "version": "4.2.4"
+      },
+      {
+        "name": "flatbuffers",
+        "version": "25.12.19"
+      },
+      {
+        "name": "fonttools",
+        "version": "4.67.0"
+      },
+      {
+        "name": "freetype-py",
+        "version": "2.5.1"
+      },
+      {
+        "name": "fsspec",
+        "version": "2026.9.0"
+      },
+      {
+        "name": "h11",
+        "version": "0.16.0"
+      },
+      {
+        "name": "httpcore",
+        "version": "1.0.9"
+      },
+      {
+        "name": "httpcore2",
+        "version": "2.16.0"
+      },
+      {
+        "name": "httpx",
+        "version": "0.28.1"
+      },
+      {
+        "name": "httpx2",
+        "version": "2.16.0"
+      },
+      {
+        "name": "hyperscan",
+        "version": "0.9.1"
+      },
+      {
+        "name": "idna",
+        "version": "3.20"
+      },
+      {
+        "name": "Jinja2",
+        "version": "3.1.6"
+      },
+      {
+        "name": "jiter",
+        "version": "0.18.0"
+      },
+      {
+        "name": "Levenshtein",
+        "version": "0.27.5"
+      },
+      {
+        "name": "lxml",
+        "version": "6.1.3"
+      },
+      {
+        "name": "markdown-it-py",
+        "version": "4.2.0"
+      },
+      {
+        "name": "MarkupSafe",
+        "version": "3.0.4"
+      },
+      {
+        "name": "mdurl",
+        "version": "0.1.2"
+      },
+      {
+        "name": "ml_dtypes",
+        "version": "0.6.0"
+      },
+      {
+        "name": "msgpack",
+        "version": "1.2.4"
+      },
+      {
+        "name": "numpy",
+        "version": "2.5.4"
+      },
+      {
+        "name": "onnx",
+        "version": "1.23.2"
+      },
+      {
+        "name": "onnxruntime",
+        "version": "1.31.1"
+      },
+      {
+        "name": "openai",
+        "version": "2.54.0"
+      },
+      {
+        "name": "orjson",
+        "version": "3.13.0"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3"
+      },
+      {
+        "name": "peewee",
+        "version": "3.19.0"
+      },
+      {
+        "name": "pillow",
+        "version": "13.0.0"
+      },
+      {
+        "name": "protobuf",
+        "version": "7.36.2"
+      },
+      {
+        "name": "psutil",
+        "version": "7.2.2"
+      },
+      {
+        "name": "pycparser",
+        "version": "3.12"
+      },
+      {
+        "name": "pydantic",
+        "version": "2.14.1"
+      },
+      {
+        "name": "pydantic_core",
+        "version": "2.50.1"
+      },
+      {
+        "name": "Pygments",
+        "version": "2.21.0"
+      },
+      {
+        "name": "PyMuPDF",
+        "version": "1.26.7"
+      },
+      {
+        "name": "pymupdf4llm",
+        "version": "0.2.9"
+      },
+      {
+        "name": "PyYAML",
+        "version": "6.0.3"
+      },
+      {
+        "name": "pyzstd",
+        "version": "0.20.0"
+      },
+      {
+        "name": "RapidFuzz",
+        "version": "3.14.6"
+      },
+      {
+        "name": "regex",
+        "version": "2026.9.29"
+      },
+      {
+        "name": "requests",
+        "version": "2.34.2"
+      },
+      {
+        "name": "rich",
+        "version": "15.0.0"
+      },
+      {
+        "name": "rtree",
+        "version": "1.4.1"
+      },
+      {
+        "name": "sniffio",
+        "version": "1.3.1"
+      },
+      {
+        "name": "socksio",
+        "version": "1.0.0"
+      },
+      {
+        "name": "tabulate",
+        "version": "0.10.0"
+      },
+      {
+        "name": "tenacity",
+        "version": "9.2.1"
+      },
+      {
+        "name": "tibs",
+        "version": "0.5.7"
+      },
+      {
+        "name": "tiktoken",
+        "version": "0.14.0"
+      },
+      {
+        "name": "toml",
+        "version": "0.10.2"
+      },
+      {
+        "name": "toposort",
+        "version": "1.10"
+      },
+      {
+        "name": "tqdm",
+        "version": "4.70.1"
+      },
+      {
+        "name": "truststore",
+        "version": "0.10.5"
+      },
+      {
+        "name": "typing_extensions",
+        "version": "4.16.0"
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.4"
+      },
+      {
+        "name": "uharfbuzz",
+        "version": "0.57.0"
+      },
+      {
+        "name": "urllib3",
+        "version": "2.8.0"
+      },
+      {
+        "name": "xsdata",
+        "version": "26.10"
+      },
+      {
+        "name": "opencv-image-only",
+        "version": "4.12.0",
+        "modules": [
+          "core",
+          "imgproc",
+          "imgcodecs",
+          "python3"
+        ],
+        "build": {
+          "version": "4.12.0",
+          "platform": "macos-arm64",
+          "architecture": "arm64",
+          "modules": [
+            "core",
+            "imgproc",
+            "imgcodecs",
+            "python3"
+          ],
+          "sourceArchiveUrl": "https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.12.0",
+          "sourceArchiveSha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
+          "sourceArchiveBytes": 95254890,
+          "python": "3.12.16",
+          "pythonAbi": "cpython-312-darwin",
+          "numpy": "2.5.4",
+          "cmake": "4.4.4",
+          "buildType": "MinSizeRel",
+          "deploymentTarget": "13.0",
+          "buildMacOS": "26.7.2",
+          "extensionPath": "cv2/python-3.12/cv2.cpython-312-darwin.so",
+          "extensionSha256": "b2f7e814e872988ac73da26e0b8e3065009fb45e5a89404de8fff457cd4a4ce7",
+          "extensionBytes": 7424248,
+          "cmakeCacheSha256": "38cfdf8d3d79a7701def5fced77a5b93c5a8e9a63098142070a2a00ae0815bef",
+          "buildInformationSha256": "b53d53829194169e49686322c6b5e527d86f5a0e671cf2379e7c87fa02ddaa7a"
+        }
+      }
+    ]
+  },
+  "check": "native_imports_and_cpu_inference",
+  "network": "blocked_for_check",
+  "zoteroAcceptance": "not_tested",
+  "translationSemantics": "not_tested",
+  "model": {
+    "path": ".cache/babeldoc/models/doclayout_yolo_docstructbench_imgsz1024.onnx",
+    "bytes": 75324598,
+    "sha256": "fece9af02f618b603ff7921ccec6861d13e7e1f9830e091dfb7e8ad9311e5b21"
+  },
+  "onnxruntime": "1.31.1",
+  "providers": [
+    "CPUExecutionProvider"
+  ],
+  "opencv": "4.12.0",
+  "tokenizerEncoding": "o200k_base",
+  "inference": {
+    "input": "images",
+    "inputShape": [
+      1,
+      3,
+      1024,
+      1024
+    ],
+    "outputShapes": [
+      [
+        1,
+        300,
+        6
+      ]
+    ],
+    "finite": true
+  },
+  "pythonBuild": {
+    "version": "3.12.16 (main, Oct 26 2026, 13:59:40) [Clang 23.1.3 ]",
+    "basePrefix": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none",
+    "executable": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/bin/python3.12",
+    "executableSha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787",
+    "executableBytes": 18134832,
+    "architecture": "arm64",
+    "pythonAbi": "cpython-312-darwin",
+    "build": [
+      "main",
+      "Oct 26 2026 13:59:40"
+    ],
+    "compiler": "Clang 23.1.3 ",
+    "configArgs": "'--build=aarch64-apple-darwin' '--host=aarch64-apple-darwin' '--prefix=/install' '--with-openssl=/tmp/tmpovtlqzoq/tools/deps' '--with-system-expat' '--without-ensurepip' '--with-system-libmpdec' 'MODULE_BUILDTYPE=static' '--enable-loadable-sqlite-extensions' '--enable-static-libpython-for-interpreter' '--enable-shared' '--enable-optimizations' '--with-lto=full' '--with-build-python=/tmp/tmpovtlqzoq/tools/host/bin/python3.12' 'ac_cv_lib_intl_textdomain=no' 'ac_cv_func_ptsname_r=no' '--with-dbmliborder=ndbm' 'build_alias=aarch64-apple-darwin' 'host_alias=aarch64-apple-darwin' 'PKG_CONFIG=pkg-config --static --define-prefix' 'PKG_CONFIG_PATH=/tmp/tmpovtlqzoq/tools/deps/share/pkgconfig:/tmp/tmpovtlqzoq/tools/deps/lib/pkgconfig' 'CC=clang' 'CFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Werror=unguarded-availability-new' 'LDFLAGS=-arch arm64 -mmacosx-version-min=11.0 -Wl,-headerpad,40' 'CPPFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Werror=unguarded-availability-new' 'PROFILE_TASK=-m test --pgo -j 12' 'BOLT_COMMON_FLAGS=' 'BOLT_APPLY_FLAGS='",
+    "uv": "uv 0.13.7 (316c827e0 2026-11-03 aarch64-apple-darwin)",
+    "files": [
+      {
+        "sourcePath": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/include/python3.12/pyconfig.h",
+        "file": "cpython-0-pyconfig.h",
+        "sha256": "19f9e6177c78b4415d47f6cbad309cdb0c6f3a933fcb7fab9be6bc11cca1873a"
+      },
+      {
+        "sourcePath": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/config-3.12-darwin/Makefile",
+        "file": "cpython-1-Makefile",
+        "sha256": "90c7608547e2bcd1326c20135ab96482810c80bb583ad021d4f3eb5d005e6d27"
+      }
+    ],
+    "uvDownloadCatalog": [
+      {
+        "key": "cpython-3.12.16-macos-aarch64-none",
+        "version": "3.12.16",
+        "version_parts": {
+          "major": 3,
+          "minor": 12,
+          "patch": 16
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://releases.astral.sh/github/python-build-standalone/releases/download/20261026/cpython-3.12.16%2B20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+        "os": "macos",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "aarch64",
+        "libc": "none"
+      }
+    ]
+  },
+  "nativeBuildInputs": [
+    {
+      "path": "candidate-native/CMakeCache.txt",
+      "bytes": 160290,
+      "sha256": "38cfdf8d3d79a7701def5fced77a5b93c5a8e9a63098142070a2a00ae0815bef"
+    },
+    {
+      "path": "candidate-native/cpython-0-pyconfig.h",
+      "bytes": 56108,
+      "sha256": "19f9e6177c78b4415d47f6cbad309cdb0c6f3a933fcb7fab9be6bc11cca1873a"
+    },
+    {
+      "path": "candidate-native/cpython-1-Makefile",
+      "bytes": 182160,
+      "sha256": "90c7608547e2bcd1326c20135ab96482810c80bb583ad021d4f3eb5d005e6d27"
+    },
+    {
+      "path": "candidate-native/cpython-build.json",
+      "bytes": 3153,
+      "sha256": "b0456752c34b2d043ef4fcfaede90c35ca2e874b0b40c10e52a21ab6406aeeff"
+    },
+    {
+      "path": "candidate-native/opencv-build-information.txt",
+      "bytes": 5823,
+      "sha256": "b53d53829194169e49686322c6b5e527d86f5a0e671cf2379e7c87fa02ddaa7a"
+    },
+    {
+      "path": "candidate-native/opencv-build.json",
+      "bytes": 931,
+      "sha256": "888289309853b3a6734a92ce3fe46cb27e8b20445304c8cf615ca1fd3443c344"
+    },
+    {
+      "path": "candidate-native/opencv-config-3.12.py",
+      "bytes": 188,
+      "sha256": "41adbf7284b0ea2954c93d681ad84f931b2759e72f6bb56459cb163633cbe284"
+    },
+    {
+      "path": "candidate-native/opencv-config.py",
+      "bytes": 169,
+      "sha256": "b41ca86d89cac01c3c27e6872e3f709a3c914ea128997a64c715d8a15ef8c3fb"
+    }
+  ],
+  "stagedOpenCV": {
+    "path": "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.cpython-312-darwin.so",
+    "sha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530"
+  },
+  "sourceHandoff": "not_completed"
+}

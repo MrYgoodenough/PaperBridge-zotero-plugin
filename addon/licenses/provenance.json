@@ -1,6 +1,7 @@
 {
+  "_comment": "Exact native/notice byte evidence for existing Linux/Windows and the actual Mac candidate; not a bit-identical source rebuild or legal claim.",
   "schemaVersion": 1,
-  "scope": "Exact staged-byte/notice evidence; not a legal opinion or exhaustive native audit. References are recorded offline; inventory performs no network calls.",
+  "scope": "Existing Linux/Windows evidence plus actual macOS native/source/notice evidence; no legal opinion or exhaustive native audit. Offline inventory performs no network calls.",
   "entries": [
     {
       "id": "cpython-linux-3.12.16",
@@ -596,6 +597,735 @@
       "limitations": [
         "Exact corresponding-source/modification/build delivery under AGPL has not been verified.",
         "Complete compiled MuPDF third-party/font provenance and notice coverage remain unverified."
+      ]
+    },
+    {
+      "id": "cpython-macos-arm64-3.12.16",
+      "component": "CPython interpreter/stdlib",
+      "platform": "macos-arm64",
+      "python": "3.12.16",
+      "artifacts": {
+        "python/bin/python3.12": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787",
+        "python/lib/python3.12/lib-dynload/_crypt.cpython-312-darwin.so": "faf0f865430482bd74d6199f549082d0a8fe3c1eedf9b5e3cadfc56fc50602df",
+        "python/lib/python3.12/lib-dynload/_dbm.cpython-312-darwin.so": "429bd11cab632d1e433da8c93bd1ae9e484e824863f04dd65831cb71a504b0c6",
+        "python/lib/python3.12/lib-dynload/_tkinter.cpython-312-darwin.so": "9e49b795b2044d8b017d4a7fa91ecba0109935b7be186ecb96cdfbe0896b085d"
+      },
+      "files": {
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.bzip2.txt": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.cpython.txt": "86e61415828a8b5b06ec8d024e6f086ce155a8b85fd0c419c0ba4dc004e74fdd",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.expat.txt": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libedit.txt": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libffi.txt": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.liblzma.txt": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libuuid.txt": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.mpdecimal.txt": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.ncurses.txt": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.openssl-3.txt": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.sqlite.txt": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.tcl.txt": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.zlib-ng.txt": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee",
+        "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.zlib.txt": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c"
+      },
+      "sources": [
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/releases/tag/20261026",
+          "sourceCommit": "fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "installArchive": "cpython-3.12.16+20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+          "installArchiveSha256": "353d5f1b4fd2715e7053f12f068435d5bbad16b91e057006b5d01e0925709a7e",
+          "installArchiveHashStatus": "locally_recomputed_and_publisher_matched",
+          "fullArchive": "cpython-3.12.16+20261026-aarch64-apple-darwin-pgo+lto-full.tar.zst",
+          "fullArchiveSha256": "016758f4881e5f71d63eddfbcdd53f25c5a9152435a863e4dc0770758eae32c3",
+          "fullArchiveHashStatus": "locally_recomputed_and_publisher_matched",
+          "metadataMember": "python/PYTHON.json",
+          "metadataMemberSha256": "dfc38df39b46bc1337abc4b3ff160e5ef4ca16f13dedb4c412a770ecb3fb8a36",
+          "metadataMemberBytes": 118275
+        },
+        {
+          "url": "https://github.com/astral-sh/python-build-standalone/tree/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "role": "Complete matching build recipe/patch/download source archive; raw publisher notices selected from the macOS full-build metadata."
+        }
+      ],
+      "declarations": {
+        "status": "actual_candidate_native_bytes_and_upstream_configuration_matched",
+        "upstreamTarget": "aarch64-apple-darwin",
+        "buildOptions": "pgo+lto",
+        "metadataFile": "licenses/supplemental/macos/python-build-standalone/PYTHON.json",
+        "metadataSha256": "dfc38df39b46bc1337abc4b3ff160e5ef4ca16f13dedb4c412a770ecb3fb8a36",
+        "sourceEvidence": "licenses/supplemental/macos/source-evidence.json",
+        "artifactScope": "All actually shipped CPython native files match the verified original stripped archive.",
+        "noticeScope": "Original CPython and extension notices referenced by the macOS full-build metadata; Apple system-library versions are not inferred from Linux sources.",
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "observedPythonBuild": {
+          "version": "3.12.16 (main, Oct 26 2026, 13:59:40) [Clang 23.1.3 ]",
+          "basePrefix": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none",
+          "executable": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/bin/python3.12",
+          "executableSha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787",
+          "executableBytes": 18134832,
+          "architecture": "arm64",
+          "pythonAbi": "cpython-312-darwin",
+          "build": [
+            "main",
+            "Oct 26 2026 13:59:40"
+          ],
+          "compiler": "Clang 23.1.3 ",
+          "configArgs": "'--build=aarch64-apple-darwin' '--host=aarch64-apple-darwin' '--prefix=/install' '--with-openssl=/tmp/tmpovtlqzoq/tools/deps' '--with-system-expat' '--without-ensurepip' '--with-system-libmpdec' 'MODULE_BUILDTYPE=static' '--enable-loadable-sqlite-extensions' '--enable-static-libpython-for-interpreter' '--enable-shared' '--enable-optimizations' '--with-lto=full' '--with-build-python=/tmp/tmpovtlqzoq/tools/host/bin/python3.12' 'ac_cv_lib_intl_textdomain=no' 'ac_cv_func_ptsname_r=no' '--with-dbmliborder=ndbm' 'build_alias=aarch64-apple-darwin' 'host_alias=aarch64-apple-darwin' 'PKG_CONFIG=pkg-config --static --define-prefix' 'PKG_CONFIG_PATH=/tmp/tmpovtlqzoq/tools/deps/share/pkgconfig:/tmp/tmpovtlqzoq/tools/deps/lib/pkgconfig' 'CC=clang' 'CFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Werror=unguarded-availability-new' 'LDFLAGS=-arch arm64 -mmacosx-version-min=11.0 -Wl,-headerpad,40' 'CPPFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Werror=unguarded-availability-new' 'PROFILE_TASK=-m test --pgo -j 12' 'BOLT_COMMON_FLAGS=' 'BOLT_APPLY_FLAGS='",
+          "uv": "uv 0.13.7 (316c827e0 2026-11-03 aarch64-apple-darwin)",
+          "files": [
+            {
+              "sourcePath": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/include/python3.12/pyconfig.h",
+              "file": "cpython-0-pyconfig.h",
+              "sha256": "19f9e6177c78b4415d47f6cbad309cdb0c6f3a933fcb7fab9be6bc11cca1873a"
+            },
+            {
+              "sourcePath": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/config-3.12-darwin/Makefile",
+              "file": "cpython-1-Makefile",
+              "sha256": "90c7608547e2bcd1326c20135ab96482810c80bb583ad021d4f3eb5d005e6d27"
+            }
+          ],
+          "uvDownloadCatalog": [
+            {
+              "key": "cpython-3.12.16-macos-aarch64-none",
+              "version": "3.12.16",
+              "version_parts": {
+                "major": 3,
+                "minor": 12,
+                "patch": 16
+              },
+              "path": null,
+              "symlink": null,
+              "url": "https://releases.astral.sh/github/python-build-standalone/releases/download/20261026/cpython-3.12.16%2B20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+              "os": "macos",
+              "variant": "default",
+              "implementation": "cpython",
+              "arch": "aarch64",
+              "libc": "none"
+            }
+          ]
+        },
+        "configurationScope": "Actual native Makefile/pyconfig are byte-identical to verified original install members; full PYTHON.json is retained unchanged."
+      },
+      "limitations": [
+        "Final rebuilt XPI notices/source-ZIP binding remains main-task delivery work; compiler/system-runtime closure is not an exhaustive audit."
+      ]
+    },
+    {
+      "id": "freetype-py-macos-arm64-2.5.1",
+      "dependency": "freetype-py",
+      "version": "2.5.1",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/freetype/libfreetype.dylib": "1f51287c6f27f2b7f726279fc5c5450263fe865576ab0a88940643b23ebb2b16"
+      },
+      "files": {
+        "licenses/native/FreeType-2.13.2-LICENSE.txt": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b",
+        "licenses/native/FreeType-2.13.2-FTL.txt": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+        "licenses/native/FreeType-2.13.2-BDF.txt": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+        "licenses/native/FreeType-2.13.2-PCF.txt": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b",
+        "licenses/native/FreeType-2.13.2-zlib.txt": "ab234c46f13c0dd02f494a713ecb48b20afd435aa6d0b3418da7686b5b7fcdfe",
+        "licenses/native/HarfBuzz-COPYING.txt": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/38/a8/258dd138ebe60c79cd8cfaa6d021599208a33f0175a5e29b01f60c9ab2c7/freetype_py-2.5.1-py3-none-macosx_10_9_universal2.whl",
+          "sha256": "d01ded2557694f06aa0413f3400c0c0b2b5ebcaabeef7aaf3d756be44f51e90b",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "freetype-harfbuzz",
+          "url": "https://github.com/harfbuzz/harfbuzz/releases/download/8.3.0/harfbuzz-8.3.0.tar.xz",
+          "sha256": "109501eaeb8bde3eadb25fab4164e993fbace29c3d775bcaa1c1e58e2f15f847"
+        },
+        {
+          "sourceId": "freetype-native",
+          "url": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz",
+          "sha256": "12991c4e55c506dd7f9b765933e62fd2be2e06d421505d7950a132e4f1bb484d"
+        },
+        {
+          "sourceId": "freetype-py-native-source",
+          "url": "https://files.pythonhosted.org/packages/d0/9c/61ba17f846b922c2d6d101cc886b0e8fb597c109cedfcb39b8c5d2304b54/freetype-py-2.5.1.zip",
+          "sha256": "cfe2686a174d0dd3d71a9d8ee9bf6a2c23f5872385cf8ce9f24af83d076e2fbd"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherRecipeFreeType": "2.13.2",
+        "publisherRecipeHarfBuzz": "8.3.0",
+        "scope": "Verified all-platform source recipe and original Mac wheel bytes; not a newly executed version API."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "uharfbuzz-macos-arm64-0.57.0",
+      "dependency": "uharfbuzz",
+      "version": "0.57.0",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/uharfbuzz/_harfbuzz.abi3.so": "bb5f9abe6f722ff11df22fe9d462fff53dd08c017358ed547c8ea0413f2b7737",
+        "python/lib/python3.12/site-packages/uharfbuzz/_harfbuzz_test.abi3.so": "d65f9e38e1504ef349bd2f0c6f316ea6abfab17792afd4b92fd9dab2c6dd808d"
+      },
+      "files": {
+        "licenses/native/HarfBuzz-COPYING.txt": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/72/8e/334849c356e47c939e835c45f163e1ce51477f77a28efc872ee0b41353fb/uharfbuzz-0.57.0-cp311-abi3-macosx_10_9_universal2.whl",
+          "sha256": "e3901acbed68995516ba272bb3ff3777adb07d832b328941da7915dd6cd145fd",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "uharfbuzz-native-source",
+          "url": "https://files.pythonhosted.org/packages/e6/48/0b293baafb87b5ccfec082f427fb1e81ce4d27098a8b2ac8db6c76e07e65/uharfbuzz-0.57.0.tar.gz",
+          "sha256": "55136df18a9dd09fec36d1ceb77965f3108de6d86c338b3825feedb0730d84b7"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherSourceHarfBuzzHeader": "15.0.0",
+        "scope": "Exact source sdist header and shared original COPYING; no Mac version API executed here."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "hyperscan-macos-arm64-0.9.1",
+      "dependency": "hyperscan",
+      "version": "0.9.1",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/hyperscan/_hs_ext.cpython-312-darwin.so": "4eae1f91687be0de93b50dd321f089b367138b70f19c3b0de634c5fe86f19f8e"
+      },
+      "files": {
+        "licenses/native/Vectorscan-5.4.12-LICENSE.txt": "1f5a587000f0d1a451fdb2e2c169e70273750f8fd3b43c9ef2e7fc287c3abc00",
+        "licenses/native/PCRE-8.45-LICENCE.txt": "51b3dea44f63338b84b9c97b3d793826a8397309068cf9379a423216ab8ea5b2"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/b5/5e/8fc638508a8da090734210d3d7df7b9d8bfc08f8a5bb9c74535fac6c0f52/hyperscan-0.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+          "sha256": "9e28b0d486f929ac5821a6eb46e2922c033453ef62afbc3677dda9516fdc921c",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "hyperscan-native-source",
+          "url": "https://files.pythonhosted.org/packages/71/de/7d18ac7f426e0096108a203cb9a4abc8d1b04aadf88838ae74fd9da2f089/hyperscan-0.9.1.tar.gz",
+          "sha256": "435aac3317b502ed73b183a35a58073853920b767d2e150722877f00c89ed824"
+        },
+        {
+          "sourceId": "hyperscan-pcre",
+          "url": "https://ftp.exim.org/pub/pcre/pcre-8.45.tar.bz2",
+          "sha256": "4dae6fdcd2bb0bb6c37b5f97c33c2be954da743985369cddac3546e3218bffb8"
+        },
+        {
+          "sourceId": "vectorscan",
+          "url": "https://codeload.github.com/VectorCamp/vectorscan/tar.gz/refs/tags/vectorscan/5.4.12",
+          "sha256": "1ac4f3c038ac163973f107ac4423a6b246b181ffd97fdd371696b2517ec9b3ed"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherMacRecipeVectorscan": "5.4.12",
+        "publisherRecipePCRE": "8.45",
+        "scope": "Exact publisher recipe source inputs; selected static features/Boost/compiler closure remain unknown."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "rtree-macos-arm64-1.4.1",
+      "dependency": "rtree",
+      "version": "1.4.1",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/rtree/lib/libspatialindex.dylib": "70108e4f07ccd87c724f28b0e14fa26b9603ef61a45653087df89b1fc26665b3",
+        "python/lib/python3.12/site-packages/rtree/lib/libspatialindex_c.dylib": "a4c2282d8ba7f63562b0631370f4e6fbd2b078e3841b5081d77b535b11af7676"
+      },
+      "files": {
+        "licenses/native/libspatialindex-2.1.0-COPYING.txt": "b63ebfaca9d7ce582580f3e11acabc9d2e37c46ce234533f7fa8a6c7278898a0",
+        "licenses/native/libspatialindex-2.1.0-copyright.txt": "6ce44263393bce3efb9df170d95ac03218d75a41c4803c4e470614c64342ae0f"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/f3/cf/2710b6fd6b07ea0aef317b29f335790ba6adf06a28ac236078ed9bd8a91d/rtree-1.4.1-py3-none-macosx_11_0_arm64.whl",
+          "sha256": "a7e48d805e12011c2cf739a29d6a60ae852fb1de9fc84220bbcef67e6e595d7d",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "libspatialindex",
+          "url": "https://codeload.github.com/libspatialindex/libspatialindex/tar.gz/refs/tags/2.1.0",
+          "sha256": "a04513cea04dd20ab2c9d153c14cc45692805ee496b30619103f7929f6fb81bf"
+        },
+        {
+          "sourceId": "rtree-native-source",
+          "url": "https://files.pythonhosted.org/packages/95/09/7302695875a019514de9a5dd17b8320e7a19d6e7bc8f85dcfb79a4ce2da3/rtree-1.4.1.tar.gz",
+          "sha256": "c6b1b3550881e57ebe530cc6cffefc87cd9bf49c30b37b894065a9f810875e46"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherRecipeLibspatialindex": "2.1.0",
+        "publisherRecipe": {
+          "path": "addon/licenses/supplemental/macos/build-inputs/rtree-install_libspatialindex.sh",
+          "bytes": 1645,
+          "sha256": "402fd3e7db6f2cc47dc280d1855d7adec0adaafd433295a4d3685a5605f6366a",
+          "url": "https://raw.githubusercontent.com/Toblerity/rtree/1.4.1/scripts/install_libspatialindex.sh"
+        },
+        "scope": "Both actual native dylibs match the official wheel RECORD; original recipe retained."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "cryptography-macos-arm64-50.0.2",
+      "dependency": "cryptography",
+      "version": "50.0.2",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/cryptography/hazmat/bindings/_rust.abi3.so": "bf1f68c3e6d900eddd1fdcc28f0a50a39a300716e4ca99dbcd155fce9bec3f2e"
+      },
+      "files": {
+        "licenses/native/OpenSSL-LICENSE.txt": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+        "licenses/native/OpenSSL-4.0.3-copyright.txt": "ec368a39fe8d31b6ed740075969a6ab7dd5128f4ab876e682352128f7551c6e2",
+        "licenses/supplemental/rust/third-party-notices.txt": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/e5/56/d194340cc4a57535e82e1bee9e89667ac4b7c13b5d3f59686deae3094dd5/cryptography-50.0.2-cp311-abi3-macosx_11_0_arm64.whl",
+          "sha256": "fa8f5efb344d6908a1ce62f4a24e2e5780f825d6f53f5f50ec5ffacac72936cb",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "cryptography-native-source",
+          "url": "https://files.pythonhosted.org/packages/9d/af/182eb91b0df3fe75c4d9f26fe70684569566745f6ba7e5c9c73a862c5252/cryptography-50.0.2.tar.gz",
+          "sha256": "7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5"
+        },
+        {
+          "sourceId": "cryptography-openssl",
+          "url": "https://github.com/openssl/openssl/releases/download/openssl-4.0.3/openssl-4.0.3.tar.gz",
+          "sha256": "325b5c806167c13b40b1ffeadfe0248197c00eccc4cf123ec1e28d2d2fd216d9"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "actualEmbeddedOpenSSLVersion": "OpenSSL 4.0.3 29 Sep 2026",
+        "scope": "Banner in the actual native file; original matching OpenSSL/Rust source inputs and notices retained."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "pymupdf-macos-arm64-1.26.7",
+      "dependency": "pymupdf",
+      "version": "1.26.7",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/pymupdf/_extra.so": "3aa42f9981cbe29fc30aed9b22384976c87e17365d92b010f57137be3d25e520",
+        "python/lib/python3.12/site-packages/pymupdf/_mupdf.so": "210448b5c9534f6ef5978b2cc4e0d0157e2112dfe654518bd758d67bf6ad0eef",
+        "python/lib/python3.12/site-packages/pymupdf/libmupdf.dylib": "2e6a8d85aab900b1bfc976801d82b1ab67cc97639cfac794bc01f2d01803be6c",
+        "python/lib/python3.12/site-packages/pymupdf/libmupdfcpp.so": "8f96f9bcf538ffb38af29b846fb84914495489829df95d7e115b6002b85ceb6c",
+        "python/lib/python3.12/site-packages/pymupdf/mupdf-devel/lib/libmupdf-threads.a": "77644146073c33ff438bdc29e8974dbb5bdb2dee3d9a3af876ad590b40014407"
+      },
+      "files": {
+        "licenses/native/MuPDF-1.26.12-README.txt": "ec7500c75d800d9d2ce8ee95ad9a528df2fef3dc293dca5a0ff6cd8377571ed6",
+        "licenses/native/MuPDF-fonts-SIL-OFL.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/72/74/448b6172927c829c6a3fba80078d7b0a016ebbe2c9ee528821f5ea21677a/pymupdf-1.26.7-cp310-abi3-macosx_11_0_arm64.whl",
+          "sha256": "31aa9c8377ea1eea02934b92f4dcf79fb2abba0bf41f8a46d64c3e31546a3c02",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "mupdf",
+          "url": "https://mupdf.com/downloads/archive/mupdf-1.26.12-source.tar.gz",
+          "sha256": "6baf910928f404167ba49be6340195dec340795724722b331f5a2143f5aa0d01"
+        },
+        {
+          "sourceId": "pymupdf",
+          "url": "https://files.pythonhosted.org/packages/48/d6/09b28f027b510838559f7748807192149c419b30cb90e6d5f0cf916dc9dc/pymupdf-1.26.7.tar.gz",
+          "sha256": "71add8bdc8eb1aaa207c69a13400693f06ad9b927bea976f5d5ab9df0bb489c3"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherSetupMuPDF": "1.26.12",
+        "grant": "AGPL; no Artifex commercial license supplied.",
+        "scope": "Exact published wheel/source version plus complete MuPDF thirdparty/font source release; compiler configuration not reconstructed."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "jiter-macos-arm64-0.18.0",
+      "dependency": "jiter",
+      "version": "0.18.0",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/jiter/jiter.cpython-312-darwin.so": "2c405496df53a569e2bf36e273f4fa539aac8d39ccf9df54199fc7028b65b923"
+      },
+      "files": {
+        "licenses/supplemental/rust/third-party-notices.txt": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/2e/e2/f4000a4d9c519ca019bf0e2922cc0c6b6db347be6303161382eda7635be7/jiter-0.18.0-cp312-cp312-macosx_11_0_arm64.whl",
+          "sha256": "7b41cd64ee6b54db94bea6274e6e37002ed526aa06c114a8be6f36ffe21c184e",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "jiter-native-source",
+          "url": "https://files.pythonhosted.org/packages/63/5b/f68319f4fe624311a744a33d10fdbcac4c971991e348223cba60d31780b2/jiter-0.18.0.tar.gz",
+          "sha256": "a0ca63fd9450a212e4e658d4cfe0ab4977c4f9b0003c68828b843c65e27662ff"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "orjson-macos-arm64-3.13.0",
+      "dependency": "orjson",
+      "version": "3.13.0",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/orjson/orjson.cpython-312-darwin.so": "cae254ba8cb97ee97a7856aeb3acbb848e044e679aa3dd6ed4a3e7fc351de4b5"
+      },
+      "files": {
+        "licenses/supplemental/rust/third-party-notices.txt": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/6f/4d/9332eb96d2e379384be0f211f543835eebc81f460c9403b84abe1294c431/orjson-3.13.0-cp312-cp312-macosx_15_0_arm64.whl",
+          "sha256": "6ff2a2c67f35202f7d823753d38ad371a9b7fc297567cdfff4420e763cb9f6f8",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "orjson-native-source",
+          "url": "https://files.pythonhosted.org/packages/f2/72/380b97dc45bd162d23afe5194721ef678d9eac7cfaa549fe2873f7f0a518/orjson-3.13.0.tar.gz",
+          "sha256": "d1de5eb04485110c5da4c657e49168995d55e076b1ce60f1a042e254f4186c4f"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "pydantic-core-macos-arm64-2.50.1",
+      "dependency": "pydantic-core",
+      "version": "2.50.1",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/pydantic_core/_pydantic_core.cpython-312-darwin.so": "dca08de9d64e292558c19fd80b16a8c5839d99f5c3d33cf745d38db0d51db689"
+      },
+      "files": {
+        "licenses/supplemental/rust/third-party-notices.txt": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/db/a3/f8b1b39349c33037c73d7a1b794c9c29d8f07d5bd2b74399c1375a529cc6/pydantic_core-2.50.1-cp312-cp312-macosx_11_0_arm64.whl",
+          "sha256": "e8e1d6ce820aa23317e8209a86bd65a540973c12dc7552b48a4f6c8e9926815e",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "pydantic-core-native-source",
+          "url": "https://files.pythonhosted.org/packages/a6/24/af4ec4be49fbc810f35b0bdcacc3d433b56bbfa469fd3bfd4ae116cd9bf1/pydantic_core-2.50.1.tar.gz",
+          "sha256": "e50d7b94baac6c7d09927fa5ca5800a0c7ee5015c7fcff65beb3a1931b5a6e09"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "tiktoken-macos-arm64-0.14.0",
+      "dependency": "tiktoken",
+      "version": "0.14.0",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/tiktoken/_tiktoken.cpython-312-darwin.so": "fdb7f9529c106ef557451c7f9c579920b74842dfdf29d3e588eb8f5e97b182ff"
+      },
+      "files": {
+        "licenses/supplemental/rust/third-party-notices.txt": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+      },
+      "sources": [
+        {
+          "url": "https://files.pythonhosted.org/packages/69/9f/fe6b1aca23331aa5271df5a4bd07bf68a7059254d47faee1b8272592a777/tiktoken-0.14.0-cp312-cp312-macosx_11_0_arm64.whl",
+          "sha256": "d6cebe67765569df3dafac8474e4eccf5c19d24140492567a5e58a11445732a4",
+          "role": "Official wheel matched through METADATA/WHEEL and original native RECORD hashes; actual staged hashes retained separately."
+        },
+        {
+          "sourceId": "tiktoken-native-source",
+          "url": "https://files.pythonhosted.org/packages/66/62/167a842aa0429d45f5e797354fd4343a96f6043d67d0513c675c7b8d36e6/tiktoken-0.14.0.tar.gz",
+          "sha256": "231dec90efcdccf1b565a1416107736f1e09b1a08fe736ef9d6363e626d03874"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked.",
+        "Publisher Cargo.lock is absent; compiled transitive versions remain unknown, not a new generic gate."
+      ]
+    },
+    {
+      "id": "opencv-image-only-macos-arm64-4.12.0",
+      "dependency": "opencv-image-only",
+      "version": "4.12.0",
+      "platform": "macos-arm64",
+      "artifacts": {
+        "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.cpython-312-darwin.so": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530"
+      },
+      "files": {
+        "licenses/supplemental/macos/opencv/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "licenses/supplemental/macos/opencv/COPYRIGHT-OpenCV.txt": "bba849c98da85a2b27b86113284a90812c959b1c1fc4ed67de9355475d1e6831",
+        "licenses/supplemental/macos/opencv/NOTICE.txt": "d903a69ab39425283b44e2ea355cbfaf79bcd738b69c2b1c3c700ce80f2d89f9",
+        "licenses/supplemental/macos/opencv/licenses/README.ijg": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6",
+        "licenses/supplemental/macos/opencv/licenses/libjpeg-turbo.txt": "96f5b328adbb78eeaaec6980d73fd558cb1e4d62560ed615646bc3cf5e532430",
+        "licenses/supplemental/macos/opencv/licenses/libpng.txt": "7317e078e2d3b5d7ba5a6159e650945153262b44b76f6700f8e9edb261c5143e",
+        "licenses/supplemental/macos/opencv/licenses/softfloat-fdlibm.txt": "27adefc3d001216b8be5af628e3583575fedc22ea6f41917e3008c8ed8cb8ce2",
+        "licenses/supplemental/macos/opencv/licenses/zlib.txt": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
+        "licenses/supplemental/macos/opencv/licenses/Carotene-BSD.txt": "90737e4d135451d474c5617217d425b2b3e0895d4ea6e76f88585673ab9fbf26",
+        "licenses/supplemental/macos/opencv/licenses/Tegra-HAL-BSD.txt": "c0343ef9c6a2c9e435e58e78806a68f6a6edbf67991f64e922a4694e442baf98",
+        "licenses/supplemental/macos/opencv/licenses/FlatBuffers-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "sources": [
+        {
+          "sourceId": "opencv-linux",
+          "url": "https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.12.0",
+          "sha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d"
+        },
+        {
+          "url": "https://github.com/MrYgoodenough/PaperBridge-zotero-plugin/actions/runs/44775827555",
+          "role": "Actual retained native build inputs."
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "stagedExtension": {
+          "path": "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.cpython-312-darwin.so",
+          "bytes": 7399184,
+          "sha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530"
+        },
+        "modules": [
+          "core",
+          "imgproc",
+          "imgcodecs",
+          "python3"
+        ],
+        "deploymentTarget": "13.0",
+        "sourceEvidence": "licenses/supplemental/macos/source-evidence.json",
+        "scope": "Actual codec/SoftFloat and original HAL notices; FlatBuffers license is a reported source/build input, not a linkage claim."
+      },
+      "limitations": [
+        "Original CI runtime size metadata must be refreshed by main hydration before inventory applies this exact 4.12.0 entry; native bytes remain fixed."
       ]
     }
   ]

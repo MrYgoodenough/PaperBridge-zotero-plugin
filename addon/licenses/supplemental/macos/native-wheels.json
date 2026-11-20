@@ -1,0 +1,3440 @@
+{
+  "_comment": "Actual macOS native/notice hashes and verified official wheel records; original and sanitized bytes are kept distinct. Unknown compile/link details are not gates.",
+  "schemaVersion": 1,
+  "origin": {
+    "runId": 44775827555,
+    "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+    "platform": "macos-arm64",
+    "buildInputsArtifactId": 14650048375,
+    "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+    "bundledArtifactId": 14649049315,
+    "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+    "artifactZipHashStatus": "user_verified_github_artifact_digest",
+    "xpi": {
+      "name": "paperbridge-0.4.3-macos-arm64.xpi",
+      "bytes": 182068982,
+      "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+    },
+    "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+  },
+  "nativeDistributionCount": 31,
+  "nativeDistributionFileCount": 116,
+  "nativeDistributions": [
+    {
+      "name": "backports.zstd",
+      "version": "1.8.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/backports_zstd-1.8.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/backports_zstd-1.8.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "8a595efc8f5bd5ee6384ee636a7be7cbcab778305a43b3162c2bcdd07e9ed619",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/backports/zstd/_zstd.cpython-312-darwin.so",
+          "bytes": 674392,
+          "sha256": "8c81e33e3870d81b722b65af473d0680b5c14e37d767ff6769c73faad32c95d6",
+          "wheelRecordSha256": "8c81e33e3870d81b722b65af473d0680b5c14e37d767ff6769c73faad32c95d6",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "8c81e33e3870d81b722b65af473d0680b5c14e37d767ff6769c73faad32c95d6",
+          "publisherWheelMemberBytes": 674392,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/backports_zstd-1.8.0.dist-info/licenses/LICENSE.txt",
+          "bytes": 13804,
+          "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/backports_zstd-1.8.0.dist-info/licenses/LICENSE_zstd.txt",
+          "bytes": 1724,
+          "sha256": "f89ef2b03b52ad7c3342aeb2e1c961737f9de4892d41b1d083b0060c6191e1bf",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "backports_zstd-1.8.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/92/31/1e73b2835c78a9067ecba390b0eea032f827fc0b2f8bf2c8656992c30dc8/backports_zstd-1.8.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 368337,
+        "sha256": "d810d83c8a703f424ed2a49aa271078c91b530da2d8c104bd88207e68d116de8",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 1,
+      "sourceInputIds": [
+        "backports-zstd-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "bitarray",
+      "version": "3.12.3",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/bitarray-3.12.3.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/bitarray-3.12.3.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "6dc050077bf78e6da85ee52b84d7fd9b493e7e7cb84b6e41c0f970dfd2898dd1",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/bitarray/_bitarray.cpython-312-darwin.so",
+          "bytes": 137696,
+          "sha256": "83e47c0e7a4c5c5c3141b8d5fcbd1803e01b5da63671826533bef9e174f58305",
+          "wheelRecordSha256": "e0b3488cd2140ba09120d658a3f3ef6240671f9d6752e567834f93ca8a47bbc7",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "e0b3488cd2140ba09120d658a3f3ef6240671f9d6752e567834f93ca8a47bbc7",
+          "publisherWheelMemberBytes": 120304,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/bitarray/_util.cpython-312-darwin.so",
+          "bytes": 110384,
+          "sha256": "79977556068b5d57b8d52b9ab437da5e87109d540dc6633b9dd23c17a912186a",
+          "wheelRecordSha256": "331489ccb1b7ac57b16d00264fa164c853b1dfc0b3d9fe0cadda589bd54cb2e2",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "331489ccb1b7ac57b16d00264fa164c853b1dfc0b3d9fe0cadda589bd54cb2e2",
+          "publisherWheelMemberBytes": 92824,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/bitarray-3.12.3.dist-info/licenses/LICENSE",
+          "bytes": 2412,
+          "sha256": "e19b1180b6ee73307a8545716be9b36318cf4f926aaf3eb43f7fde3396a102dd",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "bitarray-3.12.3-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/84/79/435925f261b08c44d5affc9556cffd06dae2626535f0af44dd044855c334/bitarray-3.12.3-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 182816,
+        "sha256": "9c5dfba2b068a54915f274adb7b4ab2852d2ba28f02151c0927b1135d75bf8dd",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 2,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "bitarray-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.1",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cffi-2.1.1.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cffi-2.1.1.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (83.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "a299efafdef6505e27bdaf22b9ee3e2570a64a9f00ef702da0babfcda9fb23d6",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/_cffi_backend.cpython-312-darwin.so",
+          "bytes": 246320,
+          "sha256": "a2c1b7229f82c8acc565881339ae985a800c4a5c0078561760ba95e8e3f15dee",
+          "wheelRecordSha256": "90177c34e639a067ee1f5a2028320b3af2940d47dfaf9583727b59abf0b3263f",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "90177c34e639a067ee1f5a2028320b3af2940d47dfaf9583727b59abf0b3263f",
+          "publisherWheelMemberBytes": 229552,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/cffi-2.1.1.dist-info/licenses/LICENSE",
+          "bytes": 1123,
+          "sha256": "5ba24ddc57067f9249add644c3afc41a5d6dc37e23433ef759d95df370b0af63",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "cffi-2.1.1-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/54/7d/16e5a096677b5e313ca80cd5e5170efa3ea44624a82bb111925522da64b1/cffi-2.1.1-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 184719,
+        "sha256": "f81b3b8f3d4e343550fa4baa0e479bba9f2d29ce9c2e9b51d1ce1718d7442fcf",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "cffi-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "chardet",
+      "version": "7.7.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet-7.7.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet-7.7.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "hatchling 1.32.4",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "a0501ac8380d51bcd3333d0673f77e5f652a60d6a196200f22ed91a714f9986c",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/650fdafa2468af73c11f__mypyc.cpython-312-darwin.so",
+          "bytes": 1145856,
+          "sha256": "e5c48e6780425eba9f9d867a46751fa6d4f3741eb45b3df9fdb1634885a9dc18",
+          "wheelRecordSha256": "e5c48e6780425eba9f9d867a46751fa6d4f3741eb45b3df9fdb1634885a9dc18",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "e5c48e6780425eba9f9d867a46751fa6d4f3741eb45b3df9fdb1634885a9dc18",
+          "publisherWheelMemberBytes": 1145856,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/_kernel.cpython-312-darwin.so",
+          "bytes": 254512,
+          "sha256": "e188959850f71fcdf8b8dd591405e30b42839ccb2b45e82b7d5019142eb70d99",
+          "wheelRecordSha256": "3d666a9f94bf062814e8b028dda59f555db4352a12ed6abd1b79edc33a863a4d",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "3d666a9f94bf062814e8b028dda59f555db4352a12ed6abd1b79edc33a863a4d",
+          "publisherWheelMemberBytes": 237792,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 3,
+          "shippedSanitizedHomeOccurrences": 3,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/models/__init__.cpython-312-darwin.so",
+          "bytes": 50400,
+          "sha256": "007ce902e830255436e07e34ad6c09fb01147bb72a4d1aa9f8b94f7cb9079700",
+          "wheelRecordSha256": "007ce902e830255436e07e34ad6c09fb01147bb72a4d1aa9f8b94f7cb9079700",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "007ce902e830255436e07e34ad6c09fb01147bb72a4d1aa9f8b94f7cb9079700",
+          "publisherWheelMemberBytes": 50400,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/models/_format.cpython-312-darwin.so",
+          "bytes": 50400,
+          "sha256": "bd88e60b1f7ce6a0a7ea23e955a4b4a04417a0215b30c17b2edcae2831c17da7",
+          "wheelRecordSha256": "bd88e60b1f7ce6a0a7ea23e955a4b4a04417a0215b30c17b2edcae2831c17da7",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "bd88e60b1f7ce6a0a7ea23e955a4b4a04417a0215b30c17b2edcae2831c17da7",
+          "publisherWheelMemberBytes": 50400,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/ascii.cpython-312-darwin.so",
+          "bytes": 50392,
+          "sha256": "790c7cec33ba1e9287c064fad765389e8f5e229bfcd9b17346c5b7d52b82fdfe",
+          "wheelRecordSha256": "790c7cec33ba1e9287c064fad765389e8f5e229bfcd9b17346c5b7d52b82fdfe",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "790c7cec33ba1e9287c064fad765389e8f5e229bfcd9b17346c5b7d52b82fdfe",
+          "publisherWheelMemberBytes": 50392,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/confusion.cpython-312-darwin.so",
+          "bytes": 50416,
+          "sha256": "ba9eb69727eba5aebd50b274b93c22e995584f84ed4653c56274b5686c892761",
+          "wheelRecordSha256": "ba9eb69727eba5aebd50b274b93c22e995584f84ed4653c56274b5686c892761",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "ba9eb69727eba5aebd50b274b93c22e995584f84ed4653c56274b5686c892761",
+          "publisherWheelMemberBytes": 50416,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/escape.cpython-312-darwin.so",
+          "bytes": 50400,
+          "sha256": "ecbd1519160e61010fc64fef381357aacf18b0e2c085d5d35e382e5afefccd70",
+          "wheelRecordSha256": "ecbd1519160e61010fc64fef381357aacf18b0e2c085d5d35e382e5afefccd70",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "ecbd1519160e61010fc64fef381357aacf18b0e2c085d5d35e382e5afefccd70",
+          "publisherWheelMemberBytes": 50400,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/language.cpython-312-darwin.so",
+          "bytes": 50400,
+          "sha256": "8eca63e983b9fc7875f9bb37b913027e3ac2f2f1c3c0b8b219f426a8435d8365",
+          "wheelRecordSha256": "8eca63e983b9fc7875f9bb37b913027e3ac2f2f1c3c0b8b219f426a8435d8365",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "8eca63e983b9fc7875f9bb37b913027e3ac2f2f1c3c0b8b219f426a8435d8365",
+          "publisherWheelMemberBytes": 50400,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/magic.cpython-312-darwin.so",
+          "bytes": 50392,
+          "sha256": "d19519af0dcecd1a59d55ef070644cf7532473789aed296b0e84a61bd1e2bae6",
+          "wheelRecordSha256": "d19519af0dcecd1a59d55ef070644cf7532473789aed296b0e84a61bd1e2bae6",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "d19519af0dcecd1a59d55ef070644cf7532473789aed296b0e84a61bd1e2bae6",
+          "publisherWheelMemberBytes": 50392,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/markup.cpython-312-darwin.so",
+          "bytes": 50400,
+          "sha256": "c7bd009d053ad00ae2b75371a7dd01bc3caea6daa8ecd4527ae511d078d59721",
+          "wheelRecordSha256": "c7bd009d053ad00ae2b75371a7dd01bc3caea6daa8ecd4527ae511d078d59721",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "c7bd009d053ad00ae2b75371a7dd01bc3caea6daa8ecd4527ae511d078d59721",
+          "publisherWheelMemberBytes": 50400,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/orchestrator.cpython-312-darwin.so",
+          "bytes": 50416,
+          "sha256": "433af62f409abb1851f109b9e9b3b2f35b2da6148d23ca7fc29bba4020d41da4",
+          "wheelRecordSha256": "433af62f409abb1851f109b9e9b3b2f35b2da6148d23ca7fc29bba4020d41da4",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "433af62f409abb1851f109b9e9b3b2f35b2da6148d23ca7fc29bba4020d41da4",
+          "publisherWheelMemberBytes": 50416,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/postprocess.cpython-312-darwin.so",
+          "bytes": 50416,
+          "sha256": "ea1c279bbc145c80a1fdc99609e2707effb2ee58ab9f8577e9221f0f5434172d",
+          "wheelRecordSha256": "ea1c279bbc145c80a1fdc99609e2707effb2ee58ab9f8577e9221f0f5434172d",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "ea1c279bbc145c80a1fdc99609e2707effb2ee58ab9f8577e9221f0f5434172d",
+          "publisherWheelMemberBytes": 50416,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/statistical.cpython-312-darwin.so",
+          "bytes": 50416,
+          "sha256": "c826c8c061e2467ce9c61990992ef9ebe346888ac27ef2a5c42a52ae6f0f07a3",
+          "wheelRecordSha256": "c826c8c061e2467ce9c61990992ef9ebe346888ac27ef2a5c42a52ae6f0f07a3",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "c826c8c061e2467ce9c61990992ef9ebe346888ac27ef2a5c42a52ae6f0f07a3",
+          "publisherWheelMemberBytes": 50416,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/structural.cpython-312-darwin.so",
+          "bytes": 50416,
+          "sha256": "0242ebd821c17700adb2b944d61c1b6aac9e19b09ed3934342a495b54d4a6308",
+          "wheelRecordSha256": "0242ebd821c17700adb2b944d61c1b6aac9e19b09ed3934342a495b54d4a6308",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "0242ebd821c17700adb2b944d61c1b6aac9e19b09ed3934342a495b54d4a6308",
+          "publisherWheelMemberBytes": 50416,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/utf1632.cpython-312-darwin.so",
+          "bytes": 50400,
+          "sha256": "d1a9e40e0f1e4c109575c1757512bbd31afcc94e394036e28e76c1baa7b0f88d",
+          "wheelRecordSha256": "d1a9e40e0f1e4c109575c1757512bbd31afcc94e394036e28e76c1baa7b0f88d",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "d1a9e40e0f1e4c109575c1757512bbd31afcc94e394036e28e76c1baa7b0f88d",
+          "publisherWheelMemberBytes": 50400,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/utf8.cpython-312-darwin.so",
+          "bytes": 50392,
+          "sha256": "eb932f754877582c348c7786d80f37b95f7fe5d461090c0071bbaba036368d6f",
+          "wheelRecordSha256": "eb932f754877582c348c7786d80f37b95f7fe5d461090c0071bbaba036368d6f",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "eb932f754877582c348c7786d80f37b95f7fe5d461090c0071bbaba036368d6f",
+          "publisherWheelMemberBytes": 50392,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet/pipeline/validity.cpython-312-darwin.so",
+          "bytes": 50400,
+          "sha256": "bdcfdddfd13aa55a85574f1db46a70a09f3e72c69df7a6622d60fa4ceeceaee2",
+          "wheelRecordSha256": "bdcfdddfd13aa55a85574f1db46a70a09f3e72c69df7a6622d60fa4ceeceaee2",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "bdcfdddfd13aa55a85574f1db46a70a09f3e72c69df7a6622d60fa4ceeceaee2",
+          "publisherWheelMemberBytes": 50400,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/chardet-7.7.0.dist-info/licenses/LICENSE",
+          "bytes": 641,
+          "sha256": "0d4cf67e7a26e9957b8948e7dfc0e380e61b427a94b061e618889aba89bb9616",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "chardet-7.7.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/49/d2/c920557bd0a621dcf6fb7a96e8746dd70c6b83e7bd6c03036b2c824a59de/chardet-7.7.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 1185195,
+        "sha256": "7df40e5267a4e9952ecb39cc23109c389fca61fc27a6e807ec9ea894a41e83d7",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 17,
+      "unchangedNativeCount": 16,
+      "sourceInputIds": [
+        "chardet-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/charset_normalizer-3.5.2.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/charset_normalizer-3.5.2.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_10_13_universal2"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "91960722fdc4b328d7cdb1f55bfd5cc22ec22175cac6e412051471b582aa9724",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/charset_normalizer/cd.cpython-312-darwin.so",
+          "bytes": 331872,
+          "sha256": "d38c3dff8e119637ff6d41466ec09d079dcce1ad93c705503d003673d68ba48b",
+          "wheelRecordSha256": "d38c3dff8e119637ff6d41466ec09d079dcce1ad93c705503d003673d68ba48b",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "d38c3dff8e119637ff6d41466ec09d079dcce1ad93c705503d003673d68ba48b",
+          "publisherWheelMemberBytes": 331872,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/charset_normalizer/md.cpython-312-darwin.so",
+          "bytes": 552208,
+          "sha256": "cd79f238f6b9ae576f19d49eee8ae48af8ef536b881a1b7c4689b0d06681f655",
+          "wheelRecordSha256": "cd79f238f6b9ae576f19d49eee8ae48af8ef536b881a1b7c4689b0d06681f655",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "cd79f238f6b9ae576f19d49eee8ae48af8ef536b881a1b7c4689b0d06681f655",
+          "publisherWheelMemberBytes": 552208,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/charset_normalizer-3.5.2.dist-info/licenses/LICENSE",
+          "bytes": 1071,
+          "sha256": "6d0d41bfe170ac6c7dc248c9a63e254d0fb45a60d50a8257d0af92c6e249b887",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "charset_normalizer-3.5.2-cp312-cp312-macosx_10_13_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/e7/c8/693809898870237d82785a03f3b2b58fe4c9f14669f84a7d4e623c92a59e/charset_normalizer-3.5.2-cp312-cp312-macosx_10_13_universal2.whl",
+        "bytes": 367780,
+        "sha256": "ed2a239c0ea213acc1908150a3037257083c7c083128f1a4cec2ec4b97dca491",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 2,
+      "unchangedNativeCount": 2,
+      "sourceInputIds": [
+        "charset-normalizer-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "cryptography",
+      "version": "50.0.2",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cryptography-50.0.2.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cryptography-50.0.2.dist-info/WHEEL",
+      "wheelTags": [
+        "cp311-abi3-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "maturin (1.14.1)"
+      ],
+      "recordSha256": "3829e37bc5bfbf83f1444339772939c9d5572951adde5d5646f81c9980d1ad48",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/cryptography/hazmat/bindings/_rust.abi3.so",
+          "bytes": 10403008,
+          "sha256": "bf1f68c3e6d900eddd1fdcc28f0a50a39a300716e4ca99dbcd155fce9bec3f2e",
+          "wheelRecordSha256": "0aced18998c288668c0eb65cfdc76fd41726370e6d5d9760c0b27143929162d2",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "0aced18998c288668c0eb65cfdc76fd41726370e6d5d9760c0b27143929162d2",
+          "publisherWheelMemberBytes": 10445664,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 89,
+          "shippedSanitizedHomeOccurrences": 89,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/cryptography-50.0.2.dist-info/licenses/LICENSE",
+          "bytes": 197,
+          "sha256": "3e0c7c091a948b82533ba98fd7cbb40432d6f1a9acbf85f5922d2f99a93ae6bb",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/cryptography-50.0.2.dist-info/licenses/LICENSE.APACHE",
+          "bytes": 11360,
+          "sha256": "aac73b3148f6d1d7111dbca32099f68d26c644c6813ae1e4f05f6579aa2663fe",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/cryptography-50.0.2.dist-info/licenses/LICENSE.BSD",
+          "bytes": 1532,
+          "sha256": "602c4c7482de6479dd2e9793cda275e5e63d773dacd1eca689232ab7008fb4fb",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "cryptography-50.0.2-cp311-abi3-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/e5/56/d194340cc4a57535e82e1bee9e89667ac4b7c13b5d3f59686deae3094dd5/cryptography-50.0.2-cp311-abi3-macosx_11_0_arm64.whl",
+        "bytes": 3914904,
+        "sha256": "fa8f5efb344d6908a1ce62f4a24e2e5780f825d6f53f5f50ec5ffacac72936cb",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "cryptography-native-source",
+        "cryptography-openssl",
+        "rust-crate-asn1-0.24.1",
+        "rust-crate-asn1_derive-0.24.1",
+        "rust-crate-base64-0.23.0",
+        "rust-crate-bitflags-2.13.1",
+        "rust-crate-cc-1.4.0",
+        "rust-crate-cfg-if-1.0.4",
+        "rust-crate-find-msvc-tools-0.1.9",
+        "rust-crate-foreign-types-0.3.2",
+        "rust-crate-foreign-types-shared-0.1.1",
+        "rust-crate-heck-0.5.0",
+        "rust-crate-itoa-1.0.18",
+        "rust-crate-libc-0.2.189",
+        "rust-crate-once_cell-1.21.4",
+        "rust-crate-openssl-0.10.81",
+        "rust-crate-openssl-macros-0.1.1",
+        "rust-crate-openssl-sys-0.9.117",
+        "rust-crate-pem-4.0.0",
+        "rust-crate-pkg-config-0.3.33",
+        "rust-crate-portable-atomic-1.14.0",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-pyo3-0.29.2",
+        "rust-crate-pyo3-build-config-0.29.2",
+        "rust-crate-pyo3-ffi-0.29.2",
+        "rust-crate-pyo3-macros-0.29.2",
+        "rust-crate-pyo3-macros-backend-0.29.2",
+        "rust-crate-quote-1.0.47",
+        "rust-crate-self_cell-1.3.0",
+        "rust-crate-shlex-2.0.1",
+        "rust-crate-syn-2.0.119",
+        "rust-crate-target-lexicon-0.13.5",
+        "rust-crate-unicode-ident-1.0.24",
+        "rust-crate-vcpkg-0.2.15"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "fonttools",
+      "version": "4.67.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/fonttools-4.67.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/fonttools-4.67.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_10_13_universal2"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "8231cf5ce2fabae36f42ca52c0fa68862e11718da16d8cc52cd4866931403620",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fontTools/cu2qu/cu2qu.cpython-312-darwin.so",
+          "bytes": 388448,
+          "sha256": "bf800449444fd70ff2d982f7e9f1b0d75d2b1359357e8d1e575bce184c1c5475",
+          "wheelRecordSha256": "2370b33258d30ffdf968d8dc06d67cd664c960ab2be9a16f09feffb33e5b7d78",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "2370b33258d30ffdf968d8dc06d67cd664c960ab2be9a16f09feffb33e5b7d78",
+          "publisherWheelMemberBytes": 338600,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fontTools/feaLib/lexer.cpython-312-darwin.so",
+          "bytes": 460400,
+          "sha256": "21f5c3b8f3fe15934f1da6440b0b452a98ca4ca23cd9f2364bf67e024c4496f7",
+          "wheelRecordSha256": "70f02db215c2ab7411666d6e4a3ede243e9fa6d8cc68fe8c5fd368fb5e83ce4c",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "70f02db215c2ab7411666d6e4a3ede243e9fa6d8cc68fe8c5fd368fb5e83ce4c",
+          "publisherWheelMemberBytes": 410776,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fontTools/misc/bezierTools.cpython-312-darwin.so",
+          "bytes": 1117648,
+          "sha256": "3d362f51f19cbe8520f4244f59239043bc36ed36330b53412ea76dc083f74603",
+          "wheelRecordSha256": "6e3fd2c1958a03b6ccb18a36297199053aeef16c4a9fdfdca12042686969e944",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "6e3fd2c1958a03b6ccb18a36297199053aeef16c4a9fdfdca12042686969e944",
+          "publisherWheelMemberBytes": 1086240,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fontTools/pens/momentsPen.cpython-312-darwin.so",
+          "bytes": 328752,
+          "sha256": "d140b9b6ab0d3b2b1a72688aa0cc29b4fc9c80c867acebd18cdda71772a4a38f",
+          "wheelRecordSha256": "ac9e3f9c02a5f3156b957bd1183616df90de2fae9f385563a47a57fef9c87b4b",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "ac9e3f9c02a5f3156b957bd1183616df90de2fae9f385563a47a57fef9c87b4b",
+          "publisherWheelMemberBytes": 278752,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fontTools/qu2cu/qu2cu.cpython-312-darwin.so",
+          "bytes": 434016,
+          "sha256": "ae38402aa43d321796a4f6b9c502b91ea3bf2c6ef40b75549bff0eefdc9e5b1a",
+          "wheelRecordSha256": "a9713bba06016a12fd561957bfb56253427816c6dc005f92faea096aa6c338d8",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "a9713bba06016a12fd561957bfb56253427816c6dc005f92faea096aa6c338d8",
+          "publisherWheelMemberBytes": 384328,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fontTools/varLib/iup.cpython-312-darwin.so",
+          "bytes": 525824,
+          "sha256": "35e1cf38095f5cd27e372c63308f3f1f544f6bd13da91b752e56b6f318c3dc9b",
+          "wheelRecordSha256": "b5d137fc0416fee0462d92a3bdaf75d7b64bc893063e457b03d725f7be6105d9",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "b5d137fc0416fee0462d92a3bdaf75d7b64bc893063e457b03d725f7be6105d9",
+          "publisherWheelMemberBytes": 476392,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fonttools-4.67.0.dist-info/licenses/LICENSE",
+          "bytes": 1072,
+          "sha256": "6787208f83f659ccbc2223b2fde952ffa6f7e8aca62f1a8a2bf5bc51bb1b2383",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/fonttools-4.67.0.dist-info/licenses/LICENSE.external",
+          "bytes": 20022,
+          "sha256": "94a83aaee0729a0f302d34acc4acecbd9d58366f262429075fe557e4a54b2e69",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "fonttools-4.67.0-cp312-cp312-macosx_10_13_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/5b/50/f674402869f11a89868c4755ae86cd2fcfd67ca6193c6f5d1b479b1267b9/fonttools-4.67.0-cp312-cp312-macosx_10_13_universal2.whl",
+        "bytes": 3108316,
+        "sha256": "fcb9743140419410161acfe7ec205fb0a8a703acfccb85b586becb5a97c047c9",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 6,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "fonttools-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "freetype-py",
+      "version": "2.5.1",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/freetype_py-2.5.1.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/freetype_py-2.5.1.dist-info/WHEEL",
+      "wheelTags": [
+        "py3-none-macosx_10_9_universal2"
+      ],
+      "wheelGenerator": [
+        "bdist_wheel (0.44.0)"
+      ],
+      "recordSha256": "f67615b1192927de1213e636e822e617baae5a2d87502930121f41f75cd9bd5f",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/freetype/libfreetype.dylib",
+          "bytes": 3841376,
+          "sha256": "1f51287c6f27f2b7f726279fc5c5450263fe865576ab0a88940643b23ebb2b16",
+          "wheelRecordSha256": "1f51287c6f27f2b7f726279fc5c5450263fe865576ab0a88940643b23ebb2b16",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "1f51287c6f27f2b7f726279fc5c5450263fe865576ab0a88940643b23ebb2b16",
+          "publisherWheelMemberBytes": 3841376,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/freetype_py-2.5.1.dist-info/LICENSE.txt",
+          "bytes": 1585,
+          "sha256": "60386caf4d85fb57b5cc5470f1a00de1692fb28e8b731f7f9187f64451dbe641",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "freetype_py-2.5.1-py3-none-macosx_10_9_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/38/a8/258dd138ebe60c79cd8cfaa6d021599208a33f0175a5e29b01f60c9ab2c7/freetype_py-2.5.1-py3-none-macosx_10_9_universal2.whl",
+        "bytes": 1747885,
+        "sha256": "d01ded2557694f06aa0413f3400c0c0b2b5ebcaabeef7aaf3d756be44f51e90b",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 1,
+      "sourceInputIds": [
+        "freetype-harfbuzz",
+        "freetype-native",
+        "freetype-py-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "hyperscan",
+      "version": "0.9.1",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/hyperscan-0.9.1.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/hyperscan-0.9.1.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "scikit-build-core 1.1.1",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "d82b9fc82729866c6f4c5ebaef02aab93df06b82ce87cb001d7f62643f66b422",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/hyperscan/_hs_ext.cpython-312-darwin.so",
+          "bytes": 4531984,
+          "sha256": "4eae1f91687be0de93b50dd321f089b367138b70f19c3b0de634c5fe86f19f8e",
+          "wheelRecordSha256": "121866d9b5dc404c1bdb26eac375045e70aff001439f58dc62b1c45b25d890fa",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "121866d9b5dc404c1bdb26eac375045e70aff001439f58dc62b1c45b25d890fa",
+          "publisherWheelMemberBytes": 4540288,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 1,
+          "shippedSanitizedHomeOccurrences": 1,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/hyperscan-0.9.1.dist-info/licenses/LICENSE",
+          "bytes": 1070,
+          "sha256": "caf9b8c9123f2314fee2264e125d4dc7d2340e6d096c06e61edf0e98aa298940",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "hyperscan-0.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/b5/5e/8fc638508a8da090734210d3d7df7b9d8bfc08f8a5bb9c74535fac6c0f52/hyperscan-0.9.1-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 2034126,
+        "sha256": "9e28b0d486f929ac5821a6eb46e2922c033453ef62afbc3677dda9516fdc921c",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "hyperscan-native-source",
+        "hyperscan-pcre",
+        "vectorscan"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "jiter",
+      "version": "0.18.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/jiter-0.18.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/jiter-0.18.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "maturin (1.15.0)"
+      ],
+      "recordSha256": "baa21da176d0b8f6bc3e6c7595e71b1d24f71f918353b69d468f428dbef2e2a5",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/jiter/jiter.cpython-312-darwin.so",
+          "bytes": 710496,
+          "sha256": "2c405496df53a569e2bf36e273f4fa539aac8d39ccf9df54199fc7028b65b923",
+          "wheelRecordSha256": "fb37792e88ab18cd6439d40e03c3c3edc92a69521b37c1fa9ed93c841bf69a57",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "fb37792e88ab18cd6439d40e03c3c3edc92a69521b37c1fa9ed93c841bf69a57",
+          "publisherWheelMemberBytes": 696432,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 26,
+          "shippedSanitizedHomeOccurrences": 26,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/jiter-0.18.0.dist-info/licenses/LICENSE",
+          "bytes": 1091,
+          "sha256": "7c7134b9f7b978c03fca875517cf398db91f19bbb8109b6685e742aa3f57468e",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "jiter-0.18.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/2e/e2/f4000a4d9c519ca019bf0e2922cc0c6b6db347be6303161382eda7635be7/jiter-0.18.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 316319,
+        "sha256": "7b41cd64ee6b54db94bea6274e6e37002ed526aa06c114a8be6f36ffe21c184e",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "jiter-native-source",
+        "rust-crate-ahash-0.8.12",
+        "rust-crate-aho-corasick-1.1.5",
+        "rust-crate-anes-0.1.6",
+        "rust-crate-anstyle-1.0.14",
+        "rust-crate-anyhow-1.0.104",
+        "rust-crate-approx-0.5.1",
+        "rust-crate-autocfg-1.5.1",
+        "rust-crate-bit-set-0.8.0",
+        "rust-crate-bit-vec-0.8.0",
+        "rust-crate-bitflags-2.13.1",
+        "rust-crate-bitvec-1.1.1",
+        "rust-crate-bumpalo-3.20.3",
+        "rust-crate-cast-0.3.0",
+        "rust-crate-cc-1.4.4",
+        "rust-crate-cfg-if-1.0.4",
+        "rust-crate-cfg_aliases-0.2.2",
+        "rust-crate-ciborium-0.2.2",
+        "rust-crate-ciborium-io-0.2.2",
+        "rust-crate-ciborium-ll-0.2.2",
+        "rust-crate-clap-4.6.6",
+        "rust-crate-clap_builder-4.6.6",
+        "rust-crate-clap_lex-1.1.0",
+        "rust-crate-codspeed-5.0.1",
+        "rust-crate-codspeed-criterion-compat-5.0.1",
+        "rust-crate-codspeed-criterion-compat-walltime-5.0.1",
+        "rust-crate-colored-3.1.1",
+        "rust-crate-criterion-plot-0.5.0",
+        "rust-crate-crossbeam-deque-0.8.7",
+        "rust-crate-crossbeam-epoch-0.9.20",
+        "rust-crate-crossbeam-utils-0.8.22",
+        "rust-crate-crunchy-0.2.4",
+        "rust-crate-either-1.17.0",
+        "rust-crate-equivalent-1.0.2",
+        "rust-crate-errno-0.3.14",
+        "rust-crate-fastrand-2.5.0",
+        "rust-crate-find-msvc-tools-0.1.11",
+        "rust-crate-fnv-1.0.7",
+        "rust-crate-foldhash-0.2.0",
+        "rust-crate-funty-2.0.0",
+        "rust-crate-futures-core-0.3.34",
+        "rust-crate-futures-task-0.3.34",
+        "rust-crate-futures-util-0.3.34",
+        "rust-crate-getrandom-0.3.4",
+        "rust-crate-getrandom-0.4.3",
+        "rust-crate-glob-0.3.4",
+        "rust-crate-half-2.7.1",
+        "rust-crate-hashbrown-0.17.1",
+        "rust-crate-heck-0.5.0",
+        "rust-crate-hermit-abi-0.5.2",
+        "rust-crate-indexmap-2.14.0",
+        "rust-crate-is-terminal-0.4.17",
+        "rust-crate-itertools-0.10.5",
+        "rust-crate-itoa-1.0.18",
+        "rust-crate-js-sys-0.3.104",
+        "rust-crate-lexical-parse-float-1.0.6",
+        "rust-crate-lexical-parse-integer-1.0.6",
+        "rust-crate-lexical-util-1.0.7",
+        "rust-crate-libc-0.2.189",
+        "rust-crate-linux-raw-sys-0.12.1",
+        "rust-crate-memchr-2.8.3",
+        "rust-crate-nix-0.31.3",
+        "rust-crate-num-bigint-0.4.8",
+        "rust-crate-num-integer-0.1.47",
+        "rust-crate-num-traits-0.2.19",
+        "rust-crate-once_cell-1.21.4",
+        "rust-crate-oorandom-11.1.5",
+        "rust-crate-paste-1.0.15",
+        "rust-crate-pin-project-lite-0.2.17",
+        "rust-crate-plotters-0.3.7",
+        "rust-crate-plotters-backend-0.3.7",
+        "rust-crate-plotters-svg-0.3.7",
+        "rust-crate-portable-atomic-1.15.0",
+        "rust-crate-ppv-lite86-0.2.21",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-proptest-1.11.0",
+        "rust-crate-pyo3-0.30.1",
+        "rust-crate-pyo3-build-config-0.30.1",
+        "rust-crate-pyo3-ffi-0.30.1",
+        "rust-crate-pyo3-macros-0.30.1",
+        "rust-crate-pyo3-macros-backend-0.30.1",
+        "rust-crate-quick-error-1.2.3",
+        "rust-crate-quote-1.0.47",
+        "rust-crate-r-efi-5.3.0",
+        "rust-crate-r-efi-6.0.0",
+        "rust-crate-radium-0.7.0",
+        "rust-crate-rand-0.9.5",
+        "rust-crate-rand_chacha-0.9.0",
+        "rust-crate-rand_core-0.9.5",
+        "rust-crate-rand_xorshift-0.4.0",
+        "rust-crate-rayon-1.12.0",
+        "rust-crate-rayon-core-1.13.0",
+        "rust-crate-regex-1.13.1",
+        "rust-crate-regex-automata-0.4.18",
+        "rust-crate-regex-syntax-0.8.11",
+        "rust-crate-rustix-1.1.4",
+        "rust-crate-rustversion-1.0.23",
+        "rust-crate-rusty-fork-0.3.1",
+        "rust-crate-same-file-1.0.6",
+        "rust-crate-serde-1.0.229",
+        "rust-crate-serde_core-1.0.229",
+        "rust-crate-serde_derive-1.0.229",
+        "rust-crate-serde_json-1.0.154",
+        "rust-crate-shlex-2.0.1",
+        "rust-crate-slab-0.4.12",
+        "rust-crate-smallvec-1.15.2",
+        "rust-crate-statrs-0.18.0",
+        "rust-crate-syn-2.0.119",
+        "rust-crate-syn-3.0.3",
+        "rust-crate-tap-1.0.1",
+        "rust-crate-target-lexicon-0.13.5",
+        "rust-crate-tempfile-3.27.0",
+        "rust-crate-tinytemplate-1.2.1",
+        "rust-crate-unarray-0.1.4",
+        "rust-crate-unicode-ident-1.0.24",
+        "rust-crate-version_check-0.9.5",
+        "rust-crate-wait-timeout-0.2.1",
+        "rust-crate-walkdir-2.5.0",
+        "rust-crate-wasip2-1.0.4+wasi-0.2.12",
+        "rust-crate-wasm-bindgen-0.2.127",
+        "rust-crate-wasm-bindgen-macro-0.2.127",
+        "rust-crate-wasm-bindgen-macro-support-0.2.127",
+        "rust-crate-wasm-bindgen-shared-0.2.127",
+        "rust-crate-web-sys-0.3.104",
+        "rust-crate-winapi-util-0.1.11",
+        "rust-crate-windows-link-0.2.1",
+        "rust-crate-windows-sys-0.61.2",
+        "rust-crate-wit-bindgen-0.57.1",
+        "rust-crate-wyz-0.5.1",
+        "rust-crate-zerocopy-0.8.56",
+        "rust-crate-zerocopy-derive-0.8.56",
+        "rust-crate-zmij-1.0.23"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "Levenshtein",
+      "version": "0.27.5",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/levenshtein-0.27.5.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/levenshtein-0.27.5.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "scikit-build-core 1.0.3",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "2dabb8d87193b8f451595743bc97e2957bea81e720378ca7dfc485c6ea81095c",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/Levenshtein/levenshtein_cpp.cpython-312-darwin.so",
+          "bytes": 441272,
+          "sha256": "851d267f8c4863f8057a5b3ce0385d9caa76337215951bc69cbc78d5d73ab926",
+          "wheelRecordSha256": "851d267f8c4863f8057a5b3ce0385d9caa76337215951bc69cbc78d5d73ab926",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "851d267f8c4863f8057a5b3ce0385d9caa76337215951bc69cbc78d5d73ab926",
+          "publisherWheelMemberBytes": 441272,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/levenshtein-0.27.5.dist-info/licenses/LICENSE",
+          "bytes": 16004,
+          "sha256": "00c45b5cb10b85516da33dacfdaa27e74ef5626268385ca3e78da1825b2b750b",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "levenshtein-0.27.5-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/7f/a5/293e8ca8436af75abdb3ea3a2c41f6d2e3bbf8ef3075ecdfba1c9e595083/levenshtein-0.27.5-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 158896,
+        "sha256": "5ca6a0559cc5cd2b434b7d96adeab85a86cb87042dcc512770cf4fb562eaea27",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 1,
+      "sourceInputIds": [
+        "levenshtein"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "lxml",
+      "version": "6.1.3",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml-6.1.3.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml-6.1.3.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_10_13_universal2"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "478535d499819c3b2d928911a1caba0509178923f9b60b589f7d71e2805acf04",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml/_elementpath.cpython-312-darwin.so",
+          "bytes": 507984,
+          "sha256": "bfed5666f09d785ef5d7333e87c604caccf90111e66ee3c435e81c94ce7eb781",
+          "wheelRecordSha256": "ddc77afa536057aef496bcaad7efc1b49306b9d9542486b751acec06f4a9cffc",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "ddc77afa536057aef496bcaad7efc1b49306b9d9542486b751acec06f4a9cffc",
+          "publisherWheelMemberBytes": 458560,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml/builder.cpython-312-darwin.so",
+          "bytes": 338016,
+          "sha256": "601ff97af84a5e8fd06cd14d77cb153ef3bc69a669da806eb4fc748e0b5fc2ee",
+          "wheelRecordSha256": "c789e3b9c2803227e7423f3050f67275d6e260464db1531d62610002692c32ce",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "c789e3b9c2803227e7423f3050f67275d6e260464db1531d62610002692c32ce",
+          "publisherWheelMemberBytes": 288048,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml/etree.cpython-312-darwin.so",
+          "bytes": 9679648,
+          "sha256": "764c3eae4131bbc44ad8b4f9ec193bb97ed86f9f769794eac220ef1ac1bcf619",
+          "wheelRecordSha256": "f63776233dc0df372c80d24c7feb0bd1cc98a4c9fba923e3c4e4b82b0b0c7896",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "f63776233dc0df372c80d24c7feb0bd1cc98a4c9fba923e3c4e4b82b0b0c7896",
+          "publisherWheelMemberBytes": 9623944,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 6,
+          "shippedSanitizedHomeOccurrences": 6,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml/html/_difflib.cpython-312-darwin.so",
+          "bytes": 1131488,
+          "sha256": "1e5bd91bed24c94be375e2d58cb5f311e697e3120d8aa90b660a7b3746f359f9",
+          "wheelRecordSha256": "eef48dc08325bfd721985d9eaa5fbb8668a2dec936025bc1d5a5892f25eb0a3c",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "eef48dc08325bfd721985d9eaa5fbb8668a2dec936025bc1d5a5892f25eb0a3c",
+          "publisherWheelMemberBytes": 1083792,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml/html/diff.cpython-312-darwin.so",
+          "bytes": 753344,
+          "sha256": "1226208f3e4bc8bbd2b55b6255fa8febdfa68fbb8f1d00ae1deb1624e8810d70",
+          "wheelRecordSha256": "7ec9cf2f8c5ce72feb2949e7c087f7c871e5795c7eb88e1b2a736d4ffdd9dd37",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "7ec9cf2f8c5ce72feb2949e7c087f7c871e5795c7eb88e1b2a736d4ffdd9dd37",
+          "publisherWheelMemberBytes": 704584,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml/objectify.cpython-312-darwin.so",
+          "bytes": 5297376,
+          "sha256": "fdd7e2c409cd1d42e25e8a7fead7720138038e2186f559960c795cc55afa7daf",
+          "wheelRecordSha256": "76babcdf313a72383d8c95b7279c12a0a8a4d2755bae4c09b15802cb8e319917",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "76babcdf313a72383d8c95b7279c12a0a8a4d2755bae4c09b15802cb8e319917",
+          "publisherWheelMemberBytes": 5245392,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 6,
+          "shippedSanitizedHomeOccurrences": 6,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml/sax.cpython-312-darwin.so",
+          "bytes": 458608,
+          "sha256": "04f620db12e8353927c4c0fdea6407aeaee0f4fffe4a4f3322386fda38fa1fe3",
+          "wheelRecordSha256": "8a59a3e1e36ad4a4c72d02ef80000a93f73fb672d59ee4fc1e22c4c4a463870e",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "8a59a3e1e36ad4a4c72d02ef80000a93f73fb672d59ee4fc1e22c4c4a463870e",
+          "publisherWheelMemberBytes": 408984,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml-6.1.3.dist-info/licenses/LICENSE.txt",
+          "bytes": 1507,
+          "sha256": "8fc2b568133516e46845d2147917adeee1648e70ae9ab5ed6c5417afef4ce855",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/lxml-6.1.3.dist-info/licenses/LICENSES.txt",
+          "bytes": 6221,
+          "sha256": "388fa99f3bde4447cd5a4cbb114037be026854db6cfe89e112691c1d8abdcf3c",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "lxml-6.1.3-cp312-cp312-macosx_10_13_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/dd/1f/a180b57d9eeabaab77f9d5aa30356898ea749c4795596a8f66d1eb6bef2e/lxml-6.1.3-cp312-cp312-macosx_10_13_universal2.whl",
+        "bytes": 8602094,
+        "sha256": "0c0710ac085a157b593c38fbcacd950f15c4afa8e2057527185875ab302752bc",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 7,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "lxml-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "3.0.4",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/markupsafe-3.0.4.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/markupsafe-3.0.4.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "0c3df9dafbe0606f021671da41b818c72b6c8177cca284c8ed73e9d3df955f0a",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/markupsafe/_speedups.cpython-312-darwin.so",
+          "bytes": 68464,
+          "sha256": "34373b378be1190cc9c6ff22e40093b1118cd8422ffe24a2da64e09de0cf9d93",
+          "wheelRecordSha256": "c5dff96c03976c47aa7d1cae3a73b4c57099259b49305c9486735ee9f7022304",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "c5dff96c03976c47aa7d1cae3a73b4c57099259b49305c9486735ee9f7022304",
+          "publisherWheelMemberBytes": 50656,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/markupsafe-3.0.4.dist-info/licenses/LICENSE.txt",
+          "bytes": 1475,
+          "sha256": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "markupsafe-3.0.4-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/a2/f0/d6613774d86fbf6d145751d43c59875e47a6f9f17daee0aef173bd36d90e/markupsafe-3.0.4-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 12050,
+        "sha256": "0930db9bdc62d22944e10b066448bb65dc9abe9112880c7cab8da54db4284d5f",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "markupsafe-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "ml_dtypes",
+      "version": "0.6.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/ml_dtypes-0.6.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/ml_dtypes-0.6.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_10_13_universal2"
+      ],
+      "wheelGenerator": [
+        "scikit-build-core 1.0.3",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "f4f3fe39880797c1887e4b2b10546ed124d2d34c4095f94a4d33c3c36af03ff0",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/ml_dtypes/_ml_dtypes_ext.cpython-312-darwin.so",
+          "bytes": 2600648,
+          "sha256": "7035bce34356b455e30252fa379292f5b33554d770a09078163d77e026d10a35",
+          "wheelRecordSha256": "7035bce34356b455e30252fa379292f5b33554d770a09078163d77e026d10a35",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "7035bce34356b455e30252fa379292f5b33554d770a09078163d77e026d10a35",
+          "publisherWheelMemberBytes": 2600648,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/ml_dtypes-0.6.0.dist-info/licenses/LICENSE",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/ml_dtypes-0.6.0.dist-info/licenses/LICENSE.eigen",
+          "bytes": 16726,
+          "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "ml_dtypes-0.6.0-cp312-cp312-macosx_10_13_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/84/6a/441eb053b078954f7fea284dfb288701884d0a1404d39babb858e1649023/ml_dtypes-0.6.0-cp312-cp312-macosx_10_13_universal2.whl",
+        "bytes": 565447,
+        "sha256": "5359c588cc62de6f78d7430f06b65853d884955494d86d6ad90b6dd64a3f3a08",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 1,
+      "sourceInputIds": [
+        "ml-dtypes-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "msgpack",
+      "version": "1.2.4",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/msgpack-1.2.4.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/msgpack-1.2.4.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.2.1)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "77d596389774c18f589392c509d5c6f6d86ff0d3617c23110426b310524f2957",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/msgpack/_cmsgpack.cpython-312-darwin.so",
+          "bytes": 243504,
+          "sha256": "a936f5b0f4e7fb650049592a92fffff1d43cfd1186d277b71f4d84097522f109",
+          "wheelRecordSha256": "93897eb366eaf9aa549f85ff6f72d07e0d3b87e5bc3cdc52d8f81bffb79ab614",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "93897eb366eaf9aa549f85ff6f72d07e0d3b87e5bc3cdc52d8f81bffb79ab614",
+          "publisherWheelMemberBytes": 226720,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/msgpack-1.2.4.dist-info/licenses/COPYING",
+          "bytes": 614,
+          "sha256": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "msgpack-1.2.4-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/7f/89/169c2a0b1ffeafe68a4f13d8d96b6ed1cd8d40d8262b3a6690851da7eda1/msgpack-1.2.4-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 90573,
+        "sha256": "112933726919f4239646cca9572e2c2fa5626358c670da8440aac09403100a48",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "msgpack-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "numpy",
+      "version": "2.5.4",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_14_0_arm64"
+      ],
+      "wheelGenerator": [
+        "meson",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "40559d470697e18427339c5e72258334f3ce78bc66c9065916837b4a166827bf",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/_multiarray_tests.cpython-312-darwin.so",
+          "bytes": 121192,
+          "sha256": "083ab89907471d9d6af7337ae44f6acbde5e5e23ef173394dc6251c925fc08ba",
+          "wheelRecordSha256": "083ab89907471d9d6af7337ae44f6acbde5e5e23ef173394dc6251c925fc08ba",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "083ab89907471d9d6af7337ae44f6acbde5e5e23ef173394dc6251c925fc08ba",
+          "publisherWheelMemberBytes": 121192,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-darwin.so",
+          "bytes": 3996184,
+          "sha256": "af36cbbb39b27651a8b9f7dfa491775016f331a58e8d116eb6b4cfd5e22efb77",
+          "wheelRecordSha256": "af36cbbb39b27651a8b9f7dfa491775016f331a58e8d116eb6b4cfd5e22efb77",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "af36cbbb39b27651a8b9f7dfa491775016f331a58e8d116eb6b4cfd5e22efb77",
+          "publisherWheelMemberBytes": 3996184,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/_operand_flag_tests.cpython-312-darwin.so",
+          "bytes": 51240,
+          "sha256": "e910e6642301f2f28a986d819a3249d5d1013b2ee6ce4e5e9a95082ecc4d3627",
+          "wheelRecordSha256": "e910e6642301f2f28a986d819a3249d5d1013b2ee6ce4e5e9a95082ecc4d3627",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "e910e6642301f2f28a986d819a3249d5d1013b2ee6ce4e5e9a95082ecc4d3627",
+          "publisherWheelMemberBytes": 51240,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/_rational_tests.cpython-312-darwin.so",
+          "bytes": 73352,
+          "sha256": "73d0f8c90654dd97fa2b0ed6c45882eb8fe83a8c4256e38bfc31713e5e07841b",
+          "wheelRecordSha256": "73d0f8c90654dd97fa2b0ed6c45882eb8fe83a8c4256e38bfc31713e5e07841b",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "73d0f8c90654dd97fa2b0ed6c45882eb8fe83a8c4256e38bfc31713e5e07841b",
+          "publisherWheelMemberBytes": 73352,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/_simd.cpython-312-darwin.so",
+          "bytes": 339640,
+          "sha256": "e78efa667e9cd2d0f319968a7feae06adf7f0945efde8bbcad3bd0f75e199541",
+          "wheelRecordSha256": "e78efa667e9cd2d0f319968a7feae06adf7f0945efde8bbcad3bd0f75e199541",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "e78efa667e9cd2d0f319968a7feae06adf7f0945efde8bbcad3bd0f75e199541",
+          "publisherWheelMemberBytes": 339640,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/_struct_ufunc_tests.cpython-312-darwin.so",
+          "bytes": 51480,
+          "sha256": "24218eec682f48246b450903e270be19eca1c6c2d828235ddef29949f2cc8950",
+          "wheelRecordSha256": "24218eec682f48246b450903e270be19eca1c6c2d828235ddef29949f2cc8950",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "24218eec682f48246b450903e270be19eca1c6c2d828235ddef29949f2cc8950",
+          "publisherWheelMemberBytes": 51480,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/_umath_tests.cpython-312-darwin.so",
+          "bytes": 71904,
+          "sha256": "1c55454c29a1a5f500fc22cf095e862b0af0f17e14c2a1fbe7140832c21a0d66",
+          "wheelRecordSha256": "1c55454c29a1a5f500fc22cf095e862b0af0f17e14c2a1fbe7140832c21a0d66",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "1c55454c29a1a5f500fc22cf095e862b0af0f17e14c2a1fbe7140832c21a0d66",
+          "publisherWheelMemberBytes": 71904,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/lib/libnpymath.a",
+          "bytes": 33472,
+          "sha256": "bafbb1c226e6c2de27325707907d096737f769fde8bdcf9bf0cd2ccc242a5d6a",
+          "wheelRecordSha256": "bafbb1c226e6c2de27325707907d096737f769fde8bdcf9bf0cd2ccc242a5d6a",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "bafbb1c226e6c2de27325707907d096737f769fde8bdcf9bf0cd2ccc242a5d6a",
+          "publisherWheelMemberBytes": 33472,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/fft/_pocketfft_umath.cpython-312-darwin.so",
+          "bytes": 329912,
+          "sha256": "51add49e0b523ae7b20a10a879a77e0998afb795d6d233ef8936f0a58ce4e36f",
+          "wheelRecordSha256": "51add49e0b523ae7b20a10a879a77e0998afb795d6d233ef8936f0a58ce4e36f",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "51add49e0b523ae7b20a10a879a77e0998afb795d6d233ef8936f0a58ce4e36f",
+          "publisherWheelMemberBytes": 329912,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/linalg/_umath_linalg.cpython-312-darwin.so",
+          "bytes": 154880,
+          "sha256": "aa8f5a2f363ad911eddb849e3ed82ba017bd2fec5b8dde28a330e2873f501fb8",
+          "wheelRecordSha256": "aa8f5a2f363ad911eddb849e3ed82ba017bd2fec5b8dde28a330e2873f501fb8",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "aa8f5a2f363ad911eddb849e3ed82ba017bd2fec5b8dde28a330e2873f501fb8",
+          "publisherWheelMemberBytes": 154880,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/linalg/lapack_lite.cpython-312-darwin.so",
+          "bytes": 53008,
+          "sha256": "a7895a9c0d4afdf3fbbdc2456e016590aa0fbd8d7e203079debee39bd0269b5c",
+          "wheelRecordSha256": "a7895a9c0d4afdf3fbbdc2456e016590aa0fbd8d7e203079debee39bd0269b5c",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "a7895a9c0d4afdf3fbbdc2456e016590aa0fbd8d7e203079debee39bd0269b5c",
+          "publisherWheelMemberBytes": 53008,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/_bounded_integers.cpython-312-darwin.so",
+          "bytes": 298024,
+          "sha256": "1215997585debe5651a77a52563dc32508e67414ef35761c49afa150ce1f8e1f",
+          "wheelRecordSha256": "1215997585debe5651a77a52563dc32508e67414ef35761c49afa150ce1f8e1f",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "1215997585debe5651a77a52563dc32508e67414ef35761c49afa150ce1f8e1f",
+          "publisherWheelMemberBytes": 298024,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/_common.cpython-312-darwin.so",
+          "bytes": 250656,
+          "sha256": "884ecb8d16bbb1572816a89fff6b2b5722bb8210273ff744ec0db5c0496de5fd",
+          "wheelRecordSha256": "884ecb8d16bbb1572816a89fff6b2b5722bb8210273ff744ec0db5c0496de5fd",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "884ecb8d16bbb1572816a89fff6b2b5722bb8210273ff744ec0db5c0496de5fd",
+          "publisherWheelMemberBytes": 250656,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/_generator.cpython-312-darwin.so",
+          "bytes": 690960,
+          "sha256": "87a6dfcf15b6107936915f76e1a52b00d68f2e539169aee194af7a3e5bbacc1b",
+          "wheelRecordSha256": "87a6dfcf15b6107936915f76e1a52b00d68f2e539169aee194af7a3e5bbacc1b",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "87a6dfcf15b6107936915f76e1a52b00d68f2e539169aee194af7a3e5bbacc1b",
+          "publisherWheelMemberBytes": 690960,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/_mt19937.cpython-312-darwin.so",
+          "bytes": 133520,
+          "sha256": "9779d38f6e586d845f2ee652959f3edf1acb44fbeff6f4ee16ec7fb58f23dd6d",
+          "wheelRecordSha256": "9779d38f6e586d845f2ee652959f3edf1acb44fbeff6f4ee16ec7fb58f23dd6d",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "9779d38f6e586d845f2ee652959f3edf1acb44fbeff6f4ee16ec7fb58f23dd6d",
+          "publisherWheelMemberBytes": 133520,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/_pcg64.cpython-312-darwin.so",
+          "bytes": 152544,
+          "sha256": "39fbdcf07c23901f4ae0b6ab3be3e05829a83495819a69cda8ddbd11d06ff136",
+          "wheelRecordSha256": "39fbdcf07c23901f4ae0b6ab3be3e05829a83495819a69cda8ddbd11d06ff136",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "39fbdcf07c23901f4ae0b6ab3be3e05829a83495819a69cda8ddbd11d06ff136",
+          "publisherWheelMemberBytes": 152544,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/_philox.cpython-312-darwin.so",
+          "bytes": 133792,
+          "sha256": "5a74868b1a98c3d0a776cf275c88959871376bab0ff15ef0d882229ddd5a2a56",
+          "wheelRecordSha256": "5a74868b1a98c3d0a776cf275c88959871376bab0ff15ef0d882229ddd5a2a56",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "5a74868b1a98c3d0a776cf275c88959871376bab0ff15ef0d882229ddd5a2a56",
+          "publisherWheelMemberBytes": 133792,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/_sfc64.cpython-312-darwin.so",
+          "bytes": 98256,
+          "sha256": "6bb290611b7fa2304d28f3c8ddb0156f435ead1aa0f5a997ddfe4e8a6762c200",
+          "wheelRecordSha256": "6bb290611b7fa2304d28f3c8ddb0156f435ead1aa0f5a997ddfe4e8a6762c200",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "6bb290611b7fa2304d28f3c8ddb0156f435ead1aa0f5a997ddfe4e8a6762c200",
+          "publisherWheelMemberBytes": 98256,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/bit_generator.cpython-312-darwin.so",
+          "bytes": 226640,
+          "sha256": "88bbb27d3f58e12c9be2ff6af6eff4e409599a3e6cece3b4144d4aa8878b149b",
+          "wheelRecordSha256": "88bbb27d3f58e12c9be2ff6af6eff4e409599a3e6cece3b4144d4aa8878b149b",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "88bbb27d3f58e12c9be2ff6af6eff4e409599a3e6cece3b4144d4aa8878b149b",
+          "publisherWheelMemberBytes": 226640,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/lib/libnpyrandom.a",
+          "bytes": 55256,
+          "sha256": "2370627c836478594a7b6b4e0afe58fed0c6e8fcd5cbc7b45fc18206fb648e43",
+          "wheelRecordSha256": "2370627c836478594a7b6b4e0afe58fed0c6e8fcd5cbc7b45fc18206fb648e43",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "2370627c836478594a7b6b4e0afe58fed0c6e8fcd5cbc7b45fc18206fb648e43",
+          "publisherWheelMemberBytes": 55256,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/mtrand.cpython-312-darwin.so",
+          "bytes": 580912,
+          "sha256": "0e52c63a090850119f67a570ae2fd094861fcff3a0bad00cbf3a0c86faa82510",
+          "wheelRecordSha256": "0e52c63a090850119f67a570ae2fd094861fcff3a0bad00cbf3a0c86faa82510",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "0e52c63a090850119f67a570ae2fd094861fcff3a0bad00cbf3a0c86faa82510",
+          "publisherWheelMemberBytes": 580912,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/LICENSE.txt",
+          "bytes": 46826,
+          "sha256": "649a589ab31076e79e9ce62ba24eae9959598124176640dbc95f87bd10f34fcf",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+          "bytes": 1018,
+          "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+          "bytes": 690,
+          "sha256": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+          "bytes": 20785,
+          "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+          "bytes": 1414,
+          "sha256": "f7b14309e5f54e5022b26448eefd419988ada2aec01d3c1162d84a0ea8f21f2c",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+          "bytes": 1514,
+          "sha256": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
+          "bytes": 1543,
+          "sha256": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+          "bytes": 1498,
+          "sha256": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+          "bytes": 2266,
+          "sha256": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/ma/LICENSE",
+          "bytes": 1593,
+          "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/random/LICENSE.md",
+          "bytes": 3511,
+          "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+          "bytes": 2745,
+          "sha256": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+          "bytes": 2926,
+          "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+          "bytes": 1154,
+          "sha256": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+          "bytes": 1509,
+          "sha256": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+          "bytes": 1226,
+          "sha256": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy-2.5.4.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+          "bytes": 332,
+          "sha256": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/_core/include/numpy/random/LICENSE.txt",
+          "bytes": 1018,
+          "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/ma/LICENSE",
+          "bytes": 1593,
+          "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/numpy/random/LICENSE.md",
+          "bytes": 3511,
+          "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "numpy-2.5.4-cp312-cp312-macosx_14_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/31/2f/5ea3570fcb8ccd0882bea99436a513b2c85dad8f774a2057849130a8fb99/numpy-2.5.4-cp312-cp312-macosx_14_0_arm64.whl",
+        "bytes": 5451717,
+        "sha256": "9cb18a327b49c5c337f972b03682f6a49855525faaf3c0d3e9c96cd0fd8880a8",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 21,
+      "unchangedNativeCount": 21,
+      "sourceInputIds": [
+        "numpy-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "onnx",
+      "version": "1.23.2",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnx-1.23.2.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnx-1.23.2.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-abi3-macosx_13_0_universal2"
+      ],
+      "wheelGenerator": [
+        "scikit-build-core 1.1.1",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "ac273d7013c40c01cd58a391b985c2c54fd660ddfb3dc5f93c0398911f7257d8",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnx/onnx_cpp2py_export.abi3.so",
+          "bytes": 10323120,
+          "sha256": "531be01c8bed6e76d4a282d3bfe76f0a2b2aceecb2a2b09b72633bad70fd2cb4",
+          "wheelRecordSha256": "4b638f68beb21569cca37a26dca2d8711dec439800bd990ae176cbf90edf85f3",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "4b638f68beb21569cca37a26dca2d8711dec439800bd990ae176cbf90edf85f3",
+          "publisherWheelMemberBytes": 10252216,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 200,
+          "shippedSanitizedHomeOccurrences": 200,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnx-1.23.2.dist-info/licenses/LICENSE",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnx-1.23.2.dist-info/licenses/NOTICE",
+          "bytes": 2133,
+          "sha256": "a4a6f2d7c4df16d4478df326169800219a6b4f51ce6f9a86074cc467e8adab28",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "onnx-1.23.2-cp312-abi3-macosx_13_0_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/d7/d9/967d6f6838ad60964de912a5e7d01915282899b254460705d952f5d14c1a/onnx-1.23.2-cp312-abi3-macosx_13_0_universal2.whl",
+        "bytes": 9725612,
+        "sha256": "1b8680ce1e6a9a4736374a9dce4de14ea8ee05e0dccf0784a78a6e5646bdc1f6",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "onnx-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "onnxruntime",
+      "version": "1.31.1",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime-1.31.1.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime-1.31.1.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_14_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (78.1.1)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "3a3f9c41c2f3542b33077c38025d9dda6e769ff1efbb60d82374fbd0e6d8cacb",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime/capi/libonnxruntime.1.31.1.dylib",
+          "bytes": 33037336,
+          "sha256": "d586cbe89effc085a09d3341b3cfbd5c322517f9d397aeb20814af21433f2b36",
+          "wheelRecordSha256": "d586cbe89effc085a09d3341b3cfbd5c322517f9d397aeb20814af21433f2b36",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "d586cbe89effc085a09d3341b3cfbd5c322517f9d397aeb20814af21433f2b36",
+          "publisherWheelMemberBytes": 33037336,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime/capi/onnxruntime_pybind11_state.so",
+          "bytes": 40771472,
+          "sha256": "b9609cc856ff105373be67cda2eb2f9468a2562499e2184988a3aa76e2d867e9",
+          "wheelRecordSha256": "b9609cc856ff105373be67cda2eb2f9468a2562499e2184988a3aa76e2d867e9",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "b9609cc856ff105373be67cda2eb2f9468a2562499e2184988a3aa76e2d867e9",
+          "publisherWheelMemberBytes": 40771472,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime/LICENSE",
+          "bytes": 1073,
+          "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime/ThirdPartyNotices.txt",
+          "bytes": 338088,
+          "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "onnxruntime-1.31.1-cp312-cp312-macosx_14_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/0e/f7/cecc0efeeea83bff2f7789ae1b80f27fa0f0210d6d9d66d1f0031a6b5e47/onnxruntime-1.31.1-cp312-cp312-macosx_14_0_arm64.whl",
+        "bytes": 20882125,
+        "sha256": "96dd2564b10ea7153ad9c207e7cd8e5917cb3ba521e0e0a62ac03486fdc8d56c",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 2,
+      "unchangedNativeCount": 2,
+      "sourceInputIds": [],
+      "sourceInputScope": "Exact wheel/notices verified; official source for embedded revision 6af1a93 was not retrievable. No substitute revision is asserted.",
+      "sourceRevisionEvidence": {
+        "version": "1.31.1",
+        "embeddedCommit": "6af1a93",
+        "apiUrl": "https://api.github.com/repos/microsoft/onnxruntime/commits/6af1a93",
+        "status": "source_commit_not_retrieved",
+        "error": "HTTP Error 404: Not Found"
+      }
+    },
+    {
+      "name": "orjson",
+      "version": "3.13.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/orjson-3.13.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/orjson-3.13.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_15_0_arm64"
+      ],
+      "wheelGenerator": [
+        "maturin (1.15.0)"
+      ],
+      "recordSha256": "11e14922e353713a9bb1082391576a6738ef67ccac7565024183bf5b90e1d437",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/orjson/orjson.cpython-312-darwin.so",
+          "bytes": 253904,
+          "sha256": "cae254ba8cb97ee97a7856aeb3acbb848e044e679aa3dd6ed4a3e7fc351de4b5",
+          "wheelRecordSha256": "cae254ba8cb97ee97a7856aeb3acbb848e044e679aa3dd6ed4a3e7fc351de4b5",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "cae254ba8cb97ee97a7856aeb3acbb848e044e679aa3dd6ed4a3e7fc351de4b5",
+          "publisherWheelMemberBytes": 253904,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/orjson-3.13.0.dist-info/licenses/LICENSE-APACHE",
+          "bytes": 10847,
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/orjson-3.13.0.dist-info/licenses/LICENSE-MIT",
+          "bytes": 1023,
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "publisherWheelMatchesActualXPI": true
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/orjson-3.13.0.dist-info/licenses/LICENSE-MPL-2.0",
+          "bytes": 16727,
+          "sha256": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "orjson-3.13.0-cp312-cp312-macosx_15_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/6f/4d/9332eb96d2e379384be0f211f543835eebc81f460c9403b84abe1294c431/orjson-3.13.0-cp312-cp312-macosx_15_0_arm64.whl",
+        "bytes": 123364,
+        "sha256": "6ff2a2c67f35202f7d823753d38ad371a9b7fc297567cdfff4420e763cb9f6f8",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 1,
+      "sourceInputIds": [
+        "orjson-native-source",
+        "rust-crate-associative-cache-3.0.1",
+        "rust-crate-bytecount-0.6.9",
+        "rust-crate-cc-1.6.0",
+        "rust-crate-find-msvc-tools-0.1.14",
+        "rust-crate-gimli-0.34.0",
+        "rust-crate-itoap-1.0.1",
+        "rust-crate-jiff-core-0.1.1",
+        "rust-crate-libc-0.2.190",
+        "rust-crate-no-panic-0.1.37",
+        "rust-crate-once_cell-1.21.4",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-pyo3-build-config-0.29.3",
+        "rust-crate-pyo3-ffi-0.29.3",
+        "rust-crate-quote-1.0.47",
+        "rust-crate-shlex-2.0.1",
+        "rust-crate-simdutf8-0.1.5",
+        "rust-crate-syn-3.0.6",
+        "rust-crate-target-lexicon-0.13.5",
+        "rust-crate-unicode-ident-1.0.26",
+        "rust-crate-unwinding-0.2.10",
+        "rust-crate-xxhash-rust-0.8.19",
+        "rust-crate-zmij-1.0.23"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "pillow",
+      "version": "13.0.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pillow-13.0.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pillow-13.0.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "f96700e5abcbfc2390cc52bb036e33ebd9cd5f19483b8199bfee0c325786e239",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libXau.6.dylib",
+          "bytes": 69584,
+          "sha256": "c30323abc362ae0e5ff8b043e13a179a1bf6a9f76011ffc57195fd43020de535",
+          "wheelRecordSha256": "c30323abc362ae0e5ff8b043e13a179a1bf6a9f76011ffc57195fd43020de535",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "c30323abc362ae0e5ff8b043e13a179a1bf6a9f76011ffc57195fd43020de535",
+          "publisherWheelMemberBytes": 69584,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libavif.16.4.2.dylib",
+          "bytes": 2999136,
+          "sha256": "5e27779af8078c5586c045176db72779a09e5f87c6d516373913a6c092b76340",
+          "wheelRecordSha256": "5e27779af8078c5586c045176db72779a09e5f87c6d516373913a6c092b76340",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "5e27779af8078c5586c045176db72779a09e5f87c6d516373913a6c092b76340",
+          "publisherWheelMemberBytes": 2999136,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libbrotlicommon.1.2.0.dylib",
+          "bytes": 183712,
+          "sha256": "3f4843c17f3cccc986279a4c9ac8a11dc3077c412fd856d1bad8231bf027a25f",
+          "wheelRecordSha256": "3f4843c17f3cccc986279a4c9ac8a11dc3077c412fd856d1bad8231bf027a25f",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "3f4843c17f3cccc986279a4c9ac8a11dc3077c412fd856d1bad8231bf027a25f",
+          "publisherWheelMemberBytes": 183712,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libbrotlidec.1.2.0.dylib",
+          "bytes": 104080,
+          "sha256": "351fa4a2f4faed4147dfead81a8b0f5500ada31db64f74c8368bc1ab894f0dd1",
+          "wheelRecordSha256": "351fa4a2f4faed4147dfead81a8b0f5500ada31db64f74c8368bc1ab894f0dd1",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "351fa4a2f4faed4147dfead81a8b0f5500ada31db64f74c8368bc1ab894f0dd1",
+          "publisherWheelMemberBytes": 104080,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libfreetype.6.dylib",
+          "bytes": 769872,
+          "sha256": "b1e5b0bd6f696d9458bbd370c1417f8b1a6bb6953c26c4c0543750f96ec32c33",
+          "wheelRecordSha256": "b1e5b0bd6f696d9458bbd370c1417f8b1a6bb6953c26c4c0543750f96ec32c33",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "b1e5b0bd6f696d9458bbd370c1417f8b1a6bb6953c26c4c0543750f96ec32c33",
+          "publisherWheelMemberBytes": 769872,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libharfbuzz.0.dylib",
+          "bytes": 1625248,
+          "sha256": "9b601043edb74e02da3fc58cd10c8bef5a79002c71f2896516c25e6224ea22bb",
+          "wheelRecordSha256": "2c88b14217bd5c823d615282dc79b860c79b7d066ddae72ad4d10e0ecca8bcb5",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "2c88b14217bd5c823d615282dc79b860c79b7d066ddae72ad4d10e0ecca8bcb5",
+          "publisherWheelMemberBytes": 1625248,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 114,
+          "shippedSanitizedHomeOccurrences": 114,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libjpeg.62.4.0.dylib",
+          "bytes": 701120,
+          "sha256": "406c999400ff12ac2ff3d5e9d97a0bf094e681de090a53f5338afada78acdad9",
+          "wheelRecordSha256": "172444d18ef193c128e3f9f4323e9d22b0d824b8172a1389ecd048b279280629",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "172444d18ef193c128e3f9f4323e9d22b0d824b8172a1389ecd048b279280629",
+          "publisherWheelMemberBytes": 701120,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 1,
+          "shippedSanitizedHomeOccurrences": 1,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/liblcms2.2.dylib",
+          "bytes": 421168,
+          "sha256": "188685d4468afb124af58f471fb2382f94b98ef560995bc910eefab50134e8fb",
+          "wheelRecordSha256": "188685d4468afb124af58f471fb2382f94b98ef560995bc910eefab50134e8fb",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "188685d4468afb124af58f471fb2382f94b98ef560995bc910eefab50134e8fb",
+          "publisherWheelMemberBytes": 421168,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/liblzma.5.dylib",
+          "bytes": 216944,
+          "sha256": "f08e18e2363a8e4fc8099de9c8b0b96b30a6a2e4a60e890f2cebb1a9e25a92fa",
+          "wheelRecordSha256": "f08e18e2363a8e4fc8099de9c8b0b96b30a6a2e4a60e890f2cebb1a9e25a92fa",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "f08e18e2363a8e4fc8099de9c8b0b96b30a6a2e4a60e890f2cebb1a9e25a92fa",
+          "publisherWheelMemberBytes": 216944,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libopenjp2.2.5.4.dylib",
+          "bytes": 430576,
+          "sha256": "2af52733d40803561752e12d6e917a5e16932a1fb7426760a2e6d8c10989c47a",
+          "wheelRecordSha256": "2af52733d40803561752e12d6e917a5e16932a1fb7426760a2e6d8c10989c47a",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "2af52733d40803561752e12d6e917a5e16932a1fb7426760a2e6d8c10989c47a",
+          "publisherWheelMemberBytes": 430576,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libpng16.16.dylib",
+          "bytes": 257296,
+          "sha256": "4777ff2529c03d4181470fb9afa10081d36153055c2989aa16bb15d6b513e772",
+          "wheelRecordSha256": "4777ff2529c03d4181470fb9afa10081d36153055c2989aa16bb15d6b513e772",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "4777ff2529c03d4181470fb9afa10081d36153055c2989aa16bb15d6b513e772",
+          "publisherWheelMemberBytes": 257296,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libsharpyuv.0.dylib",
+          "bytes": 85856,
+          "sha256": "6b2d464413fc35783c79936f1e6be631585448a37765cf79c238be2ea5e5505b",
+          "wheelRecordSha256": "6b2d464413fc35783c79936f1e6be631585448a37765cf79c238be2ea5e5505b",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "6b2d464413fc35783c79936f1e6be631585448a37765cf79c238be2ea5e5505b",
+          "publisherWheelMemberBytes": 85856,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libtiff.6.dylib",
+          "bytes": 572544,
+          "sha256": "d17ccc4d89a37c1db72aca63fdf26b2f07eaaeb737a5232a337585e3c920b3ed",
+          "wheelRecordSha256": "d17ccc4d89a37c1db72aca63fdf26b2f07eaaeb737a5232a337585e3c920b3ed",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "d17ccc4d89a37c1db72aca63fdf26b2f07eaaeb737a5232a337585e3c920b3ed",
+          "publisherWheelMemberBytes": 572544,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libwebp.7.dylib",
+          "bytes": 512672,
+          "sha256": "0a2ba0179e6bcc1bccc1a88c38b7d8efd0302d45a1bfc1eb4cf1f1f03ede73f0",
+          "wheelRecordSha256": "0a2ba0179e6bcc1bccc1a88c38b7d8efd0302d45a1bfc1eb4cf1f1f03ede73f0",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "0a2ba0179e6bcc1bccc1a88c38b7d8efd0302d45a1bfc1eb4cf1f1f03ede73f0",
+          "publisherWheelMemberBytes": 512672,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libwebpdemux.2.dylib",
+          "bytes": 69616,
+          "sha256": "f5ec6b6750ee91ff032ba62b18afc5f37c7bc842bfc9b2d325df41bc656ea066",
+          "wheelRecordSha256": "f5ec6b6750ee91ff032ba62b18afc5f37c7bc842bfc9b2d325df41bc656ea066",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "f5ec6b6750ee91ff032ba62b18afc5f37c7bc842bfc9b2d325df41bc656ea066",
+          "publisherWheelMemberBytes": 69616,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libwebpmux.3.dylib",
+          "bytes": 105792,
+          "sha256": "f9c291035190c3af29494ce9fb62987c25ee78c4365c92c323ccc5ec8740143d",
+          "wheelRecordSha256": "f9c291035190c3af29494ce9fb62987c25ee78c4365c92c323ccc5ec8740143d",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "f9c291035190c3af29494ce9fb62987c25ee78c4365c92c323ccc5ec8740143d",
+          "publisherWheelMemberBytes": 105792,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libxcb.1.1.0.dylib",
+          "bytes": 193760,
+          "sha256": "125bcffc8971652784b6a8b4061501f891aeafdf361aa4b777ba3bacc548bc84",
+          "wheelRecordSha256": "125bcffc8971652784b6a8b4061501f891aeafdf361aa4b777ba3bacc548bc84",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "125bcffc8971652784b6a8b4061501f891aeafdf361aa4b777ba3bacc548bc84",
+          "publisherWheelMemberBytes": 193760,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/.dylibs/libz.1.3.1.zlib-ng.dylib",
+          "bytes": 176320,
+          "sha256": "39ffbe6a87460a579cf414c3ee668e449b32c2cdc2cc0b64921d53fd59cb56ed",
+          "wheelRecordSha256": "39ffbe6a87460a579cf414c3ee668e449b32c2cdc2cc0b64921d53fd59cb56ed",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "39ffbe6a87460a579cf414c3ee668e449b32c2cdc2cc0b64921d53fd59cb56ed",
+          "publisherWheelMemberBytes": 176320,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_avif.cpython-312-darwin.so",
+          "bytes": 73680,
+          "sha256": "620d3bac7b512aa79928dc5c6e574129098aa00f7beaa947ab21e240195c5d2d",
+          "wheelRecordSha256": "e8a87d29c9ea3e81527efb1818ab7b6ead5bed54e4c2664c73e47f67746fd5f8",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "e8a87d29c9ea3e81527efb1818ab7b6ead5bed54e4c2664c73e47f67746fd5f8",
+          "publisherWheelMemberBytes": 73680,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_imaging.cpython-312-darwin.so",
+          "bytes": 634480,
+          "sha256": "40ac6a15f49b2c0d904cb23dbd3a19922cf834a87e512a1d75e25d94c2dd670f",
+          "wheelRecordSha256": "058a696be42c06bf77d5efd929c13f734a5e1a0c0a9e4b3e684ee5af13b4aa8f",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "058a696be42c06bf77d5efd929c13f734a5e1a0c0a9e4b3e684ee5af13b4aa8f",
+          "publisherWheelMemberBytes": 634480,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 148,
+          "shippedSanitizedHomeOccurrences": 148,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_imagingcms.cpython-312-darwin.so",
+          "bytes": 97856,
+          "sha256": "8eb46d4927df8c814c255b0820b9d4e91b17a02ba97deaba3eb2a09900a83454",
+          "wheelRecordSha256": "c940dbd46ca213366037fd958d11678497a5cd41971fc54126ac37baad396a81",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "c940dbd46ca213366037fd958d11678497a5cd41971fc54126ac37baad396a81",
+          "publisherWheelMemberBytes": 97856,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_imagingft.cpython-312-darwin.so",
+          "bytes": 117344,
+          "sha256": "5a642fd8cdf48de932d1e92c0182eebd731ee951e2340904a8516989102f9a30",
+          "wheelRecordSha256": "bbd5e4c25140c7c3b476e14ee613457c55da2694029e9a4b0805ed6711fdfd2c",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "bbd5e4c25140c7c3b476e14ee613457c55da2694029e9a4b0805ed6711fdfd2c",
+          "publisherWheelMemberBytes": 117344,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 8,
+          "shippedSanitizedHomeOccurrences": 8,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_imagingmath.cpython-312-darwin.so",
+          "bytes": 89840,
+          "sha256": "94396123b285611ed0cf4ea47e10146db84ccbf2522a797dabc5844798e16174",
+          "wheelRecordSha256": "3209a70da6bb99bc9f2dc4d98d168baae82440a5062e91a19acccf6c2b653ff6",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "3209a70da6bb99bc9f2dc4d98d168baae82440a5062e91a19acccf6c2b653ff6",
+          "publisherWheelMemberBytes": 72160,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_imagingmorph.cpython-312-darwin.so",
+          "bytes": 69296,
+          "sha256": "c687f371ff3aa7e7ea9045f0f711768af7248242dff7f143fdb6bad0cfc0055e",
+          "wheelRecordSha256": "0237c1c8ca6ab8ad087d8c6cc929d8cfbd49396491b990503e47963f616a021d",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "0237c1c8ca6ab8ad087d8c6cc929d8cfbd49396491b990503e47963f616a021d",
+          "publisherWheelMemberBytes": 51472,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 2,
+          "shippedSanitizedHomeOccurrences": 2,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_imagingtk.cpython-312-darwin.so",
+          "bytes": 70592,
+          "sha256": "16c07f4168728e7e22c315a38b4eaefc66a323ea83f1e2659e52009f04c1aabd",
+          "wheelRecordSha256": "1e11150b6f16eae297ea7da2193fa66ff4597d85db9e5d60c7238f190c5dd745",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "1e11150b6f16eae297ea7da2193fa66ff4597d85db9e5d60c7238f190c5dd745",
+          "publisherWheelMemberBytes": 52784,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/PIL/_webp.cpython-312-darwin.so",
+          "bytes": 75760,
+          "sha256": "b4faaa0f59f74518bc92f040a39e1ad15cdd7955dde907c7d452b3833f5af497",
+          "wheelRecordSha256": "3c4c8cb49c955900e361ca1bcaf44f8863ffa9edb9f7b3372e15e8938a053320",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "3c4c8cb49c955900e361ca1bcaf44f8863ffa9edb9f7b3372e15e8938a053320",
+          "publisherWheelMemberBytes": 75760,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pillow-13.0.0.dist-info/licenses/LICENSE",
+          "bytes": 70307,
+          "sha256": "dda12a98c1979cf3d94df1cff45d27a4cb3f04a60c76f76902ac54cac03ec0ce",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "pillow-13.0.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/39/4b/f2ed53d83aa44ac19599ac0a54897f867fafb95f406980d1e24083f8cbe3/pillow-13.0.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 4852329,
+        "sha256": "fc481f742ccda20e9ed760b8f978dff50f2a4e9bc253ac167fb0a05b0783ef52",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 26,
+      "unchangedNativeCount": 16,
+      "sourceInputIds": [
+        "pillow-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "protobuf",
+      "version": "7.36.2",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/protobuf-7.36.2.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/protobuf-7.36.2.dist-info/WHEEL",
+      "wheelTags": [
+        "cp310-abi3-macosx_10_9_universal2"
+      ],
+      "wheelGenerator": [
+        "bazel-wheelmaker 1.0"
+      ],
+      "recordSha256": "e707c8b6722e875c5a0e1444eb669eaf5249731439eb42a13982281dc88112aa",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/google/_upb/_message.abi3.so",
+          "bytes": 695714,
+          "sha256": "5fe9c5aa8c22f90136ea60aa2e46bdbd95d1953c1a35bdd3ca4cd643b1d74f6d",
+          "wheelRecordSha256": "5fe9c5aa8c22f90136ea60aa2e46bdbd95d1953c1a35bdd3ca4cd643b1d74f6d",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "5fe9c5aa8c22f90136ea60aa2e46bdbd95d1953c1a35bdd3ca4cd643b1d74f6d",
+          "publisherWheelMemberBytes": 695714,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/protobuf-7.36.2.dist-info/LICENSE",
+          "bytes": 1732,
+          "sha256": "6e5e117324afd944dcf67f36cf329843bc1a92229a8cd9bb573d7a83130fea7d",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "protobuf-7.36.2-cp310-abi3-macosx_10_9_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/32/72/98342feb672507c8f3a69e34b4fa8961f608edba5c1a48a6f47156d92cb5/protobuf-7.36.2-cp310-abi3-macosx_10_9_universal2.whl",
+        "bytes": 456039,
+        "sha256": "cbc70b17ee27e28894c7fee8bb04be1abead49e936bc70eb60052531eee2079e",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 1,
+      "sourceInputIds": [
+        "protobuf-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "psutil",
+      "version": "7.2.2",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/psutil-7.2.2.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/psutil-7.2.2.dist-info/WHEEL",
+      "wheelTags": [
+        "cp36-abi3-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (75.3.3)"
+      ],
+      "recordSha256": "82a0585abe618fd6b841c095e45a9970cb4c8ace9aab3209d3602a8a1233ed49",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/psutil/_psutil_osx.abi3.so",
+          "bytes": 123424,
+          "sha256": "27f4d04aa4783668121be59d3a210565ac49462cbf47a5a0ad0e095ea75b0263",
+          "wheelRecordSha256": "ff4568b9187ca7b37c5134aaf614ffb061e7fedccebd84158343afb05991b8e2",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "ff4568b9187ca7b37c5134aaf614ffb061e7fedccebd84158343afb05991b8e2",
+          "publisherWheelMemberBytes": 105920,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 44,
+          "shippedSanitizedHomeOccurrences": 44,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/psutil-7.2.2.dist-info/LICENSE",
+          "bytes": 1548,
+          "sha256": "b89c063b3786e28e0c0a38f1931db61fed35e69dd2a2966fbecffee0f46c8d10",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "psutil-7.2.2-cp36-abi3-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/80/c4/f5af4c1ca8c1eeb2e92ccca14ce8effdeec651d5ab6053c589b074eda6e1/psutil-7.2.2-cp36-abi3-macosx_11_0_arm64.whl",
+        "bytes": 129859,
+        "sha256": "1a7b04c10f32cc88ab39cbf606e117fd74721c831c98a27dc04578deb0c16979",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "psutil-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.50.1",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pydantic_core-2.50.1.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pydantic_core-2.50.1.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "maturin (1.15.0)"
+      ],
+      "recordSha256": "13081e7126f87bad8ef8cb8c8b37e8d3dd2f37289992a68b2388bd7e41a82fd5",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pydantic_core/_pydantic_core.cpython-312-darwin.so",
+          "bytes": 4344528,
+          "sha256": "dca08de9d64e292558c19fd80b16a8c5839d99f5c3d33cf745d38db0d51db689",
+          "wheelRecordSha256": "f80019557d114dbaba3ab7aa53debd7d0d717659eee1a3aad48f760a6f8f8e80",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "f80019557d114dbaba3ab7aa53debd7d0d717659eee1a3aad48f760a6f8f8e80",
+          "publisherWheelMemberBytes": 4351728,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 132,
+          "shippedSanitizedHomeOccurrences": 132,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pydantic_core-2.50.1.dist-info/licenses/LICENSE",
+          "bytes": 1080,
+          "sha256": "2afdd30d54b4d62b6f488a6bcc1546e84ec5061f13f4209c03d012348783795a",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "pydantic_core-2.50.1-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/db/a3/f8b1b39349c33037c73d7a1b794c9c29d8f07d5bd2b74399c1375a529cc6/pydantic_core-2.50.1-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 2025779,
+        "sha256": "e8e1d6ce820aa23317e8209a86bd65a540973c12dc7552b48a4f6c8e9926815e",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "pydantic-core-native-source",
+        "rust-crate-ahash-0.8.12",
+        "rust-crate-aho-corasick-1.1.3",
+        "rust-crate-autocfg-1.3.0",
+        "rust-crate-base64-0.23.1",
+        "rust-crate-bitflags-2.9.1",
+        "rust-crate-bitvec-1.0.1",
+        "rust-crate-bumpalo-3.19.0",
+        "rust-crate-cfg-if-1.0.0",
+        "rust-crate-displaydoc-0.2.5",
+        "rust-crate-enum_dispatch-0.3.13",
+        "rust-crate-foldhash-0.2.0",
+        "rust-crate-form_urlencoded-1.2.2",
+        "rust-crate-funty-2.0.0",
+        "rust-crate-getrandom-0.3.3",
+        "rust-crate-hashbrown-0.17.1",
+        "rust-crate-heck-0.5.0",
+        "rust-crate-hex-0.4.3",
+        "rust-crate-icu_collections-1.5.0",
+        "rust-crate-icu_locid-1.5.0",
+        "rust-crate-icu_locid_transform-1.5.0",
+        "rust-crate-icu_locid_transform_data-1.5.0",
+        "rust-crate-icu_normalizer-1.5.0",
+        "rust-crate-icu_normalizer_data-1.5.0",
+        "rust-crate-icu_properties-1.5.1",
+        "rust-crate-icu_properties_data-1.5.0",
+        "rust-crate-icu_provider-1.5.0",
+        "rust-crate-icu_provider_macros-1.5.0",
+        "rust-crate-idna-1.1.0",
+        "rust-crate-idna_adapter-1.2.0",
+        "rust-crate-itoa-1.0.11",
+        "rust-crate-jiter-0.16.0",
+        "rust-crate-js-sys-0.3.77",
+        "rust-crate-lexical-parse-float-1.0.5",
+        "rust-crate-lexical-parse-integer-1.0.5",
+        "rust-crate-lexical-util-1.0.6",
+        "rust-crate-libc-0.2.185",
+        "rust-crate-litemap-0.7.3",
+        "rust-crate-log-0.4.27",
+        "rust-crate-lru-0.18.5",
+        "rust-crate-memchr-2.7.4",
+        "rust-crate-num-bigint-0.4.6",
+        "rust-crate-num-integer-0.1.46",
+        "rust-crate-num-traits-0.2.19",
+        "rust-crate-once_cell-1.21.3",
+        "rust-crate-percent-encoding-2.3.2",
+        "rust-crate-portable-atomic-1.6.0",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-pyo3-0.29.2",
+        "rust-crate-pyo3-build-config-0.29.2",
+        "rust-crate-pyo3-ffi-0.29.2",
+        "rust-crate-pyo3-macros-0.29.2",
+        "rust-crate-pyo3-macros-backend-0.29.2",
+        "rust-crate-quote-1.0.44",
+        "rust-crate-r-efi-5.2.0",
+        "rust-crate-radium-0.7.0",
+        "rust-crate-regex-1.13.1",
+        "rust-crate-regex-automata-0.4.18",
+        "rust-crate-regex-syntax-0.8.11",
+        "rust-crate-serde-1.0.229",
+        "rust-crate-serde_core-1.0.229",
+        "rust-crate-serde_derive-1.0.229",
+        "rust-crate-serde_json-1.0.151",
+        "rust-crate-smallvec-1.16.2",
+        "rust-crate-speedate-0.17.0",
+        "rust-crate-stable_deref_trait-1.2.0",
+        "rust-crate-static_assertions-1.1.0",
+        "rust-crate-strum-0.27.2",
+        "rust-crate-strum_macros-0.27.2",
+        "rust-crate-syn-2.0.82",
+        "rust-crate-syn-3.0.6",
+        "rust-crate-synstructure-0.13.1",
+        "rust-crate-tap-1.0.1",
+        "rust-crate-target-lexicon-0.13.4",
+        "rust-crate-tinystr-0.7.6",
+        "rust-crate-unicode-ident-1.0.12",
+        "rust-crate-url-2.5.8",
+        "rust-crate-utf16_iter-1.0.5",
+        "rust-crate-utf8_iter-1.0.4",
+        "rust-crate-uuid-1.23.4",
+        "rust-crate-version_check-0.9.5",
+        "rust-crate-wasi-0.14.2+wasi-0.2.4",
+        "rust-crate-wasm-bindgen-0.2.100",
+        "rust-crate-wasm-bindgen-backend-0.2.100",
+        "rust-crate-wasm-bindgen-macro-0.2.100",
+        "rust-crate-wasm-bindgen-macro-support-0.2.100",
+        "rust-crate-wasm-bindgen-shared-0.2.100",
+        "rust-crate-wit-bindgen-rt-0.39.0",
+        "rust-crate-write16-1.0.0",
+        "rust-crate-writeable-0.5.5",
+        "rust-crate-wyz-0.5.1",
+        "rust-crate-yoke-0.7.4",
+        "rust-crate-yoke-derive-0.7.4",
+        "rust-crate-zerocopy-0.8.25",
+        "rust-crate-zerocopy-derive-0.8.25",
+        "rust-crate-zerofrom-0.1.4",
+        "rust-crate-zerofrom-derive-0.1.4",
+        "rust-crate-zerovec-0.10.4",
+        "rust-crate-zerovec-derive-0.10.3",
+        "rust-crate-zmij-1.0.6"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "PyMuPDF",
+      "version": "1.26.7",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf-1.26.7.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf-1.26.7.dist-info/WHEEL",
+      "wheelTags": [
+        "cp310-abi3-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "pipcl"
+      ],
+      "recordSha256": "6e3be8713b4e7cb0ec46a8ffdb09460e61150339b4e9c27a257a1616c4cff85c",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf/_extra.so",
+          "bytes": 239504,
+          "sha256": "3aa42f9981cbe29fc30aed9b22384976c87e17365d92b010f57137be3d25e520",
+          "wheelRecordSha256": "aab3c12272075ba1a44e9cb4603845c8c67f3e692f2fce9cdc6a1b0d0b0f6915",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "aab3c12272075ba1a44e9cb4603845c8c67f3e692f2fce9cdc6a1b0d0b0f6915",
+          "publisherWheelMemberBytes": 222648,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 1,
+          "shippedSanitizedHomeOccurrences": 1,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf/_mupdf.so",
+          "bytes": 12226072,
+          "sha256": "210448b5c9534f6ef5978b2cc4e0d0157e2112dfe654518bd758d67bf6ad0eef",
+          "wheelRecordSha256": "210448b5c9534f6ef5978b2cc4e0d0157e2112dfe654518bd758d67bf6ad0eef",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "210448b5c9534f6ef5978b2cc4e0d0157e2112dfe654518bd758d67bf6ad0eef",
+          "publisherWheelMemberBytes": 12226072,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf/libmupdf.dylib",
+          "bytes": 31883120,
+          "sha256": "2e6a8d85aab900b1bfc976801d82b1ab67cc97639cfac794bc01f2d01803be6c",
+          "wheelRecordSha256": "2e6a8d85aab900b1bfc976801d82b1ab67cc97639cfac794bc01f2d01803be6c",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "2e6a8d85aab900b1bfc976801d82b1ab67cc97639cfac794bc01f2d01803be6c",
+          "publisherWheelMemberBytes": 31883120,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf/libmupdfcpp.so",
+          "bytes": 1794384,
+          "sha256": "8f96f9bcf538ffb38af29b846fb84914495489829df95d7e115b6002b85ceb6c",
+          "wheelRecordSha256": "8f96f9bcf538ffb38af29b846fb84914495489829df95d7e115b6002b85ceb6c",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "8f96f9bcf538ffb38af29b846fb84914495489829df95d7e115b6002b85ceb6c",
+          "publisherWheelMemberBytes": 1794384,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf/mupdf-devel/lib/libmupdf-threads.a",
+          "bytes": 3424,
+          "sha256": "77644146073c33ff438bdc29e8974dbb5bdb2dee3d9a3af876ad590b40014407",
+          "wheelRecordSha256": "77644146073c33ff438bdc29e8974dbb5bdb2dee3d9a3af876ad590b40014407",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "77644146073c33ff438bdc29e8974dbb5bdb2dee3d9a3af876ad590b40014407",
+          "publisherWheelMemberBytes": 3424,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pymupdf-1.26.7.dist-info/COPYING",
+          "bytes": 64,
+          "sha256": "40e60697600535eabfb5ae05f72829d88cfe8d02dd4792f5a754f6f51dabe55b",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "pymupdf-1.26.7-cp310-abi3-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/72/74/448b6172927c829c6a3fba80078d7b0a016ebbe2c9ee528821f5ea21677a/pymupdf-1.26.7-cp310-abi3-macosx_11_0_arm64.whl",
+        "bytes": 22470101,
+        "sha256": "31aa9c8377ea1eea02934b92f4dcf79fb2abba0bf41f8a46d64c3e31546a3c02",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 5,
+      "unchangedNativeCount": 4,
+      "sourceInputIds": [
+        "mupdf",
+        "pymupdf"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pyyaml-6.0.3.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/pyyaml-6.0.3.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (80.9.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "4e259774348bac93724047fa3547e03b71cbe2b7d37ca39be41513355d9cf36a",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/yaml/_yaml.cpython-312-darwin.so",
+          "bytes": 397664,
+          "sha256": "5792f4c54d9a78b38d5eaa2d9a95712896ed975b8c8a97265739fcaee7da26e8",
+          "wheelRecordSha256": "e22e20c9ba0922aea16158d839a651b58226eb0e86544879b7d5f5229135d928",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "e22e20c9ba0922aea16158d839a651b58226eb0e86544879b7d5f5229135d928",
+          "publisherWheelMemberBytes": 381768,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 14,
+          "shippedSanitizedHomeOccurrences": 14,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/pyyaml-6.0.3.dist-info/licenses/LICENSE",
+          "bytes": 1101,
+          "sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "pyyaml-6.0.3-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/89/a0/6cf41a19a1f2f3feab0e9c0b74134aa2ce6849093d5517a0c550fe37a648/pyyaml-6.0.3-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 173973,
+        "sha256": "fc09d0aa354569bc501d4e787133afc08552722d3ab34836a80547331bb5d4a0",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "pyyaml-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "RapidFuzz",
+      "version": "3.14.6",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz-3.14.6.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz-3.14.6.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "scikit-build-core 1.0.3",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "d56d0cb6a9aacba27c3ce39dd0a9e0ae7ed38563237805465ec62363134f6931",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz/distance/_initialize_cpp.cpython-312-darwin.so",
+          "bytes": 280456,
+          "sha256": "d0f4c3f5e5afbc72febda4ba40c3500a56d875223517d378a6930b4502949b7f",
+          "wheelRecordSha256": "d0f4c3f5e5afbc72febda4ba40c3500a56d875223517d378a6930b4502949b7f",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "d0f4c3f5e5afbc72febda4ba40c3500a56d875223517d378a6930b4502949b7f",
+          "publisherWheelMemberBytes": 280456,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz/distance/metrics_cpp.cpython-312-darwin.so",
+          "bytes": 1766464,
+          "sha256": "77e522edb70eb3ce5862a999f135106b5e3d1e65a8c3e58abfdb2737aeb11a39",
+          "wheelRecordSha256": "77e522edb70eb3ce5862a999f135106b5e3d1e65a8c3e58abfdb2737aeb11a39",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "77e522edb70eb3ce5862a999f135106b5e3d1e65a8c3e58abfdb2737aeb11a39",
+          "publisherWheelMemberBytes": 1766464,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz/fuzz_cpp.cpython-312-darwin.so",
+          "bytes": 1203808,
+          "sha256": "f60d760186f3fc252807d25232d961c0548d79920d1d3cfee5e39755f538e342",
+          "wheelRecordSha256": "f60d760186f3fc252807d25232d961c0548d79920d1d3cfee5e39755f538e342",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "f60d760186f3fc252807d25232d961c0548d79920d1d3cfee5e39755f538e342",
+          "publisherWheelMemberBytes": 1203808,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz/process_cpp_impl.cpython-312-darwin.so",
+          "bytes": 591160,
+          "sha256": "3ed0de653b0be2dd271c51b60f1802ad7ce98a9991f9ab474195b288ac32651e",
+          "wheelRecordSha256": "3ed0de653b0be2dd271c51b60f1802ad7ce98a9991f9ab474195b288ac32651e",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "3ed0de653b0be2dd271c51b60f1802ad7ce98a9991f9ab474195b288ac32651e",
+          "publisherWheelMemberBytes": 591160,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz/utils_cpp.cpython-312-darwin.so",
+          "bytes": 226688,
+          "sha256": "a7f2ef236339ffbce05365066004d660cff1277b602728a5b60835b1c4bf3dfa",
+          "wheelRecordSha256": "a7f2ef236339ffbce05365066004d660cff1277b602728a5b60835b1c4bf3dfa",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "a7f2ef236339ffbce05365066004d660cff1277b602728a5b60835b1c4bf3dfa",
+          "publisherWheelMemberBytes": 226688,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rapidfuzz-3.14.6.dist-info/licenses/LICENSE",
+          "bytes": 1092,
+          "sha256": "f34ccdffdff56fc417785915eedf18601d5479755df3c472b2c754c29802d683",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "rapidfuzz-3.14.6-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/8b/72/10fc4e414eeed7963e2f1c315c731cb68196f0478cb244c78a21f5ce8662/rapidfuzz-3.14.6-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 1248230,
+        "sha256": "1901414b135afb1a7f4b1ef940b95523b49cc5642aecf02af740f37567e98137",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 5,
+      "unchangedNativeCount": 5,
+      "sourceInputIds": [
+        "rapidfuzz-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "regex",
+      "version": "2026.9.29",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/regex-2026.9.29.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/regex-2026.9.29.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "686c247b927ac62a9d7692deb3b9f36c23f62f120bd971f57983707dafd831a1",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/regex/_regex.cpython-312-darwin.so",
+          "bytes": 822848,
+          "sha256": "af87653437e1497f54490e7c486674c111675b588d80dc6d1582a22af8e6098a",
+          "wheelRecordSha256": "0b33109585ab9d92744a374413b078267252ba8173af994b43faf8d59d4e4df0",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "0b33109585ab9d92744a374413b078267252ba8173af994b43faf8d59d4e4df0",
+          "publisherWheelMemberBytes": 809456,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 4,
+          "shippedSanitizedHomeOccurrences": 4,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/regex-2026.9.29.dist-info/licenses/LICENSE.txt",
+          "bytes": 11584,
+          "sha256": "bff55ef4cdcc8c14ce259f8e8ab60e264418440d6335f4dc138273fbd506144d",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "regex-2026.9.29-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/37/14/f3f0ba083d2094392d5eabf56db5ea6ba469fd6e927afd187042054ea68a/regex-2026.9.29-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 293633,
+        "sha256": "f57dc6b8fef170f105d2cf5cdce254f47b137d7755086cf7050f47e16582abba",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "regex-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "rtree",
+      "version": "1.4.1",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/rtree-1.4.1.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/rtree-1.4.1.dist-info/WHEEL",
+      "wheelTags": [
+        "py3-none-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (80.9.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "876de31d99b32f21f4da899c3b46cb05b0b25031f4c1cd8d80bcc561bc178aaf",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rtree/lib/libspatialindex.dylib",
+          "bytes": 868424,
+          "sha256": "70108e4f07ccd87c724f28b0e14fa26b9603ef61a45653087df89b1fc26665b3",
+          "wheelRecordSha256": "70108e4f07ccd87c724f28b0e14fa26b9603ef61a45653087df89b1fc26665b3",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "70108e4f07ccd87c724f28b0e14fa26b9603ef61a45653087df89b1fc26665b3",
+          "publisherWheelMemberBytes": 868424,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rtree/lib/libspatialindex_c.dylib",
+          "bytes": 261104,
+          "sha256": "a4c2282d8ba7f63562b0631370f4e6fbd2b078e3841b5081d77b535b11af7676",
+          "wheelRecordSha256": "a4c2282d8ba7f63562b0631370f4e6fbd2b078e3841b5081d77b535b11af7676",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "a4c2282d8ba7f63562b0631370f4e6fbd2b078e3841b5081d77b535b11af7676",
+          "publisherWheelMemberBytes": 261104,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/rtree-1.4.1.dist-info/licenses/LICENSE.txt",
+          "bytes": 1115,
+          "sha256": "2e3e6e756da9258484bdd0e81dcd57c9094a58ca23c37c79b14cc23eeb6b7b21",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "rtree-1.4.1-py3-none-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/f3/cf/2710b6fd6b07ea0aef317b29f335790ba6adf06a28ac236078ed9bd8a91d/rtree-1.4.1-py3-none-macosx_11_0_arm64.whl",
+        "bytes": 436325,
+        "sha256": "a7e48d805e12011c2cf739a29d6a60ae852fb1de9fc84220bbcef67e6e595d7d",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 2,
+      "unchangedNativeCount": 2,
+      "sourceInputIds": [
+        "libspatialindex",
+        "rtree-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "tibs",
+      "version": "0.5.7",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/tibs-0.5.7.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/tibs-0.5.7.dist-info/WHEEL",
+      "wheelTags": [
+        "cp38-abi3-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "maturin (1.12.6)"
+      ],
+      "recordSha256": "336fd02e2ab0c9c0b228f8f6738319de4a7d830ca633d64c199866937f3a9cae",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/tibs/tibs.abi3.so",
+          "bytes": 873904,
+          "sha256": "5f3d7dbaed71d593a0d7584232eb6a22cbd9aaa83f7b0fb5618493cd2c6edc41",
+          "wheelRecordSha256": "2757bb9ed595620197f3627f6da9096a194e99ba9383c016bda1274ad4d87e50",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "2757bb9ed595620197f3627f6da9096a194e99ba9383c016bda1274ad4d87e50",
+          "publisherWheelMemberBytes": 860800,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 33,
+          "shippedSanitizedHomeOccurrences": 33,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/tibs-0.5.7.dist-info/licenses/LICENSE",
+          "bytes": 1072,
+          "sha256": "dc02ef74abe96c4cfe06044c2263dbf98dad3505b972483ef447677b7ba2f68e",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "tibs-0.5.7-cp38-abi3-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/74/71/4c21ccc5c2e1672f9cd91ed2c46604c250cffd9d386113772dded128b5cf/tibs-0.5.7-cp38-abi3-macosx_11_0_arm64.whl",
+        "bytes": 383971,
+        "sha256": "a883ca13a922a66b2c1326a9c188123a574741a72510a4bf52fd6f97db191e44",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "tibs-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "tiktoken",
+      "version": "0.14.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/tiktoken-0.14.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/tiktoken-0.14.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp312-cp312-macosx_11_0_arm64"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.0.0)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "163f4ddc509f76d6658511654b83cc63994f47fce8b092b1ab8ea68ec6abe4cb",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/tiktoken/_tiktoken.cpython-312-darwin.so",
+          "bytes": 2918608,
+          "sha256": "fdb7f9529c106ef557451c7f9c579920b74842dfdf29d3e588eb8f5e97b182ff",
+          "wheelRecordSha256": "53533787cd22e02c0469e1423b54286334131b1549891636bbc6b545113cedb5",
+          "wheelRecordMatchesActualXPI": false,
+          "publisherWheelMemberSha256": "53533787cd22e02c0469e1423b54286334131b1549891636bbc6b545113cedb5",
+          "publisherWheelMemberBytes": 2917472,
+          "publisherWheelMatchesInstalledRecord": true,
+          "originalRunnerHomeOccurrences": 141,
+          "shippedSanitizedHomeOccurrences": 141,
+          "stageTransformationStatus": "changed_after_wheel_record; native hash retained; exact signature/compiler reconstruction not asserted"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/tiktoken-0.14.0.dist-info/licenses/LICENSE",
+          "bytes": 1078,
+          "sha256": "418cb499b436128d653d79941333a5437b7be2ea9213dcc2f04d15d5d2c51d86",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "tiktoken-0.14.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "url": "https://files.pythonhosted.org/packages/69/9f/fe6b1aca23331aa5271df5a4bd07bf68a7059254d47faee1b8272592a777/tiktoken-0.14.0-cp312-cp312-macosx_11_0_arm64.whl",
+        "bytes": 1038499,
+        "sha256": "d6cebe67765569df3dafac8474e4eccf5c19d24140492567a5e58a11445732a4",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 1,
+      "unchangedNativeCount": 0,
+      "sourceInputIds": [
+        "tiktoken-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    },
+    {
+      "name": "uharfbuzz",
+      "version": "0.57.0",
+      "metadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/uharfbuzz-0.57.0.dist-info/METADATA",
+      "wheelMetadataPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/uharfbuzz-0.57.0.dist-info/WHEEL",
+      "wheelTags": [
+        "cp311-abi3-macosx_10_9_universal2"
+      ],
+      "wheelGenerator": [
+        "setuptools (84.2.1)",
+        "delocate 0.13.0"
+      ],
+      "recordSha256": "a98ed313364ff6659faf840c6a6462db9c3a9d14438d2ab52626cccced3ead85",
+      "nativeFiles": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/uharfbuzz/_harfbuzz.abi3.so",
+          "bytes": 9237440,
+          "sha256": "bb5f9abe6f722ff11df22fe9d462fff53dd08c017358ed547c8ea0413f2b7737",
+          "wheelRecordSha256": "bb5f9abe6f722ff11df22fe9d462fff53dd08c017358ed547c8ea0413f2b7737",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "bb5f9abe6f722ff11df22fe9d462fff53dd08c017358ed547c8ea0413f2b7737",
+          "publisherWheelMemberBytes": 9237440,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        },
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/uharfbuzz/_harfbuzz_test.abi3.so",
+          "bytes": 87208,
+          "sha256": "d65f9e38e1504ef349bd2f0c6f316ea6abfab17792afd4b92fd9dab2c6dd808d",
+          "wheelRecordSha256": "d65f9e38e1504ef349bd2f0c6f316ea6abfab17792afd4b92fd9dab2c6dd808d",
+          "wheelRecordMatchesActualXPI": true,
+          "publisherWheelMemberSha256": "d65f9e38e1504ef349bd2f0c6f316ea6abfab17792afd4b92fd9dab2c6dd808d",
+          "publisherWheelMemberBytes": 87208,
+          "publisherWheelMatchesInstalledRecord": true,
+          "stageTransformationStatus": "unchanged_publisher_bytes"
+        }
+      ],
+      "notices": [
+        {
+          "path": "runtime/macos-arm64/python/lib/python3.12/site-packages/uharfbuzz-0.57.0.dist-info/licenses/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "publisherWheelMatchesActualXPI": true
+        }
+      ],
+      "publisherWheel": {
+        "filename": "uharfbuzz-0.57.0-cp311-abi3-macosx_10_9_universal2.whl",
+        "url": "https://files.pythonhosted.org/packages/72/8e/334849c356e47c939e835c45f163e1ce51477f77a28efc872ee0b41353fb/uharfbuzz-0.57.0-cp311-abi3-macosx_10_9_universal2.whl",
+        "bytes": 3610563,
+        "sha256": "e3901acbed68995516ba272bb3ff3777adb07d832b328941da7915dd6cd145fd",
+        "hashStatus": "locally_recomputed_and_publisher_matched"
+      },
+      "wheelMetadataMatches": {
+        "METADATA": true,
+        "WHEEL": true
+      },
+      "nativeRecordMatchedCount": 2,
+      "unchangedNativeCount": 2,
+      "sourceInputIds": [
+        "uharfbuzz-native-source"
+      ],
+      "sourceInputScope": "Exact publisher version source inputs; Cargo.lock optional/test/build/other-target supersets are not compiled-linkage assertions."
+    }
+  ],
+  "rustSourceLocks": [
+    {
+      "sourceId": "cryptography-native-source",
+      "archiveMember": "cryptography-50.0.2/Cargo.lock",
+      "bytes": 8528,
+      "sha256": "98778208027ce05bfff0db88c290f28355eb20e685f0c728775359fb91a1a4c4",
+      "registrySourceIds": [
+        "rust-crate-asn1-0.24.1",
+        "rust-crate-asn1_derive-0.24.1",
+        "rust-crate-base64-0.23.0",
+        "rust-crate-bitflags-2.13.1",
+        "rust-crate-cc-1.4.0",
+        "rust-crate-cfg-if-1.0.4",
+        "rust-crate-find-msvc-tools-0.1.9",
+        "rust-crate-foreign-types-0.3.2",
+        "rust-crate-foreign-types-shared-0.1.1",
+        "rust-crate-heck-0.5.0",
+        "rust-crate-itoa-1.0.18",
+        "rust-crate-libc-0.2.189",
+        "rust-crate-once_cell-1.21.4",
+        "rust-crate-openssl-0.10.81",
+        "rust-crate-openssl-macros-0.1.1",
+        "rust-crate-openssl-sys-0.9.117",
+        "rust-crate-pem-4.0.0",
+        "rust-crate-pkg-config-0.3.33",
+        "rust-crate-portable-atomic-1.14.0",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-pyo3-0.29.2",
+        "rust-crate-pyo3-build-config-0.29.2",
+        "rust-crate-pyo3-ffi-0.29.2",
+        "rust-crate-pyo3-macros-0.29.2",
+        "rust-crate-pyo3-macros-backend-0.29.2",
+        "rust-crate-quote-1.0.47",
+        "rust-crate-self_cell-1.3.0",
+        "rust-crate-shlex-2.0.1",
+        "rust-crate-syn-2.0.119",
+        "rust-crate-target-lexicon-0.13.5",
+        "rust-crate-unicode-ident-1.0.24",
+        "rust-crate-vcpkg-0.2.15"
+      ],
+      "scope": "Complete source/build/test/optional/other-target lockfile superset, not actual compiled linkage."
+    },
+    {
+      "sourceId": "jiter-native-source",
+      "archiveMember": "jiter-0.18.0/Cargo.lock",
+      "bytes": 30453,
+      "sha256": "e8cc297870cc839942cbdb7f4ab01983287a92a7f9a380686e0d71ffa7718525",
+      "registrySourceIds": [
+        "rust-crate-ahash-0.8.12",
+        "rust-crate-aho-corasick-1.1.5",
+        "rust-crate-anes-0.1.6",
+        "rust-crate-anstyle-1.0.14",
+        "rust-crate-anyhow-1.0.104",
+        "rust-crate-approx-0.5.1",
+        "rust-crate-autocfg-1.5.1",
+        "rust-crate-bit-set-0.8.0",
+        "rust-crate-bit-vec-0.8.0",
+        "rust-crate-bitflags-2.13.1",
+        "rust-crate-bitvec-1.1.1",
+        "rust-crate-bumpalo-3.20.3",
+        "rust-crate-cast-0.3.0",
+        "rust-crate-cc-1.4.4",
+        "rust-crate-cfg-if-1.0.4",
+        "rust-crate-cfg_aliases-0.2.2",
+        "rust-crate-ciborium-0.2.2",
+        "rust-crate-ciborium-io-0.2.2",
+        "rust-crate-ciborium-ll-0.2.2",
+        "rust-crate-clap-4.6.6",
+        "rust-crate-clap_builder-4.6.6",
+        "rust-crate-clap_lex-1.1.0",
+        "rust-crate-codspeed-5.0.1",
+        "rust-crate-codspeed-criterion-compat-5.0.1",
+        "rust-crate-codspeed-criterion-compat-walltime-5.0.1",
+        "rust-crate-colored-3.1.1",
+        "rust-crate-criterion-plot-0.5.0",
+        "rust-crate-crossbeam-deque-0.8.7",
+        "rust-crate-crossbeam-epoch-0.9.20",
+        "rust-crate-crossbeam-utils-0.8.22",
+        "rust-crate-crunchy-0.2.4",
+        "rust-crate-either-1.17.0",
+        "rust-crate-equivalent-1.0.2",
+        "rust-crate-errno-0.3.14",
+        "rust-crate-fastrand-2.5.0",
+        "rust-crate-find-msvc-tools-0.1.11",
+        "rust-crate-fnv-1.0.7",
+        "rust-crate-foldhash-0.2.0",
+        "rust-crate-funty-2.0.0",
+        "rust-crate-futures-core-0.3.34",
+        "rust-crate-futures-task-0.3.34",
+        "rust-crate-futures-util-0.3.34",
+        "rust-crate-getrandom-0.3.4",
+        "rust-crate-getrandom-0.4.3",
+        "rust-crate-glob-0.3.4",
+        "rust-crate-half-2.7.1",
+        "rust-crate-hashbrown-0.17.1",
+        "rust-crate-heck-0.5.0",
+        "rust-crate-hermit-abi-0.5.2",
+        "rust-crate-indexmap-2.14.0",
+        "rust-crate-is-terminal-0.4.17",
+        "rust-crate-itertools-0.10.5",
+        "rust-crate-itoa-1.0.18",
+        "rust-crate-js-sys-0.3.104",
+        "rust-crate-lexical-parse-float-1.0.6",
+        "rust-crate-lexical-parse-integer-1.0.6",
+        "rust-crate-lexical-util-1.0.7",
+        "rust-crate-libc-0.2.189",
+        "rust-crate-linux-raw-sys-0.12.1",
+        "rust-crate-memchr-2.8.3",
+        "rust-crate-nix-0.31.3",
+        "rust-crate-num-bigint-0.4.8",
+        "rust-crate-num-integer-0.1.47",
+        "rust-crate-num-traits-0.2.19",
+        "rust-crate-once_cell-1.21.4",
+        "rust-crate-oorandom-11.1.5",
+        "rust-crate-paste-1.0.15",
+        "rust-crate-pin-project-lite-0.2.17",
+        "rust-crate-plotters-0.3.7",
+        "rust-crate-plotters-backend-0.3.7",
+        "rust-crate-plotters-svg-0.3.7",
+        "rust-crate-portable-atomic-1.15.0",
+        "rust-crate-ppv-lite86-0.2.21",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-proptest-1.11.0",
+        "rust-crate-pyo3-0.30.1",
+        "rust-crate-pyo3-build-config-0.30.1",
+        "rust-crate-pyo3-ffi-0.30.1",
+        "rust-crate-pyo3-macros-0.30.1",
+        "rust-crate-pyo3-macros-backend-0.30.1",
+        "rust-crate-quick-error-1.2.3",
+        "rust-crate-quote-1.0.47",
+        "rust-crate-r-efi-5.3.0",
+        "rust-crate-r-efi-6.0.0",
+        "rust-crate-radium-0.7.0",
+        "rust-crate-rand-0.9.5",
+        "rust-crate-rand_chacha-0.9.0",
+        "rust-crate-rand_core-0.9.5",
+        "rust-crate-rand_xorshift-0.4.0",
+        "rust-crate-rayon-1.12.0",
+        "rust-crate-rayon-core-1.13.0",
+        "rust-crate-regex-1.13.1",
+        "rust-crate-regex-automata-0.4.18",
+        "rust-crate-regex-syntax-0.8.11",
+        "rust-crate-rustix-1.1.4",
+        "rust-crate-rustversion-1.0.23",
+        "rust-crate-rusty-fork-0.3.1",
+        "rust-crate-same-file-1.0.6",
+        "rust-crate-serde-1.0.229",
+        "rust-crate-serde_core-1.0.229",
+        "rust-crate-serde_derive-1.0.229",
+        "rust-crate-serde_json-1.0.154",
+        "rust-crate-shlex-2.0.1",
+        "rust-crate-slab-0.4.12",
+        "rust-crate-smallvec-1.15.2",
+        "rust-crate-statrs-0.18.0",
+        "rust-crate-syn-2.0.119",
+        "rust-crate-syn-3.0.3",
+        "rust-crate-tap-1.0.1",
+        "rust-crate-target-lexicon-0.13.5",
+        "rust-crate-tempfile-3.27.0",
+        "rust-crate-tinytemplate-1.2.1",
+        "rust-crate-unarray-0.1.4",
+        "rust-crate-unicode-ident-1.0.24",
+        "rust-crate-version_check-0.9.5",
+        "rust-crate-wait-timeout-0.2.1",
+        "rust-crate-walkdir-2.5.0",
+        "rust-crate-wasip2-1.0.4+wasi-0.2.12",
+        "rust-crate-wasm-bindgen-0.2.127",
+        "rust-crate-wasm-bindgen-macro-0.2.127",
+        "rust-crate-wasm-bindgen-macro-support-0.2.127",
+        "rust-crate-wasm-bindgen-shared-0.2.127",
+        "rust-crate-web-sys-0.3.104",
+        "rust-crate-winapi-util-0.1.11",
+        "rust-crate-windows-link-0.2.1",
+        "rust-crate-windows-sys-0.61.2",
+        "rust-crate-wit-bindgen-0.57.1",
+        "rust-crate-wyz-0.5.1",
+        "rust-crate-zerocopy-0.8.56",
+        "rust-crate-zerocopy-derive-0.8.56",
+        "rust-crate-zmij-1.0.23"
+      ],
+      "scope": "Complete source/build/test/optional/other-target lockfile superset, not actual compiled linkage."
+    },
+    {
+      "sourceId": "orjson-native-source",
+      "archiveMember": "orjson-3.13.0/Cargo.lock",
+      "bytes": 4979,
+      "sha256": "390b4f0b2c4cc36f64bb1dddc8ed1dde1fa4a1819c1dbda385d4db9f1e3d7b36",
+      "registrySourceIds": [
+        "rust-crate-associative-cache-3.0.1",
+        "rust-crate-bytecount-0.6.9",
+        "rust-crate-cc-1.6.0",
+        "rust-crate-find-msvc-tools-0.1.14",
+        "rust-crate-gimli-0.34.0",
+        "rust-crate-itoap-1.0.1",
+        "rust-crate-jiff-core-0.1.1",
+        "rust-crate-libc-0.2.190",
+        "rust-crate-no-panic-0.1.37",
+        "rust-crate-once_cell-1.21.4",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-pyo3-build-config-0.29.3",
+        "rust-crate-pyo3-ffi-0.29.3",
+        "rust-crate-quote-1.0.47",
+        "rust-crate-shlex-2.0.1",
+        "rust-crate-simdutf8-0.1.5",
+        "rust-crate-syn-3.0.6",
+        "rust-crate-target-lexicon-0.13.5",
+        "rust-crate-unicode-ident-1.0.26",
+        "rust-crate-unwinding-0.2.10",
+        "rust-crate-xxhash-rust-0.8.19",
+        "rust-crate-zmij-1.0.23"
+      ],
+      "scope": "Complete source/build/test/optional/other-target lockfile superset, not actual compiled linkage."
+    },
+    {
+      "sourceId": "pydantic-core-native-source",
+      "archiveMember": "pydantic_core-2.50.1/Cargo.lock",
+      "bytes": 23985,
+      "sha256": "ac24753c2ed315f8dc22d6470fa868970e3705a0888d879704e872d53f21452d",
+      "registrySourceIds": [
+        "rust-crate-ahash-0.8.12",
+        "rust-crate-aho-corasick-1.1.3",
+        "rust-crate-autocfg-1.3.0",
+        "rust-crate-base64-0.23.1",
+        "rust-crate-bitflags-2.9.1",
+        "rust-crate-bitvec-1.0.1",
+        "rust-crate-bumpalo-3.19.0",
+        "rust-crate-cfg-if-1.0.0",
+        "rust-crate-displaydoc-0.2.5",
+        "rust-crate-enum_dispatch-0.3.13",
+        "rust-crate-foldhash-0.2.0",
+        "rust-crate-form_urlencoded-1.2.2",
+        "rust-crate-funty-2.0.0",
+        "rust-crate-getrandom-0.3.3",
+        "rust-crate-hashbrown-0.17.1",
+        "rust-crate-heck-0.5.0",
+        "rust-crate-hex-0.4.3",
+        "rust-crate-icu_collections-1.5.0",
+        "rust-crate-icu_locid-1.5.0",
+        "rust-crate-icu_locid_transform-1.5.0",
+        "rust-crate-icu_locid_transform_data-1.5.0",
+        "rust-crate-icu_normalizer-1.5.0",
+        "rust-crate-icu_normalizer_data-1.5.0",
+        "rust-crate-icu_properties-1.5.1",
+        "rust-crate-icu_properties_data-1.5.0",
+        "rust-crate-icu_provider-1.5.0",
+        "rust-crate-icu_provider_macros-1.5.0",
+        "rust-crate-idna-1.1.0",
+        "rust-crate-idna_adapter-1.2.0",
+        "rust-crate-itoa-1.0.11",
+        "rust-crate-jiter-0.16.0",
+        "rust-crate-js-sys-0.3.77",
+        "rust-crate-lexical-parse-float-1.0.5",
+        "rust-crate-lexical-parse-integer-1.0.5",
+        "rust-crate-lexical-util-1.0.6",
+        "rust-crate-libc-0.2.185",
+        "rust-crate-litemap-0.7.3",
+        "rust-crate-log-0.4.27",
+        "rust-crate-lru-0.18.5",
+        "rust-crate-memchr-2.7.4",
+        "rust-crate-num-bigint-0.4.6",
+        "rust-crate-num-integer-0.1.46",
+        "rust-crate-num-traits-0.2.19",
+        "rust-crate-once_cell-1.21.3",
+        "rust-crate-percent-encoding-2.3.2",
+        "rust-crate-portable-atomic-1.6.0",
+        "rust-crate-proc-macro2-1.0.107",
+        "rust-crate-pyo3-0.29.2",
+        "rust-crate-pyo3-build-config-0.29.2",
+        "rust-crate-pyo3-ffi-0.29.2",
+        "rust-crate-pyo3-macros-0.29.2",
+        "rust-crate-pyo3-macros-backend-0.29.2",
+        "rust-crate-quote-1.0.44",
+        "rust-crate-r-efi-5.2.0",
+        "rust-crate-radium-0.7.0",
+        "rust-crate-regex-1.13.1",
+        "rust-crate-regex-automata-0.4.18",
+        "rust-crate-regex-syntax-0.8.11",
+        "rust-crate-serde-1.0.229",
+        "rust-crate-serde_core-1.0.229",
+        "rust-crate-serde_derive-1.0.229",
+        "rust-crate-serde_json-1.0.151",
+        "rust-crate-smallvec-1.16.2",
+        "rust-crate-speedate-0.17.0",
+        "rust-crate-stable_deref_trait-1.2.0",
+        "rust-crate-static_assertions-1.1.0",
+        "rust-crate-strum-0.27.2",
+        "rust-crate-strum_macros-0.27.2",
+        "rust-crate-syn-2.0.82",
+        "rust-crate-syn-3.0.6",
+        "rust-crate-synstructure-0.13.1",
+        "rust-crate-tap-1.0.1",
+        "rust-crate-target-lexicon-0.13.4",
+        "rust-crate-tinystr-0.7.6",
+        "rust-crate-unicode-ident-1.0.12",
+        "rust-crate-url-2.5.8",
+        "rust-crate-utf16_iter-1.0.5",
+        "rust-crate-utf8_iter-1.0.4",
+        "rust-crate-uuid-1.23.4",
+        "rust-crate-version_check-0.9.5",
+        "rust-crate-wasi-0.14.2+wasi-0.2.4",
+        "rust-crate-wasm-bindgen-0.2.100",
+        "rust-crate-wasm-bindgen-backend-0.2.100",
+        "rust-crate-wasm-bindgen-macro-0.2.100",
+        "rust-crate-wasm-bindgen-macro-support-0.2.100",
+        "rust-crate-wasm-bindgen-shared-0.2.100",
+        "rust-crate-wit-bindgen-rt-0.39.0",
+        "rust-crate-write16-1.0.0",
+        "rust-crate-writeable-0.5.5",
+        "rust-crate-wyz-0.5.1",
+        "rust-crate-yoke-0.7.4",
+        "rust-crate-yoke-derive-0.7.4",
+        "rust-crate-zerocopy-0.8.25",
+        "rust-crate-zerocopy-derive-0.8.25",
+        "rust-crate-zerofrom-0.1.4",
+        "rust-crate-zerofrom-derive-0.1.4",
+        "rust-crate-zerovec-0.10.4",
+        "rust-crate-zerovec-derive-0.10.3",
+        "rust-crate-zmij-1.0.6"
+      ],
+      "scope": "Complete source/build/test/optional/other-target lockfile superset, not actual compiled linkage."
+    }
+  ],
+  "limitations": [
+    "All original native RECORD digests and METADATA/WHEEL match official publisher wheels. Some staged Mach-O files changed during sanitization/signing; bit-identical source rebuilds are not claimed.",
+    "The 243 exact registry input archives come from four matching source Cargo.lock files, including optional/test/build/other-target inputs; their presence does not prove Mac linkage.",
+    "Tiktoken 0.14.0 has no publisher Cargo.lock; its existing declared candidates do not confirm compiled transitive versions.",
+    "numpy/onnxruntime wheel tags require macosx_14_0_arm64 and orjson macosx_15_0_arm64. OpenCV deployment target 13.0 is not the minimum of the whole runtime."
+  ]
+}

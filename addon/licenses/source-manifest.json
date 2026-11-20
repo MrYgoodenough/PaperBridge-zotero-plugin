@@ -1,6 +1,7 @@
 {
+  "_comment": "Pinned source/build/notice inputs for existing Linux/Windows and actual macOS native candidate bytes; no publication or legal clearance.",
   "schemaVersion": 1,
-  "scope": "BabelDOC 0.6.4 / PyMuPDF 1.26.7 Linux/Windows source-delivery candidate. Complete pinned archives and exact shipped sources are supplied separately from binaries; licenseCompliance remains unknown.",
+  "scope": "BabelDOC 0.6.4 / PyMuPDF 1.26.7 Linux/Windows and macOS arm64 source-delivery candidate. Actual Mac native/source/notice evidence is recorded; final rebuilt XPI/source-ZIP delivery remains pending and licenseCompliance remains unknown.",
   "copyleftPackages": [
     "babeldoc",
     "pymupdf",
@@ -120,6 +121,115 @@
         "linux-x64"
       ],
       "bundledCopyPath": "addon/licenses/supplemental/build-inputs/linux-opencv/opencv-build.json"
+    },
+    {
+      "_comment": "Original upstream full-build metadata, not observed candidate interpreter identity.",
+      "path": "addon/licenses/supplemental/macos/python-build-standalone/PYTHON.json",
+      "sha256": "dfc38df39b46bc1337abc4b3ff160e5ef4ca16f13dedb4c412a770ecb3fb8a36",
+      "bytes": 118275,
+      "platforms": [
+        "macos-arm64"
+      ]
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-stage.json",
+      "bytes": 12510,
+      "sha256": "ee14497925853d0773edbeef996802a701c44cb23c970d5cba4a9e4b0441aa37",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-stage.json"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/CMakeCache.txt",
+      "bytes": 160290,
+      "sha256": "38cfdf8d3d79a7701def5fced77a5b93c5a8e9a63098142070a2a00ae0815bef",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/CMakeCache.txt"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/cpython-0-pyconfig.h",
+      "bytes": 56108,
+      "sha256": "19f9e6177c78b4415d47f6cbad309cdb0c6f3a933fcb7fab9be6bc11cca1873a",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-0-pyconfig.h"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/cpython-1-Makefile",
+      "bytes": 182160,
+      "sha256": "90c7608547e2bcd1326c20135ab96482810c80bb583ad021d4f3eb5d005e6d27",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-1-Makefile"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/cpython-build.json",
+      "bytes": 3153,
+      "sha256": "b0456752c34b2d043ef4fcfaede90c35ca2e874b0b40c10e52a21ab6406aeeff",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-build.json"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/opencv-build-information.txt",
+      "bytes": 5823,
+      "sha256": "b53d53829194169e49686322c6b5e527d86f5a0e671cf2379e7c87fa02ddaa7a",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-build-information.txt"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/opencv-build.json",
+      "bytes": 931,
+      "sha256": "888289309853b3a6734a92ce3fe46cb27e8b20445304c8cf615ca1fd3443c344",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-build.json"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/opencv-config-3.12.py",
+      "bytes": 188,
+      "sha256": "41adbf7284b0ea2954c93d681ad84f931b2759e72f6bb56459cb163633cbe284",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-config-3.12.py"
+    },
+    {
+      "_comment": "Original actual Mac native CI evidence; retain unchanged beside candidate metadata.",
+      "path": "agent/codex/release-prep-20261120-234418/artifacts/native-macos03/candidate-native/opencv-config.py",
+      "bytes": 169,
+      "sha256": "b41ca86d89cac01c3c27e6872e3f709a3c914ea128997a64c715d8a15ef8c3fb",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-config.py"
+    },
+    {
+      "_comment": "Original publisher recipe absent from the rtree sdist.",
+      "path": "agent/codex/release-prep-20261120-234418/source-cache-macos/publisher-recipes/rtree-install_libspatialindex.sh",
+      "bytes": 1645,
+      "sha256": "402fd3e7db6f2cc47dc280d1855d7adec0adaafd433295a4d3685a5605f6366a",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "bundledCopyPath": "addon/licenses/supplemental/macos/build-inputs/rtree-install_libspatialindex.sh"
     }
   ],
   "archives": [
@@ -132,7 +242,8 @@
       "bytes": 16415074,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "babeldoc-0.6.4/LICENSE": "afca41723b45e26069f68d485bf906a202f892f90c801d3052f8e6296bb41454",
@@ -184,7 +295,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -196,7 +308,8 @@
       "sha256": "b5796915dc45ff745cfb4e990a7e7c93d6f546328a102ce31448d69ebc37575c",
       "bytes": 20839652,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "Python-3.12.16/LICENSE": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
@@ -248,7 +361,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -261,7 +375,8 @@
       "bytes": 55235667,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependency": {
         "name": "cryptography",
@@ -284,7 +399,8 @@
       "bytes": 19002808,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependency": {
         "name": "freetype-py",
@@ -307,7 +423,8 @@
       "bytes": 2501764,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependency": {
         "name": "freetype-py",
@@ -339,7 +456,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -361,7 +479,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -374,7 +493,8 @@
       "bytes": 1578809,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependency": {
         "name": "hyperscan",
@@ -428,7 +548,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -441,7 +562,8 @@
       "bytes": 402914,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "levenshtein-0.27.5/LICENSE": "00c45b5cb10b85516da33dacfdaa27e74ef5626268385ca3e78da1825b2b750b",
@@ -466,7 +588,8 @@
       "bytes": 670671,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependency": {
         "name": "rtree",
@@ -498,7 +621,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -511,7 +635,8 @@
       "bytes": 64536473,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "mupdf-1.26.12-source/COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
@@ -542,7 +667,8 @@
       "sha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
       "bytes": 95254890,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "opencv-4.12.0/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
@@ -598,7 +724,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -611,17 +738,19 @@
       "bytes": 810029,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "bzip2-1.0.8/LICENSE": "c6dbbf828498be844a89eaa3b84adbab3199e342eb5cb2ed2f0d4ba7ec0f38a3",
         "bzip2-1.0.8/blocksort.c": "4e48cd2ccff44699e67a7c949b0e9576c05b8dcbe20f863475c4fcc8db11a409"
       },
       "bundledPythonOnly": true,
-      "role": "Source pinned by both identified standalone recipes; platform interpreter versions remain constrained.",
+      "role": "Source pinned by the identified Linux, Windows and macOS standalone recipes; platform interpreter versions remain constrained.",
       "pythonVersions": {
         "linux-x64": "3.12.16",
-        "windows-x64": "3.12.13"
+        "windows-x64": "3.12.13",
+        "macos-arm64": "3.12.16"
       }
     },
     {
@@ -632,7 +761,8 @@
       "sha256": "1e6371862cc31999b368c3b89b49994f0677e1bab5f1b2b85ae3741f5d803051",
       "bytes": 534052,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "expat-2.9.0/COPYING": "31b15de82aa19a845156169a17a5488bf597e561b2c318d159ed583139b25e87",
@@ -641,7 +771,7 @@
       },
       "python": "3.12.16",
       "bundledPythonOnly": true,
-      "role": "Full native-library/build-header source pinned by the Linux standalone recipe. System/compiler runtime closure remains unverified."
+      "role": "Full native-library/build-header source pinned by the Linux/macOS 3.12.16 standalone recipe. System/compiler runtime closure remains unverified."
     },
     {
       "id": "pbs-linux-libX11",
@@ -708,7 +838,8 @@
       "sha256": "7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4",
       "bytes": 1581626,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "libffi-3.8.0/LICENSE": "17b64dc60f3b6897a60f971e288b973f655c2edcdf08b25f3c3dd5549857881c",
@@ -717,7 +848,7 @@
       },
       "python": "3.12.16",
       "bundledPythonOnly": true,
-      "role": "Full native-library/build-header source pinned by the Linux standalone recipe. System/compiler runtime closure remains unverified."
+      "role": "Full native-library/build-header source pinned by the Linux/macOS 3.12.16 standalone recipe. System/compiler runtime closure remains unverified."
     },
     {
       "id": "pbs-linux-libpthread-stubs",
@@ -765,17 +896,19 @@
       "bytes": 315325,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "mpdecimal-4.0.0/Makefile.in": "1e8a2b57d7fff70bd0809b8e323be9cd9aee42e5f3018682fd78c4b3e6b749fb",
         "mpdecimal-4.0.0/libmpdec++/bench.cc": "a431ed2cf5e7626ad9a3b810408451f0813c5d97b954d4ae04f6a9ecf51707c5"
       },
       "bundledPythonOnly": true,
-      "role": "Source pinned by both identified standalone recipes; platform interpreter versions remain constrained.",
+      "role": "Source pinned by the identified Linux, Windows and macOS standalone recipes; platform interpreter versions remain constrained.",
       "pythonVersions": {
         "linux-x64": "3.12.16",
-        "windows-x64": "3.12.13"
+        "windows-x64": "3.12.13",
+        "macos-arm64": "3.12.16"
       }
     },
     {
@@ -805,7 +938,8 @@
       "sha256": "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a",
       "bytes": 53279637,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "openssl-3.5.9/LICENSE.txt": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
@@ -813,7 +947,7 @@
       },
       "python": "3.12.16",
       "bundledPythonOnly": true,
-      "role": "Full native-library/build-header source pinned by the Linux standalone recipe. System/compiler runtime closure remains unverified."
+      "role": "Full native-library/build-header source pinned by the Linux/macOS 3.12.16 standalone recipe. System/compiler runtime closure remains unverified."
     },
     {
       "id": "pbs-linux-sqlite",
@@ -824,7 +958,8 @@
       "bytes": 3275272,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "sqlite-autoconf-3530100/autosetup/LICENSE": "679b9208e67df09977456d1d2ae4d885b9badf02c47b45a28cf95ee27c14cb18",
@@ -832,10 +967,11 @@
         "sqlite-autoconf-3530100/autosetup/jimsh0.c": "20f8554be6bd4ba142870f1a4ade1e96115cf5a07704e3522c08b25f9f405ae0"
       },
       "bundledPythonOnly": true,
-      "role": "Source pinned by both identified standalone recipes; platform interpreter versions remain constrained.",
+      "role": "Source pinned by the identified Linux, Windows and macOS standalone recipes; platform interpreter versions remain constrained.",
       "pythonVersions": {
         "linux-x64": "3.12.16",
-        "windows-x64": "3.12.13"
+        "windows-x64": "3.12.13",
+        "macos-arm64": "3.12.16"
       }
     },
     {
@@ -846,7 +982,8 @@
       "sha256": "d0aed49230bc02a65c1e0229e65f34590a4b037ec40d546f32573b467f7551ea",
       "bytes": 11866337,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "tcl9.0.4/compat/zlib/LICENSE": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2",
@@ -855,7 +992,7 @@
       },
       "python": "3.12.16",
       "bundledPythonOnly": true,
-      "role": "Full native-library/build-header source pinned by the Linux standalone recipe. System/compiler runtime closure remains unverified."
+      "role": "Full native-library/build-header source pinned by the Linux/macOS 3.12.16 standalone recipe. System/compiler runtime closure remains unverified."
     },
     {
       "id": "pbs-linux-tk",
@@ -865,7 +1002,8 @@
       "sha256": "d7a146d2917eb8b5cc95276dbf0e3d03c7464d2b19c1675357857c989301dbb4",
       "bytes": 4613019,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "tk9.0.4/macosx/configure": "e9820e991f211677a4ebacfcb57a0fc63c2e3103dab2fbb7e065f7d167aeb696",
@@ -873,7 +1011,7 @@
       },
       "python": "3.12.16",
       "bundledPythonOnly": true,
-      "role": "Full native-library/build-header source pinned by the Linux standalone recipe. System/compiler runtime closure remains unverified."
+      "role": "Full native-library/build-header source pinned by the Linux/macOS 3.12.16 standalone recipe. System/compiler runtime closure remains unverified."
     },
     {
       "id": "pbs-linux-uuid",
@@ -883,7 +1021,8 @@
       "sha256": "46af3275291091009ad7f1b899de3d0cea0252737550e7919d17237997db5644",
       "bytes": 318256,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "libuuid-1.0.3/COPYING": "18a4a3931b5b703202793f7ec14b07639dd6b502162049f66250aa6445032ae3",
@@ -892,7 +1031,7 @@
       },
       "python": "3.12.16",
       "bundledPythonOnly": true,
-      "role": "Full native-library/build-header source pinned by the Linux standalone recipe. System/compiler runtime closure remains unverified."
+      "role": "Full native-library/build-header source pinned by the Linux/macOS 3.12.16 standalone recipe. System/compiler runtime closure remains unverified."
     },
     {
       "id": "pbs-linux-xcb-proto",
@@ -957,7 +1096,8 @@
       "sha256": "0014c7886930454fe8bd4228665b51af55eeae560ea135c9c4cd33f55b2591d9",
       "bytes": 2799797,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "xz-5.8.4/COPYING": "616a3ad264ce29b8f1cb97e53037b139d406899ca8d1f799651e17bfa09830b8",
@@ -966,7 +1106,7 @@
       },
       "python": "3.12.16",
       "bundledPythonOnly": true,
-      "role": "Full native-library/build-header source pinned by the Linux standalone recipe. System/compiler runtime closure remains unverified."
+      "role": "Full native-library/build-header source pinned by the Linux/macOS 3.12.16 standalone recipe. System/compiler runtime closure remains unverified."
     },
     {
       "id": "pbs-linux-zlib",
@@ -1122,7 +1262,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -1144,7 +1285,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -1157,7 +1299,8 @@
       "bytes": 84327033,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "pymupdf-1.26.7/COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
@@ -1180,7 +1323,8 @@
       "bytes": 70453,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "pymupdf4llm-0.2.9/LICENSE": "6f1e622c82a380075843bb084a7ec3b1f1d12a4a02526d75e78b0924a860aa75",
@@ -1201,7 +1345,8 @@
       "sha256": "2d393784593531f14f1aad1e4e60c91fde242cfa87432c35ed31f4c18b3e89ff",
       "bytes": 465507,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "requiredMembers": {
         "python-build-standalone-fa506e0858ac9f2cc5b289c137b888a2aa24d1ee/LICENSE": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
@@ -1251,7 +1396,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -1264,7 +1410,8 @@
       "bytes": 43413,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1291,7 +1438,8 @@
       "bytes": 183311,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1314,7 +1462,8 @@
       "bytes": 184315,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1337,7 +1486,8 @@
       "bytes": 23857,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1359,7 +1509,8 @@
       "bytes": 17787,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1382,7 +1533,8 @@
       "bytes": 48819,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1405,7 +1557,8 @@
       "bytes": 15100,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1428,7 +1581,8 @@
       "bytes": 50502,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1451,7 +1605,8 @@
       "bytes": 9534,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1474,7 +1629,8 @@
       "bytes": 21494,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1497,7 +1653,8 @@
       "bytes": 16524,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1520,7 +1677,8 @@
       "bytes": 18911,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1543,7 +1701,8 @@
       "bytes": 93578,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1566,7 +1725,8 @@
       "bytes": 93605,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1589,7 +1749,8 @@
       "bytes": 16289,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1612,7 +1773,8 @@
       "bytes": 24132,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1635,7 +1797,8 @@
       "bytes": 51395,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1662,7 +1825,8 @@
       "bytes": 47913,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1685,7 +1849,8 @@
       "bytes": 224375,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1708,7 +1873,8 @@
       "bytes": 225850,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1758,7 +1924,8 @@
       "bytes": 96414,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1781,7 +1948,8 @@
       "bytes": 98671,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1804,7 +1972,8 @@
       "bytes": 18695,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1827,7 +1996,8 @@
       "bytes": 11452,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1850,7 +2020,8 @@
       "bytes": 97878,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1873,7 +2044,8 @@
       "bytes": 100602,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1896,7 +2068,8 @@
       "bytes": 116280,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1919,7 +2092,8 @@
       "bytes": 7934,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1942,7 +2116,8 @@
       "bytes": 9360,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1969,7 +2144,8 @@
       "bytes": 6527,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -1992,7 +2168,8 @@
       "bytes": 35611,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2015,7 +2192,8 @@
       "bytes": 6697,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2038,7 +2216,8 @@
       "bytes": 14695,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2061,7 +2240,8 @@
       "bytes": 64815,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2084,7 +2264,8 @@
       "bytes": 171756,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2107,7 +2288,8 @@
       "bytes": 13470,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2130,7 +2312,8 @@
       "bytes": 647128,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2153,7 +2336,8 @@
       "bytes": 24256,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2175,7 +2359,8 @@
       "bytes": 126530,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2198,7 +2383,8 @@
       "bytes": 36216,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2221,7 +2407,8 @@
       "bytes": 22706,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2244,7 +2431,8 @@
       "bytes": 24141,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2270,7 +2458,8 @@
       "bytes": 47545,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2293,7 +2482,8 @@
       "bytes": 46874,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2316,7 +2506,8 @@
       "bytes": 3887,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2339,7 +2530,8 @@
       "bytes": 24219,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2362,7 +2554,8 @@
       "bytes": 21820,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2385,7 +2578,8 @@
       "bytes": 29876,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2408,7 +2602,8 @@
       "bytes": 7419,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2431,7 +2626,8 @@
       "bytes": 12002,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2479,7 +2675,8 @@
       "bytes": 20782,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2502,7 +2699,8 @@
       "bytes": 31517,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2525,7 +2723,8 @@
       "bytes": 31390,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2548,7 +2747,8 @@
       "bytes": 31493,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2571,7 +2771,8 @@
       "bytes": 11266,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2594,7 +2795,8 @@
       "bytes": 23329,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2621,7 +2823,8 @@
       "bytes": 7504,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2644,7 +2847,8 @@
       "bytes": 5672,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2667,7 +2871,8 @@
       "bytes": 9347,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2690,7 +2895,8 @@
       "bytes": 13160,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2717,7 +2923,8 @@
       "bytes": 14692,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2740,7 +2947,8 @@
       "bytes": 11376,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2763,7 +2971,8 @@
       "bytes": 169782,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2786,7 +2995,8 @@
       "bytes": 49493,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2809,7 +3019,8 @@
       "bytes": 50932,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2832,7 +3043,8 @@
       "bytes": 52437,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2855,7 +3067,8 @@
       "bytes": 335386,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2878,7 +3091,8 @@
       "bytes": 23511,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2901,7 +3115,8 @@
       "bytes": 61040,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2924,7 +3139,8 @@
       "bytes": 155512,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2951,7 +3167,8 @@
       "bytes": 11517,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -2982,7 +3199,8 @@
       "bytes": 17435,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3005,7 +3223,8 @@
       "bytes": 13299,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3028,7 +3247,8 @@
       "bytes": 82762,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3051,7 +3271,8 @@
       "bytes": 55131,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3074,7 +3295,8 @@
       "bytes": 29094,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3097,7 +3319,8 @@
       "bytes": 44727,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3120,7 +3343,8 @@
       "bytes": 53113,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3143,7 +3367,8 @@
       "bytes": 50561,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3166,7 +3391,8 @@
       "bytes": 64479,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3189,7 +3415,8 @@
       "bytes": 227993,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3212,7 +3439,8 @@
       "bytes": 52722,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3235,7 +3463,8 @@
       "bytes": 6436,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3258,7 +3487,8 @@
       "bytes": 148747,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3281,7 +3511,8 @@
       "bytes": 8206,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3304,7 +3535,8 @@
       "bytes": 104085,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3327,7 +3559,8 @@
       "bytes": 7458,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3350,7 +3583,8 @@
       "bytes": 115354,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3373,7 +3607,8 @@
       "bytes": 10563,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3396,7 +3631,8 @@
       "bytes": 15935,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3423,7 +3659,8 @@
       "bytes": 83316,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3446,7 +3683,8 @@
       "bytes": 129192,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3469,7 +3707,8 @@
       "bytes": 167515,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3492,7 +3731,8 @@
       "bytes": 108816,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3515,7 +3755,8 @@
       "bytes": 55538,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3538,7 +3779,8 @@
       "bytes": 186731,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3561,7 +3803,8 @@
       "bytes": 194003,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3584,7 +3827,8 @@
       "bytes": 36912,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3607,7 +3851,8 @@
       "bytes": 37501,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3630,7 +3875,8 @@
       "bytes": 106117,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3653,7 +3899,8 @@
       "bytes": 111747,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3676,7 +3923,8 @@
       "bytes": 821775,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3699,7 +3947,8 @@
       "bytes": 851502,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3726,7 +3975,8 @@
       "bytes": 853678,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3749,7 +3999,8 @@
       "bytes": 3006116,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3772,7 +4023,8 @@
       "bytes": 28728,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3795,7 +4047,8 @@
       "bytes": 48120,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3818,7 +4071,8 @@
       "bytes": 19761,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3841,7 +4095,8 @@
       "bytes": 96670,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3864,7 +4119,8 @@
       "bytes": 99165,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3887,7 +4143,8 @@
       "bytes": 347476,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3910,7 +4167,8 @@
       "bytes": 15125,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3933,7 +4191,8 @@
       "bytes": 102801,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3956,7 +4215,8 @@
       "bytes": 109961,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -3979,7 +4239,8 @@
       "bytes": 22331,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4002,7 +4263,8 @@
       "bytes": 23502,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4025,7 +4287,8 @@
       "bytes": 51631,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4052,7 +4315,8 @@
       "bytes": 34534,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4075,7 +4339,8 @@
       "bytes": 35010,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4106,7 +4371,8 @@
       "bytes": 23750,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4129,7 +4395,8 @@
       "bytes": 311187,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4152,7 +4419,8 @@
       "bytes": 5601,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4175,7 +4443,8 @@
       "bytes": 76045,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4198,7 +4467,8 @@
       "bytes": 18374,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4221,7 +4491,8 @@
       "bytes": 18770,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4244,7 +4515,8 @@
       "bytes": 11583,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4267,7 +4539,8 @@
       "bytes": 31034,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4290,7 +4563,8 @@
       "bytes": 21590,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4313,7 +4587,8 @@
       "bytes": 149031,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4336,7 +4611,8 @@
       "bytes": 13709,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4359,7 +4635,8 @@
       "bytes": 6715,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4382,7 +4659,8 @@
       "bytes": 200703,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4405,7 +4683,8 @@
       "bytes": 202705,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4428,7 +4707,8 @@
       "bytes": 140689,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4451,7 +4731,8 @@
       "bytes": 22522,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4474,7 +4755,8 @@
       "bytes": 59588,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4509,7 +4791,8 @@
       "bytes": 207859,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4532,7 +4815,8 @@
       "bytes": 1255741,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4559,7 +4843,8 @@
       "bytes": 1345706,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4582,7 +4867,8 @@
       "bytes": 41104,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4609,7 +4895,8 @@
       "bytes": 41138,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4632,7 +4919,8 @@
       "bytes": 42996,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4655,7 +4943,8 @@
       "bytes": 90029,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4682,7 +4971,8 @@
       "bytes": 91291,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4705,7 +4995,8 @@
       "bytes": 93717,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4728,7 +5019,8 @@
       "bytes": 9044,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4755,7 +5047,8 @@
       "bytes": 9055,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4778,7 +5071,8 @@
       "bytes": 93749,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4805,7 +5099,8 @@
       "bytes": 97593,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4828,7 +5123,8 @@
       "bytes": 15066,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4851,7 +5147,8 @@
       "bytes": 31629,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4874,7 +5171,8 @@
       "bytes": 31622,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4905,7 +5203,8 @@
       "bytes": 64764,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4927,7 +5226,8 @@
       "bytes": 64532,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4949,7 +5249,8 @@
       "bytes": 65303,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4971,7 +5272,8 @@
       "bytes": 10906,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -4998,7 +5300,8 @@
       "bytes": 100216,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5021,7 +5324,8 @@
       "bytes": 18258,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5044,7 +5348,8 @@
       "bytes": 24129,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5067,7 +5372,8 @@
       "bytes": 10262,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5090,7 +5396,8 @@
       "bytes": 183391,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5113,7 +5420,8 @@
       "bytes": 73151,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5136,7 +5444,8 @@
       "bytes": 157118,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5163,7 +5472,8 @@
       "bytes": 628707,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5190,7 +5500,8 @@
       "bytes": 359055,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5243,7 +5554,8 @@
       "bytes": 425241,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5266,7 +5578,8 @@
       "bytes": 21013,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5289,7 +5602,8 @@
       "bytes": 21108,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5312,7 +5626,8 @@
       "bytes": 10183,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5335,7 +5650,8 @@
       "bytes": 23869,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5358,7 +5674,8 @@
       "bytes": 83669,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5385,7 +5702,8 @@
       "bytes": 63100,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5412,7 +5730,8 @@
       "bytes": 59864,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5439,7 +5758,8 @@
       "bytes": 156556,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5462,7 +5782,8 @@
       "bytes": 158079,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5485,7 +5806,8 @@
       "bytes": 19332,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5516,7 +5838,8 @@
       "bytes": 28488,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5539,7 +5862,8 @@
       "bytes": 19080,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5562,7 +5886,8 @@
       "bytes": 34899,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5585,7 +5910,8 @@
       "bytes": 34874,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5608,7 +5934,8 @@
       "bytes": 40124,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5631,7 +5958,8 @@
       "bytes": 8054,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5654,7 +5982,8 @@
       "bytes": 18480,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5677,7 +6006,8 @@
       "bytes": 156842,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5700,7 +6030,8 @@
       "bytes": 8489,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5723,7 +6054,8 @@
       "bytes": 30522,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5746,7 +6078,8 @@
       "bytes": 307407,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5773,7 +6106,8 @@
       "bytes": 272300,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5796,7 +6130,8 @@
       "bytes": 312999,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5819,7 +6154,8 @@
       "bytes": 313821,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5846,7 +6182,8 @@
       "bytes": 18327,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5869,7 +6206,8 @@
       "bytes": 11316,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5896,7 +6234,8 @@
       "bytes": 26832,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5919,7 +6258,8 @@
       "bytes": 26928,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5950,7 +6290,8 @@
       "bytes": 44780,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5973,7 +6314,8 @@
       "bytes": 16971,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -5996,7 +6338,8 @@
       "bytes": 26490,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6019,7 +6362,8 @@
       "bytes": 12895,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6042,7 +6386,8 @@
       "bytes": 42168,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6065,7 +6410,8 @@
       "bytes": 49298,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6092,7 +6438,8 @@
       "bytes": 48425,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6115,7 +6462,8 @@
       "bytes": 29566,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6138,7 +6486,8 @@
       "bytes": 86512,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6161,7 +6510,8 @@
       "bytes": 9736,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6184,7 +6534,8 @@
       "bytes": 10437,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6207,7 +6558,8 @@
       "bytes": 62165,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6230,7 +6582,8 @@
       "bytes": 228735,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6253,7 +6606,8 @@
       "bytes": 15554,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6280,7 +6634,8 @@
       "bytes": 11435,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6303,7 +6658,8 @@
       "bytes": 23951,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6326,7 +6682,8 @@
       "bytes": 140921,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6349,7 +6706,8 @@
       "bytes": 135311,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6372,7 +6730,8 @@
       "bytes": 48288,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6395,7 +6754,8 @@
       "bytes": 68138,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6418,7 +6778,8 @@
       "bytes": 32111,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6441,7 +6802,8 @@
       "bytes": 9663,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6464,7 +6826,8 @@
       "bytes": 9372,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6487,7 +6850,8 @@
       "bytes": 26243,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6510,7 +6874,8 @@
       "bytes": 85236,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6533,7 +6898,8 @@
       "bytes": 8570,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6556,7 +6922,8 @@
       "bytes": 11291,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6579,7 +6946,8 @@
       "bytes": 682013,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6602,7 +6970,8 @@
       "bytes": 13368,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6625,7 +6994,8 @@
       "bytes": 6133,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6648,7 +7018,8 @@
       "bytes": 2517186,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6671,7 +7042,8 @@
       "bytes": 71227,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6694,7 +7066,8 @@
       "bytes": 12241,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6716,7 +7089,8 @@
       "bytes": 7218,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6739,7 +7113,8 @@
       "bytes": 22354,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6762,7 +7137,8 @@
       "bytes": 18790,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6789,7 +7165,8 @@
       "bytes": 23487,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6812,7 +7189,8 @@
       "bytes": 27781,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6835,7 +7213,8 @@
       "bytes": 7470,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6858,7 +7237,8 @@
       "bytes": 252714,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6881,7 +7261,8 @@
       "bytes": 284907,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6904,7 +7285,8 @@
       "bytes": 87671,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6927,7 +7309,8 @@
       "bytes": 105007,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6950,7 +7333,8 @@
       "bytes": 5044,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6973,7 +7357,8 @@
       "bytes": 8232,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -6996,7 +7381,8 @@
       "bytes": 126398,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -7019,7 +7405,8 @@
       "bytes": 19438,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -7042,7 +7429,8 @@
       "bytes": 28612,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -7069,7 +7457,8 @@
       "bytes": 21298,
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "dependencyChoices": [
         {
@@ -7101,7 +7490,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -7123,7 +7513,8 @@
       },
       "platforms": [
         "linux-x64",
-        "windows-x64"
+        "windows-x64",
+        "macos-arm64"
       ],
       "role": "Complete publisher sdist with build/source inputs; native wheel-equivalent rebuild not claimed."
     },
@@ -7135,7 +7526,8 @@
       "sha256": "1ac4f3c038ac163973f107ac4423a6b246b181ffd97fdd371696b2517ec9b3ed",
       "bytes": 20849791,
       "platforms": [
-        "linux-x64"
+        "linux-x64",
+        "macos-arm64"
       ],
       "dependency": {
         "name": "hyperscan",
@@ -7148,9 +7540,344 @@
         "vectorscan-vectorscan-5.4.12/CMakeLists.txt": "5e54e01b2da19be3b2992fc9ea25ca4b30f2654ca4d56858b19aef738b9366b9",
         "vectorscan-vectorscan-5.4.12/benchmarks/benchmarks.cpp": "cc15fc2a5bc162c212881dd98404b18a1a212be1329428f57c7ad871f8f0653e"
       }
+    },
+    {
+      "id": "backports-zstd-native-source",
+      "version": "1.8.0",
+      "filename": "backports_zstd-1.8.0.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/ff/9c/13569626440e88f09d16f43ec1c2aa0d10a523be2811414580d1cfb7c9f3/backports_zstd-1.8.0.tar.gz",
+      "sha256": "9dae4f4c481716e3db473d667457b4f508ff7459c0931b567a5c9677fb3db316",
+      "bytes": 1006566,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "backports_zstd-1.8.0/LICENSE.txt": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
+        "backports_zstd-1.8.0/pyproject.toml": "29ce0000f3d942f4ede741477c09ebad6b7cd6ac782fae4b3e260ee73313962b",
+        "backports_zstd-1.8.0/src/c/cffi/source.c": "e2bcefcab793be586bee694d23fbb7f5560f54e1dc85cf6cb5014e3c4e790237"
+      },
+      "dependency": {
+        "name": "backports-zstd",
+        "version": "1.8.0"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "bitarray-native-source",
+      "version": "3.12.3",
+      "filename": "bitarray-3.12.3.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/a9/cc/aa09a20048dd650d9a36bd70c26b2688413066d65acc9f484f94b9929108/bitarray-3.12.3.tar.gz",
+      "sha256": "919e35a951c0a551631b94bf568f3f5e38d004e0c60866cb2ca51bd8c4778fec",
+      "bytes": 189559,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "bitarray-3.12.3/LICENSE": "e19b1180b6ee73307a8545716be9b36318cf4f926aaf3eb43f7fde3396a102dd",
+        "bitarray-3.12.3/pyproject.toml": "509554847feeca9da26ce5a658d2007667169616cd8212e13cf15f4d105aefb2",
+        "bitarray-3.12.3/bitarray/_bitarray.c": "9f51bb87dfefb6eff4f99f2a425b28b2d734761c3917ec9d7ef9dd5da294a287"
+      },
+      "dependency": {
+        "name": "bitarray",
+        "version": "3.12.3"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "chardet-native-source",
+      "version": "7.7.0",
+      "filename": "chardet-7.7.0.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/47/92/3d893ac5d338b9a9af34c5b517d77492dcea8a10254254eead4215a96f3f/chardet-7.7.0.tar.gz",
+      "sha256": "0ba38a05201b0abf7570c12d8af45c30b2af835bd5cc52bfc7105082eda82c1e",
+      "bytes": 1008480,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "chardet-7.7.0/LICENSE": "0d4cf67e7a26e9957b8948e7dfc0e380e61b427a94b061e618889aba89bb9616",
+        "chardet-7.7.0/pyproject.toml": "a7c7b3a43ce0e5d480a81490af291500554d5f4a5802952821d92cc1b843e162",
+        "chardet-7.7.0/hatch_build_cython.py": "16d00298e98b090a2f2c50e38803f7248370f751e1e91dfbf489d7243ad581f0"
+      },
+      "dependency": {
+        "name": "chardet",
+        "version": "7.7.0"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "charset-normalizer-native-source",
+      "version": "3.5.2",
+      "filename": "charset_normalizer-3.5.2.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/33/1c/f41d4e74c28ab327ff3acd36053f7ea506c55872d7a90b0fa71aa3ab0c89/charset_normalizer-3.5.2.tar.gz",
+      "sha256": "39de2a259fc954455c57274dc94c79d5842774e1247a016aff30bc0efed0f4ef",
+      "bytes": 172659,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "charset_normalizer-3.5.2/LICENSE": "6d0d41bfe170ac6c7dc248c9a63e254d0fb45a60d50a8257d0af92c6e249b887",
+        "charset_normalizer-3.5.2/pyproject.toml": "70075afafa963cee98104fd0dc0b460c142e479769ab46a36e222396d20890ce",
+        "charset_normalizer-3.5.2/src/charset_normalizer/cd.pyx": "bb238d2149be5bdb552c2c24294a4626e21101b6870b84106778faded79561f6"
+      },
+      "dependency": {
+        "name": "charset-normalizer",
+        "version": "3.5.2"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "fonttools-native-source",
+      "version": "4.67.0",
+      "filename": "fonttools-4.67.0.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/94/36/102e180f8f5dbaee88b26595b01ca8aa80bf4e62128d9aa94265b3996c96/fonttools-4.67.0.tar.gz",
+      "sha256": "3cb57e6600ca77c0b1729cf8adc23bc0652633a37f18cfa934d9c7bc3de25519",
+      "bytes": 3750028,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "fonttools-4.67.0/LICENSE": "6787208f83f659ccbc2223b2fde952ffa6f7e8aca62f1a8a2bf5bc51bb1b2383",
+        "fonttools-4.67.0/pyproject.toml": "3183c175d175a1c618bef2024ed536c321139322d0ac09bfc4a54aa84cc73799",
+        "fonttools-4.67.0/setup.py": "12c804113547b2d792db2eea0136bb1e4bce5cb84a4044cf7ab5d80104a48732"
+      },
+      "dependency": {
+        "name": "fonttools",
+        "version": "4.67.0"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "markupsafe-native-source",
+      "version": "3.0.4",
+      "filename": "markupsafe-3.0.4.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/38/9b/e422a865e1d5d57d0e509b4e0bf1c1a70a7f6382c29a5aa428df994c8bc8/markupsafe-3.0.4.tar.gz",
+      "sha256": "2e9ad7dd851bf45fab9f75cbff4cb493fee9979e8d8c7c9c3ee119022518edd6",
+      "bytes": 153777,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "markupsafe-3.0.4/LICENSE.txt": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea",
+        "markupsafe-3.0.4/pyproject.toml": "f177449f075d9ada5de58f5083e58515d7c8bbd9d2cd95e09d28ad273313dbdc",
+        "markupsafe-3.0.4/src/markupsafe/_speedups.c": "b77b42ea8555efe6e6294aaf08ee69552932f86f000885e958c689c2436d2638"
+      },
+      "dependency": {
+        "name": "markupsafe",
+        "version": "3.0.4"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "ml-dtypes-native-source",
+      "version": "0.6.0",
+      "filename": "ml_dtypes-0.6.0.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/12/72/307d7c4bd0600601c7133fba5cb78af7db968152951c1cd473abb1cda782/ml_dtypes-0.6.0.tar.gz",
+      "sha256": "5e60251d32ced5598972e4d5e06a2f044341f9291402551a3f6f0ec44f9299b0",
+      "bytes": 3032327,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "ml_dtypes-0.6.0/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "ml_dtypes-0.6.0/pyproject.toml": "ab733380d65e1d9d7a76c8f67eb07b2c62c76540f07f377228b72fc1fb961451",
+        "ml_dtypes-0.6.0/third_party/eigen/bench/analyze-blocking-sizes.cpp": "66f8ea6c3c863acb6e387baaea4002e7d91345d8dab2cdc025e0008d11f3bcf3"
+      },
+      "dependency": {
+        "name": "ml-dtypes",
+        "version": "0.6.0"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "msgpack-native-source",
+      "version": "1.2.4",
+      "filename": "msgpack-1.2.4.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/cc/52/1ec7ead2c7528bf3d1db73e886fa4df10f9e6f0eb7854a448b7090cfcef7/msgpack-1.2.4.tar.gz",
+      "sha256": "475c44e12f2a5de766a8448783f149c9b33f3f49b88953c6cd739a77d93c732c",
+      "bytes": 197764,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "msgpack-1.2.4/COPYING": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427",
+        "msgpack-1.2.4/pyproject.toml": "568acaa97916e46a0211d8a209269c2ce65b8ff1e3c299bf16cc0bcc93b104f6",
+        "msgpack-1.2.4/msgpack/_cmsgpack.c": "a4293586f928767f61ee4c6bfb56624f05e69bd30127eaaf3720666f296f1c1b"
+      },
+      "dependency": {
+        "name": "msgpack",
+        "version": "1.2.4"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "numpy-native-source",
+      "version": "2.5.4",
+      "filename": "numpy-2.5.4.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/95/b0/c7453d0b6e2073c3264468b106ee1563750cecc910965e67357e3698c83e/numpy-2.5.4.tar.gz",
+      "sha256": "9a94cf751c9ad8ebaa835bcd3d40dacf8534ad086b88c38029b65123c7999d2a",
+      "bytes": 20866315,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "numpy-2.5.4/LICENSE.txt": "1be1df33863f97a7bc1c4d67980bd6c69c9a6fef0a5ee76e6ad6cb91e56e8491",
+        "numpy-2.5.4/pyproject.toml": "ca481a43fe6b283917c835b70fcabb225a89ca0f533c811c9fff1071c836f698",
+        "numpy-2.5.4/meson_cpu/x86/test_x86_v2.c": "3952113db4ec1cb0c15aec7cfe053a6131e2f89a42954cc3a2fb459d36c64345"
+      },
+      "dependency": {
+        "name": "numpy",
+        "version": "2.5.4"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "onnx-native-source",
+      "version": "1.23.2",
+      "filename": "onnx-1.23.2.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/3f/62/bc2dfadb63ecf04cb2d65a6b17751863039d36c65de51d6a3128ab35f1e7/onnx-1.23.2.tar.gz",
+      "sha256": "008cb0467b2bbee41448acc7da8b6f4e704624cb0d327a2d5adafc7ce19bc5b8",
+      "bytes": 6023090,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "onnx-1.23.2/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "onnx-1.23.2/pyproject.toml": "062d3b76552e335c366fd43b3bab7465b36259feb8d97206b49d8372c6f66abe",
+        "onnx-1.23.2/onnx/__init__.py": "bc629ae3520cb85919ea4dbffca55662b4fe2a042c072ca4bfc4159a96006e84"
+      },
+      "dependency": {
+        "name": "onnx",
+        "version": "1.23.2"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "protobuf-native-source",
+      "version": "7.36.2",
+      "filename": "protobuf-7.36.2.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/d9/89/5b8517baa72f84a67b8a307ba953c91057af618bf40bf676f3c03551f8f0/protobuf-7.36.2.tar.gz",
+      "sha256": "497d0463ff3316681da6c0b9e8d06cb465d61abce00b613ab42226175644d1bb",
+      "bytes": 512737,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "protobuf-7.36.2/LICENSE": "6e5e117324afd944dcf67f36cf329843bc1a92229a8cd9bb573d7a83130fea7d",
+        "protobuf-7.36.2/setup.py": "da4e762ef9ce12ecf5bd1dca2e85543bed17e8fe4f3177e1ec63d97f1055ed9b",
+        "protobuf-7.36.2/python/convert.c": "7831a11326a8a0f43d0c9bb6eb11b8c023e2710ff7ce60cbd3f563e756ecea68"
+      },
+      "dependency": {
+        "name": "protobuf",
+        "version": "7.36.2"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "psutil-native-source",
+      "version": "7.2.2",
+      "filename": "psutil-7.2.2.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/aa/c6/d1ddf4abb55e93cebc4f2ed8b5d6dbad109ecb8d63748dd2b20ab5e57ebe/psutil-7.2.2.tar.gz",
+      "sha256": "0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372",
+      "bytes": 493740,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "psutil-7.2.2/LICENSE": "b89c063b3786e28e0c0a38f1931db61fed35e69dd2a2966fbecffee0f46c8d10",
+        "psutil-7.2.2/pyproject.toml": "48d1ca822b45dfccf02146bb3443c10416537a6e2569fb658e9a5cbdddd0e134",
+        "psutil-7.2.2/psutil/_psutil_aix.c": "3a9ae2bb8270598ffbb135923df03f2a0992ce48695d314fb9ac36449b825488"
+      },
+      "dependency": {
+        "name": "psutil",
+        "version": "7.2.2"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "pyyaml-native-source",
+      "version": "6.0.3",
+      "filename": "pyyaml-6.0.3.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz",
+      "sha256": "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f",
+      "bytes": 130960,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "pyyaml-6.0.3/LICENSE": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4",
+        "pyyaml-6.0.3/pyproject.toml": "ed2365bda4f2d4d1a7195dc63411fcfe0b69d923454b356fc597815aa9747f68",
+        "pyyaml-6.0.3/yaml/_yaml.pyx": "65efc5f00591ca6d5771a64790d6dbae69677a0d723736b7c2994386a5761313"
+      },
+      "dependency": {
+        "name": "pyyaml",
+        "version": "6.0.3"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "rapidfuzz-native-source",
+      "version": "3.14.6",
+      "filename": "rapidfuzz-3.14.6.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/18/97/226c43b7b5d957bc3840ed52ea99eed261f99834c4619be7a4742cbaeafa/rapidfuzz-3.14.6.tar.gz",
+      "sha256": "e13a8160d017b499ec7a2fa9d0ce1ae2e7377080815785819f966fb235d4eb60",
+      "bytes": 57955060,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "rapidfuzz-3.14.6/LICENSE": "f34ccdffdff56fc417785915eedf18601d5479755df3c472b2c754c29802d683",
+        "rapidfuzz-3.14.6/pyproject.toml": "92766575c4c50bb8dccce68633f55f0ebd949535cbbe705bab8a4d04ada64d54",
+        "rapidfuzz-3.14.6/src/rapidfuzz/_feature_detector_cpp.pyx": "d8a83f28770b8e50bb30c7ff51ad8f89f709b60c0f524a40798d7e045534ed75"
+      },
+      "dependency": {
+        "name": "rapidfuzz",
+        "version": "3.14.6"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "regex-native-source",
+      "version": "2026.9.29",
+      "filename": "regex-2026.9.29.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/fc/f2/af1da9d3ceed77bfcdce40427d49ba0be94e4fe84245e3bfef68c10e75b6/regex-2026.9.29.tar.gz",
+      "sha256": "8b5fcc4771732191b2b7d1dd68d8f0353f47f8d90b6150f6dce58bf1112442cb",
+      "bytes": 419199,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "regex-2026.9.29/LICENSE.txt": "bff55ef4cdcc8c14ce259f8e8ab60e264418440d6335f4dc138273fbd506144d",
+        "regex-2026.9.29/pyproject.toml": "500dcde45f0f533adca07feb3924b27315ba403fb5839ef7925e1816fc5d43d2",
+        "regex-2026.9.29/src/_regex.c": "5a09aba56ea3de42138cf0e7c00b65a5e85ee97f31bd6829c7aba376030a9a11"
+      },
+      "dependency": {
+        "name": "regex",
+        "version": "2026.9.29"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
+    },
+    {
+      "id": "tibs-native-source",
+      "version": "0.5.7",
+      "filename": "tibs-0.5.7.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/57/cd/6cf028decf1c2df4d26077dd5d0532587d93d4917233d5e004133166a940/tibs-0.5.7.tar.gz",
+      "sha256": "173dfbecb2309edd9771f453580c88cf251e775613461566b23dbd756b3d54cb",
+      "bytes": 78255,
+      "platforms": [
+        "macos-arm64"
+      ],
+      "requiredMembers": {
+        "tibs-0.5.7/LICENSE": "dc02ef74abe96c4cfe06044c2263dbf98dad3505b972483ef447677b7ba2f68e",
+        "tibs-0.5.7/pyproject.toml": "ad91a2fc05d9e068bad8016a06bea193257bbeb920b211ef04a1b043f018edd0",
+        "tibs-0.5.7/src/core.rs": "c2a44899028ee7b3fc0b566bbb9e09de4214dba56f580079d7644dff1e360579"
+      },
+      "dependency": {
+        "name": "tibs",
+        "version": "0.5.7"
+      },
+      "role": "Exact publisher sdist for the observed macOS wheel version; complete archive retained, not a compiler/linkage or bit-identical rebuild assertion."
     }
   ],
-  "_comment": "Pinned source/build/notice delivery evidence for fixed Linux/Windows bytes; no native replacement, publication or legal clearance.",
   "nativeEvidence": [
     {
       "id": "cpython-linux-x64",
@@ -9020,11 +9747,807 @@
       },
       "redistributionGrant": "community_2026_section_8_user_confirmed_conditional",
       "protectiveAgreement": "msvc-community-2026-v1; explicit Windows engine consent and downstream-distributor protection, not AGPL application restrictions"
+    },
+    {
+      "id": "cpython-macos-arm64",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "python": "3.12.16",
+      "bundledPythonOnly": true,
+      "artifacts": [
+        {
+          "path": "python/bin/python3.12",
+          "bytes": 18134832,
+          "sha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787"
+        },
+        {
+          "path": "python/lib/python3.12/lib-dynload/_crypt.cpython-312-darwin.so",
+          "bytes": 50720,
+          "sha256": "faf0f865430482bd74d6199f549082d0a8fe3c1eedf9b5e3cadfc56fc50602df"
+        },
+        {
+          "path": "python/lib/python3.12/lib-dynload/_dbm.cpython-312-darwin.so",
+          "bytes": 53952,
+          "sha256": "429bd11cab632d1e433da8c93bd1ae9e484e824863f04dd65831cb71a504b0c6"
+        },
+        {
+          "path": "python/lib/python3.12/lib-dynload/_tkinter.cpython-312-darwin.so",
+          "bytes": 100096,
+          "sha256": "9e49b795b2044d8b017d4a7fa91ecba0109935b7be186ecb96cdfbe0896b085d"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.bzip2.txt",
+          "bytes": 1743,
+          "sha256": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.cpython.txt",
+          "bytes": 36164,
+          "sha256": "86e61415828a8b5b06ec8d024e6f086ce155a8b85fd0c419c0ba4dc004e74fdd"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.expat.txt",
+          "bytes": 1144,
+          "sha256": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libedit.txt",
+          "bytes": 1614,
+          "sha256": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libffi.txt",
+          "bytes": 1132,
+          "sha256": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.liblzma.txt",
+          "bytes": 660,
+          "sha256": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libuuid.txt",
+          "bytes": 1432,
+          "sha256": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.mpdecimal.txt",
+          "bytes": 1284,
+          "sha256": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.ncurses.txt",
+          "bytes": 1447,
+          "sha256": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.openssl-3.txt",
+          "bytes": 10175,
+          "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.sqlite.txt",
+          "bytes": 1481,
+          "sha256": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.tcl.txt",
+          "bytes": 2255,
+          "sha256": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.zlib-ng.txt",
+          "bytes": 867,
+          "sha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee"
+        },
+        {
+          "path": "licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.zlib.txt",
+          "bytes": 995,
+          "sha256": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "scope": "Actually shipped interpreter bytes match verified upstream; new notice shipping awaits final repack."
+      }
+    },
+    {
+      "id": "freetype-py-macos-arm64-2.5.1",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "freetype-py",
+        "version": "2.5.1"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/freetype/libfreetype.dylib",
+          "bytes": 3841376,
+          "sha256": "1f51287c6f27f2b7f726279fc5c5450263fe865576ab0a88940643b23ebb2b16"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/native/FreeType-2.13.2-LICENSE.txt",
+          "bytes": 2074,
+          "sha256": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b"
+        },
+        {
+          "path": "licenses/native/FreeType-2.13.2-FTL.txt",
+          "bytes": 6743,
+          "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+        },
+        {
+          "path": "licenses/native/FreeType-2.13.2-BDF.txt",
+          "bytes": 5972,
+          "sha256": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe"
+        },
+        {
+          "path": "licenses/native/FreeType-2.13.2-PCF.txt",
+          "bytes": 3311,
+          "sha256": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b"
+        },
+        {
+          "path": "licenses/native/FreeType-2.13.2-zlib.txt",
+          "bytes": 1329,
+          "sha256": "ab234c46f13c0dd02f494a713ecb48b20afd435aa6d0b3418da7686b5b7fcdfe"
+        },
+        {
+          "path": "licenses/native/HarfBuzz-COPYING.txt",
+          "bytes": 1971,
+          "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherRecipeFreeType": "2.13.2",
+        "publisherRecipeHarfBuzz": "8.3.0",
+        "scope": "Verified all-platform source recipe and original Mac wheel bytes; not a newly executed version API."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "uharfbuzz-macos-arm64-0.57.0",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "uharfbuzz",
+        "version": "0.57.0"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/uharfbuzz/_harfbuzz.abi3.so",
+          "bytes": 9237440,
+          "sha256": "bb5f9abe6f722ff11df22fe9d462fff53dd08c017358ed547c8ea0413f2b7737"
+        },
+        {
+          "path": "python/lib/python3.12/site-packages/uharfbuzz/_harfbuzz_test.abi3.so",
+          "bytes": 87208,
+          "sha256": "d65f9e38e1504ef349bd2f0c6f316ea6abfab17792afd4b92fd9dab2c6dd808d"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/native/HarfBuzz-COPYING.txt",
+          "bytes": 1971,
+          "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherSourceHarfBuzzHeader": "15.0.0",
+        "scope": "Exact source sdist header and shared original COPYING; no Mac version API executed here."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "hyperscan-macos-arm64-0.9.1",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "hyperscan",
+        "version": "0.9.1"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/hyperscan/_hs_ext.cpython-312-darwin.so",
+          "bytes": 4531984,
+          "sha256": "4eae1f91687be0de93b50dd321f089b367138b70f19c3b0de634c5fe86f19f8e"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/native/Vectorscan-5.4.12-LICENSE.txt",
+          "bytes": 6125,
+          "sha256": "1f5a587000f0d1a451fdb2e2c169e70273750f8fd3b43c9ef2e7fc287c3abc00"
+        },
+        {
+          "path": "licenses/native/PCRE-8.45-LICENCE.txt",
+          "bytes": 3190,
+          "sha256": "51b3dea44f63338b84b9c97b3d793826a8397309068cf9379a423216ab8ea5b2"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherMacRecipeVectorscan": "5.4.12",
+        "publisherRecipePCRE": "8.45",
+        "scope": "Exact publisher recipe source inputs; selected static features/Boost/compiler closure remain unknown."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "rtree-macos-arm64-1.4.1",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "rtree",
+        "version": "1.4.1"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/rtree/lib/libspatialindex.dylib",
+          "bytes": 868424,
+          "sha256": "70108e4f07ccd87c724f28b0e14fa26b9603ef61a45653087df89b1fc26665b3"
+        },
+        {
+          "path": "python/lib/python3.12/site-packages/rtree/lib/libspatialindex_c.dylib",
+          "bytes": 261104,
+          "sha256": "a4c2282d8ba7f63562b0631370f4e6fbd2b078e3841b5081d77b535b11af7676"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/native/libspatialindex-2.1.0-COPYING.txt",
+          "bytes": 2484,
+          "sha256": "b63ebfaca9d7ce582580f3e11acabc9d2e37c46ce234533f7fa8a6c7278898a0"
+        },
+        {
+          "path": "licenses/native/libspatialindex-2.1.0-copyright.txt",
+          "bytes": 1511,
+          "sha256": "6ce44263393bce3efb9df170d95ac03218d75a41c4803c4e470614c64342ae0f"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherRecipeLibspatialindex": "2.1.0",
+        "publisherRecipe": {
+          "path": "addon/licenses/supplemental/macos/build-inputs/rtree-install_libspatialindex.sh",
+          "bytes": 1645,
+          "sha256": "402fd3e7db6f2cc47dc280d1855d7adec0adaafd433295a4d3685a5605f6366a",
+          "url": "https://raw.githubusercontent.com/Toblerity/rtree/1.4.1/scripts/install_libspatialindex.sh"
+        },
+        "scope": "Both actual native dylibs match the official wheel RECORD; original recipe retained."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "cryptography-macos-arm64-50.0.2",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "cryptography",
+        "version": "50.0.2"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/cryptography/hazmat/bindings/_rust.abi3.so",
+          "bytes": 10403008,
+          "sha256": "bf1f68c3e6d900eddd1fdcc28f0a50a39a300716e4ca99dbcd155fce9bec3f2e"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/native/OpenSSL-LICENSE.txt",
+          "bytes": 10175,
+          "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+        },
+        {
+          "path": "licenses/native/OpenSSL-4.0.3-copyright.txt",
+          "bytes": 377,
+          "sha256": "ec368a39fe8d31b6ed740075969a6ab7dd5128f4ab876e682352128f7551c6e2"
+        },
+        {
+          "path": "licenses/supplemental/rust/third-party-notices.txt",
+          "bytes": 2627575,
+          "sha256": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "actualEmbeddedOpenSSLVersion": "OpenSSL 4.0.3 29 Sep 2026",
+        "scope": "Banner in the actual native file; original matching OpenSSL/Rust source inputs and notices retained."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "pymupdf-macos-arm64-1.26.7",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "pymupdf",
+        "version": "1.26.7"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/pymupdf/_extra.so",
+          "bytes": 239504,
+          "sha256": "3aa42f9981cbe29fc30aed9b22384976c87e17365d92b010f57137be3d25e520"
+        },
+        {
+          "path": "python/lib/python3.12/site-packages/pymupdf/_mupdf.so",
+          "bytes": 12226072,
+          "sha256": "210448b5c9534f6ef5978b2cc4e0d0157e2112dfe654518bd758d67bf6ad0eef"
+        },
+        {
+          "path": "python/lib/python3.12/site-packages/pymupdf/libmupdf.dylib",
+          "bytes": 31883120,
+          "sha256": "2e6a8d85aab900b1bfc976801d82b1ab67cc97639cfac794bc01f2d01803be6c"
+        },
+        {
+          "path": "python/lib/python3.12/site-packages/pymupdf/libmupdfcpp.so",
+          "bytes": 1794384,
+          "sha256": "8f96f9bcf538ffb38af29b846fb84914495489829df95d7e115b6002b85ceb6c"
+        },
+        {
+          "path": "python/lib/python3.12/site-packages/pymupdf/mupdf-devel/lib/libmupdf-threads.a",
+          "bytes": 3424,
+          "sha256": "77644146073c33ff438bdc29e8974dbb5bdb2dee3d9a3af876ad590b40014407"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/native/MuPDF-1.26.12-README.txt",
+          "bytes": 1402,
+          "sha256": "ec7500c75d800d9d2ce8ee95ad9a528df2fef3dc293dca5a0ff6cd8377571ed6"
+        },
+        {
+          "path": "licenses/native/MuPDF-fonts-SIL-OFL.txt",
+          "bytes": 4301,
+          "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "publisherSetupMuPDF": "1.26.12",
+        "grant": "AGPL; no Artifex commercial license supplied.",
+        "scope": "Exact published wheel/source version plus complete MuPDF thirdparty/font source release; compiler configuration not reconstructed."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "jiter-macos-arm64-0.18.0",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "jiter",
+        "version": "0.18.0"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/jiter/jiter.cpython-312-darwin.so",
+          "bytes": 710496,
+          "sha256": "2c405496df53a569e2bf36e273f4fa539aac8d39ccf9df54199fc7028b65b923"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/supplemental/rust/third-party-notices.txt",
+          "bytes": 2627575,
+          "sha256": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "orjson-macos-arm64-3.13.0",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "orjson",
+        "version": "3.13.0"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/orjson/orjson.cpython-312-darwin.so",
+          "bytes": 253904,
+          "sha256": "cae254ba8cb97ee97a7856aeb3acbb848e044e679aa3dd6ed4a3e7fc351de4b5"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/supplemental/rust/third-party-notices.txt",
+          "bytes": 2627575,
+          "sha256": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "pydantic-core-macos-arm64-2.50.1",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "pydantic-core",
+        "version": "2.50.1"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/pydantic_core/_pydantic_core.cpython-312-darwin.so",
+          "bytes": 4344528,
+          "sha256": "dca08de9d64e292558c19fd80b16a8c5839d99f5c3d33cf745d38db0d51db689"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/supplemental/rust/third-party-notices.txt",
+          "bytes": 2627575,
+          "sha256": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked."
+      ]
+    },
+    {
+      "id": "tiktoken-macos-arm64-0.14.0",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "tiktoken",
+        "version": "0.14.0"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/tiktoken/_tiktoken.cpython-312-darwin.so",
+          "bytes": 2918608,
+          "sha256": "fdb7f9529c106ef557451c7f9c579920b74842dfdf29d3e588eb8f5e97b182ff"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/supplemental/rust/third-party-notices.txt",
+          "bytes": 2627575,
+          "sha256": "27ccf0633b0cace104350854c644e8ab14bd3ed7a68e9051d977eb09500f050e"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "sourceInputEvidence": "licenses/supplemental/macos/native-wheels.json",
+        "scope": "Source-lock registry notice superset, not proof that all listed crates were compiled."
+      },
+      "limitations": [
+        "Exact prebuilt compiler/feature/link closure remains unknown. Optional/test/other-target source inputs are not asserted as linked.",
+        "Publisher Cargo.lock is absent; compiled transitive versions remain unknown, not a new generic gate."
+      ]
+    },
+    {
+      "id": "opencv-image-only-macos-arm64-4.12.0",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "dependency": {
+        "name": "opencv-image-only",
+        "version": "4.12.0"
+      },
+      "artifacts": [
+        {
+          "path": "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.cpython-312-darwin.so",
+          "bytes": 7399184,
+          "sha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530"
+        }
+      ],
+      "files": [
+        {
+          "path": "licenses/supplemental/macos/opencv/LICENSE",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/COPYRIGHT-OpenCV.txt",
+          "bytes": 733,
+          "sha256": "bba849c98da85a2b27b86113284a90812c959b1c1fc4ed67de9355475d1e6831"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/NOTICE.txt",
+          "bytes": 74,
+          "sha256": "d903a69ab39425283b44e2ea355cbfaf79bcd738b69c2b1c3c700ce80f2d89f9"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/README.ijg",
+          "bytes": 12799,
+          "sha256": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/libjpeg-turbo.txt",
+          "bytes": 5620,
+          "sha256": "96f5b328adbb78eeaaec6980d73fd558cb1e4d62560ed615646bc3cf5e532430"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/libpng.txt",
+          "bytes": 5345,
+          "sha256": "7317e078e2d3b5d7ba5a6159e650945153262b44b76f6700f8e9edb261c5143e"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/softfloat-fdlibm.txt",
+          "bytes": 2853,
+          "sha256": "27adefc3d001216b8be5af628e3583575fedc22ea6f41917e3008c8ed8cb8ce2"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/zlib.txt",
+          "bytes": 1002,
+          "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/Carotene-BSD.txt",
+          "bytes": 2005,
+          "sha256": "90737e4d135451d474c5617217d425b2b3e0895d4ea6e76f88585673ab9fbf26"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/Tegra-HAL-BSD.txt",
+          "bytes": 2005,
+          "sha256": "c0343ef9c6a2c9e435e58e78806a68f6a6edbf67991f64e922a4694e442baf98"
+        },
+        {
+          "path": "licenses/supplemental/macos/opencv/licenses/FlatBuffers-LICENSE.txt",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        }
+      ],
+      "declarations": {
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "stagedExtension": {
+          "path": "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.cpython-312-darwin.so",
+          "bytes": 7399184,
+          "sha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530"
+        },
+        "modules": [
+          "core",
+          "imgproc",
+          "imgcodecs",
+          "python3"
+        ],
+        "deploymentTarget": "13.0",
+        "sourceEvidence": "licenses/supplemental/macos/source-evidence.json",
+        "scope": "Actual codec/SoftFloat and original HAL notices; FlatBuffers license is a reported source/build input, not a linkage claim."
+      },
+      "limitations": [
+        "Original CI runtime size metadata must be refreshed by main hydration before inventory applies this exact 4.12.0 entry; native bytes remain fixed."
+      ]
     }
   ],
   "releaseObligations": [
-    "Finalize source membership (including scripts/package_sources.py and addon/licenses/supplemental), rebuild all four XPIs, complete native acceptance and regenerate the source bundle against those completed exact bytes. Provisional old-hash bundles cannot certify rebuilt packages.",
-    "Publish the verified source ZIP, its manifest and SHA256 beside the exact Linux/Windows XPIs at the same download location and without an extra source charge; retain upstream licenses, populated native/font trees, modifications, configuration and build/install scripts. Do not replace this delivery with repository links or an unspecified offer.",
+    "Freeze source membership (including scripts/package_sources.py and addon/licenses/supplemental), rebuild every selected platform/mode XPI, complete native acceptance and generate the source bundle against those exact bytes. Earlier package hashes cannot certify rebuilt packages.",
+    "Publish only the verified corresponding-source ZIP beside its exact selected XPIs, without an extra source charge. Retain upstream licenses, native/font trees, modifications and build/install inputs; its internal bundle-manifest.json carries the delivery index. Keep external checksums/inventory/manifests local and do not substitute repository links or an unspecified offer.",
     "Retain the AGPLv3 project and dependency licenses/full sources/build instructions and comply with the user-confirmed Community 2026 section 8 distribution conditions. Resolve specifically identified required source/notices; do not demand an original compiler or byte-identical wheel as a substitute for this review.",
     "If distributing a modified AGPL network-facing service, provide the applicable corresponding-source access to interacting users; assess the actual shipped/operated scope instead of asserting private use waives obligations.",
     "Do not add local Songti/Noto/Source Han cache fonts to a public package based only on filename, OS/2 fsType or a generic OFL copy. Bind any added font/derivative to its actual upstream grant and reserved-name/modification conditions; PDF embedding is a separate applicable-license question."
@@ -9414,6 +10937,71 @@
             "matches": true
           }
         ]
+      },
+      {
+        "platform": "macos-arm64",
+        "filename": "cpython-3.12.16+20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.12.16%2B20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+        "bytes": 25035343,
+        "sha256": "353d5f1b4fd2715e7053f12f068435d5bbad16b91e057006b5d01e0925709a7e",
+        "hashStatus": "locally_recomputed_and_publisher_matched",
+        "upstreamNativeFileCount": 11,
+        "upstreamInterpreter": {
+          "path": "python/bin/python3.12",
+          "bytes": 18134832,
+          "sha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787"
+        },
+        "candidateBindingStatus": "all_actual_shipped_native_files_match_verified_upstream",
+        "evidencePath": "addon/licenses/supplemental/macos/source-evidence.json",
+        "evidenceSha256": "ea32bd33237585e728c5ef225d3f631d0133a434afe0a3fba1f4144c55036482",
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "nativeFileCount": 4,
+        "allShippedNativeFilesMatch": true,
+        "files": [
+          {
+            "path": "python/bin/python3.12",
+            "bytes": 18134832,
+            "sha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787",
+            "upstreamSha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787",
+            "matches": true
+          },
+          {
+            "path": "python/lib/python3.12/lib-dynload/_crypt.cpython-312-darwin.so",
+            "bytes": 50720,
+            "sha256": "faf0f865430482bd74d6199f549082d0a8fe3c1eedf9b5e3cadfc56fc50602df",
+            "upstreamSha256": "faf0f865430482bd74d6199f549082d0a8fe3c1eedf9b5e3cadfc56fc50602df",
+            "matches": true
+          },
+          {
+            "path": "python/lib/python3.12/lib-dynload/_dbm.cpython-312-darwin.so",
+            "bytes": 53952,
+            "sha256": "429bd11cab632d1e433da8c93bd1ae9e484e824863f04dd65831cb71a504b0c6",
+            "upstreamSha256": "429bd11cab632d1e433da8c93bd1ae9e484e824863f04dd65831cb71a504b0c6",
+            "matches": true
+          },
+          {
+            "path": "python/lib/python3.12/lib-dynload/_tkinter.cpython-312-darwin.so",
+            "bytes": 100096,
+            "sha256": "9e49b795b2044d8b017d4a7fa91ecba0109935b7be186ecb96cdfbe0896b085d",
+            "upstreamSha256": "9e49b795b2044d8b017d4a7fa91ecba0109935b7be186ecb96cdfbe0896b085d",
+            "matches": true
+          }
+        ]
       }
     ],
     "standaloneFullBuildArchives": [
@@ -9600,6 +11188,82 @@
             "bytes": 1016
           }
         }
+      },
+      {
+        "platform": "macos-arm64",
+        "filename": "cpython-3.12.16+20261026-aarch64-apple-darwin-pgo+lto-full.tar.zst",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.12.16%2B20261026-aarch64-apple-darwin-pgo%2Blto-full.tar.zst",
+        "bytes": 57660205,
+        "sha256": "016758f4881e5f71d63eddfbcdd53f25c5a9152435a863e4dc0770758eae32c3",
+        "hashStatus": "locally_recomputed_and_publisher_matched",
+        "sourceCommit": "fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+        "metadataMember": "python/PYTHON.json",
+        "metadataSha256": "dfc38df39b46bc1337abc4b3ff160e5ef4ca16f13dedb4c412a770ecb3fb8a36",
+        "metadataBytes": 118275,
+        "retainedMetadataPath": "addon/licenses/supplemental/macos/python-build-standalone/PYTHON.json",
+        "retainedMetadataSha256": "dfc38df39b46bc1337abc4b3ff160e5ef4ca16f13dedb4c412a770ecb3fb8a36",
+        "retainedMetadataBytes": 118275,
+        "jsonValuesMatch": true,
+        "licenses": {
+          "python/licenses/LICENSE.bzip2.txt": {
+            "sha256": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441",
+            "bytes": 1743
+          },
+          "python/licenses/LICENSE.cpython.txt": {
+            "sha256": "86e61415828a8b5b06ec8d024e6f086ce155a8b85fd0c419c0ba4dc004e74fdd",
+            "bytes": 36164
+          },
+          "python/licenses/LICENSE.expat.txt": {
+            "sha256": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534",
+            "bytes": 1144
+          },
+          "python/licenses/LICENSE.libedit.txt": {
+            "sha256": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1",
+            "bytes": 1614
+          },
+          "python/licenses/LICENSE.libffi.txt": {
+            "sha256": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0",
+            "bytes": 1132
+          },
+          "python/licenses/LICENSE.liblzma.txt": {
+            "sha256": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02",
+            "bytes": 660
+          },
+          "python/licenses/LICENSE.libuuid.txt": {
+            "sha256": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b",
+            "bytes": 1432
+          },
+          "python/licenses/LICENSE.mpdecimal.txt": {
+            "sha256": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b",
+            "bytes": 1284
+          },
+          "python/licenses/LICENSE.ncurses.txt": {
+            "sha256": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c",
+            "bytes": 1447
+          },
+          "python/licenses/LICENSE.openssl-3.txt": {
+            "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+            "bytes": 10175
+          },
+          "python/licenses/LICENSE.sqlite.txt": {
+            "sha256": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719",
+            "bytes": 1481
+          },
+          "python/licenses/LICENSE.tcl.txt": {
+            "sha256": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16",
+            "bytes": 2255
+          },
+          "python/licenses/LICENSE.zlib-ng.txt": {
+            "sha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee",
+            "bytes": 867
+          },
+          "python/licenses/LICENSE.zlib.txt": {
+            "sha256": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c",
+            "bytes": 995
+          }
+        },
+        "candidateBindingStatus": "actual_native_identity_and_configuration_match_verified_upstream",
+        "candidateBuildIdentityPath": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-build.json"
       }
     ],
     "knownMetadataLimits": [
@@ -9607,7 +11271,95 @@
     ],
     "opencvBuildInformation": {
       "linux-x64": "\nGeneral configuration for OpenCV 4.12.0 =====================================\n  Version control:               4963eb8-dirty\n\n  Platform:\n    Timestamp:                   2026-11-15T02:07:55Z\n    Host:                        Linux 7.0.0-38-generic x86_64\n    CMake:                       4.4.4\n    CMake generator:             Ninja\n    CMake build tool:            /build/us/PaperBridge-zotero-plugin/.venv/bin/ninja\n    Configuration:               MinSizeRel\n    Algorithm Hint:              ALGO_HINT_ACCURATE\n\n  CPU/HW features:\n    Baseline:                    SSE SSE2 SSE3\n      requested:                 SSE3\n    Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX\n      SSE4_1 (14 files):         + SSSE3 SSE4_1\n      SSE4_2 (1 files):          + SSSE3 SSE4_1 POPCNT SSE4_2\n      AVX (4 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX\n      FP16 (0 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16\n      AVX2 (26 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3\n      AVX512_SKX (3 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3 AVX_512F AVX512_COMMON AVX512_SKX\n\n  C/C++:\n    Built as dynamic libs?:      NO\n    C++ standard:                11\n    C++ Compiler:                /build/us/PaperBridge-zotero-plugin/agent/codex/current-slimming-20261115/tools/debian11-sysroot/usr/bin/g++-10  (ver 10.2.1)\n    C++ flags (Release):         -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Wsuggest-override -Wno-delete-non-virtual-dtor -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -fvisibility-inlines-hidden -O3 -DNDEBUG  -DNDEBUG\n    C++ flags (Debug):           -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Wsuggest-override -Wno-delete-non-virtual-dtor -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -fvisibility-inlines-hidden -g  -O0 -DDEBUG -D_DEBUG\n    C Compiler:                  /build/us/PaperBridge-zotero-plugin/agent/codex/current-slimming-20261115/tools/debian11-sysroot/usr/bin/gcc-10\n    C flags (Release):           -fsigned-char -W -Wall -Wreturn-type -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -O3 -DNDEBUG  -DNDEBUG\n    C flags (Debug):             -fsigned-char -W -Wall -Wreturn-type -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -g  -O0 -DDEBUG -D_DEBUG\n    Linker flags (Release):      -Wl,--gc-sections -Wl,--as-needed -Wl,--no-undefined  \n    Linker flags (Debug):        -Wl,--gc-sections -Wl,--as-needed -Wl,--no-undefined  \n    ccache:                      YES\n    Precompiled headers:         NO\n    Extra dependencies:          dl m pthread rt\n    3rdparty dependencies:       libjpeg-turbo libpng zlib\n\n  OpenCV modules:\n    To be built:                 core imgcodecs imgproc python3\n    Disabled:                    world\n    Disabled by dependency:      calib3d dnn features2d flann highgui java_bindings_generator js_bindings_generator ml objc_bindings_generator objdetect photo python_tests stitching video videoio\n    Unavailable:                 gapi java python2 ts\n    Applications:                -\n    Documentation:               NO\n    Non-free algorithms:         NO\n\n  GUI: \n\n  Media I/O: \n    ZLib:                        build (ver 1.3.1)\n    JPEG:                        build-libjpeg-turbo (ver 3.1.0-70)\n      SIMD Support Request:      YES\n      SIMD Support:              NO\n    PNG:                         build (ver 1.6.43)\n      SIMD Support Request:      YES\n      SIMD Support:              YES (Intel SSE)\n    GIF:                         YES\n    HDR:                         YES\n    SUNRASTER:                   YES\n    PXM:                         YES\n    PFM:                         YES\n\n  Video I/O:\n    v4l/v4l2:                    YES (linux/videodev2.h)\n\n  Parallel framework:            pthreads\n\n  Trace:                         YES (built-in)\n\n  Other third-party libraries:\n    VA:                          NO\n    Eigen:                       NO\n    Custom HAL:                  NO\n    Flatbuffers:                 builtin/3rdparty (23.5.9)\n\n  Python 3:\n    Interpreter:                 /build/us/PaperBridge-zotero-plugin/.venv/bin/python (ver 3.12.16)\n    Libraries:                   /build/us/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-linux-x86_64-gnu/lib/libpython3.12.so (ver 3.12.16)\n    Limited API:                 NO\n    numpy:                       /build/us/PaperBridge-zotero-plugin/.venv/lib/python3.12/site-packages/numpy/_core/include (ver 2.5.4)\n    install path:                /build/us/PaperBridge-zotero-plugin/agent/codex/current-slimming-20261115/opencv-linux-x64/install/cv2/python-3.12\n\n  Python (for build):            /build/us/PaperBridge-zotero-plugin/.venv/bin/python\n\n  Install to:                    /build/us/PaperBridge-zotero-plugin/agent/codex/current-slimming-20261115/opencv-linux-x64/install\n-----------------------------------------------------------------\n\n",
-      "windows-x64": "\nGeneral configuration for OpenCV 5.0.0 =====================================\n  Version control:               5.0.0\n\n  Platform:\n    Timestamp:                   2026-07-01T09:07:40Z\n    Host:                        Windows 10.0.20348 AMD64\n    CMake:                       4.3.2\n    CMake generator:             Visual Studio 17 2022\n    CMake build tool:            C:/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/amd64/MSBuild.exe\n    MSVC:                        1944\n    Configuration:               Debug Release\n    Algorithm Hint:              ALGO_HINT_ACCURATE\n\n  CPU/HW features:\n    Baseline:                    SSE SSE2 SSE3\n      requested:                 SSE3\n    Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX\n      SSE4_1 (18 files):         + SSSE3 SSE4_1\n      SSE4_2 (1 files):          + SSSE3 SSE4_1 POPCNT SSE4_2\n      AVX (17 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX\n      FP16 (0 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16\n      AVX2 (49 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3\n      AVX512_SKX (9 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3 AVX_512F AVX512_COMMON AVX512_SKX\n\n  C/C++:\n    Built as dynamic libs?:      NO\n    C++ standard:                17\n    C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe  (ver 19.44.35228.0)\n    C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /O2 /Ob2 /DNDEBUG \n    C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /Zi /Ob0 /Od /RTC1 \n    C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe\n    C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /MP   /O2 /Ob2 /DNDEBUG \n    C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /MP /Zi /Ob0 /Od /RTC1 \n    Linker flags (Release):      /machine:x64  /NODEFAULTLIB:atlthunk.lib /INCREMENTAL:NO  /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:libcpmtd.lib /NODEFAULTLIB:msvcrtd.lib\n    Linker flags (Debug):        /machine:x64  /NODEFAULTLIB:atlthunk.lib /debug /INCREMENTAL  /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcpmt.lib /NODEFAULTLIB:msvcrt.lib\n    ccache:                      NO\n    Precompiled headers:         YES\n    Extra dependencies:          comctl32 gdi32 ole32 setupapi ws2_32\n    3rdparty dependencies:       ittnotify libprotobuf libjpeg-turbo libwebp libpng libtiff libopenjp2 zlib libclapack ipphal ippiw ippicv\n\n  OpenCV modules:\n    To be built:                 calib core dnn features flann geometry highgui imgcodecs imgproc objdetect photo ptcloud python3 stereo stitching video videoio\n    Disabled:                    java world\n    Disabled by dependency:      -\n    Unavailable:                 ts\n    Applications:                -\n    Documentation:               NO\n    Non-free algorithms:         NO\n\n  Windows RT support:            NO\n\n  GUI:                           NONE\n    VTK support:                 NO\n    Built-in Unicode font:       YES\n\n  Media I/O: \n    ZLib:                        build (ver 1.3.2)\n    JPEG:                        build-libjpeg-turbo (ver 3.1.2-70)\n      SIMD Support Request:      YES\n      SIMD Support:              YES\n    WEBP:                        build (ver decoder: 0x0210, encoder: 0x0210, demux: 0x0107)\n    AVIF:                        NO\n    PNG:                         build (ver 1.6.57)\n      SIMD Support Request:      YES\n      SIMD Support:              YES (Intel SSE)\n      Metadata Support:          EXIF XMP ICC cICP\n    TIFF:                        build (ver 42 - 4.7.1)\n    JPEG 2000:                   build (ver 2.5.3)\n    OpenEXR:                     NO\n    GIF:                         YES\n    HDR:                         YES\n    SUNRASTER:                   YES\n    PXM:                         YES\n    PFM:                         YES\n\n  Video I/O:\n    FFMPEG:                      YES (prebuilt binaries)\n      avcodec:                   YES (61.19.100)\n      avformat:                  YES (61.7.100)\n      avutil:                    YES (59.39.100)\n      swscale:                   YES (8.3.100)\n      avdevice:                  NO\n    GStreamer:                   NO\n    DirectShow:                  YES\n    Orbbec:                      NO\n\n  Parallel framework:            Concurrency\n\n  Trace:                         YES (with Intel ITT(3.25.4))\n\n  Other third-party libraries:\n    Intel IPP:                   2026.0.0 [2026.0.0]\n           at:                   D:/a/opencv-python/opencv-python/_skbuild/win-amd64-3.9/cmake-build/3rdparty/ippicv/ippicv_win/icv\n    Intel IPP IW:                sources (2026.0.0)\n              at:                D:/a/opencv-python/opencv-python/_skbuild/win-amd64-3.9/cmake-build/3rdparty/ippicv/ippicv_win/iw\n    Lapack:                      YES (Built-In libclapack)\n    DNN MLAS:                    NO (no ASM compiler available for AMD64)\n    Eigen:                       NO\n    Custom HAL:                  YES (ipp (ver 0.0.1))\n    Protobuf:                    build (3.19.1)\n    Flatbuffers:                 builtin/3rdparty (25.9.23)\n\n  OpenCL:                        YES (NVD3D11)\n    Include path:                D:/a/opencv-python/opencv-python/opencv/3rdparty/include/opencl/1.2\n    Link libraries:              Dynamic load\n\n  ONNX Runtime:                  NO\n\n  Python 3:\n    Interpreter:                 C:/hostedtoolcache/windows/Python/3.9.13/x64/python.exe (ver 3.9.13)\n    Libraries:                   C:/hostedtoolcache/windows/Python/3.9.13/x64/libs/python39.lib (ver 3.9.13)\n    Limited API:                 YES (ver 0x03060000)\n    numpy:                       C:/hostedtoolcache/windows/Python/3.9.13/x64/lib/site-packages/numpy/_core/include (ver 2.0.2)\n    install path:                python/cv2/python-3\n\n  Python (for build):            C:\\hostedtoolcache\\windows\\Python\\3.9.13\\x64\\python.exe\n\n  Java:                          \n    ant:                         NO\n    Java:                        YES (ver 1.8.0.492)\n    JNI:                         C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk/8.0.492-9/x64/include C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk/8.0.492-9/x64/include/win32 C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk/8.0.492-9/x64/include\n    Java wrappers:               NO\n    Java tests:                  NO\n\n  Install to:                    D:/a/opencv-python/opencv-python/_skbuild/win-amd64-3.9/cmake-install\n-----------------------------------------------------------------\n\n"
+      "windows-x64": "\nGeneral configuration for OpenCV 5.0.0 =====================================\n  Version control:               5.0.0\n\n  Platform:\n    Timestamp:                   2026-07-01T09:07:40Z\n    Host:                        Windows 10.0.20348 AMD64\n    CMake:                       4.3.2\n    CMake generator:             Visual Studio 17 2022\n    CMake build tool:            C:/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/amd64/MSBuild.exe\n    MSVC:                        1944\n    Configuration:               Debug Release\n    Algorithm Hint:              ALGO_HINT_ACCURATE\n\n  CPU/HW features:\n    Baseline:                    SSE SSE2 SSE3\n      requested:                 SSE3\n    Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX\n      SSE4_1 (18 files):         + SSSE3 SSE4_1\n      SSE4_2 (1 files):          + SSSE3 SSE4_1 POPCNT SSE4_2\n      AVX (17 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX\n      FP16 (0 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16\n      AVX2 (49 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3\n      AVX512_SKX (9 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3 AVX_512F AVX512_COMMON AVX512_SKX\n\n  C/C++:\n    Built as dynamic libs?:      NO\n    C++ standard:                17\n    C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe  (ver 19.44.35228.0)\n    C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /O2 /Ob2 /DNDEBUG \n    C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /Zi /Ob0 /Od /RTC1 \n    C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe\n    C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /MP   /O2 /Ob2 /DNDEBUG \n    C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise    /MP /Zi /Ob0 /Od /RTC1 \n    Linker flags (Release):      /machine:x64  /NODEFAULTLIB:atlthunk.lib /INCREMENTAL:NO  /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:libcpmtd.lib /NODEFAULTLIB:msvcrtd.lib\n    Linker flags (Debug):        /machine:x64  /NODEFAULTLIB:atlthunk.lib /debug /INCREMENTAL  /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcpmt.lib /NODEFAULTLIB:msvcrt.lib\n    ccache:                      NO\n    Precompiled headers:         YES\n    Extra dependencies:          comctl32 gdi32 ole32 setupapi ws2_32\n    3rdparty dependencies:       ittnotify libprotobuf libjpeg-turbo libwebp libpng libtiff libopenjp2 zlib libclapack ipphal ippiw ippicv\n\n  OpenCV modules:\n    To be built:                 calib core dnn features flann geometry highgui imgcodecs imgproc objdetect photo ptcloud python3 stereo stitching video videoio\n    Disabled:                    java world\n    Disabled by dependency:      -\n    Unavailable:                 ts\n    Applications:                -\n    Documentation:               NO\n    Non-free algorithms:         NO\n\n  Windows RT support:            NO\n\n  GUI:                           NONE\n    VTK support:                 NO\n    Built-in Unicode font:       YES\n\n  Media I/O: \n    ZLib:                        build (ver 1.3.2)\n    JPEG:                        build-libjpeg-turbo (ver 3.1.2-70)\n      SIMD Support Request:      YES\n      SIMD Support:              YES\n    WEBP:                        build (ver decoder: 0x0210, encoder: 0x0210, demux: 0x0107)\n    AVIF:                        NO\n    PNG:                         build (ver 1.6.57)\n      SIMD Support Request:      YES\n      SIMD Support:              YES (Intel SSE)\n      Metadata Support:          EXIF XMP ICC cICP\n    TIFF:                        build (ver 42 - 4.7.1)\n    JPEG 2000:                   build (ver 2.5.3)\n    OpenEXR:                     NO\n    GIF:                         YES\n    HDR:                         YES\n    SUNRASTER:                   YES\n    PXM:                         YES\n    PFM:                         YES\n\n  Video I/O:\n    FFMPEG:                      YES (prebuilt binaries)\n      avcodec:                   YES (61.19.100)\n      avformat:                  YES (61.7.100)\n      avutil:                    YES (59.39.100)\n      swscale:                   YES (8.3.100)\n      avdevice:                  NO\n    GStreamer:                   NO\n    DirectShow:                  YES\n    Orbbec:                      NO\n\n  Parallel framework:            Concurrency\n\n  Trace:                         YES (with Intel ITT(3.25.4))\n\n  Other third-party libraries:\n    Intel IPP:                   2026.0.0 [2026.0.0]\n           at:                   D:/a/opencv-python/opencv-python/_skbuild/win-amd64-3.9/cmake-build/3rdparty/ippicv/ippicv_win/icv\n    Intel IPP IW:                sources (2026.0.0)\n              at:                D:/a/opencv-python/opencv-python/_skbuild/win-amd64-3.9/cmake-build/3rdparty/ippicv/ippicv_win/iw\n    Lapack:                      YES (Built-In libclapack)\n    DNN MLAS:                    NO (no ASM compiler available for AMD64)\n    Eigen:                       NO\n    Custom HAL:                  YES (ipp (ver 0.0.1))\n    Protobuf:                    build (3.19.1)\n    Flatbuffers:                 builtin/3rdparty (25.9.23)\n\n  OpenCL:                        YES (NVD3D11)\n    Include path:                D:/a/opencv-python/opencv-python/opencv/3rdparty/include/opencl/1.2\n    Link libraries:              Dynamic load\n\n  ONNX Runtime:                  NO\n\n  Python 3:\n    Interpreter:                 C:/hostedtoolcache/windows/Python/3.9.13/x64/python.exe (ver 3.9.13)\n    Libraries:                   C:/hostedtoolcache/windows/Python/3.9.13/x64/libs/python39.lib (ver 3.9.13)\n    Limited API:                 YES (ver 0x03060000)\n    numpy:                       C:/hostedtoolcache/windows/Python/3.9.13/x64/lib/site-packages/numpy/_core/include (ver 2.0.2)\n    install path:                python/cv2/python-3\n\n  Python (for build):            C:\\hostedtoolcache\\windows\\Python\\3.9.13\\x64\\python.exe\n\n  Java:                          \n    ant:                         NO\n    Java:                        YES (ver 1.8.0.492)\n    JNI:                         C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk/8.0.492-9/x64/include C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk/8.0.492-9/x64/include/win32 C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk/8.0.492-9/x64/include\n    Java wrappers:               NO\n    Java tests:                  NO\n\n  Install to:                    D:/a/opencv-python/opencv-python/_skbuild/win-amd64-3.9/cmake-install\n-----------------------------------------------------------------\n\n",
+      "macos-arm64": {
+        "status": "actual_native_build_inputs_and_extension_verified",
+        "sourceId": "opencv-linux",
+        "version": "4.12.0",
+        "sourceArchiveSha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
+        "sourceNotice": {
+          "path": "addon/licenses/supplemental/macos/opencv/LICENSE",
+          "archiveMember": "opencv-4.12.0/LICENSE",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        "evidencePath": "addon/licenses/supplemental/macos/source-evidence.json",
+        "evidenceSha256": "ea32bd33237585e728c5ef225d3f631d0133a434afe0a3fba1f4144c55036482",
+        "limitations": [
+          "Original CI runtime extensionBytes is stale; main hydration refreshes metadata without changing native bytes."
+        ],
+        "candidateOrigin": {
+          "runId": 44775827555,
+          "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+          "platform": "macos-arm64",
+          "buildInputsArtifactId": 14650048375,
+          "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+          "bundledArtifactId": 14649049315,
+          "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+          "artifactZipHashStatus": "user_verified_github_artifact_digest",
+          "xpi": {
+            "name": "paperbridge-0.4.3-macos-arm64.xpi",
+            "bytes": 182068982,
+            "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+          },
+          "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+        },
+        "stagedExtension": {
+          "path": "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.cpython-312-darwin.so",
+          "bytes": 7399184,
+          "sha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530"
+        },
+        "unsanitizedExtension": {
+          "bytes": 7424248,
+          "sha256": "b2f7e814e872988ac73da26e0b8e3065009fb45e5a89404de8fff457cd4a4ce7"
+        },
+        "retainedBuildInputs": [
+          {
+            "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/CMakeCache.txt",
+            "bytes": 160290,
+            "sha256": "38cfdf8d3d79a7701def5fced77a5b93c5a8e9a63098142070a2a00ae0815bef",
+            "originalArtifactPath": "candidate-native/CMakeCache.txt"
+          },
+          {
+            "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-build-information.txt",
+            "bytes": 5823,
+            "sha256": "b53d53829194169e49686322c6b5e527d86f5a0e671cf2379e7c87fa02ddaa7a",
+            "originalArtifactPath": "candidate-native/opencv-build-information.txt"
+          },
+          {
+            "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-build.json",
+            "bytes": 931,
+            "sha256": "888289309853b3a6734a92ce3fe46cb27e8b20445304c8cf615ca1fd3443c344",
+            "originalArtifactPath": "candidate-native/opencv-build.json"
+          },
+          {
+            "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-config-3.12.py",
+            "bytes": 188,
+            "sha256": "41adbf7284b0ea2954c93d681ad84f931b2759e72f6bb56459cb163633cbe284",
+            "originalArtifactPath": "candidate-native/opencv-config-3.12.py"
+          },
+          {
+            "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-config.py",
+            "bytes": 169,
+            "sha256": "b41ca86d89cac01c3c27e6872e3f709a3c914ea128997a64c715d8a15ef8c3fb",
+            "originalArtifactPath": "candidate-native/opencv-config.py"
+          }
+        ],
+        "runtimeMetadataConsistency": {
+          "status": "original_ci_runtime_extension_size_stale_main_hydration_refresh_required",
+          "declaredExtensionBytes": 7424248,
+          "actualExtensionBytes": 7399184,
+          "actualExtensionSha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530",
+          "scope": "Refresh metadata only during main-task hydration; keep actual native bytes unchanged."
+        }
+      }
+    },
+    "macosNativeWheels": {
+      "path": "addon/licenses/supplemental/macos/native-wheels.json",
+      "bytes": 174802,
+      "sha256": "f796a411a9c95c988504e44ab22d7f0a2546db6d4f42b2b3c8116c28596d4bf0",
+      "nativeDistributions": 31,
+      "sourceInputScope": "Matching source versions and exact lockfile supersets; actual optional/target linkage is not asserted."
     }
   },
   "rustSourceScope": {
@@ -9640,6 +11392,7 @@
   "evidenceLimits": [
     "All 243 existing Cargo.lock registry candidates now have checksum-matching archives. Optional/test/other-target presence does not prove linkage.",
     "Tiktoken 0.14.0 PyPI native wheel bytes match the old Linux/Windows baseline. Public tag/sdist/wheels contain no Cargo.lock or third-party dependency manifest; unauthenticated tag-build logs are unavailable. Direct-dependency notices/source candidates are retained but exact transitive versions remain unconfirmed. Missing lock or byte-identical rebuild is not itself a proven missing-license violation.",
-    "Original wheel compiler options and enabled/static/font attribution are not fully reconstructed. Supplied full sources, notices and build declarations do not claim bit-identical native reproduction; this uncertainty alone is not a release gate. Any specifically identified missing required source/notice remains actionable."
+    "Original wheel compiler options and enabled/static/font attribution are not fully reconstructed. Supplied full sources, notices and build declarations do not claim bit-identical native reproduction; this uncertainty alone is not a release gate. Any specifically identified missing required source/notice remains actionable.",
+    "Actual Mac interpreter/native bytes, Makefile/pyconfig, OpenCV build inputs and 31 official wheel records are verified. Final repack/source-ZIP binding and stale OpenCV runtime size refresh belong to the main task. ONNX Runtime revision 6af1a93, Tiktoken compiled transitive versions and unreported compiler/optional-link details remain unknown; no substituted source or new generic gate is introduced."
   ]
 }

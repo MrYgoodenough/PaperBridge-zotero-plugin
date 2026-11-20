@@ -94,6 +94,12 @@ for package in metadata.get("packages", []):
             build["unsanitizedExtensionSha256"] = build.get("extensionSha256")
             build["extensionSha256"] = actual
             build["pathSanitized"] = True
+        # Relocation/signing can also change size even when a reused stage already has its final hash.
+        actual_bytes = extensions[0].stat().st_size
+        if actual_bytes != build.get("extensionBytes"):
+            build["unsanitizedExtensionBytes"] = build.get("extensionBytes")
+            build["extensionBytes"] = actual_bytes
+            build["pathSanitized"] = True
 # Always rebuild from current bytes: a source-built cv2 must not reuse a wheel-era ZIP.
 payload_candidate = payload.with_suffix(".zip.tmp")
 with zipfile.ZipFile(payload_candidate, "w", zipfile.ZIP_DEFLATED, compresslevel=ZIP_COMPRESSION_LEVEL) as archive:

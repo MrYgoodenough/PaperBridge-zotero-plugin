@@ -53,6 +53,8 @@ ZOTERO_VERSION = "10.0.8"
 OFFICIAL_URL = "https://www.zotero.org/download/client/dl?channel=release&version=10.0.8&platform=mac"
 # Allow ten minutes per real GUI phase; timeout must never kill Zotero.
 PHASE_TIMEOUT = 600
+# Public installer/preparation commands get five minutes, separate from native UI work.
+INSTALL_TIMEOUT = 300
 # Keep client, mount and all reports inside the calling checkout.
 root, tools = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
 artifact = root / "dist/candidate-native-zotero"
@@ -70,7 +72,7 @@ def logged(command, path):
         log.write(shlex.join(command) + "\n")
         log.flush()
         subprocess.run(command, cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT,
-                       timeout=300, check=True)
+                       timeout=INSTALL_TIMEOUT, check=True)
 
 
 # Missing native reports remain unknown, never fabricated provider/check successes.
@@ -92,7 +94,7 @@ try:
     install_log = artifact / f"install-{tools.name}.log"
     dmg, mount, app = tools / "Zotero.dmg", tools / "mount", tools / "Zotero.app"
     mount.mkdir()
-    logged(["curl", "--fail", "--location", "--max-time", "300", OFFICIAL_URL, "--output", str(dmg)], install_log)
+    logged(["curl", "--fail", "--location", "--max-time", str(INSTALL_TIMEOUT), OFFICIAL_URL, "--output", str(dmg)], install_log)
     logged(["hdiutil", "attach", "-readonly", "-nobrowse", "-mountpoint", str(mount), str(dmg)], install_log)
     logged(["ditto", str(mount / "Zotero.app"), str(app)], install_log)
     with (app / "Contents/Info.plist").open("rb") as stream:
@@ -133,7 +135,11 @@ try:
             with (profile / "user.js").open("a", encoding="utf-8") as prefs:
                 for key in ("extensions.zotero.firstRun2", "app.update.enabled", "extensions.update.enabled"):
                     prefs.write(f"\nuser_pref({json.dumps(key)}, false);\n")
-            command = [str(app / "Contents/MacOS/zotero"), "-no-remote", "-profile", str(profile)]
+                # Hosted Mac VMs lack GPU WebRender; Gecko's supported software renderer keeps UI tests real.
+                for key in ("gfx.webrender.software", "layers.acceleration.disabled"):
+                    prefs.write(f"\nuser_pref({json.dumps(key)}, true);\n")
+            # LaunchServices initializes the native GUI session; open's PID is not the actual Zotero PID.
+            command = ["open", "-W", "-n", str(app), "--args", "-no-remote", "-profile", str(profile)]
             with Path(str(prefix) + "-launch.log").open("w", encoding="utf-8") as log:
                 log.write(shlex.join(command) + "\n")
                 log.flush()
@@ -149,6 +155,9 @@ try:
             if report.exists():
                 shutil.copyfile(report, Path(str(prefix) + ".json"))
                 native = json.loads(report.read_text())
+            helper_error = root / ".runtime/packaged-test.json"
+            if not native and helper_error.is_file():
+                shutil.copyfile(helper_error, Path(str(prefix) + "-helper-error.json"))
             checks = native.get("checks", [])
             result.update(actualChecks=len(checks) if native else None,
                           providerCalls=native.get("providerCalls"), zoteroVersion=native.get("zoteroVersion"),

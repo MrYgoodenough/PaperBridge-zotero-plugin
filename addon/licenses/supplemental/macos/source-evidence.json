@@ -1,0 +1,3063 @@
+{
+  "_comment": "Actual macOS candidate native bytes and original source/notice inputs; final rebuilt XPI/source-ZIP delivery is separate. Original files remain unchanged.",
+  "schemaVersion": 1,
+  "platform": "macos-arm64",
+  "licenseCompliance": "unknown",
+  "sourceSelection": {
+    "status": "actual_native_versions_and_publisher_source_inputs_verified",
+    "archiveCount": 295,
+    "archives": [
+      {
+        "id": "babeldoc",
+        "version": "0.6.4",
+        "filename": "babeldoc-0.6.4.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/a8/6b/96925501ac8d8b22bcbddd3a8baebe53575e37cd1f82ba634b95000d0bfe/babeldoc-0.6.4.tar.gz",
+        "bytes": 16415074,
+        "sha256": "dbd2a69ccaf6678c34089f8c422a38a0fa170f5fa88ee1313b4235103421a875"
+      },
+      {
+        "id": "cffi-native-source",
+        "version": "2.1.1",
+        "filename": "cffi-2.1.1.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz",
+        "bytes": 530807,
+        "sha256": "dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be"
+      },
+      {
+        "id": "cpython-linux",
+        "version": "3.12.16",
+        "filename": "Python-3.12.16.tar.xz",
+        "url": "https://www.python.org/ftp/python/3.12.16/Python-3.12.16.tar.xz",
+        "bytes": 20839652,
+        "sha256": "b5796915dc45ff745cfb4e990a7e7c93d6f546328a102ce31448d69ebc37575c"
+      },
+      {
+        "id": "cryptography-native-source",
+        "version": "50.0.2",
+        "filename": "cryptography-50.0.2.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/9d/af/182eb91b0df3fe75c4d9f26fe70684569566745f6ba7e5c9c73a862c5252/cryptography-50.0.2.tar.gz",
+        "bytes": 880623,
+        "sha256": "7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5"
+      },
+      {
+        "id": "cryptography-openssl",
+        "version": "4.0.3",
+        "filename": "openssl-4.0.3.tar.gz",
+        "url": "https://github.com/openssl/openssl/releases/download/openssl-4.0.3/openssl-4.0.3.tar.gz",
+        "bytes": 55235667,
+        "sha256": "325b5c806167c13b40b1ffeadfe0248197c00eccc4cf123ec1e28d2d2fd216d9"
+      },
+      {
+        "id": "freetype-harfbuzz",
+        "version": "8.3.0",
+        "filename": "harfbuzz-8.3.0.tar.xz",
+        "url": "https://github.com/harfbuzz/harfbuzz/releases/download/8.3.0/harfbuzz-8.3.0.tar.xz",
+        "bytes": 19002808,
+        "sha256": "109501eaeb8bde3eadb25fab4164e993fbace29c3d775bcaa1c1e58e2f15f847"
+      },
+      {
+        "id": "freetype-native",
+        "version": "2.13.2",
+        "filename": "freetype-2.13.2.tar.xz",
+        "url": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz",
+        "bytes": 2501764,
+        "sha256": "12991c4e55c506dd7f9b765933e62fd2be2e06d421505d7950a132e4f1bb484d"
+      },
+      {
+        "id": "freetype-py-native-source",
+        "version": "2.5.1",
+        "filename": "freetype-py-2.5.1.zip",
+        "url": "https://files.pythonhosted.org/packages/d0/9c/61ba17f846b922c2d6d101cc886b0e8fb597c109cedfcb39b8c5d2304b54/freetype-py-2.5.1.zip",
+        "bytes": 851738,
+        "sha256": "cfe2686a174d0dd3d71a9d8ee9bf6a2c23f5872385cf8ce9f24af83d076e2fbd"
+      },
+      {
+        "id": "hyperscan-native-source",
+        "version": "0.9.1",
+        "filename": "hyperscan-0.9.1.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/71/de/7d18ac7f426e0096108a203cb9a4abc8d1b04aadf88838ae74fd9da2f089/hyperscan-0.9.1.tar.gz",
+        "bytes": 125854,
+        "sha256": "435aac3317b502ed73b183a35a58073853920b767d2e150722877f00c89ed824"
+      },
+      {
+        "id": "hyperscan-pcre",
+        "version": "8.45",
+        "filename": "pcre-8.45.tar.bz2",
+        "url": "https://ftp.exim.org/pub/pcre/pcre-8.45.tar.bz2",
+        "bytes": 1578809,
+        "sha256": "4dae6fdcd2bb0bb6c37b5f97c33c2be954da743985369cddac3546e3218bffb8"
+      },
+      {
+        "id": "jiter-native-source",
+        "version": "0.18.0",
+        "filename": "jiter-0.18.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/63/5b/f68319f4fe624311a744a33d10fdbcac4c971991e348223cba60d31780b2/jiter-0.18.0.tar.gz",
+        "bytes": 234470,
+        "sha256": "a0ca63fd9450a212e4e658d4cfe0ab4977c4f9b0003c68828b843c65e27662ff"
+      },
+      {
+        "id": "levenshtein",
+        "version": "0.27.5",
+        "filename": "levenshtein-0.27.5.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/81/ab/d55fdebfdee7605df174913708d44f75dfec0ec5e4e5fd8e978bb88897eb/levenshtein-0.27.5.tar.gz",
+        "bytes": 402914,
+        "sha256": "22021caf5867a46fae5ab927bbdcb430599d7e5ee3898449cbbe430ff07b7d08"
+      },
+      {
+        "id": "libspatialindex",
+        "version": "2.1.0",
+        "filename": "libspatialindex-2.1.0-source.tar.gz",
+        "url": "https://codeload.github.com/libspatialindex/libspatialindex/tar.gz/refs/tags/2.1.0",
+        "bytes": 670671,
+        "sha256": "a04513cea04dd20ab2c9d153c14cc45692805ee496b30619103f7929f6fb81bf"
+      },
+      {
+        "id": "lxml-native-source",
+        "version": "6.1.3",
+        "filename": "lxml-6.1.3.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/23/ad/28ecd7cb894d172f3c9c80a075eeeb2017ac62e3632cee05a5f9493547eb/lxml-6.1.3.tar.gz",
+        "bytes": 4211198,
+        "sha256": "45222d94ddd511536f3b2f7d9deae3b2339b4ce0f075f1ca25703b07cad9dd21"
+      },
+      {
+        "id": "mupdf",
+        "version": "1.26.12",
+        "filename": "mupdf-1.26.12-source.tar.gz",
+        "url": "https://mupdf.com/downloads/archive/mupdf-1.26.12-source.tar.gz",
+        "bytes": 64536473,
+        "sha256": "6baf910928f404167ba49be6340195dec340795724722b331f5a2143f5aa0d01"
+      },
+      {
+        "id": "opencv-linux",
+        "version": "4.12.0",
+        "filename": "opencv-4.12.0.tar.gz",
+        "url": "https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.12.0",
+        "bytes": 95254890,
+        "sha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d"
+      },
+      {
+        "id": "orjson-native-source",
+        "version": "3.13.0",
+        "filename": "orjson-3.13.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/f2/72/380b97dc45bd162d23afe5194721ef678d9eac7cfaa549fe2873f7f0a518/orjson-3.13.0.tar.gz",
+        "bytes": 2732604,
+        "sha256": "d1de5eb04485110c5da4c657e49168995d55e076b1ce60f1a042e254f4186c4f"
+      },
+      {
+        "id": "pbs-linux-bzip2",
+        "version": "1.0.8",
+        "filename": "bzip2-1.0.8.tar.gz",
+        "url": "https://astral-sh.github.io/mirror/files/bzip2-1.0.8.tar.gz",
+        "bytes": 810029,
+        "sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+      },
+      {
+        "id": "pbs-linux-expat",
+        "version": "2.9.0",
+        "filename": "expat-2.9.0.tar.xz",
+        "url": "https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.xz",
+        "bytes": 534052,
+        "sha256": "1e6371862cc31999b368c3b89b49994f0677e1bab5f1b2b85ae3741f5d803051"
+      },
+      {
+        "id": "pbs-linux-libffi",
+        "version": "3.8.0",
+        "filename": "libffi-3.8.0.tar.gz",
+        "url": "https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz",
+        "bytes": 1581626,
+        "sha256": "7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4"
+      },
+      {
+        "id": "pbs-linux-mpdecimal",
+        "version": "4.0.0",
+        "filename": "mpdecimal-4.0.0.tar.gz",
+        "url": "https://astral-sh.github.io/mirror/files/mpdecimal-4.0.0.tar.gz",
+        "bytes": 315325,
+        "sha256": "942445c3245b22730fd41a67a7c5c231d11cb1b9936b9c0f76334fb7d0b4468c"
+      },
+      {
+        "id": "pbs-linux-openssl-3.5",
+        "version": "3.5.9",
+        "filename": "openssl-3.5.9.tar.gz",
+        "url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz",
+        "bytes": 53279637,
+        "sha256": "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a"
+      },
+      {
+        "id": "pbs-linux-sqlite",
+        "version": "3530100",
+        "filename": "sqlite-autoconf-3530100.tar.gz",
+        "url": "https://www.sqlite.org/2026/sqlite-autoconf-3530100.tar.gz",
+        "bytes": 3275272,
+        "sha256": "83e6b2020a034e9a7ad4a72feea59e1ad52f162e09cbd26735a3ffb98359fc4f"
+      },
+      {
+        "id": "pbs-linux-tcl",
+        "version": "9.0.4",
+        "filename": "tcl9.0.4-src.tar.gz",
+        "url": "https://prdownloads.sourceforge.net/tcl/tcl9.0.4-src.tar.gz",
+        "bytes": 11866337,
+        "sha256": "d0aed49230bc02a65c1e0229e65f34590a4b037ec40d546f32573b467f7551ea"
+      },
+      {
+        "id": "pbs-linux-tk",
+        "version": "9.0.4",
+        "filename": "tk9.0.4-src.tar.gz",
+        "url": "https://prdownloads.sourceforge.net/tcl/tk9.0.4-src.tar.gz",
+        "bytes": 4613019,
+        "sha256": "d7a146d2917eb8b5cc95276dbf0e3d03c7464d2b19c1675357857c989301dbb4"
+      },
+      {
+        "id": "pbs-linux-uuid",
+        "version": "1.0.3",
+        "filename": "libuuid-1.0.3.tar.gz",
+        "url": "https://sourceforge.net/projects/libuuid/files/libuuid-1.0.3.tar.gz",
+        "bytes": 318256,
+        "sha256": "46af3275291091009ad7f1b899de3d0cea0252737550e7919d17237997db5644"
+      },
+      {
+        "id": "pbs-linux-xz",
+        "version": "5.8.4",
+        "filename": "xz-5.8.4.tar.gz",
+        "url": "https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.gz",
+        "bytes": 2799797,
+        "sha256": "0014c7886930454fe8bd4228665b51af55eeae560ea135c9c4cd33f55b2591d9"
+      },
+      {
+        "id": "pillow-native-source",
+        "version": "13.0.0",
+        "filename": "pillow-13.0.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/ce/a4/9cc30690a394a8305e8be4c9036aa16d0dfddadd09079860b582f562496d/pillow-13.0.0.tar.gz",
+        "bytes": 47058631,
+        "sha256": "cdcd1ba258178f7356d74170c9a81ba4eab6a5d55748bc402a5a2a6fe6be3510"
+      },
+      {
+        "id": "pydantic-core-native-source",
+        "version": "2.50.1",
+        "filename": "pydantic_core-2.50.1.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/a6/24/af4ec4be49fbc810f35b0bdcacc3d433b56bbfa469fd3bfd4ae116cd9bf1/pydantic_core-2.50.1.tar.gz",
+        "bytes": 513515,
+        "sha256": "e50d7b94baac6c7d09927fa5ca5800a0c7ee5015c7fcff65beb3a1931b5a6e09"
+      },
+      {
+        "id": "pymupdf",
+        "version": "1.26.7",
+        "filename": "pymupdf-1.26.7.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/48/d6/09b28f027b510838559f7748807192149c419b30cb90e6d5f0cf916dc9dc/pymupdf-1.26.7.tar.gz",
+        "bytes": 84327033,
+        "sha256": "71add8bdc8eb1aaa207c69a13400693f06ad9b927bea976f5d5ab9df0bb489c3"
+      },
+      {
+        "id": "pymupdf4llm",
+        "version": "0.2.9",
+        "filename": "pymupdf4llm-0.2.9.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/cb/25/40ce2f199d97439bff28d9fb3723d68995905b98cba113873d9ff6cfd013/pymupdf4llm-0.2.9.tar.gz",
+        "bytes": 70453,
+        "sha256": "6a3e156d1f5724353ae44c18b86b4c5eefcc0d8599eb73a0e92f8137fcbce012"
+      },
+      {
+        "id": "python-build-standalone-linux",
+        "version": "fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+        "filename": "python-build-standalone-fa506e0858ac9f2cc5b289c137b888a2aa24d1ee.tar.gz",
+        "url": "https://codeload.github.com/astral-sh/python-build-standalone/tar.gz/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+        "bytes": 465507,
+        "sha256": "2d393784593531f14f1aad1e4e60c91fde242cfa87432c35ed31f4c18b3e89ff"
+      },
+      {
+        "id": "rtree-native-source",
+        "version": "1.4.1",
+        "filename": "rtree-1.4.1.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/95/09/7302695875a019514de9a5dd17b8320e7a19d6e7bc8f85dcfb79a4ce2da3/rtree-1.4.1.tar.gz",
+        "bytes": 52425,
+        "sha256": "c6b1b3550881e57ebe530cc6cffefc87cd9bf49c30b37b894065a9f810875e46"
+      },
+      {
+        "id": "rust-crate-ahash-0.8.12",
+        "version": "0.8.12",
+        "filename": "ahash-0.8.12.crate",
+        "url": "https://static.crates.io/crates/ahash/ahash-0.8.12.crate",
+        "bytes": 43413,
+        "sha256": "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
+      },
+      {
+        "id": "rust-crate-aho-corasick-1.1.3",
+        "version": "1.1.3",
+        "filename": "aho-corasick-1.1.3.crate",
+        "url": "https://static.crates.io/crates/aho-corasick/aho-corasick-1.1.3.crate",
+        "bytes": 183311,
+        "sha256": "8e60d3430d3a69478ad0993f19238d2df97c507009a52b3c10addcd7f6bcb916"
+      },
+      {
+        "id": "rust-crate-aho-corasick-1.1.5",
+        "version": "1.1.5",
+        "filename": "aho-corasick-1.1.5.crate",
+        "url": "https://static.crates.io/crates/aho-corasick/aho-corasick-1.1.5.crate",
+        "bytes": 184315,
+        "sha256": "c982642fa9e8606056828ee9a8505737230110bb1099153c79efe865c59d12ba"
+      },
+      {
+        "id": "rust-crate-anes-0.1.6",
+        "version": "0.1.6",
+        "filename": "anes-0.1.6.crate",
+        "url": "https://static.crates.io/crates/anes/anes-0.1.6.crate",
+        "bytes": 23857,
+        "sha256": "4b46cbb362ab8752921c97e041f5e366ee6297bd428a31275b9fcf1e380f7299"
+      },
+      {
+        "id": "rust-crate-anstyle-1.0.14",
+        "version": "1.0.14",
+        "filename": "anstyle-1.0.14.crate",
+        "url": "https://static.crates.io/crates/anstyle/anstyle-1.0.14.crate",
+        "bytes": 17787,
+        "sha256": "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
+      },
+      {
+        "id": "rust-crate-anyhow-1.0.104",
+        "version": "1.0.104",
+        "filename": "anyhow-1.0.104.crate",
+        "url": "https://static.crates.io/crates/anyhow/anyhow-1.0.104.crate",
+        "bytes": 48819,
+        "sha256": "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
+      },
+      {
+        "id": "rust-crate-approx-0.5.1",
+        "version": "0.5.1",
+        "filename": "approx-0.5.1.crate",
+        "url": "https://static.crates.io/crates/approx/approx-0.5.1.crate",
+        "bytes": 15100,
+        "sha256": "cab112f0a86d568ea0e627cc1d6be74a1e9cd55214684db5561995f6dad897c6"
+      },
+      {
+        "id": "rust-crate-asn1-0.24.1",
+        "version": "0.24.1",
+        "filename": "asn1-0.24.1.crate",
+        "url": "https://static.crates.io/crates/asn1/asn1-0.24.1.crate",
+        "bytes": 50502,
+        "sha256": "c9795210620c0cb3f9a7ce4f882808c38e1ef7b347c90591dceae0886e031fb1"
+      },
+      {
+        "id": "rust-crate-asn1_derive-0.24.1",
+        "version": "0.24.1",
+        "filename": "asn1_derive-0.24.1.crate",
+        "url": "https://static.crates.io/crates/asn1_derive/asn1_derive-0.24.1.crate",
+        "bytes": 9534,
+        "sha256": "909e307f1cc32bb8bccbd98f446e6d1bf03fa30f7b53a4337da7181ad30fa11a"
+      },
+      {
+        "id": "rust-crate-associative-cache-3.0.1",
+        "version": "3.0.1",
+        "filename": "associative-cache-3.0.1.crate",
+        "url": "https://static.crates.io/crates/associative-cache/associative-cache-3.0.1.crate",
+        "bytes": 21494,
+        "sha256": "138b4febdc7d0135523c55358c97361fd45089bc65fe859ef21a58d0892deb00"
+      },
+      {
+        "id": "rust-crate-autocfg-1.3.0",
+        "version": "1.3.0",
+        "filename": "autocfg-1.3.0.crate",
+        "url": "https://static.crates.io/crates/autocfg/autocfg-1.3.0.crate",
+        "bytes": 16524,
+        "sha256": "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0"
+      },
+      {
+        "id": "rust-crate-autocfg-1.5.1",
+        "version": "1.5.1",
+        "filename": "autocfg-1.5.1.crate",
+        "url": "https://static.crates.io/crates/autocfg/autocfg-1.5.1.crate",
+        "bytes": 18911,
+        "sha256": "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
+      },
+      {
+        "id": "rust-crate-base64-0.23.0",
+        "version": "0.23.0",
+        "filename": "base64-0.23.0.crate",
+        "url": "https://static.crates.io/crates/base64/base64-0.23.0.crate",
+        "bytes": 93578,
+        "sha256": "b25655df2c3cdd83c5e5b293b88acd880332b2ddadd7c30ac43144fdc0033da9"
+      },
+      {
+        "id": "rust-crate-base64-0.23.1",
+        "version": "0.23.1",
+        "filename": "base64-0.23.1.crate",
+        "url": "https://static.crates.io/crates/base64/base64-0.23.1.crate",
+        "bytes": 93605,
+        "sha256": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
+      },
+      {
+        "id": "rust-crate-bit-set-0.8.0",
+        "version": "0.8.0",
+        "filename": "bit-set-0.8.0.crate",
+        "url": "https://static.crates.io/crates/bit-set/bit-set-0.8.0.crate",
+        "bytes": 16289,
+        "sha256": "08807e080ed7f9d5433fa9b275196cfc35414f66a0c79d864dc51a0d825231a3"
+      },
+      {
+        "id": "rust-crate-bit-vec-0.8.0",
+        "version": "0.8.0",
+        "filename": "bit-vec-0.8.0.crate",
+        "url": "https://static.crates.io/crates/bit-vec/bit-vec-0.8.0.crate",
+        "bytes": 24132,
+        "sha256": "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7"
+      },
+      {
+        "id": "rust-crate-bitflags-2.13.1",
+        "version": "2.13.1",
+        "filename": "bitflags-2.13.1.crate",
+        "url": "https://static.crates.io/crates/bitflags/bitflags-2.13.1.crate",
+        "bytes": 51395,
+        "sha256": "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da"
+      },
+      {
+        "id": "rust-crate-bitflags-2.9.1",
+        "version": "2.9.1",
+        "filename": "bitflags-2.9.1.crate",
+        "url": "https://static.crates.io/crates/bitflags/bitflags-2.9.1.crate",
+        "bytes": 47913,
+        "sha256": "1b8e56985ec62d17e9c1001dc89c88ecd7dc08e47eba5ec7c29c7b5eeecde967"
+      },
+      {
+        "id": "rust-crate-bitvec-1.0.1",
+        "version": "1.0.1",
+        "filename": "bitvec-1.0.1.crate",
+        "url": "https://static.crates.io/crates/bitvec/bitvec-1.0.1.crate",
+        "bytes": 224375,
+        "sha256": "1bc2832c24239b0141d5674bb9174f9d68a8b5b3f2753311927c172ca46f7e9c"
+      },
+      {
+        "id": "rust-crate-bitvec-1.1.1",
+        "version": "1.1.1",
+        "filename": "bitvec-1.1.1.crate",
+        "url": "https://static.crates.io/crates/bitvec/bitvec-1.1.1.crate",
+        "bytes": 225850,
+        "sha256": "ddcec3d12c579d40898fe0a9a358a803c23e9c52ca3c425707f81c9436211837"
+      },
+      {
+        "id": "rust-crate-bumpalo-3.19.0",
+        "version": "3.19.0",
+        "filename": "bumpalo-3.19.0.crate",
+        "url": "https://static.crates.io/crates/bumpalo/bumpalo-3.19.0.crate",
+        "bytes": 96414,
+        "sha256": "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43"
+      },
+      {
+        "id": "rust-crate-bumpalo-3.20.3",
+        "version": "3.20.3",
+        "filename": "bumpalo-3.20.3.crate",
+        "url": "https://static.crates.io/crates/bumpalo/bumpalo-3.20.3.crate",
+        "bytes": 98671,
+        "sha256": "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
+      },
+      {
+        "id": "rust-crate-bytecount-0.6.9",
+        "version": "0.6.9",
+        "filename": "bytecount-0.6.9.crate",
+        "url": "https://static.crates.io/crates/bytecount/bytecount-0.6.9.crate",
+        "bytes": 18695,
+        "sha256": "175812e0be2bccb6abe50bb8d566126198344f707e304f45c648fd8f2cc0365e"
+      },
+      {
+        "id": "rust-crate-cast-0.3.0",
+        "version": "0.3.0",
+        "filename": "cast-0.3.0.crate",
+        "url": "https://static.crates.io/crates/cast/cast-0.3.0.crate",
+        "bytes": 11452,
+        "sha256": "37b2a672a2cb129a2e41c10b1224bb368f9f37a2b16b612598138befd7b37eb5"
+      },
+      {
+        "id": "rust-crate-cc-1.4.0",
+        "version": "1.4.0",
+        "filename": "cc-1.4.0.crate",
+        "url": "https://static.crates.io/crates/cc/cc-1.4.0.crate",
+        "bytes": 97878,
+        "sha256": "5add81bb678e6cb321aff7fa0dc7689ad82b112dbc032cea19f91d6b8e3582b9"
+      },
+      {
+        "id": "rust-crate-cc-1.4.4",
+        "version": "1.4.4",
+        "filename": "cc-1.4.4.crate",
+        "url": "https://static.crates.io/crates/cc/cc-1.4.4.crate",
+        "bytes": 100602,
+        "sha256": "0ad534f4357a5264cce5019c989cf66a4f0dc4e0d1b1d15f8aacec0ff7360273"
+      },
+      {
+        "id": "rust-crate-cc-1.6.0",
+        "version": "1.6.0",
+        "filename": "cc-1.6.0.crate",
+        "url": "https://static.crates.io/crates/cc/cc-1.6.0.crate",
+        "bytes": 116280,
+        "sha256": "f74872d07caf508b30a21f6836e7d7016a2eaf7d9ff4f48deaa58cd8a0407630"
+      },
+      {
+        "id": "rust-crate-cfg-if-1.0.0",
+        "version": "1.0.0",
+        "filename": "cfg-if-1.0.0.crate",
+        "url": "https://static.crates.io/crates/cfg-if/cfg-if-1.0.0.crate",
+        "bytes": 7934,
+        "sha256": "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+      },
+      {
+        "id": "rust-crate-cfg-if-1.0.4",
+        "version": "1.0.4",
+        "filename": "cfg-if-1.0.4.crate",
+        "url": "https://static.crates.io/crates/cfg-if/cfg-if-1.0.4.crate",
+        "bytes": 9360,
+        "sha256": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
+      },
+      {
+        "id": "rust-crate-cfg_aliases-0.2.2",
+        "version": "0.2.2",
+        "filename": "cfg_aliases-0.2.2.crate",
+        "url": "https://static.crates.io/crates/cfg_aliases/cfg_aliases-0.2.2.crate",
+        "bytes": 6527,
+        "sha256": "f079e83a288787bcd14a6aea84cee5c87a67c5a3e660c30f557a3d24761b3527"
+      },
+      {
+        "id": "rust-crate-ciborium-0.2.2",
+        "version": "0.2.2",
+        "filename": "ciborium-0.2.2.crate",
+        "url": "https://static.crates.io/crates/ciborium/ciborium-0.2.2.crate",
+        "bytes": 35611,
+        "sha256": "42e69ffd6f0917f5c029256a24d0161db17cea3997d185db0d35926308770f0e"
+      },
+      {
+        "id": "rust-crate-ciborium-io-0.2.2",
+        "version": "0.2.2",
+        "filename": "ciborium-io-0.2.2.crate",
+        "url": "https://static.crates.io/crates/ciborium-io/ciborium-io-0.2.2.crate",
+        "bytes": 6697,
+        "sha256": "05afea1e0a06c9be33d539b876f1ce3692f4afea2cb41f740e7743225ed1c757"
+      },
+      {
+        "id": "rust-crate-ciborium-ll-0.2.2",
+        "version": "0.2.2",
+        "filename": "ciborium-ll-0.2.2.crate",
+        "url": "https://static.crates.io/crates/ciborium-ll/ciborium-ll-0.2.2.crate",
+        "bytes": 14695,
+        "sha256": "57663b653d948a338bfb3eeba9bb2fd5fcfaecb9e199e87e1eda4d9e8b240fd9"
+      },
+      {
+        "id": "rust-crate-clap-4.6.6",
+        "version": "4.6.6",
+        "filename": "clap-4.6.6.crate",
+        "url": "https://static.crates.io/crates/clap/clap-4.6.6.crate",
+        "bytes": 64815,
+        "sha256": "473c7e07f409a8d772161724aa8db6a765a2532a70f9667eeb7b49d3d02fbdca"
+      },
+      {
+        "id": "rust-crate-clap_builder-4.6.6",
+        "version": "4.6.6",
+        "filename": "clap_builder-4.6.6.crate",
+        "url": "https://static.crates.io/crates/clap_builder/clap_builder-4.6.6.crate",
+        "bytes": 171756,
+        "sha256": "7b48fea5a88e9ae728a2dcbedbfc0e730f7d60da42e1cb049a83c9fb8b789889"
+      },
+      {
+        "id": "rust-crate-clap_lex-1.1.0",
+        "version": "1.1.0",
+        "filename": "clap_lex-1.1.0.crate",
+        "url": "https://static.crates.io/crates/clap_lex/clap_lex-1.1.0.crate",
+        "bytes": 13470,
+        "sha256": "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
+      },
+      {
+        "id": "rust-crate-codspeed-5.0.1",
+        "version": "5.0.1",
+        "filename": "codspeed-5.0.1.crate",
+        "url": "https://static.crates.io/crates/codspeed/codspeed-5.0.1.crate",
+        "bytes": 647128,
+        "sha256": "7083f253260bcb4aaa3b4aa4c52973703dabc1a85c2f193997e2689aafa8a919"
+      },
+      {
+        "id": "rust-crate-codspeed-criterion-compat-5.0.1",
+        "version": "5.0.1",
+        "filename": "codspeed-criterion-compat-5.0.1.crate",
+        "url": "https://static.crates.io/crates/codspeed-criterion-compat/codspeed-criterion-compat-5.0.1.crate",
+        "bytes": 24256,
+        "sha256": "d9f24251445188c69d50f10179d795424bd71b533b7e3f84fc03f26893b01af0"
+      },
+      {
+        "id": "rust-crate-codspeed-criterion-compat-walltime-5.0.1",
+        "version": "5.0.1",
+        "filename": "codspeed-criterion-compat-walltime-5.0.1.crate",
+        "url": "https://static.crates.io/crates/codspeed-criterion-compat-walltime/codspeed-criterion-compat-walltime-5.0.1.crate",
+        "bytes": 126530,
+        "sha256": "5c38205d56e2cb4fe04b708de7f9653a3f1b89edbe3a20b28f21e9e525e9e061"
+      },
+      {
+        "id": "rust-crate-colored-3.1.1",
+        "version": "3.1.1",
+        "filename": "colored-3.1.1.crate",
+        "url": "https://static.crates.io/crates/colored/colored-3.1.1.crate",
+        "bytes": 36216,
+        "sha256": "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
+      },
+      {
+        "id": "rust-crate-criterion-plot-0.5.0",
+        "version": "0.5.0",
+        "filename": "criterion-plot-0.5.0.crate",
+        "url": "https://static.crates.io/crates/criterion-plot/criterion-plot-0.5.0.crate",
+        "bytes": 22706,
+        "sha256": "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
+      },
+      {
+        "id": "rust-crate-crossbeam-deque-0.8.7",
+        "version": "0.8.7",
+        "filename": "crossbeam-deque-0.8.7.crate",
+        "url": "https://static.crates.io/crates/crossbeam-deque/crossbeam-deque-0.8.7.crate",
+        "bytes": 24141,
+        "sha256": "5181e0de7b61eb03a81e347d6dd8797bae9da5146707b51077e2d71a54ec0ceb"
+      },
+      {
+        "id": "rust-crate-crossbeam-epoch-0.9.20",
+        "version": "0.9.20",
+        "filename": "crossbeam-epoch-0.9.20.crate",
+        "url": "https://static.crates.io/crates/crossbeam-epoch/crossbeam-epoch-0.9.20.crate",
+        "bytes": 47545,
+        "sha256": "2d6914041f254d6e9176c01941b21115dcfb7089e55135a35411081bd106ef3f"
+      },
+      {
+        "id": "rust-crate-crossbeam-utils-0.8.22",
+        "version": "0.8.22",
+        "filename": "crossbeam-utils-0.8.22.crate",
+        "url": "https://static.crates.io/crates/crossbeam-utils/crossbeam-utils-0.8.22.crate",
+        "bytes": 46874,
+        "sha256": "61803da095bee82a81bb1a452ecc25d3b2f1416d1897eb86430c6159ef717c17"
+      },
+      {
+        "id": "rust-crate-crunchy-0.2.4",
+        "version": "0.2.4",
+        "filename": "crunchy-0.2.4.crate",
+        "url": "https://static.crates.io/crates/crunchy/crunchy-0.2.4.crate",
+        "bytes": 3887,
+        "sha256": "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
+      },
+      {
+        "id": "rust-crate-displaydoc-0.2.5",
+        "version": "0.2.5",
+        "filename": "displaydoc-0.2.5.crate",
+        "url": "https://static.crates.io/crates/displaydoc/displaydoc-0.2.5.crate",
+        "bytes": 24219,
+        "sha256": "97369cbbc041bc366949bc74d34658d6cda5621039731c6310521892a3a20ae0"
+      },
+      {
+        "id": "rust-crate-either-1.17.0",
+        "version": "1.17.0",
+        "filename": "either-1.17.0.crate",
+        "url": "https://static.crates.io/crates/either/either-1.17.0.crate",
+        "bytes": 21820,
+        "sha256": "9e5e8f6c15a24b9a3ee5efec809ccd006d3b30e8b3bb63c39af737c7f87daa1d"
+      },
+      {
+        "id": "rust-crate-enum_dispatch-0.3.13",
+        "version": "0.3.13",
+        "filename": "enum_dispatch-0.3.13.crate",
+        "url": "https://static.crates.io/crates/enum_dispatch/enum_dispatch-0.3.13.crate",
+        "bytes": 29876,
+        "sha256": "aa18ce2bc66555b3218614519ac839ddb759a7d6720732f979ef8d13be147ecd"
+      },
+      {
+        "id": "rust-crate-equivalent-1.0.2",
+        "version": "1.0.2",
+        "filename": "equivalent-1.0.2.crate",
+        "url": "https://static.crates.io/crates/equivalent/equivalent-1.0.2.crate",
+        "bytes": 7419,
+        "sha256": "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
+      },
+      {
+        "id": "rust-crate-errno-0.3.14",
+        "version": "0.3.14",
+        "filename": "errno-0.3.14.crate",
+        "url": "https://static.crates.io/crates/errno/errno-0.3.14.crate",
+        "bytes": 12002,
+        "sha256": "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
+      },
+      {
+        "id": "rust-crate-fastrand-2.5.0",
+        "version": "2.5.0",
+        "filename": "fastrand-2.5.0.crate",
+        "url": "https://static.crates.io/crates/fastrand/fastrand-2.5.0.crate",
+        "bytes": 20782,
+        "sha256": "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223"
+      },
+      {
+        "id": "rust-crate-find-msvc-tools-0.1.11",
+        "version": "0.1.11",
+        "filename": "find-msvc-tools-0.1.11.crate",
+        "url": "https://static.crates.io/crates/find-msvc-tools/find-msvc-tools-0.1.11.crate",
+        "bytes": 31517,
+        "sha256": "d45db016d36b838f563236e9193d0ee6ce38f3f68b6c94e914b4929c96bbb890"
+      },
+      {
+        "id": "rust-crate-find-msvc-tools-0.1.14",
+        "version": "0.1.14",
+        "filename": "find-msvc-tools-0.1.14.crate",
+        "url": "https://static.crates.io/crates/find-msvc-tools/find-msvc-tools-0.1.14.crate",
+        "bytes": 31390,
+        "sha256": "aedcfb3409746eddb02b9e19ebda1c3394f759a152e48ee875a0844d1b955484"
+      },
+      {
+        "id": "rust-crate-find-msvc-tools-0.1.9",
+        "version": "0.1.9",
+        "filename": "find-msvc-tools-0.1.9.crate",
+        "url": "https://static.crates.io/crates/find-msvc-tools/find-msvc-tools-0.1.9.crate",
+        "bytes": 31493,
+        "sha256": "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
+      },
+      {
+        "id": "rust-crate-fnv-1.0.7",
+        "version": "1.0.7",
+        "filename": "fnv-1.0.7.crate",
+        "url": "https://static.crates.io/crates/fnv/fnv-1.0.7.crate",
+        "bytes": 11266,
+        "sha256": "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
+      },
+      {
+        "id": "rust-crate-foldhash-0.2.0",
+        "version": "0.2.0",
+        "filename": "foldhash-0.2.0.crate",
+        "url": "https://static.crates.io/crates/foldhash/foldhash-0.2.0.crate",
+        "bytes": 23329,
+        "sha256": "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
+      },
+      {
+        "id": "rust-crate-foreign-types-0.3.2",
+        "version": "0.3.2",
+        "filename": "foreign-types-0.3.2.crate",
+        "url": "https://static.crates.io/crates/foreign-types/foreign-types-0.3.2.crate",
+        "bytes": 7504,
+        "sha256": "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1"
+      },
+      {
+        "id": "rust-crate-foreign-types-shared-0.1.1",
+        "version": "0.1.1",
+        "filename": "foreign-types-shared-0.1.1.crate",
+        "url": "https://static.crates.io/crates/foreign-types-shared/foreign-types-shared-0.1.1.crate",
+        "bytes": 5672,
+        "sha256": "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
+      },
+      {
+        "id": "rust-crate-form_urlencoded-1.2.2",
+        "version": "1.2.2",
+        "filename": "form_urlencoded-1.2.2.crate",
+        "url": "https://static.crates.io/crates/form_urlencoded/form_urlencoded-1.2.2.crate",
+        "bytes": 9347,
+        "sha256": "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf"
+      },
+      {
+        "id": "rust-crate-funty-2.0.0",
+        "version": "2.0.0",
+        "filename": "funty-2.0.0.crate",
+        "url": "https://static.crates.io/crates/funty/funty-2.0.0.crate",
+        "bytes": 13160,
+        "sha256": "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
+      },
+      {
+        "id": "rust-crate-futures-core-0.3.34",
+        "version": "0.3.34",
+        "filename": "futures-core-0.3.34.crate",
+        "url": "https://static.crates.io/crates/futures-core/futures-core-0.3.34.crate",
+        "bytes": 14692,
+        "sha256": "92d699e522242e69e3003b94ecc1f960f3a5e015aa7c5d7486e65ad01dd94f5e"
+      },
+      {
+        "id": "rust-crate-futures-task-0.3.34",
+        "version": "0.3.34",
+        "filename": "futures-task-0.3.34.crate",
+        "url": "https://static.crates.io/crates/futures-task/futures-task-0.3.34.crate",
+        "bytes": 11376,
+        "sha256": "cd417de3d1d015fc3bfd2b1ea46dfc7bab72ef86f1cc7cc9c78e728b34a6d1fd"
+      },
+      {
+        "id": "rust-crate-futures-util-0.3.34",
+        "version": "0.3.34",
+        "filename": "futures-util-0.3.34.crate",
+        "url": "https://static.crates.io/crates/futures-util/futures-util-0.3.34.crate",
+        "bytes": 169782,
+        "sha256": "0d50a92467f8ba5dd6e3ee5d4bd04d73ab2e4e1c44474a0674821dfce14b79bc"
+      },
+      {
+        "id": "rust-crate-getrandom-0.3.3",
+        "version": "0.3.3",
+        "filename": "getrandom-0.3.3.crate",
+        "url": "https://static.crates.io/crates/getrandom/getrandom-0.3.3.crate",
+        "bytes": 49493,
+        "sha256": "26145e563e54f2cadc477553f1ec5ee650b00862f0a58bcd12cbdc5f0ea2d2f4"
+      },
+      {
+        "id": "rust-crate-getrandom-0.3.4",
+        "version": "0.3.4",
+        "filename": "getrandom-0.3.4.crate",
+        "url": "https://static.crates.io/crates/getrandom/getrandom-0.3.4.crate",
+        "bytes": 50932,
+        "sha256": "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
+      },
+      {
+        "id": "rust-crate-getrandom-0.4.3",
+        "version": "0.4.3",
+        "filename": "getrandom-0.4.3.crate",
+        "url": "https://static.crates.io/crates/getrandom/getrandom-0.4.3.crate",
+        "bytes": 52437,
+        "sha256": "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099"
+      },
+      {
+        "id": "rust-crate-gimli-0.34.0",
+        "version": "0.34.0",
+        "filename": "gimli-0.34.0.crate",
+        "url": "https://static.crates.io/crates/gimli/gimli-0.34.0.crate",
+        "bytes": 335386,
+        "sha256": "1033caf0b349c518623b5396bfb2cf0bddf44f0306d543a250e5743297aafd10"
+      },
+      {
+        "id": "rust-crate-glob-0.3.4",
+        "version": "0.3.4",
+        "filename": "glob-0.3.4.crate",
+        "url": "https://static.crates.io/crates/glob/glob-0.3.4.crate",
+        "bytes": 23511,
+        "sha256": "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b"
+      },
+      {
+        "id": "rust-crate-half-2.7.1",
+        "version": "2.7.1",
+        "filename": "half-2.7.1.crate",
+        "url": "https://static.crates.io/crates/half/half-2.7.1.crate",
+        "bytes": 61040,
+        "sha256": "6ea2d84b969582b4b1864a92dc5d27cd2b77b622a8d79306834f1be5ba20d84b"
+      },
+      {
+        "id": "rust-crate-hashbrown-0.17.1",
+        "version": "0.17.1",
+        "filename": "hashbrown-0.17.1.crate",
+        "url": "https://static.crates.io/crates/hashbrown/hashbrown-0.17.1.crate",
+        "bytes": 155512,
+        "sha256": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
+      },
+      {
+        "id": "rust-crate-heck-0.5.0",
+        "version": "0.5.0",
+        "filename": "heck-0.5.0.crate",
+        "url": "https://static.crates.io/crates/heck/heck-0.5.0.crate",
+        "bytes": 11517,
+        "sha256": "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
+      },
+      {
+        "id": "rust-crate-hermit-abi-0.5.2",
+        "version": "0.5.2",
+        "filename": "hermit-abi-0.5.2.crate",
+        "url": "https://static.crates.io/crates/hermit-abi/hermit-abi-0.5.2.crate",
+        "bytes": 17435,
+        "sha256": "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c"
+      },
+      {
+        "id": "rust-crate-hex-0.4.3",
+        "version": "0.4.3",
+        "filename": "hex-0.4.3.crate",
+        "url": "https://static.crates.io/crates/hex/hex-0.4.3.crate",
+        "bytes": 13299,
+        "sha256": "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+      },
+      {
+        "id": "rust-crate-icu_collections-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_collections-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_collections/icu_collections-1.5.0.crate",
+        "bytes": 82762,
+        "sha256": "db2fa452206ebee18c4b5c2274dbf1de17008e874b4dc4f0aea9d01ca79e4526"
+      },
+      {
+        "id": "rust-crate-icu_locid-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_locid-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_locid/icu_locid-1.5.0.crate",
+        "bytes": 55131,
+        "sha256": "13acbb8371917fc971be86fc8057c41a64b521c184808a698c02acc242dbf637"
+      },
+      {
+        "id": "rust-crate-icu_locid_transform-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_locid_transform-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_locid_transform/icu_locid_transform-1.5.0.crate",
+        "bytes": 29094,
+        "sha256": "01d11ac35de8e40fdeda00d9e1e9d92525f3f9d887cdd7aa81d727596788b54e"
+      },
+      {
+        "id": "rust-crate-icu_locid_transform_data-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_locid_transform_data-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_locid_transform_data/icu_locid_transform_data-1.5.0.crate",
+        "bytes": 44727,
+        "sha256": "fdc8ff3388f852bede6b579ad4e978ab004f139284d7b28715f773507b946f6e"
+      },
+      {
+        "id": "rust-crate-icu_normalizer-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_normalizer-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_normalizer/icu_normalizer-1.5.0.crate",
+        "bytes": 53113,
+        "sha256": "19ce3e0da2ec68599d193c93d088142efd7f9c5d6fc9b803774855747dc6a84f"
+      },
+      {
+        "id": "rust-crate-icu_normalizer_data-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_normalizer_data-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_normalizer_data/icu_normalizer_data-1.5.0.crate",
+        "bytes": 50561,
+        "sha256": "f8cafbf7aa791e9b22bec55a167906f9e1215fd475cd22adfcf660e03e989516"
+      },
+      {
+        "id": "rust-crate-icu_properties-1.5.1",
+        "version": "1.5.1",
+        "filename": "icu_properties-1.5.1.crate",
+        "url": "https://static.crates.io/crates/icu_properties/icu_properties-1.5.1.crate",
+        "bytes": 64479,
+        "sha256": "93d6020766cfc6302c15dbbc9c8778c37e62c14427cb7f6e601d849e092aeef5"
+      },
+      {
+        "id": "rust-crate-icu_properties_data-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_properties_data-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_properties_data/icu_properties_data-1.5.0.crate",
+        "bytes": 227993,
+        "sha256": "67a8effbc3dd3e4ba1afa8ad918d5684b8868b3b26500753effea8d2eed19569"
+      },
+      {
+        "id": "rust-crate-icu_provider-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_provider-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_provider/icu_provider-1.5.0.crate",
+        "bytes": 52722,
+        "sha256": "6ed421c8a8ef78d3e2dbc98a973be2f3770cb42b606e3ab18d6237c4dfde68d9"
+      },
+      {
+        "id": "rust-crate-icu_provider_macros-1.5.0",
+        "version": "1.5.0",
+        "filename": "icu_provider_macros-1.5.0.crate",
+        "url": "https://static.crates.io/crates/icu_provider_macros/icu_provider_macros-1.5.0.crate",
+        "bytes": 6436,
+        "sha256": "1ec89e9337638ecdc08744df490b221a7399bf8d164eb52a665454e60e075ad6"
+      },
+      {
+        "id": "rust-crate-idna-1.1.0",
+        "version": "1.1.0",
+        "filename": "idna-1.1.0.crate",
+        "url": "https://static.crates.io/crates/idna/idna-1.1.0.crate",
+        "bytes": 148747,
+        "sha256": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de"
+      },
+      {
+        "id": "rust-crate-idna_adapter-1.2.0",
+        "version": "1.2.0",
+        "filename": "idna_adapter-1.2.0.crate",
+        "url": "https://static.crates.io/crates/idna_adapter/idna_adapter-1.2.0.crate",
+        "bytes": 8206,
+        "sha256": "daca1df1c957320b2cf139ac61e7bd64fed304c5040df000a745aa1de3b4ef71"
+      },
+      {
+        "id": "rust-crate-indexmap-2.14.0",
+        "version": "2.14.0",
+        "filename": "indexmap-2.14.0.crate",
+        "url": "https://static.crates.io/crates/indexmap/indexmap-2.14.0.crate",
+        "bytes": 104085,
+        "sha256": "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9"
+      },
+      {
+        "id": "rust-crate-is-terminal-0.4.17",
+        "version": "0.4.17",
+        "filename": "is-terminal-0.4.17.crate",
+        "url": "https://static.crates.io/crates/is-terminal/is-terminal-0.4.17.crate",
+        "bytes": 7458,
+        "sha256": "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
+      },
+      {
+        "id": "rust-crate-itertools-0.10.5",
+        "version": "0.10.5",
+        "filename": "itertools-0.10.5.crate",
+        "url": "https://static.crates.io/crates/itertools/itertools-0.10.5.crate",
+        "bytes": 115354,
+        "sha256": "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+      },
+      {
+        "id": "rust-crate-itoa-1.0.11",
+        "version": "1.0.11",
+        "filename": "itoa-1.0.11.crate",
+        "url": "https://static.crates.io/crates/itoa/itoa-1.0.11.crate",
+        "bytes": 10563,
+        "sha256": "49f1f14873335454500d59611f1cf4a4b0f786f9ac11f4312a78e4cf2566695b"
+      },
+      {
+        "id": "rust-crate-itoa-1.0.18",
+        "version": "1.0.18",
+        "filename": "itoa-1.0.18.crate",
+        "url": "https://static.crates.io/crates/itoa/itoa-1.0.18.crate",
+        "bytes": 15935,
+        "sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
+      },
+      {
+        "id": "rust-crate-itoap-1.0.1",
+        "version": "1.0.1",
+        "filename": "itoap-1.0.1.crate",
+        "url": "https://static.crates.io/crates/itoap/itoap-1.0.1.crate",
+        "bytes": 83316,
+        "sha256": "9028f49264629065d057f340a86acb84867925865f73bbf8d47b4d149a7e88b8"
+      },
+      {
+        "id": "rust-crate-jiff-core-0.1.1",
+        "version": "0.1.1",
+        "filename": "jiff-core-0.1.1.crate",
+        "url": "https://static.crates.io/crates/jiff-core/jiff-core-0.1.1.crate",
+        "bytes": 129192,
+        "sha256": "5e52fe76043ccecc9005d2305ebaadf7d7fc0cc89ca6baa10a94d6bc68c7128c"
+      },
+      {
+        "id": "rust-crate-jiter-0.16.0",
+        "version": "0.16.0",
+        "filename": "jiter-0.16.0.crate",
+        "url": "https://static.crates.io/crates/jiter/jiter-0.16.0.crate",
+        "bytes": 167515,
+        "sha256": "820ddcacd75c9782308d3fa594f3885630ea3f49adba78a8a29abdfe4b81630c"
+      },
+      {
+        "id": "rust-crate-js-sys-0.3.104",
+        "version": "0.3.104",
+        "filename": "js-sys-0.3.104.crate",
+        "url": "https://static.crates.io/crates/js-sys/js-sys-0.3.104.crate",
+        "bytes": 108816,
+        "sha256": "0e0c1080212aad755ea003d18543e8768dd432c48819efd73a7bf1e39b7a5a3a"
+      },
+      {
+        "id": "rust-crate-js-sys-0.3.77",
+        "version": "0.3.77",
+        "filename": "js-sys-0.3.77.crate",
+        "url": "https://static.crates.io/crates/js-sys/js-sys-0.3.77.crate",
+        "bytes": 55538,
+        "sha256": "1cfaf33c695fc6e08064efbc1f72ec937429614f25eef83af942d0e227c3a28f"
+      },
+      {
+        "id": "rust-crate-lexical-parse-float-1.0.5",
+        "version": "1.0.5",
+        "filename": "lexical-parse-float-1.0.5.crate",
+        "url": "https://static.crates.io/crates/lexical-parse-float/lexical-parse-float-1.0.5.crate",
+        "bytes": 186731,
+        "sha256": "de6f9cb01fb0b08060209a057c048fcbab8717b4c1ecd2eac66ebfe39a65b0f2"
+      },
+      {
+        "id": "rust-crate-lexical-parse-float-1.0.6",
+        "version": "1.0.6",
+        "filename": "lexical-parse-float-1.0.6.crate",
+        "url": "https://static.crates.io/crates/lexical-parse-float/lexical-parse-float-1.0.6.crate",
+        "bytes": 194003,
+        "sha256": "52a9f232fbd6f550bc0137dcb5f99ab674071ac2d690ac69704593cb4abbea56"
+      },
+      {
+        "id": "rust-crate-lexical-parse-integer-1.0.5",
+        "version": "1.0.5",
+        "filename": "lexical-parse-integer-1.0.5.crate",
+        "url": "https://static.crates.io/crates/lexical-parse-integer/lexical-parse-integer-1.0.5.crate",
+        "bytes": 36912,
+        "sha256": "72207aae22fc0a121ba7b6d479e42cbfea549af1479c3f3a4f12c70dd66df12e"
+      },
+      {
+        "id": "rust-crate-lexical-parse-integer-1.0.6",
+        "version": "1.0.6",
+        "filename": "lexical-parse-integer-1.0.6.crate",
+        "url": "https://static.crates.io/crates/lexical-parse-integer/lexical-parse-integer-1.0.6.crate",
+        "bytes": 37501,
+        "sha256": "9a7a039f8fb9c19c996cd7b2fcce303c1b2874fe1aca544edc85c4a5f8489b34"
+      },
+      {
+        "id": "rust-crate-lexical-util-1.0.6",
+        "version": "1.0.6",
+        "filename": "lexical-util-1.0.6.crate",
+        "url": "https://static.crates.io/crates/lexical-util/lexical-util-1.0.6.crate",
+        "bytes": 106117,
+        "sha256": "5a82e24bf537fd24c177ffbbdc6ebcc8d54732c35b50a3f28cc3f4e4c949a0b3"
+      },
+      {
+        "id": "rust-crate-lexical-util-1.0.7",
+        "version": "1.0.7",
+        "filename": "lexical-util-1.0.7.crate",
+        "url": "https://static.crates.io/crates/lexical-util/lexical-util-1.0.7.crate",
+        "bytes": 111747,
+        "sha256": "2604dd126bb14f13fb5d1bd6a66155079cb9fa655b37f875b3a742c705dbed17"
+      },
+      {
+        "id": "rust-crate-libc-0.2.185",
+        "version": "0.2.185",
+        "filename": "libc-0.2.185.crate",
+        "url": "https://static.crates.io/crates/libc/libc-0.2.185.crate",
+        "bytes": 821775,
+        "sha256": "52ff2c0fe9bc6cb6b14a0592c2ff4fa9ceb83eea9db979b0487cd054946a2b8f"
+      },
+      {
+        "id": "rust-crate-libc-0.2.189",
+        "version": "0.2.189",
+        "filename": "libc-0.2.189.crate",
+        "url": "https://static.crates.io/crates/libc/libc-0.2.189.crate",
+        "bytes": 851502,
+        "sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
+      },
+      {
+        "id": "rust-crate-libc-0.2.190",
+        "version": "0.2.190",
+        "filename": "libc-0.2.190.crate",
+        "url": "https://static.crates.io/crates/libc/libc-0.2.190.crate",
+        "bytes": 853678,
+        "sha256": "ce5d3ddc6d3fa000eb1536d85e147bfe31aacaba692ed6a876f95cb7c855be78"
+      },
+      {
+        "id": "rust-crate-linux-raw-sys-0.12.1",
+        "version": "0.12.1",
+        "filename": "linux-raw-sys-0.12.1.crate",
+        "url": "https://static.crates.io/crates/linux-raw-sys/linux-raw-sys-0.12.1.crate",
+        "bytes": 3006116,
+        "sha256": "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53"
+      },
+      {
+        "id": "rust-crate-litemap-0.7.3",
+        "version": "0.7.3",
+        "filename": "litemap-0.7.3.crate",
+        "url": "https://static.crates.io/crates/litemap/litemap-0.7.3.crate",
+        "bytes": 28728,
+        "sha256": "643cb0b8d4fcc284004d5fd0d67ccf61dfffadb7f75e1e71bc420f4688a3a704"
+      },
+      {
+        "id": "rust-crate-log-0.4.27",
+        "version": "0.4.27",
+        "filename": "log-0.4.27.crate",
+        "url": "https://static.crates.io/crates/log/log-0.4.27.crate",
+        "bytes": 48120,
+        "sha256": "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94"
+      },
+      {
+        "id": "rust-crate-lru-0.18.5",
+        "version": "0.18.5",
+        "filename": "lru-0.18.5.crate",
+        "url": "https://static.crates.io/crates/lru/lru-0.18.5.crate",
+        "bytes": 19761,
+        "sha256": "ef9ac18847474e638e3702b76c65d4eb93428471a74778ef0f1be711717f89b5"
+      },
+      {
+        "id": "rust-crate-memchr-2.7.4",
+        "version": "2.7.4",
+        "filename": "memchr-2.7.4.crate",
+        "url": "https://static.crates.io/crates/memchr/memchr-2.7.4.crate",
+        "bytes": 96670,
+        "sha256": "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
+      },
+      {
+        "id": "rust-crate-memchr-2.8.3",
+        "version": "2.8.3",
+        "filename": "memchr-2.8.3.crate",
+        "url": "https://static.crates.io/crates/memchr/memchr-2.8.3.crate",
+        "bytes": 99165,
+        "sha256": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
+      },
+      {
+        "id": "rust-crate-nix-0.31.3",
+        "version": "0.31.3",
+        "filename": "nix-0.31.3.crate",
+        "url": "https://static.crates.io/crates/nix/nix-0.31.3.crate",
+        "bytes": 347476,
+        "sha256": "cf20d2fde8ff38632c426f1165ed7436270b44f199fc55284c38276f9db47c3d"
+      },
+      {
+        "id": "rust-crate-no-panic-0.1.37",
+        "version": "0.1.37",
+        "filename": "no-panic-0.1.37.crate",
+        "url": "https://static.crates.io/crates/no-panic/no-panic-0.1.37.crate",
+        "bytes": 15125,
+        "sha256": "fc80370b4544f28ffa317e3c3474ee3ecbfe269196c01ae657d9f837a7d944a1"
+      },
+      {
+        "id": "rust-crate-num-bigint-0.4.6",
+        "version": "0.4.6",
+        "filename": "num-bigint-0.4.6.crate",
+        "url": "https://static.crates.io/crates/num-bigint/num-bigint-0.4.6.crate",
+        "bytes": 102801,
+        "sha256": "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9"
+      },
+      {
+        "id": "rust-crate-num-bigint-0.4.8",
+        "version": "0.4.8",
+        "filename": "num-bigint-0.4.8.crate",
+        "url": "https://static.crates.io/crates/num-bigint/num-bigint-0.4.8.crate",
+        "bytes": 109961,
+        "sha256": "c89e69e7e0f03bea5ef08013795c25018e101932225a656383bd384495ecc367"
+      },
+      {
+        "id": "rust-crate-num-integer-0.1.46",
+        "version": "0.1.46",
+        "filename": "num-integer-0.1.46.crate",
+        "url": "https://static.crates.io/crates/num-integer/num-integer-0.1.46.crate",
+        "bytes": 22331,
+        "sha256": "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f"
+      },
+      {
+        "id": "rust-crate-num-integer-0.1.47",
+        "version": "0.1.47",
+        "filename": "num-integer-0.1.47.crate",
+        "url": "https://static.crates.io/crates/num-integer/num-integer-0.1.47.crate",
+        "bytes": 23502,
+        "sha256": "7ce2d95d4b3734dc35aa2f45e1aa22cd416814592a4f9d9205e11affd5b8e10b"
+      },
+      {
+        "id": "rust-crate-num-traits-0.2.19",
+        "version": "0.2.19",
+        "filename": "num-traits-0.2.19.crate",
+        "url": "https://static.crates.io/crates/num-traits/num-traits-0.2.19.crate",
+        "bytes": 51631,
+        "sha256": "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
+      },
+      {
+        "id": "rust-crate-once_cell-1.21.3",
+        "version": "1.21.3",
+        "filename": "once_cell-1.21.3.crate",
+        "url": "https://static.crates.io/crates/once_cell/once_cell-1.21.3.crate",
+        "bytes": 34534,
+        "sha256": "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
+      },
+      {
+        "id": "rust-crate-once_cell-1.21.4",
+        "version": "1.21.4",
+        "filename": "once_cell-1.21.4.crate",
+        "url": "https://static.crates.io/crates/once_cell/once_cell-1.21.4.crate",
+        "bytes": 35010,
+        "sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
+      },
+      {
+        "id": "rust-crate-oorandom-11.1.5",
+        "version": "11.1.5",
+        "filename": "oorandom-11.1.5.crate",
+        "url": "https://static.crates.io/crates/oorandom/oorandom-11.1.5.crate",
+        "bytes": 23750,
+        "sha256": "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
+      },
+      {
+        "id": "rust-crate-openssl-0.10.81",
+        "version": "0.10.81",
+        "filename": "openssl-0.10.81.crate",
+        "url": "https://static.crates.io/crates/openssl/openssl-0.10.81.crate",
+        "bytes": 311187,
+        "sha256": "77823a27f0babb03091cb9ed9ef80af3b39dbc82f97e8fa530374b7dafd87a45"
+      },
+      {
+        "id": "rust-crate-openssl-macros-0.1.1",
+        "version": "0.1.1",
+        "filename": "openssl-macros-0.1.1.crate",
+        "url": "https://static.crates.io/crates/openssl-macros/openssl-macros-0.1.1.crate",
+        "bytes": 5601,
+        "sha256": "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c"
+      },
+      {
+        "id": "rust-crate-openssl-sys-0.9.117",
+        "version": "0.9.117",
+        "filename": "openssl-sys-0.9.117.crate",
+        "url": "https://static.crates.io/crates/openssl-sys/openssl-sys-0.9.117.crate",
+        "bytes": 76045,
+        "sha256": "b47e7e6bb2c38cd930d25a23b40fa52e068c10e85f3e03a7f5ba5aaca5713695"
+      },
+      {
+        "id": "rust-crate-paste-1.0.15",
+        "version": "1.0.15",
+        "filename": "paste-1.0.15.crate",
+        "url": "https://static.crates.io/crates/paste/paste-1.0.15.crate",
+        "bytes": 18374,
+        "sha256": "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
+      },
+      {
+        "id": "rust-crate-pem-4.0.0",
+        "version": "4.0.0",
+        "filename": "pem-4.0.0.crate",
+        "url": "https://static.crates.io/crates/pem/pem-4.0.0.crate",
+        "bytes": 18770,
+        "sha256": "d354a98a3d1251555de99e8fdd8afda05573c31b82f59063a7b0a29b5527f120"
+      },
+      {
+        "id": "rust-crate-percent-encoding-2.3.2",
+        "version": "2.3.2",
+        "filename": "percent-encoding-2.3.2.crate",
+        "url": "https://static.crates.io/crates/percent-encoding/percent-encoding-2.3.2.crate",
+        "bytes": 11583,
+        "sha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
+      },
+      {
+        "id": "rust-crate-pin-project-lite-0.2.17",
+        "version": "0.2.17",
+        "filename": "pin-project-lite-0.2.17.crate",
+        "url": "https://static.crates.io/crates/pin-project-lite/pin-project-lite-0.2.17.crate",
+        "bytes": 31034,
+        "sha256": "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
+      },
+      {
+        "id": "rust-crate-pkg-config-0.3.33",
+        "version": "0.3.33",
+        "filename": "pkg-config-0.3.33.crate",
+        "url": "https://static.crates.io/crates/pkg-config/pkg-config-0.3.33.crate",
+        "bytes": 21590,
+        "sha256": "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
+      },
+      {
+        "id": "rust-crate-plotters-0.3.7",
+        "version": "0.3.7",
+        "filename": "plotters-0.3.7.crate",
+        "url": "https://static.crates.io/crates/plotters/plotters-0.3.7.crate",
+        "bytes": 149031,
+        "sha256": "5aeb6f403d7a4911efb1e33402027fc44f29b5bf6def3effcc22d7bb75f2b747"
+      },
+      {
+        "id": "rust-crate-plotters-backend-0.3.7",
+        "version": "0.3.7",
+        "filename": "plotters-backend-0.3.7.crate",
+        "url": "https://static.crates.io/crates/plotters-backend/plotters-backend-0.3.7.crate",
+        "bytes": 13709,
+        "sha256": "df42e13c12958a16b3f7f4386b9ab1f3e7933914ecea48da7139435263a4172a"
+      },
+      {
+        "id": "rust-crate-plotters-svg-0.3.7",
+        "version": "0.3.7",
+        "filename": "plotters-svg-0.3.7.crate",
+        "url": "https://static.crates.io/crates/plotters-svg/plotters-svg-0.3.7.crate",
+        "bytes": 6715,
+        "sha256": "51bae2ac328883f7acdfea3d66a7c35751187f870bc81f94563733a154d7a670"
+      },
+      {
+        "id": "rust-crate-portable-atomic-1.14.0",
+        "version": "1.14.0",
+        "filename": "portable-atomic-1.14.0.crate",
+        "url": "https://static.crates.io/crates/portable-atomic/portable-atomic-1.14.0.crate",
+        "bytes": 200703,
+        "sha256": "3d20d5497ef88037a52ff98267d066e7f11fcc5e99bbfbd58a42336193aacec3"
+      },
+      {
+        "id": "rust-crate-portable-atomic-1.15.0",
+        "version": "1.15.0",
+        "filename": "portable-atomic-1.15.0.crate",
+        "url": "https://static.crates.io/crates/portable-atomic/portable-atomic-1.15.0.crate",
+        "bytes": 202705,
+        "sha256": "05c8b63e8d9609db387f0324918f81d68fe27748f084ef092fb35954d0539a85"
+      },
+      {
+        "id": "rust-crate-portable-atomic-1.6.0",
+        "version": "1.6.0",
+        "filename": "portable-atomic-1.6.0.crate",
+        "url": "https://static.crates.io/crates/portable-atomic/portable-atomic-1.6.0.crate",
+        "bytes": 140689,
+        "sha256": "7170ef9988bc169ba16dd36a7fa041e5c4cbeb6a35b76d4c03daded371eae7c0"
+      },
+      {
+        "id": "rust-crate-ppv-lite86-0.2.21",
+        "version": "0.2.21",
+        "filename": "ppv-lite86-0.2.21.crate",
+        "url": "https://static.crates.io/crates/ppv-lite86/ppv-lite86-0.2.21.crate",
+        "bytes": 22522,
+        "sha256": "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
+      },
+      {
+        "id": "rust-crate-proc-macro2-1.0.107",
+        "version": "1.0.107",
+        "filename": "proc-macro2-1.0.107.crate",
+        "url": "https://static.crates.io/crates/proc-macro2/proc-macro2-1.0.107.crate",
+        "bytes": 59588,
+        "sha256": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
+      },
+      {
+        "id": "rust-crate-proptest-1.11.0",
+        "version": "1.11.0",
+        "filename": "proptest-1.11.0.crate",
+        "url": "https://static.crates.io/crates/proptest/proptest-1.11.0.crate",
+        "bytes": 207859,
+        "sha256": "4b45fcc2344c680f5025fe57779faef368840d0bd1f42f216291f0dc4ace4744"
+      },
+      {
+        "id": "rust-crate-pyo3-0.29.2",
+        "version": "0.29.2",
+        "filename": "pyo3-0.29.2.crate",
+        "url": "https://static.crates.io/crates/pyo3/pyo3-0.29.2.crate",
+        "bytes": 1255741,
+        "sha256": "4688ddedf473e32662b9b067670129a8afb8c18e351482c70d62ba4a88171e8b"
+      },
+      {
+        "id": "rust-crate-pyo3-0.30.1",
+        "version": "0.30.1",
+        "filename": "pyo3-0.30.1.crate",
+        "url": "https://static.crates.io/crates/pyo3/pyo3-0.30.1.crate",
+        "bytes": 1345706,
+        "sha256": "229ca13b8a15bb0d1487b81ab975bfcd97513416499a8312011b6036e42e0de4"
+      },
+      {
+        "id": "rust-crate-pyo3-build-config-0.29.2",
+        "version": "0.29.2",
+        "filename": "pyo3-build-config-0.29.2.crate",
+        "url": "https://static.crates.io/crates/pyo3-build-config/pyo3-build-config-0.29.2.crate",
+        "bytes": 41104,
+        "sha256": "f41027e41b4bd03f6e60f9f417fe24a6341a6bb744edd62b6f709f2a52ea30e9"
+      },
+      {
+        "id": "rust-crate-pyo3-build-config-0.29.3",
+        "version": "0.29.3",
+        "filename": "pyo3-build-config-0.29.3.crate",
+        "url": "https://static.crates.io/crates/pyo3-build-config/pyo3-build-config-0.29.3.crate",
+        "bytes": 41138,
+        "sha256": "7b3fc0c4d08f6bb10e71fe39dfb9e2f59c6eb6854e22ec8092f50c69a4499adb"
+      },
+      {
+        "id": "rust-crate-pyo3-build-config-0.30.1",
+        "version": "0.30.1",
+        "filename": "pyo3-build-config-0.30.1.crate",
+        "url": "https://static.crates.io/crates/pyo3-build-config/pyo3-build-config-0.30.1.crate",
+        "bytes": 42996,
+        "sha256": "70130e2b6dd1ee589a8788026a429561ca5c40fa7a2fa7914c2282eddae24700"
+      },
+      {
+        "id": "rust-crate-pyo3-ffi-0.29.2",
+        "version": "0.29.2",
+        "filename": "pyo3-ffi-0.29.2.crate",
+        "url": "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-0.29.2.crate",
+        "bytes": 90029,
+        "sha256": "e591a95526fead067432c3b3a33fc74770b87b1e04e73671090d9c2055a2b327"
+      },
+      {
+        "id": "rust-crate-pyo3-ffi-0.29.3",
+        "version": "0.29.3",
+        "filename": "pyo3-ffi-0.29.3.crate",
+        "url": "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-0.29.3.crate",
+        "bytes": 91291,
+        "sha256": "dfc0b8e19df29aad7086cf977bb0c2a2f143e30567eb113e9cf72b62ca698330"
+      },
+      {
+        "id": "rust-crate-pyo3-ffi-0.30.1",
+        "version": "0.30.1",
+        "filename": "pyo3-ffi-0.30.1.crate",
+        "url": "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-0.30.1.crate",
+        "bytes": 93717,
+        "sha256": "5e7ff73c555c286d212d4ce7e5fbda845a973c4f61bd5f160f5f2c3c2a04d1c4"
+      },
+      {
+        "id": "rust-crate-pyo3-macros-0.29.2",
+        "version": "0.29.2",
+        "filename": "pyo3-macros-0.29.2.crate",
+        "url": "https://static.crates.io/crates/pyo3-macros/pyo3-macros-0.29.2.crate",
+        "bytes": 9044,
+        "sha256": "73225868fc1cd84eef2c3c230ddb91273bf1de46aeb8a4248da76d32a0924a1c"
+      },
+      {
+        "id": "rust-crate-pyo3-macros-0.30.1",
+        "version": "0.30.1",
+        "filename": "pyo3-macros-0.30.1.crate",
+        "url": "https://static.crates.io/crates/pyo3-macros/pyo3-macros-0.30.1.crate",
+        "bytes": 9055,
+        "sha256": "c46d2e5862c7bb8207e3b639f713dda3c499933444784154c11d013c5a691b60"
+      },
+      {
+        "id": "rust-crate-pyo3-macros-backend-0.29.2",
+        "version": "0.29.2",
+        "filename": "pyo3-macros-backend-0.29.2.crate",
+        "url": "https://static.crates.io/crates/pyo3-macros-backend/pyo3-macros-backend-0.29.2.crate",
+        "bytes": 93749,
+        "sha256": "571575aa3749fa6216757dd47d2a3e7ef360f329a40f0666a9fbd14889024952"
+      },
+      {
+        "id": "rust-crate-pyo3-macros-backend-0.30.1",
+        "version": "0.30.1",
+        "filename": "pyo3-macros-backend-0.30.1.crate",
+        "url": "https://static.crates.io/crates/pyo3-macros-backend/pyo3-macros-backend-0.30.1.crate",
+        "bytes": 97593,
+        "sha256": "38b89f066f2ae72a2aef52d1537ca2fcd104440ebfadee06e97aa90738a25b9b"
+      },
+      {
+        "id": "rust-crate-quick-error-1.2.3",
+        "version": "1.2.3",
+        "filename": "quick-error-1.2.3.crate",
+        "url": "https://static.crates.io/crates/quick-error/quick-error-1.2.3.crate",
+        "bytes": 15066,
+        "sha256": "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
+      },
+      {
+        "id": "rust-crate-quote-1.0.44",
+        "version": "1.0.44",
+        "filename": "quote-1.0.44.crate",
+        "url": "https://static.crates.io/crates/quote/quote-1.0.44.crate",
+        "bytes": 31629,
+        "sha256": "21b2ebcf727b7760c461f091f9f0f539b77b8e87f2fd88131e7f1b433b3cece4"
+      },
+      {
+        "id": "rust-crate-quote-1.0.47",
+        "version": "1.0.47",
+        "filename": "quote-1.0.47.crate",
+        "url": "https://static.crates.io/crates/quote/quote-1.0.47.crate",
+        "bytes": 31622,
+        "sha256": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001"
+      },
+      {
+        "id": "rust-crate-r-efi-5.2.0",
+        "version": "5.2.0",
+        "filename": "r-efi-5.2.0.crate",
+        "url": "https://static.crates.io/crates/r-efi/r-efi-5.2.0.crate",
+        "bytes": 64764,
+        "sha256": "74765f6d916ee2faa39bc8e68e4f3ed8949b48cccdac59983d287a7cb71ce9c5"
+      },
+      {
+        "id": "rust-crate-r-efi-5.3.0",
+        "version": "5.3.0",
+        "filename": "r-efi-5.3.0.crate",
+        "url": "https://static.crates.io/crates/r-efi/r-efi-5.3.0.crate",
+        "bytes": 64532,
+        "sha256": "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f"
+      },
+      {
+        "id": "rust-crate-r-efi-6.0.0",
+        "version": "6.0.0",
+        "filename": "r-efi-6.0.0.crate",
+        "url": "https://static.crates.io/crates/r-efi/r-efi-6.0.0.crate",
+        "bytes": 65303,
+        "sha256": "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
+      },
+      {
+        "id": "rust-crate-radium-0.7.0",
+        "version": "0.7.0",
+        "filename": "radium-0.7.0.crate",
+        "url": "https://static.crates.io/crates/radium/radium-0.7.0.crate",
+        "bytes": 10906,
+        "sha256": "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
+      },
+      {
+        "id": "rust-crate-rand-0.9.5",
+        "version": "0.9.5",
+        "filename": "rand-0.9.5.crate",
+        "url": "https://static.crates.io/crates/rand/rand-0.9.5.crate",
+        "bytes": 100216,
+        "sha256": "b9ef1d0d795eb7d84685bca4f72f3649f064e6641543d3a8c415898726a57b41"
+      },
+      {
+        "id": "rust-crate-rand_chacha-0.9.0",
+        "version": "0.9.0",
+        "filename": "rand_chacha-0.9.0.crate",
+        "url": "https://static.crates.io/crates/rand_chacha/rand_chacha-0.9.0.crate",
+        "bytes": 18258,
+        "sha256": "d3022b5f1df60f26e1ffddd6c66e8aa15de382ae63b3a0c1bfc0e4d3e3f325cb"
+      },
+      {
+        "id": "rust-crate-rand_core-0.9.5",
+        "version": "0.9.5",
+        "filename": "rand_core-0.9.5.crate",
+        "url": "https://static.crates.io/crates/rand_core/rand_core-0.9.5.crate",
+        "bytes": 24129,
+        "sha256": "76afc826de14238e6e8c374ddcc1fa19e374fd8dd986b0d2af0d02377261d83c"
+      },
+      {
+        "id": "rust-crate-rand_xorshift-0.4.0",
+        "version": "0.4.0",
+        "filename": "rand_xorshift-0.4.0.crate",
+        "url": "https://static.crates.io/crates/rand_xorshift/rand_xorshift-0.4.0.crate",
+        "bytes": 10262,
+        "sha256": "513962919efc330f829edb2535844d1b912b0fbe2ca165d613e4e8788bb05a5a"
+      },
+      {
+        "id": "rust-crate-rayon-1.12.0",
+        "version": "1.12.0",
+        "filename": "rayon-1.12.0.crate",
+        "url": "https://static.crates.io/crates/rayon/rayon-1.12.0.crate",
+        "bytes": 183391,
+        "sha256": "fb39b166781f92d482534ef4b4b1b2568f42613b53e5b6c160e24cfbfa30926d"
+      },
+      {
+        "id": "rust-crate-rayon-core-1.13.0",
+        "version": "1.13.0",
+        "filename": "rayon-core-1.13.0.crate",
+        "url": "https://static.crates.io/crates/rayon-core/rayon-core-1.13.0.crate",
+        "bytes": 73151,
+        "sha256": "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91"
+      },
+      {
+        "id": "rust-crate-regex-1.13.1",
+        "version": "1.13.1",
+        "filename": "regex-1.13.1.crate",
+        "url": "https://static.crates.io/crates/regex/regex-1.13.1.crate",
+        "bytes": 157118,
+        "sha256": "f020237b6c8eed93db2e2cb53c00c60a8e1bc73da7d073199a1180401450218d"
+      },
+      {
+        "id": "rust-crate-regex-automata-0.4.18",
+        "version": "0.4.18",
+        "filename": "regex-automata-0.4.18.crate",
+        "url": "https://static.crates.io/crates/regex-automata/regex-automata-0.4.18.crate",
+        "bytes": 628707,
+        "sha256": "ad8553b9b26413251cbf30e620595c7a41b3887f03da04579c0e6b0d6a06b4b2"
+      },
+      {
+        "id": "rust-crate-regex-syntax-0.8.11",
+        "version": "0.8.11",
+        "filename": "regex-syntax-0.8.11.crate",
+        "url": "https://static.crates.io/crates/regex-syntax/regex-syntax-0.8.11.crate",
+        "bytes": 359055,
+        "sha256": "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
+      },
+      {
+        "id": "rust-crate-rustix-1.1.4",
+        "version": "1.1.4",
+        "filename": "rustix-1.1.4.crate",
+        "url": "https://static.crates.io/crates/rustix/rustix-1.1.4.crate",
+        "bytes": 425241,
+        "sha256": "b6fe4565b9518b83ef4f91bb47ce29620ca828bd32cb7e408f0062e9930ba190"
+      },
+      {
+        "id": "rust-crate-rustversion-1.0.23",
+        "version": "1.0.23",
+        "filename": "rustversion-1.0.23.crate",
+        "url": "https://static.crates.io/crates/rustversion/rustversion-1.0.23.crate",
+        "bytes": 21013,
+        "sha256": "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
+      },
+      {
+        "id": "rust-crate-rusty-fork-0.3.1",
+        "version": "0.3.1",
+        "filename": "rusty-fork-0.3.1.crate",
+        "url": "https://static.crates.io/crates/rusty-fork/rusty-fork-0.3.1.crate",
+        "bytes": 21108,
+        "sha256": "cc6bf79ff24e648f6da1f8d1f011e9cac26491b619e6b9280f2b47f1774e6ee2"
+      },
+      {
+        "id": "rust-crate-same-file-1.0.6",
+        "version": "1.0.6",
+        "filename": "same-file-1.0.6.crate",
+        "url": "https://static.crates.io/crates/same-file/same-file-1.0.6.crate",
+        "bytes": 10183,
+        "sha256": "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
+      },
+      {
+        "id": "rust-crate-self_cell-1.3.0",
+        "version": "1.3.0",
+        "filename": "self_cell-1.3.0.crate",
+        "url": "https://static.crates.io/crates/self_cell/self_cell-1.3.0.crate",
+        "bytes": 23869,
+        "sha256": "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
+      },
+      {
+        "id": "rust-crate-serde-1.0.229",
+        "version": "1.0.229",
+        "filename": "serde-1.0.229.crate",
+        "url": "https://static.crates.io/crates/serde/serde-1.0.229.crate",
+        "bytes": 83669,
+        "sha256": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba"
+      },
+      {
+        "id": "rust-crate-serde_core-1.0.229",
+        "version": "1.0.229",
+        "filename": "serde_core-1.0.229.crate",
+        "url": "https://static.crates.io/crates/serde_core/serde_core-1.0.229.crate",
+        "bytes": 63100,
+        "sha256": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48"
+      },
+      {
+        "id": "rust-crate-serde_derive-1.0.229",
+        "version": "1.0.229",
+        "filename": "serde_derive-1.0.229.crate",
+        "url": "https://static.crates.io/crates/serde_derive/serde_derive-1.0.229.crate",
+        "bytes": 59864,
+        "sha256": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348"
+      },
+      {
+        "id": "rust-crate-serde_json-1.0.151",
+        "version": "1.0.151",
+        "filename": "serde_json-1.0.151.crate",
+        "url": "https://static.crates.io/crates/serde_json/serde_json-1.0.151.crate",
+        "bytes": 156556,
+        "sha256": "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14"
+      },
+      {
+        "id": "rust-crate-serde_json-1.0.154",
+        "version": "1.0.154",
+        "filename": "serde_json-1.0.154.crate",
+        "url": "https://static.crates.io/crates/serde_json/serde_json-1.0.154.crate",
+        "bytes": 158079,
+        "sha256": "e7e9cc8b1b85264074fbcc02a88680c4096b1e47df8f739dceb03bf482f04bd6"
+      },
+      {
+        "id": "rust-crate-shlex-2.0.1",
+        "version": "2.0.1",
+        "filename": "shlex-2.0.1.crate",
+        "url": "https://static.crates.io/crates/shlex/shlex-2.0.1.crate",
+        "bytes": 19332,
+        "sha256": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
+      },
+      {
+        "id": "rust-crate-simdutf8-0.1.5",
+        "version": "0.1.5",
+        "filename": "simdutf8-0.1.5.crate",
+        "url": "https://static.crates.io/crates/simdutf8/simdutf8-0.1.5.crate",
+        "bytes": 28488,
+        "sha256": "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
+      },
+      {
+        "id": "rust-crate-slab-0.4.12",
+        "version": "0.4.12",
+        "filename": "slab-0.4.12.crate",
+        "url": "https://static.crates.io/crates/slab/slab-0.4.12.crate",
+        "bytes": 19080,
+        "sha256": "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
+      },
+      {
+        "id": "rust-crate-smallvec-1.15.2",
+        "version": "1.15.2",
+        "filename": "smallvec-1.15.2.crate",
+        "url": "https://static.crates.io/crates/smallvec/smallvec-1.15.2.crate",
+        "bytes": 34899,
+        "sha256": "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
+      },
+      {
+        "id": "rust-crate-smallvec-1.16.2",
+        "version": "1.16.2",
+        "filename": "smallvec-1.16.2.crate",
+        "url": "https://static.crates.io/crates/smallvec/smallvec-1.16.2.crate",
+        "bytes": 34874,
+        "sha256": "f9395f0f0eee849a9b707b2f06bb92a6a422090e2123bb2ef8e87a0e61892a8e"
+      },
+      {
+        "id": "rust-crate-speedate-0.17.0",
+        "version": "0.17.0",
+        "filename": "speedate-0.17.0.crate",
+        "url": "https://static.crates.io/crates/speedate/speedate-0.17.0.crate",
+        "bytes": 40124,
+        "sha256": "aba069c070b5e213f2a094deb7e5ed50ecb092be36102a4f4042e8d2056d060e"
+      },
+      {
+        "id": "rust-crate-stable_deref_trait-1.2.0",
+        "version": "1.2.0",
+        "filename": "stable_deref_trait-1.2.0.crate",
+        "url": "https://static.crates.io/crates/stable_deref_trait/stable_deref_trait-1.2.0.crate",
+        "bytes": 8054,
+        "sha256": "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
+      },
+      {
+        "id": "rust-crate-static_assertions-1.1.0",
+        "version": "1.1.0",
+        "filename": "static_assertions-1.1.0.crate",
+        "url": "https://static.crates.io/crates/static_assertions/static_assertions-1.1.0.crate",
+        "bytes": 18480,
+        "sha256": "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+      },
+      {
+        "id": "rust-crate-statrs-0.18.0",
+        "version": "0.18.0",
+        "filename": "statrs-0.18.0.crate",
+        "url": "https://static.crates.io/crates/statrs/statrs-0.18.0.crate",
+        "bytes": 156842,
+        "sha256": "2a3fe7c28c6512e766b0874335db33c94ad7b8f9054228ae1c2abd47ce7d335e"
+      },
+      {
+        "id": "rust-crate-strum-0.27.2",
+        "version": "0.27.2",
+        "filename": "strum-0.27.2.crate",
+        "url": "https://static.crates.io/crates/strum/strum-0.27.2.crate",
+        "bytes": 8489,
+        "sha256": "af23d6f6c1a224baef9d3f61e287d2761385a5b88fdab4eb4c6f11aeb54c4bcf"
+      },
+      {
+        "id": "rust-crate-strum_macros-0.27.2",
+        "version": "0.27.2",
+        "filename": "strum_macros-0.27.2.crate",
+        "url": "https://static.crates.io/crates/strum_macros/strum_macros-0.27.2.crate",
+        "bytes": 30522,
+        "sha256": "7695ce3845ea4b33927c055a39dc438a45b059f7c1b3d91d38d10355fb8cbca7"
+      },
+      {
+        "id": "rust-crate-syn-2.0.119",
+        "version": "2.0.119",
+        "filename": "syn-2.0.119.crate",
+        "url": "https://static.crates.io/crates/syn/syn-2.0.119.crate",
+        "bytes": 307407,
+        "sha256": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297"
+      },
+      {
+        "id": "rust-crate-syn-2.0.82",
+        "version": "2.0.82",
+        "filename": "syn-2.0.82.crate",
+        "url": "https://static.crates.io/crates/syn/syn-2.0.82.crate",
+        "bytes": 272300,
+        "sha256": "83540f837a8afc019423a8edb95b52a8effe46957ee402287f4292fae35be021"
+      },
+      {
+        "id": "rust-crate-syn-3.0.3",
+        "version": "3.0.3",
+        "filename": "syn-3.0.3.crate",
+        "url": "https://static.crates.io/crates/syn/syn-3.0.3.crate",
+        "bytes": 312999,
+        "sha256": "53e9bae58849f64dfa4f5d5ae372c8341f7305f82a3868709269343628b659a3"
+      },
+      {
+        "id": "rust-crate-syn-3.0.6",
+        "version": "3.0.6",
+        "filename": "syn-3.0.6.crate",
+        "url": "https://static.crates.io/crates/syn/syn-3.0.6.crate",
+        "bytes": 313821,
+        "sha256": "8593e8e72159ed2257d083c7a454a85cbf854f37a0966d8d483aff8c8a3ebcee"
+      },
+      {
+        "id": "rust-crate-synstructure-0.13.1",
+        "version": "0.13.1",
+        "filename": "synstructure-0.13.1.crate",
+        "url": "https://static.crates.io/crates/synstructure/synstructure-0.13.1.crate",
+        "bytes": 18327,
+        "sha256": "c8af7666ab7b6390ab78131fb5b0fce11d6b7a6951602017c35fa82800708971"
+      },
+      {
+        "id": "rust-crate-tap-1.0.1",
+        "version": "1.0.1",
+        "filename": "tap-1.0.1.crate",
+        "url": "https://static.crates.io/crates/tap/tap-1.0.1.crate",
+        "bytes": 11316,
+        "sha256": "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
+      },
+      {
+        "id": "rust-crate-target-lexicon-0.13.4",
+        "version": "0.13.4",
+        "filename": "target-lexicon-0.13.4.crate",
+        "url": "https://static.crates.io/crates/target-lexicon/target-lexicon-0.13.4.crate",
+        "bytes": 26832,
+        "sha256": "b1dd07eb858a2067e2f3c7155d54e929265c264e6f37efe3ee7a8d1b5a1dd0ba"
+      },
+      {
+        "id": "rust-crate-target-lexicon-0.13.5",
+        "version": "0.13.5",
+        "filename": "target-lexicon-0.13.5.crate",
+        "url": "https://static.crates.io/crates/target-lexicon/target-lexicon-0.13.5.crate",
+        "bytes": 26928,
+        "sha256": "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
+      },
+      {
+        "id": "rust-crate-tempfile-3.27.0",
+        "version": "3.27.0",
+        "filename": "tempfile-3.27.0.crate",
+        "url": "https://static.crates.io/crates/tempfile/tempfile-3.27.0.crate",
+        "bytes": 44780,
+        "sha256": "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
+      },
+      {
+        "id": "rust-crate-tinystr-0.7.6",
+        "version": "0.7.6",
+        "filename": "tinystr-0.7.6.crate",
+        "url": "https://static.crates.io/crates/tinystr/tinystr-0.7.6.crate",
+        "bytes": 16971,
+        "sha256": "9117f5d4db391c1cf6927e7bea3db74b9a1c1add8f7eda9ffd5364f40f57b82f"
+      },
+      {
+        "id": "rust-crate-tinytemplate-1.2.1",
+        "version": "1.2.1",
+        "filename": "tinytemplate-1.2.1.crate",
+        "url": "https://static.crates.io/crates/tinytemplate/tinytemplate-1.2.1.crate",
+        "bytes": 26490,
+        "sha256": "be4d6b5f19ff7664e8c98d03e2139cb510db9b0a60b55f8e8709b689d939b6bc"
+      },
+      {
+        "id": "rust-crate-unarray-0.1.4",
+        "version": "0.1.4",
+        "filename": "unarray-0.1.4.crate",
+        "url": "https://static.crates.io/crates/unarray/unarray-0.1.4.crate",
+        "bytes": 12895,
+        "sha256": "eaea85b334db583fe3274d12b4cd1880032beab409c0d774be044d4480ab9a94"
+      },
+      {
+        "id": "rust-crate-unicode-ident-1.0.12",
+        "version": "1.0.12",
+        "filename": "unicode-ident-1.0.12.crate",
+        "url": "https://static.crates.io/crates/unicode-ident/unicode-ident-1.0.12.crate",
+        "bytes": 42168,
+        "sha256": "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+      },
+      {
+        "id": "rust-crate-unicode-ident-1.0.24",
+        "version": "1.0.24",
+        "filename": "unicode-ident-1.0.24.crate",
+        "url": "https://static.crates.io/crates/unicode-ident/unicode-ident-1.0.24.crate",
+        "bytes": 49298,
+        "sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
+      },
+      {
+        "id": "rust-crate-unicode-ident-1.0.26",
+        "version": "1.0.26",
+        "filename": "unicode-ident-1.0.26.crate",
+        "url": "https://static.crates.io/crates/unicode-ident/unicode-ident-1.0.26.crate",
+        "bytes": 48425,
+        "sha256": "d245f478577f809a851594d02313b640fb437e0bb33866753cff937863096954"
+      },
+      {
+        "id": "rust-crate-unwinding-0.2.10",
+        "version": "0.2.10",
+        "filename": "unwinding-0.2.10.crate",
+        "url": "https://static.crates.io/crates/unwinding/unwinding-0.2.10.crate",
+        "bytes": 29566,
+        "sha256": "4b134ada16dda9e435abe2a6d76a01d497bc60707357845a15f9b0ed42dc88ce"
+      },
+      {
+        "id": "rust-crate-url-2.5.8",
+        "version": "2.5.8",
+        "filename": "url-2.5.8.crate",
+        "url": "https://static.crates.io/crates/url/url-2.5.8.crate",
+        "bytes": 86512,
+        "sha256": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed"
+      },
+      {
+        "id": "rust-crate-utf16_iter-1.0.5",
+        "version": "1.0.5",
+        "filename": "utf16_iter-1.0.5.crate",
+        "url": "https://static.crates.io/crates/utf16_iter/utf16_iter-1.0.5.crate",
+        "bytes": 9736,
+        "sha256": "c8232dd3cdaed5356e0f716d285e4b40b932ac434100fe9b7e0e8e935b9e6246"
+      },
+      {
+        "id": "rust-crate-utf8_iter-1.0.4",
+        "version": "1.0.4",
+        "filename": "utf8_iter-1.0.4.crate",
+        "url": "https://static.crates.io/crates/utf8_iter/utf8_iter-1.0.4.crate",
+        "bytes": 10437,
+        "sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
+      },
+      {
+        "id": "rust-crate-uuid-1.23.4",
+        "version": "1.23.4",
+        "filename": "uuid-1.23.4.crate",
+        "url": "https://static.crates.io/crates/uuid/uuid-1.23.4.crate",
+        "bytes": 62165,
+        "sha256": "bf80a72845275afea99e7f2b434723d3bc7e38470fcd1c7ed39a599c73319a53"
+      },
+      {
+        "id": "rust-crate-vcpkg-0.2.15",
+        "version": "0.2.15",
+        "filename": "vcpkg-0.2.15.crate",
+        "url": "https://static.crates.io/crates/vcpkg/vcpkg-0.2.15.crate",
+        "bytes": 228735,
+        "sha256": "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
+      },
+      {
+        "id": "rust-crate-version_check-0.9.5",
+        "version": "0.9.5",
+        "filename": "version_check-0.9.5.crate",
+        "url": "https://static.crates.io/crates/version_check/version_check-0.9.5.crate",
+        "bytes": 15554,
+        "sha256": "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+      },
+      {
+        "id": "rust-crate-wait-timeout-0.2.1",
+        "version": "0.2.1",
+        "filename": "wait-timeout-0.2.1.crate",
+        "url": "https://static.crates.io/crates/wait-timeout/wait-timeout-0.2.1.crate",
+        "bytes": 11435,
+        "sha256": "09ac3b126d3914f9849036f826e054cbabdc8519970b8998ddaf3b5bd3c65f11"
+      },
+      {
+        "id": "rust-crate-walkdir-2.5.0",
+        "version": "2.5.0",
+        "filename": "walkdir-2.5.0.crate",
+        "url": "https://static.crates.io/crates/walkdir/walkdir-2.5.0.crate",
+        "bytes": 23951,
+        "sha256": "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
+      },
+      {
+        "id": "rust-crate-wasi-0.14.2+wasi-0.2.4",
+        "version": "0.14.2+wasi-0.2.4",
+        "filename": "wasi-0.14.2+wasi-0.2.4.crate",
+        "url": "https://static.crates.io/crates/wasi/wasi-0.14.2+wasi-0.2.4.crate",
+        "bytes": 140921,
+        "sha256": "9683f9a5a998d873c0d21fcbe3c083009670149a8fab228644b8bd36b2c48cb3"
+      },
+      {
+        "id": "rust-crate-wasip2-1.0.4+wasi-0.2.12",
+        "version": "1.0.4+wasi-0.2.12",
+        "filename": "wasip2-1.0.4+wasi-0.2.12.crate",
+        "url": "https://static.crates.io/crates/wasip2/wasip2-1.0.4+wasi-0.2.12.crate",
+        "bytes": 135311,
+        "sha256": "b67efb37e106e55ce722a510d6b5f9c17f083e5fc79afc2badeb12cc313d9487"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-0.2.100",
+        "version": "0.2.100",
+        "filename": "wasm-bindgen-0.2.100.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen/wasm-bindgen-0.2.100.crate",
+        "bytes": 48288,
+        "sha256": "1edc8929d7499fc4e8f0be2262a241556cfc54a0bea223790e71446f2aab1ef5"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-0.2.127",
+        "version": "0.2.127",
+        "filename": "wasm-bindgen-0.2.127.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen/wasm-bindgen-0.2.127.crate",
+        "bytes": 68138,
+        "sha256": "1b70935747edd64d89de3efa29d73789b806c15798f8e7dca4d8ac356b50ce70"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-backend-0.2.100",
+        "version": "0.2.100",
+        "filename": "wasm-bindgen-backend-0.2.100.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen-backend/wasm-bindgen-backend-0.2.100.crate",
+        "bytes": 32111,
+        "sha256": "2f0a0651a5c2bc21487bde11ee802ccaf4c51935d0d3d42a6101f98161700bc6"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-macro-0.2.100",
+        "version": "0.2.100",
+        "filename": "wasm-bindgen-macro-0.2.100.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen-macro/wasm-bindgen-macro-0.2.100.crate",
+        "bytes": 9663,
+        "sha256": "7fe63fc6d09ed3792bd0897b314f53de8e16568c2b3f7982f468c0bf9bd0b407"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-macro-0.2.127",
+        "version": "0.2.127",
+        "filename": "wasm-bindgen-macro-0.2.127.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen-macro/wasm-bindgen-macro-0.2.127.crate",
+        "bytes": 9372,
+        "sha256": "77775f8f3f7217702089053b94958f8f54061a3f663417df76e19cbdcca29bc1"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-macro-support-0.2.100",
+        "version": "0.2.100",
+        "filename": "wasm-bindgen-macro-support-0.2.100.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen-macro-support/wasm-bindgen-macro-support-0.2.100.crate",
+        "bytes": 26243,
+        "sha256": "8ae87ea40c9f689fc23f209965b6fb8a99ad69aeeb0231408be24920604395de"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-macro-support-0.2.127",
+        "version": "0.2.127",
+        "filename": "wasm-bindgen-macro-support-0.2.127.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen-macro-support/wasm-bindgen-macro-support-0.2.127.crate",
+        "bytes": 85236,
+        "sha256": "e11d33f857dc2fb11b8bc75aee111aa9cbeb12cd9f25efd3d4c2a3dd4e235284"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-shared-0.2.100",
+        "version": "0.2.100",
+        "filename": "wasm-bindgen-shared-0.2.100.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen-shared/wasm-bindgen-shared-0.2.100.crate",
+        "bytes": 8570,
+        "sha256": "1a05d73b933a847d6cccdda8f838a22ff101ad9bf93e33684f39c1f5f0eece3d"
+      },
+      {
+        "id": "rust-crate-wasm-bindgen-shared-0.2.127",
+        "version": "0.2.127",
+        "filename": "wasm-bindgen-shared-0.2.127.crate",
+        "url": "https://static.crates.io/crates/wasm-bindgen-shared/wasm-bindgen-shared-0.2.127.crate",
+        "bytes": 11291,
+        "sha256": "7ef64dbcc55df09c7e5a46182d181c2cfa3e925f3da937ea764728b4bbb9dcbf"
+      },
+      {
+        "id": "rust-crate-web-sys-0.3.104",
+        "version": "0.3.104",
+        "filename": "web-sys-0.3.104.crate",
+        "url": "https://static.crates.io/crates/web-sys/web-sys-0.3.104.crate",
+        "bytes": 682013,
+        "sha256": "c435338968042f4f59a557f690a253676d47ce13ceb55d70100e7facf6620a30"
+      },
+      {
+        "id": "rust-crate-winapi-util-0.1.11",
+        "version": "0.1.11",
+        "filename": "winapi-util-0.1.11.crate",
+        "url": "https://static.crates.io/crates/winapi-util/winapi-util-0.1.11.crate",
+        "bytes": 13368,
+        "sha256": "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
+      },
+      {
+        "id": "rust-crate-windows-link-0.2.1",
+        "version": "0.2.1",
+        "filename": "windows-link-0.2.1.crate",
+        "url": "https://static.crates.io/crates/windows-link/windows-link-0.2.1.crate",
+        "bytes": 6133,
+        "sha256": "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5"
+      },
+      {
+        "id": "rust-crate-windows-sys-0.61.2",
+        "version": "0.61.2",
+        "filename": "windows-sys-0.61.2.crate",
+        "url": "https://static.crates.io/crates/windows-sys/windows-sys-0.61.2.crate",
+        "bytes": 2517186,
+        "sha256": "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
+      },
+      {
+        "id": "rust-crate-wit-bindgen-0.57.1",
+        "version": "0.57.1",
+        "filename": "wit-bindgen-0.57.1.crate",
+        "url": "https://static.crates.io/crates/wit-bindgen/wit-bindgen-0.57.1.crate",
+        "bytes": 71227,
+        "sha256": "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
+      },
+      {
+        "id": "rust-crate-wit-bindgen-rt-0.39.0",
+        "version": "0.39.0",
+        "filename": "wit-bindgen-rt-0.39.0.crate",
+        "url": "https://static.crates.io/crates/wit-bindgen-rt/wit-bindgen-rt-0.39.0.crate",
+        "bytes": 12241,
+        "sha256": "6f42320e61fe2cfd34354ecb597f86f413484a798ba44a8ca1165c58d42da6c1"
+      },
+      {
+        "id": "rust-crate-write16-1.0.0",
+        "version": "1.0.0",
+        "filename": "write16-1.0.0.crate",
+        "url": "https://static.crates.io/crates/write16/write16-1.0.0.crate",
+        "bytes": 7218,
+        "sha256": "d1890f4022759daae28ed4fe62859b1236caebfc61ede2f63ed4e695f3f6d936"
+      },
+      {
+        "id": "rust-crate-writeable-0.5.5",
+        "version": "0.5.5",
+        "filename": "writeable-0.5.5.crate",
+        "url": "https://static.crates.io/crates/writeable/writeable-0.5.5.crate",
+        "bytes": 22354,
+        "sha256": "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
+      },
+      {
+        "id": "rust-crate-wyz-0.5.1",
+        "version": "0.5.1",
+        "filename": "wyz-0.5.1.crate",
+        "url": "https://static.crates.io/crates/wyz/wyz-0.5.1.crate",
+        "bytes": 18790,
+        "sha256": "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
+      },
+      {
+        "id": "rust-crate-xxhash-rust-0.8.19",
+        "version": "0.8.19",
+        "filename": "xxhash-rust-0.8.19.crate",
+        "url": "https://static.crates.io/crates/xxhash-rust/xxhash-rust-0.8.19.crate",
+        "bytes": 23487,
+        "sha256": "550a2b930b62486a393c52d5c3b84bff264b28aa437ed64694d31e93b1757af7"
+      },
+      {
+        "id": "rust-crate-yoke-0.7.4",
+        "version": "0.7.4",
+        "filename": "yoke-0.7.4.crate",
+        "url": "https://static.crates.io/crates/yoke/yoke-0.7.4.crate",
+        "bytes": 27781,
+        "sha256": "6c5b1314b079b0930c31e3af543d8ee1757b1951ae1e1565ec704403a7240ca5"
+      },
+      {
+        "id": "rust-crate-yoke-derive-0.7.4",
+        "version": "0.7.4",
+        "filename": "yoke-derive-0.7.4.crate",
+        "url": "https://static.crates.io/crates/yoke-derive/yoke-derive-0.7.4.crate",
+        "bytes": 7470,
+        "sha256": "28cc31741b18cb6f1d5ff12f5b7523e3d6eb0852bbbad19d73905511d9849b95"
+      },
+      {
+        "id": "rust-crate-zerocopy-0.8.25",
+        "version": "0.8.25",
+        "filename": "zerocopy-0.8.25.crate",
+        "url": "https://static.crates.io/crates/zerocopy/zerocopy-0.8.25.crate",
+        "bytes": 252714,
+        "sha256": "a1702d9583232ddb9174e01bb7c15a2ab8fb1bc6f227aa1233858c351a3ba0cb"
+      },
+      {
+        "id": "rust-crate-zerocopy-0.8.56",
+        "version": "0.8.56",
+        "filename": "zerocopy-0.8.56.crate",
+        "url": "https://static.crates.io/crates/zerocopy/zerocopy-0.8.56.crate",
+        "bytes": 284907,
+        "sha256": "556764e583adb45a9f8d413c2a147fa7e8d821e48e12b14fd560b607998b75eb"
+      },
+      {
+        "id": "rust-crate-zerocopy-derive-0.8.25",
+        "version": "0.8.25",
+        "filename": "zerocopy-derive-0.8.25.crate",
+        "url": "https://static.crates.io/crates/zerocopy-derive/zerocopy-derive-0.8.25.crate",
+        "bytes": 87671,
+        "sha256": "28a6e20d751156648aa063f3800b706ee209a32c0b4d9f24be3d980b01be55ef"
+      },
+      {
+        "id": "rust-crate-zerocopy-derive-0.8.56",
+        "version": "0.8.56",
+        "filename": "zerocopy-derive-0.8.56.crate",
+        "url": "https://static.crates.io/crates/zerocopy-derive/zerocopy-derive-0.8.56.crate",
+        "bytes": 105007,
+        "sha256": "f2ab42fc20575779bd240faa45f94a74256f755c0fa9e89f0ede20d91d0cdfc1"
+      },
+      {
+        "id": "rust-crate-zerofrom-0.1.4",
+        "version": "0.1.4",
+        "filename": "zerofrom-0.1.4.crate",
+        "url": "https://static.crates.io/crates/zerofrom/zerofrom-0.1.4.crate",
+        "bytes": 5044,
+        "sha256": "91ec111ce797d0e0784a1116d0ddcdbea84322cd79e5d5ad173daeba4f93ab55"
+      },
+      {
+        "id": "rust-crate-zerofrom-derive-0.1.4",
+        "version": "0.1.4",
+        "filename": "zerofrom-derive-0.1.4.crate",
+        "url": "https://static.crates.io/crates/zerofrom-derive/zerofrom-derive-0.1.4.crate",
+        "bytes": 8232,
+        "sha256": "0ea7b4a3637ea8669cedf0f1fd5c286a17f3de97b8dd5a70a6c167a1730e63a5"
+      },
+      {
+        "id": "rust-crate-zerovec-0.10.4",
+        "version": "0.10.4",
+        "filename": "zerovec-0.10.4.crate",
+        "url": "https://static.crates.io/crates/zerovec/zerovec-0.10.4.crate",
+        "bytes": 126398,
+        "sha256": "aa2b893d79df23bfb12d5461018d408ea19dfafe76c2c7ef6d4eba614f8ff079"
+      },
+      {
+        "id": "rust-crate-zerovec-derive-0.10.3",
+        "version": "0.10.3",
+        "filename": "zerovec-derive-0.10.3.crate",
+        "url": "https://static.crates.io/crates/zerovec-derive/zerovec-derive-0.10.3.crate",
+        "bytes": 19438,
+        "sha256": "6eafa6dfb17584ea3e2bd6e76e0cc15ad7af12b09abdd1ca55961bed9b1063c6"
+      },
+      {
+        "id": "rust-crate-zmij-1.0.23",
+        "version": "1.0.23",
+        "filename": "zmij-1.0.23.crate",
+        "url": "https://static.crates.io/crates/zmij/zmij-1.0.23.crate",
+        "bytes": 28612,
+        "sha256": "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"
+      },
+      {
+        "id": "rust-crate-zmij-1.0.6",
+        "version": "1.0.6",
+        "filename": "zmij-1.0.6.crate",
+        "url": "https://static.crates.io/crates/zmij/zmij-1.0.6.crate",
+        "bytes": 21298,
+        "sha256": "aac060176f7020d62c3bcc1cdbcec619d54f48b07ad1963a3f80ce7a0c17755f"
+      },
+      {
+        "id": "tiktoken-native-source",
+        "version": "0.14.0",
+        "filename": "tiktoken-0.14.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/66/62/167a842aa0429d45f5e797354fd4343a96f6043d67d0513c675c7b8d36e6/tiktoken-0.14.0.tar.gz",
+        "bytes": 38898,
+        "sha256": "231dec90efcdccf1b565a1416107736f1e09b1a08fe736ef9d6363e626d03874"
+      },
+      {
+        "id": "uharfbuzz-native-source",
+        "version": "0.57.0",
+        "filename": "uharfbuzz-0.57.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/e6/48/0b293baafb87b5ccfec082f427fb1e81ce4d27098a8b2ac8db6c76e07e65/uharfbuzz-0.57.0.tar.gz",
+        "bytes": 39863434,
+        "sha256": "55136df18a9dd09fec36d1ceb77965f3108de6d86c338b3825feedb0730d84b7"
+      },
+      {
+        "id": "vectorscan",
+        "version": "5.4.12",
+        "filename": "vectorscan-5.4.12-source.tar.gz",
+        "url": "https://codeload.github.com/VectorCamp/vectorscan/tar.gz/refs/tags/vectorscan/5.4.12",
+        "bytes": 20849791,
+        "sha256": "1ac4f3c038ac163973f107ac4423a6b246b181ffd97fdd371696b2517ec9b3ed"
+      },
+      {
+        "id": "backports-zstd-native-source",
+        "version": "1.8.0",
+        "filename": "backports_zstd-1.8.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/ff/9c/13569626440e88f09d16f43ec1c2aa0d10a523be2811414580d1cfb7c9f3/backports_zstd-1.8.0.tar.gz",
+        "bytes": 1006566,
+        "sha256": "9dae4f4c481716e3db473d667457b4f508ff7459c0931b567a5c9677fb3db316"
+      },
+      {
+        "id": "bitarray-native-source",
+        "version": "3.12.3",
+        "filename": "bitarray-3.12.3.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/a9/cc/aa09a20048dd650d9a36bd70c26b2688413066d65acc9f484f94b9929108/bitarray-3.12.3.tar.gz",
+        "bytes": 189559,
+        "sha256": "919e35a951c0a551631b94bf568f3f5e38d004e0c60866cb2ca51bd8c4778fec"
+      },
+      {
+        "id": "chardet-native-source",
+        "version": "7.7.0",
+        "filename": "chardet-7.7.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/47/92/3d893ac5d338b9a9af34c5b517d77492dcea8a10254254eead4215a96f3f/chardet-7.7.0.tar.gz",
+        "bytes": 1008480,
+        "sha256": "0ba38a05201b0abf7570c12d8af45c30b2af835bd5cc52bfc7105082eda82c1e"
+      },
+      {
+        "id": "charset-normalizer-native-source",
+        "version": "3.5.2",
+        "filename": "charset_normalizer-3.5.2.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/33/1c/f41d4e74c28ab327ff3acd36053f7ea506c55872d7a90b0fa71aa3ab0c89/charset_normalizer-3.5.2.tar.gz",
+        "bytes": 172659,
+        "sha256": "39de2a259fc954455c57274dc94c79d5842774e1247a016aff30bc0efed0f4ef"
+      },
+      {
+        "id": "fonttools-native-source",
+        "version": "4.67.0",
+        "filename": "fonttools-4.67.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/94/36/102e180f8f5dbaee88b26595b01ca8aa80bf4e62128d9aa94265b3996c96/fonttools-4.67.0.tar.gz",
+        "bytes": 3750028,
+        "sha256": "3cb57e6600ca77c0b1729cf8adc23bc0652633a37f18cfa934d9c7bc3de25519"
+      },
+      {
+        "id": "markupsafe-native-source",
+        "version": "3.0.4",
+        "filename": "markupsafe-3.0.4.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/38/9b/e422a865e1d5d57d0e509b4e0bf1c1a70a7f6382c29a5aa428df994c8bc8/markupsafe-3.0.4.tar.gz",
+        "bytes": 153777,
+        "sha256": "2e9ad7dd851bf45fab9f75cbff4cb493fee9979e8d8c7c9c3ee119022518edd6"
+      },
+      {
+        "id": "ml-dtypes-native-source",
+        "version": "0.6.0",
+        "filename": "ml_dtypes-0.6.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/12/72/307d7c4bd0600601c7133fba5cb78af7db968152951c1cd473abb1cda782/ml_dtypes-0.6.0.tar.gz",
+        "bytes": 3032327,
+        "sha256": "5e60251d32ced5598972e4d5e06a2f044341f9291402551a3f6f0ec44f9299b0"
+      },
+      {
+        "id": "msgpack-native-source",
+        "version": "1.2.4",
+        "filename": "msgpack-1.2.4.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/cc/52/1ec7ead2c7528bf3d1db73e886fa4df10f9e6f0eb7854a448b7090cfcef7/msgpack-1.2.4.tar.gz",
+        "bytes": 197764,
+        "sha256": "475c44e12f2a5de766a8448783f149c9b33f3f49b88953c6cd739a77d93c732c"
+      },
+      {
+        "id": "numpy-native-source",
+        "version": "2.5.4",
+        "filename": "numpy-2.5.4.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/95/b0/c7453d0b6e2073c3264468b106ee1563750cecc910965e67357e3698c83e/numpy-2.5.4.tar.gz",
+        "bytes": 20866315,
+        "sha256": "9a94cf751c9ad8ebaa835bcd3d40dacf8534ad086b88c38029b65123c7999d2a"
+      },
+      {
+        "id": "onnx-native-source",
+        "version": "1.23.2",
+        "filename": "onnx-1.23.2.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/3f/62/bc2dfadb63ecf04cb2d65a6b17751863039d36c65de51d6a3128ab35f1e7/onnx-1.23.2.tar.gz",
+        "bytes": 6023090,
+        "sha256": "008cb0467b2bbee41448acc7da8b6f4e704624cb0d327a2d5adafc7ce19bc5b8"
+      },
+      {
+        "id": "protobuf-native-source",
+        "version": "7.36.2",
+        "filename": "protobuf-7.36.2.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/d9/89/5b8517baa72f84a67b8a307ba953c91057af618bf40bf676f3c03551f8f0/protobuf-7.36.2.tar.gz",
+        "bytes": 512737,
+        "sha256": "497d0463ff3316681da6c0b9e8d06cb465d61abce00b613ab42226175644d1bb"
+      },
+      {
+        "id": "psutil-native-source",
+        "version": "7.2.2",
+        "filename": "psutil-7.2.2.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/aa/c6/d1ddf4abb55e93cebc4f2ed8b5d6dbad109ecb8d63748dd2b20ab5e57ebe/psutil-7.2.2.tar.gz",
+        "bytes": 493740,
+        "sha256": "0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372"
+      },
+      {
+        "id": "pyyaml-native-source",
+        "version": "6.0.3",
+        "filename": "pyyaml-6.0.3.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz",
+        "bytes": 130960,
+        "sha256": "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f"
+      },
+      {
+        "id": "rapidfuzz-native-source",
+        "version": "3.14.6",
+        "filename": "rapidfuzz-3.14.6.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/18/97/226c43b7b5d957bc3840ed52ea99eed261f99834c4619be7a4742cbaeafa/rapidfuzz-3.14.6.tar.gz",
+        "bytes": 57955060,
+        "sha256": "e13a8160d017b499ec7a2fa9d0ce1ae2e7377080815785819f966fb235d4eb60"
+      },
+      {
+        "id": "regex-native-source",
+        "version": "2026.9.29",
+        "filename": "regex-2026.9.29.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/fc/f2/af1da9d3ceed77bfcdce40427d49ba0be94e4fe84245e3bfef68c10e75b6/regex-2026.9.29.tar.gz",
+        "bytes": 419199,
+        "sha256": "8b5fcc4771732191b2b7d1dd68d8f0353f47f8d90b6150f6dce58bf1112442cb"
+      },
+      {
+        "id": "tibs-native-source",
+        "version": "0.5.7",
+        "filename": "tibs-0.5.7.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/57/cd/6cf028decf1c2df4d26077dd5d0532587d93d4917233d5e004133166a940/tibs-0.5.7.tar.gz",
+        "bytes": 78255,
+        "sha256": "173dfbecb2309edd9771f453580c88cf251e775613461566b23dbd756b3d54cb"
+      }
+    ],
+    "newPublisherSdistCount": 16,
+    "limitations": [
+      "Existing Linux/Windows source choices and hashes are unchanged. Mac scope is based on actual observed versions, verified native recipes and matching source-lock input supersets.",
+      "Exact ONNX Runtime native revision 6af1a93 was not available from the official tag/commit endpoints; no different source is substituted.",
+      "Tiktoken compiled transitive versions and some prebuilt-wheel compiler/vendor details remain unknown, not additional legal or execution gates."
+    ]
+  },
+  "cpython": {
+    "python": "3.12.16",
+    "targetTriple": "aarch64-apple-darwin",
+    "upstreamMachOArchitecture": "arm64",
+    "buildOptions": "pgo+lto",
+    "releaseUrl": "https://github.com/astral-sh/python-build-standalone/releases/tag/20261026",
+    "sourceCommit": "fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+    "fullBuildArchive": {
+      "filename": "cpython-3.12.16+20261026-aarch64-apple-darwin-pgo+lto-full.tar.zst",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.12.16%2B20261026-aarch64-apple-darwin-pgo%2Blto-full.tar.zst",
+      "bytes": 57660205,
+      "sha256": "016758f4881e5f71d63eddfbcdd53f25c5a9152435a863e4dc0770758eae32c3",
+      "hashStatus": "locally_recomputed_and_publisher_matched"
+    },
+    "installOnlyStrippedArchive": {
+      "filename": "cpython-3.12.16+20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.12.16%2B20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+      "bytes": 25035343,
+      "sha256": "353d5f1b4fd2715e7053f12f068435d5bbad16b91e057006b5d01e0925709a7e",
+      "hashStatus": "locally_recomputed_and_publisher_matched"
+    },
+    "sourceId": "cpython-linux",
+    "recipeSourceId": "python-build-standalone-linux",
+    "metadata": {
+      "path": "addon/licenses/supplemental/macos/python-build-standalone/PYTHON.json",
+      "archiveMember": "python/PYTHON.json",
+      "bytes": 118275,
+      "sha256": "dfc38df39b46bc1337abc4b3ff160e5ef4ca16f13dedb4c412a770ecb3fb8a36"
+    },
+    "notices": [
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.bzip2.txt",
+        "archiveMember": "python/licenses/LICENSE.bzip2.txt",
+        "bytes": 1743,
+        "sha256": "1f38bbc7caacafd65169276d759c0d88c991b753b643ce35d0e45ea1971dd441"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.cpython.txt",
+        "archiveMember": "python/licenses/LICENSE.cpython.txt",
+        "bytes": 36164,
+        "sha256": "86e61415828a8b5b06ec8d024e6f086ce155a8b85fd0c419c0ba4dc004e74fdd"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.expat.txt",
+        "archiveMember": "python/licenses/LICENSE.expat.txt",
+        "bytes": 1144,
+        "sha256": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libedit.txt",
+        "archiveMember": "python/licenses/LICENSE.libedit.txt",
+        "bytes": 1614,
+        "sha256": "29cea33c32bbc9785142386377915612a2fa786482c46843383384aded2e09b1"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libffi.txt",
+        "archiveMember": "python/licenses/LICENSE.libffi.txt",
+        "bytes": 1132,
+        "sha256": "deaf3a42effb551a5b140fa9afefed183a27f1341c6d1bf430d106a5e6931fc0"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.liblzma.txt",
+        "archiveMember": "python/licenses/LICENSE.liblzma.txt",
+        "bytes": 660,
+        "sha256": "9a4062de0a2c388a98cf35a35d348b62fa97c838a71c3c28ee1a2d7d0a565b02"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.libuuid.txt",
+        "archiveMember": "python/licenses/LICENSE.libuuid.txt",
+        "bytes": 1432,
+        "sha256": "122ee1f7e258f2c3c0e538a75c037684f420454bf3850ddc74ce750bbf5fe86b"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.mpdecimal.txt",
+        "archiveMember": "python/licenses/LICENSE.mpdecimal.txt",
+        "bytes": 1284,
+        "sha256": "669512af7219f58be03a398766d7c9da11a3b3df9d3f05cb74c5ceca25c8da3b"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.ncurses.txt",
+        "archiveMember": "python/licenses/LICENSE.ncurses.txt",
+        "bytes": 1447,
+        "sha256": "87a4c4442337b8968ef956031c406b74f9cb7149b7ba87311bdaba534816201c"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.openssl-3.txt",
+        "archiveMember": "python/licenses/LICENSE.openssl-3.txt",
+        "bytes": 10175,
+        "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.sqlite.txt",
+        "archiveMember": "python/licenses/LICENSE.sqlite.txt",
+        "bytes": 1481,
+        "sha256": "38bef3d28b24f145ea293bd3b6eb4b20396982abc8303128fb493986ea5bc719"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.tcl.txt",
+        "archiveMember": "python/licenses/LICENSE.tcl.txt",
+        "bytes": 2255,
+        "sha256": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.zlib-ng.txt",
+        "archiveMember": "python/licenses/LICENSE.zlib-ng.txt",
+        "bytes": 867,
+        "sha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee"
+      },
+      {
+        "path": "addon/licenses/supplemental/macos/python-build-standalone/licenses/LICENSE.zlib.txt",
+        "archiveMember": "python/licenses/LICENSE.zlib.txt",
+        "bytes": 995,
+        "sha256": "818922b2620f12801a12bf78e399644a30990e66824abd8ca8ec24d451d6f92c"
+      }
+    ],
+    "recipeNotice": {
+      "path": "addon/licenses/supplemental/macos/python-build-standalone/recipe-LICENSE.txt",
+      "archiveMember": "python-build-standalone-fa506e0858ac9f2cc5b289c137b888a2aa24d1ee/LICENSE",
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "nativeSourceDependencies": [
+      {
+        "sourceId": "pbs-linux-bzip2",
+        "recipeKey": "bzip2",
+        "version": "1.0.8",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-expat",
+        "recipeKey": "expat",
+        "version": "2.9.0",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-libffi",
+        "recipeKey": "libffi",
+        "version": "3.8.0",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-mpdecimal",
+        "recipeKey": "mpdecimal",
+        "version": "4.0.0",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-openssl-3.5",
+        "recipeKey": "openssl-3.5",
+        "version": "3.5.9",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-sqlite",
+        "recipeKey": "sqlite",
+        "version": "3530100",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-uuid",
+        "recipeKey": "uuid",
+        "version": "1.0.3",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-xz",
+        "recipeKey": "xz",
+        "version": "5.8.4",
+        "linkScope": "declared_static_library"
+      },
+      {
+        "sourceId": "pbs-linux-tcl",
+        "recipeKey": "tcl",
+        "version": "9.0.4",
+        "linkScope": "static_stubs_and_original_gui_payload"
+      },
+      {
+        "sourceId": "pbs-linux-tk",
+        "recipeKey": "tk",
+        "version": "9.0.4",
+        "linkScope": "static_stubs_and_original_gui_payload"
+      }
+    ],
+    "systemLinkDeclarations": [
+      {
+        "name": "dl",
+        "system": true
+      },
+      {
+        "framework": true,
+        "name": "CoreFoundation"
+      },
+      {
+        "name": "ncurses",
+        "system": true
+      },
+      {
+        "name": "panel",
+        "system": true
+      },
+      {
+        "name": "pthread",
+        "system": true
+      },
+      {
+        "framework": true,
+        "name": "SystemConfiguration"
+      },
+      {
+        "name": "z",
+        "system": true
+      },
+      {
+        "name": "tcl9.0",
+        "system": true
+      },
+      {
+        "name": "tcl9tk9.0",
+        "system": true
+      },
+      {
+        "name": "edit",
+        "system": true
+      }
+    ],
+    "systemLinkScope": "Apple libSystem/zlib/libedit/ncurses/panel and framework versions are not inferred from Linux recipes. Tcl/Tk dynamic links are marked system in PYTHON.json but originate in this standalone build.",
+    "berkeleyDB": "No Berkeley DB linkage is declared by this macOS full-build metadata.",
+    "appleSDK": {
+      "apple_sdk_canonical_name": "macosx15.0",
+      "apple_sdk_platform": "macosx",
+      "apple_sdk_version": "15.0",
+      "apple_sdk_deployment_target": "11.0"
+    },
+    "crtFeatures": [
+      "libSystem"
+    ],
+    "libpythonLinkMode": "shared",
+    "interpreterLinkScope": "Original CONFIG_ARGS includes --enable-static-libpython-for-interpreter as well as --enable-shared; a shared-libpython label alone does not establish an interpreter dylib requirement.",
+    "originalConfig": {
+      "CONFIG_ARGS": "'--build=aarch64-apple-darwin' '--host=aarch64-apple-darwin' '--prefix=/install' '--with-openssl=/tmp/tmpovtlqzoq/tools/deps' '--with-system-expat' '--without-ensurepip' '--with-system-libmpdec' 'MODULE_BUILDTYPE=static' '--enable-loadable-sqlite-extensions' '--enable-static-libpython-for-interpreter' '--enable-shared' '--enable-optimizations' '--with-lto=full' '--with-build-python=/tmp/tmpovtlqzoq/tools/host/bin/python3.12' 'ac_cv_lib_intl_textdomain=no' 'ac_cv_func_ptsname_r=no' '--with-dbmliborder=ndbm' 'build_alias=aarch64-apple-darwin' 'host_alias=aarch64-apple-darwin' 'PKG_CONFIG=pkg-config --static --define-prefix' 'PKG_CONFIG_PATH=/tmp/tmpovtlqzoq/tools/deps/share/pkgconfig:/tmp/tmpovtlqzoq/tools/deps/lib/pkgconfig' 'CC=clang' 'CFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix   -fPIC    -Werror=unguarded-availability-new' 'LDFLAGS=-arch arm64 -mmacosx-version-min=11.0   -Wl,-headerpad,40' 'CPPFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix   -fPIC    -Werror=unguarded-availability-new' 'PROFILE_TASK=-m test --pgo -j 12' 'BOLT_COMMON_FLAGS=' 'BOLT_APPLY_FLAGS='",
+      "CC": "clang",
+      "CXX": "clang++",
+      "CFLAGS": "-fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -g -O3 -Wall -O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix   -fPIC    ",
+      "LDFLAGS": "-arch arm64 -mmacosx-version-min=11.0   -Wl,-headerpad,40",
+      "MACOSX_DEPLOYMENT_TARGET": "11.0"
+    },
+    "upstreamInterpreter": {
+      "path": "python/bin/python3.12",
+      "bytes": 18134832,
+      "sha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787"
+    },
+    "upstreamNativeFiles": [
+      {
+        "path": "python/bin/python3.12",
+        "bytes": 18134832,
+        "sha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787"
+      },
+      {
+        "path": "python/lib/itcl4.3.8/libitcl4.3.8.dylib",
+        "bytes": 299856,
+        "sha256": "153c74a4ee0eeef1ca2b841731a49d4ac43e97d62429e00a4fa319f7b7428e00"
+      },
+      {
+        "path": "python/lib/itcl4.3.8/libtcl9itcl4.3.8.dylib",
+        "bytes": 300224,
+        "sha256": "0f153872f271178064cb3045c14363497fe61c74c3a05432508dc08ef7558634"
+      },
+      {
+        "path": "python/lib/libpython3.12.dylib",
+        "bytes": 18134672,
+        "sha256": "f67c069bb9323a3ee98ef17add05b2905ac8c8167a73749ebe5c6b0b46104801"
+      },
+      {
+        "path": "python/lib/libtcl9.0.dylib",
+        "bytes": 2040608,
+        "sha256": "1bbcd09f4915deb7b8c5fd093d183f5fbbeee1c2394e0f5b6a2aa6eafcf792b6"
+      },
+      {
+        "path": "python/lib/libtcl9tk9.0.dylib",
+        "bytes": 1843888,
+        "sha256": "70e957729684dee04299d1b6bbb46e495595036e8f67b75757600642cbf3275a"
+      },
+      {
+        "path": "python/lib/python3.12/lib-dynload/_crypt.cpython-312-darwin.so",
+        "bytes": 50720,
+        "sha256": "faf0f865430482bd74d6199f549082d0a8fe3c1eedf9b5e3cadfc56fc50602df"
+      },
+      {
+        "path": "python/lib/python3.12/lib-dynload/_dbm.cpython-312-darwin.so",
+        "bytes": 53952,
+        "sha256": "429bd11cab632d1e433da8c93bd1ae9e484e824863f04dd65831cb71a504b0c6"
+      },
+      {
+        "path": "python/lib/python3.12/lib-dynload/_tkinter.cpython-312-darwin.so",
+        "bytes": 100096,
+        "sha256": "9e49b795b2044d8b017d4a7fa91ecba0109935b7be186ecb96cdfbe0896b085d"
+      },
+      {
+        "path": "python/lib/thread3.0.6/libtcl9thread3.0.6.dylib",
+        "bytes": 138768,
+        "sha256": "54f67ba09fe80d48c9ec393aa0e350d2656e0bfe71d52330f95a7e5c62e26bc2"
+      },
+      {
+        "path": "python/lib/thread3.0.6/libthread3.0.6.dylib",
+        "bytes": 138768,
+        "sha256": "a13afa50ed855fb2aca31ba70e846b4ac5a1dbe473cd19c6f3693b870290ff8d"
+      }
+    ],
+    "upstreamNativeScope": "Every interpreter native file actually shipped matches the verified original stripped archive. Unshipped GUI/libpython payloads are not asserted as shipped.",
+    "candidateNativeFiles": [
+      {
+        "path": "python/bin/python3.12",
+        "bytes": 18134832,
+        "sha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787"
+      },
+      {
+        "path": "python/lib/python3.12/lib-dynload/_crypt.cpython-312-darwin.so",
+        "bytes": 50720,
+        "sha256": "faf0f865430482bd74d6199f549082d0a8fe3c1eedf9b5e3cadfc56fc50602df"
+      },
+      {
+        "path": "python/lib/python3.12/lib-dynload/_dbm.cpython-312-darwin.so",
+        "bytes": 53952,
+        "sha256": "429bd11cab632d1e433da8c93bd1ae9e484e824863f04dd65831cb71a504b0c6"
+      },
+      {
+        "path": "python/lib/python3.12/lib-dynload/_tkinter.cpython-312-darwin.so",
+        "bytes": 100096,
+        "sha256": "9e49b795b2044d8b017d4a7fa91ecba0109935b7be186ecb96cdfbe0896b085d"
+      }
+    ],
+    "candidateBuildIdentity": {
+      "version": "3.12.16 (main, Oct 26 2026, 13:59:40) [Clang 23.1.3 ]",
+      "basePrefix": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none",
+      "executable": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/bin/python3.12",
+      "executableSha256": "7a427de7a538c033f821bae69d18dba1fcf01e1947f8fdfece0d9654f680a787",
+      "executableBytes": 18134832,
+      "architecture": "arm64",
+      "pythonAbi": "cpython-312-darwin",
+      "build": [
+        "main",
+        "Oct 26 2026 13:59:40"
+      ],
+      "compiler": "Clang 23.1.3 ",
+      "configArgs": "'--build=aarch64-apple-darwin' '--host=aarch64-apple-darwin' '--prefix=/install' '--with-openssl=/tmp/tmpovtlqzoq/tools/deps' '--with-system-expat' '--without-ensurepip' '--with-system-libmpdec' 'MODULE_BUILDTYPE=static' '--enable-loadable-sqlite-extensions' '--enable-static-libpython-for-interpreter' '--enable-shared' '--enable-optimizations' '--with-lto=full' '--with-build-python=/tmp/tmpovtlqzoq/tools/host/bin/python3.12' 'ac_cv_lib_intl_textdomain=no' 'ac_cv_func_ptsname_r=no' '--with-dbmliborder=ndbm' 'build_alias=aarch64-apple-darwin' 'host_alias=aarch64-apple-darwin' 'PKG_CONFIG=pkg-config --static --define-prefix' 'PKG_CONFIG_PATH=/tmp/tmpovtlqzoq/tools/deps/share/pkgconfig:/tmp/tmpovtlqzoq/tools/deps/lib/pkgconfig' 'CC=clang' 'CFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Werror=unguarded-availability-new' 'LDFLAGS=-arch arm64 -mmacosx-version-min=11.0 -Wl,-headerpad,40' 'CPPFLAGS=-O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Werror=unguarded-availability-new' 'PROFILE_TASK=-m test --pgo -j 12' 'BOLT_COMMON_FLAGS=' 'BOLT_APPLY_FLAGS='",
+      "uv": "uv 0.13.7 (316c827e0 2026-11-03 aarch64-apple-darwin)",
+      "files": [
+        {
+          "sourcePath": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/include/python3.12/pyconfig.h",
+          "file": "cpython-0-pyconfig.h",
+          "sha256": "19f9e6177c78b4415d47f6cbad309cdb0c6f3a933fcb7fab9be6bc11cca1873a"
+        },
+        {
+          "sourcePath": "/Users/runner/work/PaperBridge-zotero-plugin/PaperBridge-zotero-plugin/.tools/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/config-3.12-darwin/Makefile",
+          "file": "cpython-1-Makefile",
+          "sha256": "90c7608547e2bcd1326c20135ab96482810c80bb583ad021d4f3eb5d005e6d27"
+        }
+      ],
+      "uvDownloadCatalog": [
+        {
+          "key": "cpython-3.12.16-macos-aarch64-none",
+          "version": "3.12.16",
+          "version_parts": {
+            "major": 3,
+            "minor": 12,
+            "patch": 16
+          },
+          "path": null,
+          "symlink": null,
+          "url": "https://releases.astral.sh/github/python-build-standalone/releases/download/20261026/cpython-3.12.16%2B20261026-aarch64-apple-darwin-install_only_stripped.tar.gz",
+          "os": "macos",
+          "variant": "default",
+          "implementation": "cpython",
+          "arch": "aarch64",
+          "libc": "none"
+        }
+      ]
+    },
+    "candidateBindingStatus": "all_shipped_interpreter_native_bytes_match_verified_install_archive",
+    "configurationBinding": {
+      "status": "actual_native_makefile_and_pyconfig_byte_match_verified_install_archive",
+      "files": [
+        {
+          "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-0-pyconfig.h",
+          "bytes": 56108,
+          "sha256": "19f9e6177c78b4415d47f6cbad309cdb0c6f3a933fcb7fab9be6bc11cca1873a",
+          "originalArtifactPath": "candidate-native/cpython-0-pyconfig.h"
+        },
+        {
+          "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-1-Makefile",
+          "bytes": 182160,
+          "sha256": "90c7608547e2bcd1326c20135ab96482810c80bb583ad021d4f3eb5d005e6d27",
+          "originalArtifactPath": "candidate-native/cpython-1-Makefile"
+        }
+      ],
+      "fullMetadataFlagFormatting": "Original full JSON and installed sysconfig CONFIG_ARGS differ only in whitespace within flags; both original values are retained."
+    }
+  },
+  "opencv": {
+    "sourceId": "opencv-linux",
+    "version": "4.12.0",
+    "sourceArchiveSha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
+    "sourceNotice": {
+      "path": "addon/licenses/supplemental/macos/opencv/LICENSE",
+      "archiveMember": "opencv-4.12.0/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "buildStatus": "actual_native_build_inputs_and_staged_extension_verified",
+    "noticeScope": "Actual codec/SoftFloat notices plus original Carotene/Tegra-HAL BSD blocks and reported FlatBuffers source license; the pinned archive supplies full source files.",
+    "actualBuildProvenance": {
+      "version": "4.12.0",
+      "platform": "macos-arm64",
+      "architecture": "arm64",
+      "modules": [
+        "core",
+        "imgproc",
+        "imgcodecs",
+        "python3"
+      ],
+      "sourceArchiveUrl": "https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.12.0",
+      "sourceArchiveSha256": "44c106d5bb47efec04e531fd93008b3fcd1d27138985c5baf4eafac0e1ec9e9d",
+      "sourceArchiveBytes": 95254890,
+      "python": "3.12.16",
+      "pythonAbi": "cpython-312-darwin",
+      "numpy": "2.5.4",
+      "cmake": "4.4.4",
+      "buildType": "MinSizeRel",
+      "deploymentTarget": "13.0",
+      "buildMacOS": "26.7.2",
+      "extensionPath": "cv2/python-3.12/cv2.cpython-312-darwin.so",
+      "extensionSha256": "b2f7e814e872988ac73da26e0b8e3065009fb45e5a89404de8fff457cd4a4ce7",
+      "extensionBytes": 7424248,
+      "cmakeCacheSha256": "38cfdf8d3d79a7701def5fced77a5b93c5a8e9a63098142070a2a00ae0815bef",
+      "buildInformationSha256": "b53d53829194169e49686322c6b5e527d86f5a0e671cf2379e7c87fa02ddaa7a"
+    },
+    "stagedExtension": {
+      "path": "python/lib/python3.12/site-packages/cv2/python-3.12/cv2.cpython-312-darwin.so",
+      "bytes": 7399184,
+      "sha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530"
+    },
+    "runtimeMetadataConsistency": {
+      "status": "original_ci_runtime_extension_size_stale_main_hydration_refresh_required",
+      "declaredExtensionBytes": 7424248,
+      "actualExtensionBytes": 7399184,
+      "actualExtensionSha256": "23172671168202f26fbcf3c7d3e965c9d7cadc44ac7864761b5b3d8b71d6b530",
+      "scope": "Refresh metadata only during main-task hydration; keep actual native bytes unchanged."
+    },
+    "additionalNotices": [
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/COPYRIGHT-OpenCV.txt",
+        "originalXPIPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cv2/COPYRIGHT-OpenCV.txt",
+        "bytes": 733,
+        "sha256": "bba849c98da85a2b27b86113284a90812c959b1c1fc4ed67de9355475d1e6831",
+        "scope": "Original actual-candidate notice, retained byte-for-byte."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/NOTICE.txt",
+        "originalXPIPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cv2/NOTICE.txt",
+        "bytes": 74,
+        "sha256": "d903a69ab39425283b44e2ea355cbfaf79bcd738b69c2b1c3c700ce80f2d89f9",
+        "scope": "Original actual-candidate notice, retained byte-for-byte."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/README.ijg",
+        "originalXPIPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cv2/licenses/README.ijg",
+        "bytes": 12799,
+        "sha256": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6",
+        "scope": "Original actual-candidate notice, retained byte-for-byte."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/libjpeg-turbo.txt",
+        "originalXPIPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cv2/licenses/libjpeg-turbo.txt",
+        "bytes": 5620,
+        "sha256": "96f5b328adbb78eeaaec6980d73fd558cb1e4d62560ed615646bc3cf5e532430",
+        "scope": "Original actual-candidate notice, retained byte-for-byte."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/libpng.txt",
+        "originalXPIPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cv2/licenses/libpng.txt",
+        "bytes": 5345,
+        "sha256": "7317e078e2d3b5d7ba5a6159e650945153262b44b76f6700f8e9edb261c5143e",
+        "scope": "Original actual-candidate notice, retained byte-for-byte."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/softfloat-fdlibm.txt",
+        "originalXPIPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cv2/licenses/softfloat-fdlibm.txt",
+        "bytes": 2853,
+        "sha256": "27adefc3d001216b8be5af628e3583575fedc22ea6f41917e3008c8ed8cb8ce2",
+        "scope": "Original actual-candidate notice, retained byte-for-byte."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/zlib.txt",
+        "originalXPIPath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cv2/licenses/zlib.txt",
+        "bytes": 1002,
+        "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
+        "scope": "Original actual-candidate notice, retained byte-for-byte."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/Carotene-BSD.txt",
+        "sourceId": "opencv-linux",
+        "archiveMember": "opencv-4.12.0/hal/carotene/include/carotene/definitions.hpp",
+        "sourceMemberSha256": "70dece7391d5f610fd79b5b950c7a09903f4059d2a5d64f92a006015dd5c4564",
+        "bytes": 2005,
+        "sha256": "90737e4d135451d474c5617217d425b2b3e0895d4ea6e76f88585673ab9fbf26",
+        "scope": "Original publisher license or unedited leading license block. FlatBuffers is a reported build input, not an assertion of compiled usage."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/Tegra-HAL-BSD.txt",
+        "sourceId": "opencv-linux",
+        "archiveMember": "opencv-4.12.0/hal/carotene/hal/tegra_hal.hpp",
+        "sourceMemberSha256": "4798dd11ce253bd6157e9e564db6eb86811b875a1a6d39aec237d61cc91a01e4",
+        "bytes": 2005,
+        "sha256": "c0343ef9c6a2c9e435e58e78806a68f6a6edbf67991f64e922a4694e442baf98",
+        "scope": "Original publisher license or unedited leading license block. FlatBuffers is a reported build input, not an assertion of compiled usage."
+      },
+      {
+        "destination": "addon/licenses/supplemental/macos/opencv/licenses/FlatBuffers-LICENSE.txt",
+        "sourceId": "opencv-linux",
+        "archiveMember": "opencv-4.12.0/3rdparty/flatbuffers/LICENSE.txt",
+        "sourceMemberSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "scope": "Original publisher license or unedited leading license block. FlatBuffers is a reported build input, not an assertion of compiled usage."
+      }
+    ],
+    "versionControlScope": "Build-information f75f138 names the enclosing PaperBridge checkout, not the upstream OpenCV Git revision; source identity is the verified 4.12.0 archive hash."
+  },
+  "candidateBinding": {
+    "status": "actual_native_bytes_and_source_inputs_verified_final_delivery_pending",
+    "cpuInferenceEvidence": {
+      "check": "native_imports_and_cpu_inference",
+      "network": "blocked_for_check",
+      "providers": [
+        "CPUExecutionProvider"
+      ],
+      "inference": {
+        "input": "images",
+        "inputShape": [
+          1,
+          3,
+          1024,
+          1024
+        ],
+        "outputShapes": [
+          [
+            1,
+            300,
+            6
+          ]
+        ],
+        "finite": true
+      },
+      "model": {
+        "path": ".cache/babeldoc/models/doclayout_yolo_docstructbench_imgsz1024.onnx",
+        "bytes": 75324598,
+        "sha256": "fece9af02f618b603ff7921ccec6861d13e7e1f9830e091dfb7e8ad9311e5b21"
+      },
+      "zoteroAcceptance": "not_tested",
+      "translationSemantics": "not_tested"
+    },
+    "remainingDeliveryWork": [
+      "Main-task hydration must refresh OpenCV runtime extensionBytes so existing inventory/source selection recognizes the verified 4.12.0 build.",
+      "Main task rebuilds final bundled/local XPIs with these notices from the same native bytes, then binds/verifies the final corresponding-sources ZIP."
+    ],
+    "unknownBuildDetails": [
+      "ONNX Runtime source revision 6af1a93 was not retrievable; exact native source/build closure remains unknown.",
+      "Tiktoken compiled transitive versions, Rust compiler versions and unreported prebuilt-wheel compiler/optional-link details remain unknown."
+    ],
+    "scope": "No source-ZIP check against the pre-notice CI XPI or local native execution is performed. CI CPU inference is retained evidence, not Zotero acceptance. Unknown build details are not generic gates."
+  },
+  "nativeCandidateOrigin": {
+    "runId": 44775827555,
+    "sourceCommit": "f75f1388083f4701f1505664a5720a2358e147a5",
+    "platform": "macos-arm64",
+    "buildInputsArtifactId": 14650048375,
+    "buildInputsArtifactZipSha256": "7d5df0697a5016f0abc5b31267ed3dd3fe3eabfcbfe881839c16e97c37760ed0",
+    "bundledArtifactId": 14649049315,
+    "bundledArtifactZipSha256": "fb5c394cc90688ad0ff840997d62d707363cbe541af7a1b87752c96807513007",
+    "artifactZipHashStatus": "user_verified_github_artifact_digest",
+    "xpi": {
+      "name": "paperbridge-0.4.3-macos-arm64.xpi",
+      "bytes": 182068982,
+      "sha256": "b9fa35646fe0c367ec1a29e7cc49c2b4500440565f776db88fa4653a26f2e7e3"
+    },
+    "xpiHashStatus": "locally_recomputed_and_inventory_matched"
+  },
+  "nativeBuildInputs": [
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-stage.json",
+      "bytes": 12510,
+      "sha256": "ee14497925853d0773edbeef996802a701c44cb23c970d5cba4a9e4b0441aa37",
+      "originalArtifactPath": "candidate-stage.json"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/CMakeCache.txt",
+      "bytes": 160290,
+      "sha256": "38cfdf8d3d79a7701def5fced77a5b93c5a8e9a63098142070a2a00ae0815bef",
+      "originalArtifactPath": "candidate-native/CMakeCache.txt"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-0-pyconfig.h",
+      "bytes": 56108,
+      "sha256": "19f9e6177c78b4415d47f6cbad309cdb0c6f3a933fcb7fab9be6bc11cca1873a",
+      "originalArtifactPath": "candidate-native/cpython-0-pyconfig.h"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-1-Makefile",
+      "bytes": 182160,
+      "sha256": "90c7608547e2bcd1326c20135ab96482810c80bb583ad021d4f3eb5d005e6d27",
+      "originalArtifactPath": "candidate-native/cpython-1-Makefile"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/cpython-build.json",
+      "bytes": 3153,
+      "sha256": "b0456752c34b2d043ef4fcfaede90c35ca2e874b0b40c10e52a21ab6406aeeff",
+      "originalArtifactPath": "candidate-native/cpython-build.json"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-build-information.txt",
+      "bytes": 5823,
+      "sha256": "b53d53829194169e49686322c6b5e527d86f5a0e671cf2379e7c87fa02ddaa7a",
+      "originalArtifactPath": "candidate-native/opencv-build-information.txt"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-build.json",
+      "bytes": 931,
+      "sha256": "888289309853b3a6734a92ce3fe46cb27e8b20445304c8cf615ca1fd3443c344",
+      "originalArtifactPath": "candidate-native/opencv-build.json"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-config-3.12.py",
+      "bytes": 188,
+      "sha256": "41adbf7284b0ea2954c93d681ad84f931b2759e72f6bb56459cb163633cbe284",
+      "originalArtifactPath": "candidate-native/opencv-config-3.12.py"
+    },
+    {
+      "path": "addon/licenses/supplemental/macos/build-inputs/native-macos03/candidate-native/opencv-config.py",
+      "bytes": 169,
+      "sha256": "b41ca86d89cac01c3c27e6872e3f709a3c914ea128997a64c715d8a15ef8c3fb",
+      "originalArtifactPath": "candidate-native/opencv-config.py"
+    }
+  ],
+  "publisherRtreeBuildRecipe": {
+    "path": "addon/licenses/supplemental/macos/build-inputs/rtree-install_libspatialindex.sh",
+    "bytes": 1645,
+    "sha256": "402fd3e7db6f2cc47dc280d1855d7adec0adaafd433295a4d3685a5605f6366a",
+    "url": "https://raw.githubusercontent.com/Toblerity/rtree/1.4.1/scripts/install_libspatialindex.sh"
+  },
+  "nativeWheelEvidence": {
+    "path": "addon/licenses/supplemental/macos/native-wheels.json",
+    "bytes": 174802,
+    "sha256": "f796a411a9c95c988504e44ab22d7f0a2546db6d4f42b2b3c8116c28596d4bf0"
+  },
+  "nativeVersionBannerEvidence": [
+    {
+      "package": "cryptography",
+      "nativePath": "runtime/macos-arm64/python/lib/python3.12/site-packages/cryptography/hazmat/bindings/_rust.abi3.so",
+      "sha256": "bf1f68c3e6d900eddd1fdcc28f0a50a39a300716e4ca99dbcd155fce9bec3f2e",
+      "embeddedPublicBuildBanners": [
+        "OpenSSL 4.0.3 29 Sep 2026"
+      ],
+      "scope": "Stored public version/build strings only; no native API execution or compiler reconstruction."
+    },
+    {
+      "package": "onnxruntime",
+      "nativePath": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime/capi/libonnxruntime.1.31.1.dylib",
+      "sha256": "d586cbe89effc085a09d3341b3cfbd5c322517f9d397aeb20814af21433f2b36",
+      "embeddedPublicBuildBanners": [
+        "ORT Build Info: git-branch=HEAD, git-commit-id=6af1a93, fp8-kv-cache=1, build type=Release",
+        "git-commit-id=6af1a93"
+      ],
+      "scope": "Stored public version/build strings only; no native API execution or compiler reconstruction."
+    },
+    {
+      "package": "onnxruntime",
+      "nativePath": "runtime/macos-arm64/python/lib/python3.12/site-packages/onnxruntime/capi/onnxruntime_pybind11_state.so",
+      "sha256": "b9609cc856ff105373be67cda2eb2f9468a2562499e2184988a3aa76e2d867e9",
+      "embeddedPublicBuildBanners": [
+        "ORT Build Info: git-branch=HEAD, git-commit-id=6af1a93, fp8-kv-cache=1, build type=Release",
+        "git-commit-id=6af1a93"
+      ],
+      "scope": "Stored public version/build strings only; no native API execution or compiler reconstruction."
+    }
+  ]
+}
