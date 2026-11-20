@@ -451,6 +451,9 @@ var PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE = (async () => {
     }, "Production settings window did not open");
     ownedWindows.add(window);
     await painted(window);
+    // Shared settings nest the runtime controls inside the support disclosure.
+    const support = window.document.getElementById("support-settings");
+    if (support && !support.open) await nativeClick(support.querySelector("summary"));
     await until(function ready() { return window.document.getElementById("runtime-terms-status")?.textContent; }, "Settings terms status did not initialize");
     check(!window.document.getElementById("runtime-terms").hidden, "Windows production settings expose the runtime terms controls");
     return window;
