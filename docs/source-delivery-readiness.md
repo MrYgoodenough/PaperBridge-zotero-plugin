@@ -36,6 +36,10 @@ selected XPI; count alone is not coverage.
   software sources, including executable modules with its normal-OS-components exception.
   Retain CPython/standalone recipes, linked-library sources and modifications.
   Unused functionality is not an exemption; deliver full sources, not an unspecified offer.
+  The current Linux bundled `_dbm` source scope is covered; original build metadata
+  identifies no distributed DB interpreter component in the other five candidates.
+  Recheck actual declarations/bytes on dependency changes:
+  [dependency source scope](dependency-source-scope.md).
 - Provide applicable AGPL section 13 source access to users of a modified network
   service. Loopback/private operation does not automatically waive obligations.
 
@@ -131,6 +135,12 @@ reserved-name review, not filename/header-based permission.
 proof of missing obligations**. Resolve identified source/input/notice omissions.
 Compiler options, optional Rust linkage/tiktoken locks, SBOM or bit-identical rebuild
 evidence gaps are not extra gates by themselves.
+
+The [current component assessment](dependency-source-scope.md) closes the identified
+Linux bundled DB/accompanying source scope. It identifies a specific ORT 1.31.1
+native-source/build-input gap under the actual in-process AGPL integration; that
+gap must be closed before publishing the current six-package distribution. Verified
+archive/file integrity does not close an archive that is absent from the delivery.
 
 Rebind after source/doc or XPI changes. With authorization, publish the source ZIP
 beside exact XPIs at the same download location, without extra source

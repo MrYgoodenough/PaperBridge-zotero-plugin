@@ -1,15 +1,16 @@
 <!-- License scope, exact-byte source delivery and original native notices. -->
 # Licensing and native attribution
 
-Scope: **0.3.7 Linux/Windows bundled + local-Python**; **AGPLv3** project,
+Scope: unpublished **0.4.3 Linux/Windows/macOS bundled + local-Python**; **AGPLv3** project,
 BabelDOC **0.6.4**, PyMuPDF **1.26.7**, MuPDF **1.26.12** baseline. This is
-**not legal clearance** or current build/native/publication acceptance. No macOS
-integration/replacement, engine migration or native reverse engineering.
+**not legal clearance** or publication acceptance. Preserve frozen 0.3.7 and
+independent macOS 0.4.2; no engine migration or native reverse engineering.
 
 ## Evidence entry points
 
-- [Source manifest](../addon/licenses/source-manifest.json): **303 pinned archives**,
-  hashes/sizes, member probes, native artifacts and **four Linux build inputs**.
+- [Source manifest](../addon/licenses/source-manifest.json): **319 pinned archives**,
+  hashes/sizes, member probes, native artifacts and **15 build inputs**, retaining
+  the original Linux/Windows 303 archive identities and four Linux inputs.
   Counts/labels are not source coverage.
 - [Provenance](../addon/licenses/provenance.json) records component associations;
   [public-source evidence](../addon/licenses/supplemental/public-source-evidence.json)
@@ -35,12 +36,18 @@ not identify delivered bytes.
   pymupdf4llm and Levenshtein, populated MuPDF third-party/font trees and vendored
   RapidFuzz C++ sources/notices. PyMuPDF's dual-license label proves neither a
   commercial license nor combined-work source sufficiency.
+  The actual in-process ORT 1.31.1 dependency is included in the current AGPL
+  corresponding-source assessment; its native-source/build-input gap remains a
+  release blocker, distinct from MIT notice retention: [dependency source scope](dependency-source-scope.md).
 - [Berkeley DB 6.0.19 clause 3](../addon/licenses/supplemental/python-build-standalone/linux/LICENSE.bdb.txt)
   requires access information for complete sources of DB and accompanying software
   using it, under its availability/redistributability conditions. Executable sources
   include all contained modules, with its normal-OS-components exception. Retain
   CPython/standalone recipes, selected linked-library sources and modifications;
   unused DB functionality is not an exemption.
+  The current audited DB/accompanying scope is covered for Linux bundled `_dbm`;
+  no distributed DB interpreter component is identified in the other five packages:
+  [dependency source scope](dependency-source-scope.md).
 - Provide applicable **AGPL section 13** source access to users of a modified
   network service. Loopback/private operation is not an automatic waiver.
 
@@ -67,12 +74,12 @@ hashes/sizes using originals or unchanged
 
 [package_inventory.py](../scripts/package_inventory.py) records native hashes/owners;
 [package_sources.py](../scripts/package_sources.py) generates the source ZIP/index.
-Bind four platform/mode pairs to **finished XPI SHA256**, not labels/prior acceptance.
+Bind six platform/mode pairs to **finished XPI SHA256**, not labels/prior acceptance.
 Match exact addon/backend membership/bytes; only build-time manifest
 `update_url`/JSON serialization is exempt.
 
 Use project `.venv` Python and the pinned cache via the
-[source-generation commands](source-delivery-readiness.md#generate-against-the-frozen-four-xpis),
+[source-generation commands](source-delivery-readiness.md#generate-against-completed-candidate-xpis),
 then [verify the handoff](source-delivery-readiness.md#verify-the-complete-handoff),
 including the source ZIP's internal `bundle-manifest.json` and local checksum.
 Keep external checksums/inventories/manifests local, not Release assets. Retain original archives,
