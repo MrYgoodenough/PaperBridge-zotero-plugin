@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
 # Run real backend and synthetic annotation/rendering suites in an official, isolated macOS Zotero.
 set -euo pipefail
-# Resolve only this checkout; neither /Applications nor daily profiles are used.
+# Resolve this checkout and use only disposable profiles.
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Optional explicit candidates otherwise use the workflow's standard dist names.
-bundled_xpi=""; local_xpi=""
+bundled_xpi=""; local_xpi=""; zotero_app=""; baseline_xpi=""
 
 # Describe the two already-built package inputs without starting native tools.
 usage() {
-  printf 'Usage: bash %s [--bundled-xpi PATH] [--local-xpi PATH]\n' "$0"
+  printf 'Usage: bash %s [--bundled-xpi PATH] [--local-xpi PATH] [--zotero-app PATH] [--baseline-xpi PATH]\n' "$0"
 }
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --help|-h) usage; exit 0 ;;
-    --bundled-xpi|--local-xpi)
+    --bundled-xpi|--local-xpi|--zotero-app|--baseline-xpi)
       [[ $# -ge 2 && "$2" != --* ]] || { usage >&2; exit 2; }
-      if [[ "$1" == --bundled-xpi ]]; then bundled_xpi="$2"; else local_xpi="$2"; fi
+      case "$1" in
+        --bundled-xpi) bundled_xpi="$2" ;;
+        --local-xpi) local_xpi="$2" ;;
+        --zotero-app) zotero_app="$2" ;;
+        --baseline-xpi) baseline_xpi="$2" ;;
+      esac
       shift 2 ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -26,13 +31,13 @@ for name in PYTHONPATH PYTHONHOME ${!LD_@} ${!DYLD_@}; do unset "$name"; done
 # Both preparation and the local variant use this exact project interpreter.
 python="$root/.venv/bin/python"
 [[ -x "$python" ]] || { echo 'Project .venv/bin/python is unavailable.' >&2; exit 1; }
-# Only native acceptance evidence and a private official client installation are created.
+# Keep receipts and any downloaded client inside this checkout.
 artifact="$root/dist/candidate-native-zotero"
 mkdir -p "$artifact" "$root/.tools"
 tools="$(mktemp -d "$root/.tools/zotero-native-macos.XXXXXX")"
 # Detach only this unique mount, never force-unmount or alter an application signature.
-trap 'hdiutil detach "$tools/mount" >> "$artifact/install-${tools##*/}.log" 2>&1 || true' EXIT
-"$python" -I -B - "$root" "$tools" "$bundled_xpi" "$local_xpi" <<'PY'
+trap 'if [[ -d "$tools/mount" ]]; then hdiutil detach "$tools/mount" >> "$artifact/install-${tools##*/}.log" 2>&1 || true; fi' EXIT
+"$python" -I -B - "$root" "$tools" "$bundled_xpi" "$local_xpi" "$zotero_app" "$baseline_xpi" <<'PY'
 """Retain actual native results and normal process exits, including explicit failures."""
 import hashlib
 import json
@@ -76,13 +81,15 @@ def logged(command, path):
 
 
 def configure_gui(profile):
-    """Apply hosted-runner rendering and update preferences only to this disposable profile."""
+    """Keep standalone checks isolated and use software rendering on the hosted runner."""
     with (profile / "user.js").open("a", encoding="utf-8") as prefs:
-        for key in ("extensions.zotero.firstRun2", "app.update.enabled", "extensions.update.enabled"):
+        for key in ("extensions.zotero.firstRun2", "extensions.zotero.sync.autoSync", "app.update.enabled",
+                    "extensions.update.enabled"):
             prefs.write(f"\nuser_pref({json.dumps(key)}, false);\n")
         # Hosted Mac VMs use Gecko's supported software renderer, not a simulated GUI.
-        for key in ("gfx.webrender.software", "layers.acceleration.disabled"):
-            prefs.write(f"\nuser_pref({json.dumps(key)}, true);\n")
+        if not supplied_app:
+            for key in ("gfx.webrender.software", "layers.acceleration.disabled"):
+                prefs.write(f"\nuser_pref({json.dumps(key)}, true);\n")
 
 
 def launch_native(profile, prefix, report, result, suite):
@@ -116,7 +123,7 @@ def launch_native(profile, prefix, report, result, suite):
 
 # Missing native reports remain unknown, never fabricated provider/check successes.
 summary = {"ok": False, "status": "error", "sourceCommit": None, "zoteroVersion": None,
-           "officialURL": OFFICIAL_URL, "providerCalls": None, "physicalInput": False, "inputMethod": "Gecko trusted only",
+           "officialURL": None, "providerCalls": None, "physicalInput": False, "inputMethod": "Gecko trusted only",
            "semanticAcceptance": False, "publicUpdateAcceptance": False, "variants": [], "errors": []}
 try:
     if sys.platform != "darwin" or platform.machine() != "arm64":
@@ -130,15 +137,22 @@ try:
             digest = hashlib.file_digest(stream, "sha256").hexdigest()
         summary["variants"].append({"variant": variant, "xpi": str(xpi), "actualSHA256": digest,
                                     "runID": f"{token}-{variant}", "phases": []})
-    install_log = artifact / f"install-{tools.name}.log"
-    dmg, mount, app = tools / "Zotero.dmg", tools / "mount", tools / "Zotero.app"
-    mount.mkdir()
-    logged(["curl", "--fail", "--location", "--max-time", str(INSTALL_TIMEOUT), OFFICIAL_URL, "--output", str(dmg)], install_log)
-    logged(["hdiutil", "attach", "-readonly", "-nobrowse", "-mountpoint", str(mount), str(dmg)], install_log)
-    logged(["ditto", str(mount / "Zotero.app"), str(app)], install_log)
+    supplied_app, baseline_xpi = sys.argv[5:7]
+    if supplied_app:
+        app = Path(supplied_app).resolve(strict=True)
+        if not (app / "Contents/MacOS/zotero").is_file():
+            raise RuntimeError("--zotero-app must point to a Zotero.app bundle")
+    else:
+        summary["officialURL"] = OFFICIAL_URL
+        install_log = artifact / f"install-{tools.name}.log"
+        dmg, mount, app = tools / "Zotero.dmg", tools / "mount", tools / "Zotero.app"
+        mount.mkdir()
+        logged(["curl", "--fail", "--location", "--max-time", str(INSTALL_TIMEOUT), OFFICIAL_URL, "--output", str(dmg)], install_log)
+        logged(["hdiutil", "attach", "-readonly", "-nobrowse", "-mountpoint", str(mount), str(dmg)], install_log)
+        logged(["ditto", str(mount / "Zotero.app"), str(app)], install_log)
     with (app / "Contents/Info.plist").open("rb") as stream:
-        summary["zoteroVersion"] = plistlib.load(stream)["CFBundleShortVersionString"]
-    if summary["zoteroVersion"] != ZOTERO_VERSION:
+        client_version = summary["zoteroVersion"] = plistlib.load(stream)["CFBundleShortVersionString"]
+    if not supplied_app and client_version != ZOTERO_VERSION:
         raise RuntimeError("Downloaded official app has an unexpected Zotero version")
     import pymupdf
     fixture = root / ".runtime/annotations-fixture"
@@ -184,7 +198,7 @@ try:
                             and native.get("ok") is True and native.get("stage") == "complete"
                             and bool(checks) and all(check.get("pass") is True for check in checks)
                             and not native.get("errors") and native.get("providerCalls") == 0
-                            and native.get("nativeUI") is True and native.get("zoteroVersion") == ZOTERO_VERSION)
+                            and native.get("nativeUI") is True and native.get("zoteroVersion") == client_version)
             if not result["pidExited"]:
                 raise RuntimeError(result["error"])
             if not result["ok"]:
@@ -229,13 +243,52 @@ try:
                 summary["errors"].append(f"{run_id} {phase} backend failed; see retained native report")
                 break
             previous_pid = result["nativePID"]
+    upgrade_phases = []
+    if baseline_xpi:
+        summary["inputMethod"] = "Gecko trusted for annotations; programmatic settings controls during upgrade"
+        baseline = Path(baseline_xpi).resolve(strict=True)
+        with baseline.open("rb") as stream:
+            baseline_hash = hashlib.file_digest(stream, "sha256").hexdigest()
+        candidate = summary["variants"][0]
+        summary["upgrade"] = {"baselineSHA256": baseline_hash, "candidateSHA256": candidate["actualSHA256"],
+                              "phases": upgrade_phases}
+        run_id = "mac-upgrade-" + hashlib.sha256(token.encode()).hexdigest()[:12]
+        profile = root / f".runtime/macos-upgrade-{run_id}-profile"
+        previous_pid = None
+        for phase in ("create", "reopen"):
+            prefix = artifact / f"{run_id}-{phase}"
+            result = {"phase": phase, "ok": False, "previousPID": previous_pid, "exitCode": None}
+            upgrade_phases.append(result)
+            command = [str(root / ".venv/bin/python"), "-I", "-B", "scripts/prepare_nonmac_test.py",
+                       "--suite", "macos-upgrade", "--run-id", run_id, "--phase", phase]
+            if phase == "create":
+                command.extend(["--xpi", str(baseline), "--upgrade-xpi", candidate["xpi"]])
+            logged(command, Path(str(prefix) + "-prepare.log"))
+            configure_gui(profile)
+            report = root / f".runtime/macos-upgrade-{run_id}-{phase}.json"
+            native = launch_native(profile, prefix, report, result, "macos-upgrade")
+            checks = native.get("checks", [])
+            result["actualChecks"] = len(checks)
+            result["ok"] = (result["exitCode"] == 0 and result["pidExited"] and result["nativePIDExited"]
+                            and result["nativePID"] != previous_pid and native.get("ok") is True
+                            and bool(checks) and all(check.get("pass") is True for check in checks)
+                            and native.get("providerRequestsBlocked") == 0 and native.get("zoteroVersion") == client_version
+                            and native.get("xpiSha256") == (baseline_hash if phase == "create" else candidate["actualSHA256"]))
+            result["providerCalls"] = 0 if result["ok"] else None
+            if not result["pidExited"]:
+                raise RuntimeError(result["error"])
+            if not result["ok"]:
+                summary["errors"].append(f"{run_id} {phase} upgrade failed; see retained native report")
+                break
+            previous_pid = result["nativePID"]
     phases = [phase for variant in summary["variants"] for phase in variant["phases"]]
     engines = [phase for variant in summary["variants"] for phase in variant["enginePhases"]]
     summary["nativeBackendStartup"] = len(engines) == 4 and all(phase["ok"] for phase in engines)
-    observations = phases + engines
+    observations = phases + engines + upgrade_phases
     summary["providerCalls"] = sum(phase["providerCalls"] for phase in observations) if all(
         phase.get("providerCalls") is not None for phase in observations) else None
     summary["ok"] = (len(phases) == 4 and all(phase["ok"] for phase in phases)
+                     and (not baseline_xpi or len(upgrade_phases) == 2)
                      and summary["nativeBackendStartup"] and not summary["errors"])
     summary["status"] = "ok" if summary["ok"] else "error"
 except Exception as error:
