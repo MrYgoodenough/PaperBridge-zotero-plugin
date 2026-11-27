@@ -31,6 +31,12 @@ def platform_id():
 def prepare(options):
     """Install once; subsequent phases only update the external helper configuration."""
     runtime_terms = options.suite == "runtime-terms"
+    macos_upgrade = options.suite == "macos-upgrade"
+    if macos_upgrade:
+        if platform_id() != "macos-arm64" or options.phase not in {"create", "reopen"}:
+            raise ValueError("The macOS upgrade suite requires native arm64 and create or reopen")
+        if options.phase == "create" and not (options.xpi and options.upgrade_xpi):
+            raise ValueError("The macOS upgrade suite requires explicit baseline and candidate XPIs")
     if runtime_terms and options.phase not in {"create", "reopen"}:
         raise ValueError("Runtime terms support only create and cold reopen")
     if runtime_terms and (options.case_manifest or options.upgrade_xpi or options.paragraph_cache):
@@ -132,6 +138,11 @@ def prepare(options):
                                       for case in cases for page in case["selected_pages_one_based"]])
     if options.suite == "upgrade" and not options.case_manifest:
         raise ValueError("An upgrade test needs an explicit real case manifest")
+    if macos_upgrade:
+        fixture = ROOT / ".runtime" / "annotations-fixture"
+        config.update(sourcePDF=str(fixture / "source.pdf"), translatedPDF=str(fixture / "translated.pdf"))
+        if not create_profile:
+            config["upgradeSha256"] = previous["upgradeSha256"]
     if options.upgrade_xpi:
         with zipfile.ZipFile(options.upgrade_xpi) as archive:
             candidate = json.loads(archive.read("manifest.json"))
@@ -231,6 +242,7 @@ async function runTests() {
   if (scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE) await scope.PAPERBRIDGE_UPGRADE_TEST_PROMISE;
   if (scope.PAPERBRIDGE_ASSETS_TEST_PROMISE) await scope.PAPERBRIDGE_ASSETS_TEST_PROMISE;
   if (scope.PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE) await scope.PAPERBRIDGE_RUNTIME_TERMS_TEST_PROMISE;
+  if (scope.PAPERBRIDGE_MACOS_UPGRADE_TEST_PROMISE) await scope.PAPERBRIDGE_MACOS_UPGRADE_TEST_PROMISE;
 }
 /** Retain actual helper progress before the acceptance script owns its own report. */
 async function helperCheckpoint(stage) {
@@ -245,6 +257,7 @@ async function helperCheckpoint(stage) {
             "upgrade": ("upgrade_packaged.js", "PAPERBRIDGE_UPGRADE_TEST"),
             "assets": ("assets_packaged.js", "PAPERBRIDGE_ASSETS_TEST"),
             "runtime-terms": ("runtime_terms_packaged.js", "PAPERBRIDGE_RUNTIME_TERMS_TEST"),
+            "macos-upgrade": ("macos_upgrade_packaged.js", "PAPERBRIDGE_MACOS_UPGRADE_TEST"),
         }[options.suite]
         for key, value in {"CONFIG_PATH": json.dumps(str(config_path)),
                            "SUPPLEMENT_URI": json.dumps((ROOT / "tests/windows_supplement_packaged.js").as_uri()),
@@ -268,9 +281,12 @@ async function helperCheckpoint(stage) {
         if sys.platform == "win32":
             # Optional Word installation must not block a disposable PaperBridge acceptance profile.
             prefs["extensions.zoteroWinWordIntegration.skipInstallation"] = True
-        if runtime_terms:
-            # This fresh profile must never attempt account sync during the consent exercise.
+        if runtime_terms or macos_upgrade:
+            # These profiles are local-only and do not participate in account sync.
             prefs["extensions.zotero.sync.autoSync"] = False
+        if macos_upgrade:
+            prefs["extensions.update.enabled"] = False
+            prefs["app.update.enabled"] = False
         (profile / "user.js").write_text("\n".join(
             f"user_pref({json.dumps(key)}, {json.dumps(value)});" for key, value in prefs.items()), encoding="utf-8")
     return {"profile": str(profile), "data": str(data), "report": str(report_path), "config": str(config_path)}
@@ -279,7 +295,8 @@ async function helperCheckpoint(stage) {
 def main():
     """Expose explicit artifacts and cold phases without guessing or modifying public feeds."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade", "assets", "runtime-terms"), required=True)
+    parser.add_argument("--suite", choices=("reading", "update", "alignment", "upgrade", "assets", "runtime-terms",
+                                            "macos-upgrade"), required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--phase", choices=("create", "install", "reopen", "receive"), default="create")
     parser.add_argument("--xpi", type=Path, help="Exact baseline/test XPI, installed only during create")

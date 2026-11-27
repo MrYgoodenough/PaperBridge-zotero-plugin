@@ -58,7 +58,7 @@ Windows 包首次启用排版引擎时需同意随包提供的 Microsoft DLL 条
 
 ## 开发与构建
 
-共享基线固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**，本次源码增量不新增生产依赖或升级引擎。项目 Python 位于 `.venv`，Windows 操作使用 PowerShell；不据此宣称 macOS 合流构建已完成。
+共享基线固定 BabelDOC **0.6.4** / PyMuPDF **1.26.7**。项目 Python 位于 `.venv`。Apple Silicon 的原生构建、验包和 0.4.2 文件升级测试见 [macOS arm64 指南](docs/macos-arm64.md)。
 
 Linux：
 
